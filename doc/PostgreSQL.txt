@@ -1,1 +1,2 @@
 1. Connect to psql : docker compose exec postgres psql -U admin -d transcendence_db
+2. In the container to check database/users(Role): \l or \du
