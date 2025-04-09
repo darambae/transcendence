@@ -9,5 +9,5 @@ else
   echo "A superuser already exists."
 fi
 
-#python manage.py collectstatic --noinput
+python manage.py collectstatic --noinput
 exec "$@"
