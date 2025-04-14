@@ -4,7 +4,7 @@ RUN mkdir /django
 WORKDIR /django/
 
 RUN apt-get update && apt-get install -y ca-certificates
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
     build-essential libpq-dev
 RUN pip install --upgrade pip
 
