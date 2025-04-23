@@ -90,53 +90,6 @@ DATABASES = {
     }
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'tcp': {
-            'level': 'INFO',
-            'class': 'tcp_handler.TCPLogHandler',
-            'host': 'logstash',
-            'port': 5044,
-            'formatter': 'jsonFormatter',
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
-            'formatter': 'simpleFormatter',
-        },
-    },
-    'formatters': {
-        'formatters': {
-            'jsonFormatter': {
-                '()': 'django.utils.log.ServerFormatter',
-                'format': '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "module": "%(module)s", "message": "%(message)s", "logger": "%(name)s", "threadName": "%(threadName)s", "process": "%(process)d"}'
-            },
-            'simpleFormatter': {
-                'format': '%(asctime)s %(levelname)s %(module)s - %(message)s'
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['tcp'], # Use the TCP handler
-                'level': 'INFO',
-                'propagate': True,
-            },
-            'your_app_name': {
-                'handlers': ['tcp'], # Use the TCP handler
-                'level': 'DEBUG',
-                'propagate': False,
-            },
-            '': { # Root logger to catch all other logs
-                'handlers': ['tcp'],
-                'level': 'WARNING',
-            },
-        },
-    }
-}
-
-
 #Set custom user model
 AUTH_USER_MODEL = 'user.User'
 # Password validation
