@@ -1,0 +1,9 @@
+http.host: "0.0.0.0"
+xpack.monitoring.enabled: false
+config.reload.automatic: false
+path.logs: /usr/share/logstash/logs
+path.data: /usr/share/logstash/data
+path.config: /usr/share/logstash/config
+pipeline.workers: 2 # Or the number of CPU cores you want to dedicate
+pipeline.batch.size: 125
+pipeline.batch.delay: 50

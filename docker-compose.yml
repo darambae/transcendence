@@ -16,12 +16,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-  django:
+    logging:
+      driver: "json-file"
+      
+  user_service:
     build:
-      context: ./django
+      context: ./backend/user_service
       dockerfile: Dockerfile
-    container_name: django
+    container_name: user_service
     ports:
       - "8000:8000"
     depends_on:
@@ -40,6 +42,7 @@ services:
     env_file:
       - .env
     restart: always
+
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -47,9 +50,46 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      - django
+      - user_service
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    restart: always
+    logging:
+      driver: "json-file"
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.17.5
+    container_name: logstash
+    ports:
+      - "5044:5044"
+    volumes:
+      - .elk/logstash/pipeline:/usr/share/logstash/pipeline
+      - .elk/logstash/config:/usr/share/logstash/config
+      - .elk/logstash/data:/usr/share/logstash/data
+      - .elk/logstash/logs:/usr/share/logstash/logs
+    depends_on:
+      - postgres
+  
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.17.5
+    container_name: filebeat
+    volumes:
+      -.elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - logstash
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.5
+    container_name: elasticsearch
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.5
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+  
 volumes:
   postgres_data:

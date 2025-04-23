@@ -3,3 +3,4 @@ Django
 pip
 psycopg2-binary
 Pillow
+django-tcp-handler
