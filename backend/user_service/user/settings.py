@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import logging
+import logging.handlers
 import sys
 
 load_dotenv()
@@ -96,7 +98,7 @@ LOGGING = {
     'handlers': {
         'tcp': {
             'level': 'INFO',
-            'class': 'tcp_handler.TCPLogHandler',
+            'class': 'logging.handlers.SocketHandler',
             'host': 'logstash',
             'port': 5044,
             'formatter': 'jsonFormatter',
@@ -123,15 +125,15 @@ LOGGING = {
                 'level': 'INFO',
                 'propagate': True,
             },
-            'your_app_name': {
+            'user_service': {
                 'handlers': ['tcp'], # Use the TCP handler
                 'level': 'DEBUG',
                 'propagate': False,
             },
-            '': { # Root logger to catch all other logs
-                'handlers': ['tcp'],
-                'level': 'WARNING',
-            },
+        },
+        'root': {
+            'handlers': ['tcp'], # Use the TCP handler
+            'level': 'DEBUG',
         },
     }
 }

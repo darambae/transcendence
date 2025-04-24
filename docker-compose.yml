@@ -217,7 +217,7 @@ volumes:
         driver: local
 
 networks:
-    default:
-        name: transcendence_network
+    transcendence_network:
         driver: bridge
+       
         
