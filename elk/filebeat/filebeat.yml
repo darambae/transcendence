@@ -25,6 +25,7 @@ filebeat.modules:
     process.include_top_n: 
       by_cpu: 5
       by_memory: 5
+
   - module: nginx
     access:
       enabled: true
@@ -32,6 +33,7 @@ filebeat.modules:
     error:
       enabled: true
       var.paths: ["/var/log/nginx/error.log"]
+      
   - module: postgresql
     log:
       enabled: true
