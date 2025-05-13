@@ -81,16 +81,16 @@ until curl -k -u kibana_system:jJkJ_p7EwHa0k+EgBgNW --silent --fail https://elas
     sleep 10
 done
 echo "Elasticsearch started!"
-curl -u elastic:jJkJ_p7EwHa0k+EgBgNW -X POST "https://elasticsearch:9200/_security/role/logstash_editor" -H 'Content-Type: application/json' -k -d'
-{
+curl -u elastic:jJkJ_p7EwHa0k+EgBgNW -X POST "https://elasticsearch:9200/_security/role/logstash_editor" -H 'Content-Type: application/json' -k -d '{
     "cluster": ["monitor", "manage_index_templates"],
     "indices": [
         {
         "names": ["*"],
         "privileges": ["read", "write", "create", "create_index"]
         }
-    ],
+    ]
 }'
+
 echo "Editor role created!"
 echo "Resetting password for the logstash_internal built-in user..."
 gosu elasticsearch bin/elasticsearch-users useradd logstash_internal -p jJkJ_p7EwHa0k+EgBgNW -r logstash_editor
