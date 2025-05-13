@@ -1,0 +1,11 @@
+server.host: "0.0.0.0" # Or your specific IP
+server.port: 5601
+server.ssl.enabled: true
+server.ssl.keystore.path: /usr/share/kibana/config/certs/kibana.p12
+# server.ssl.keystore.password: jJkJ_p7EwHa0k+EgBgNW
+
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "jJkJ_p7EwHa0k+EgBgNW"
+elasticsearch.hosts: ["https://elasticsearch:9200"]
+elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca/ca.crt"]
+elasticsearch.ssl.verificationMode: certificate

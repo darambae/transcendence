@@ -5,9 +5,11 @@ filebeat.inputs:
     - "postgres"
   fields_under_root: true
 
-output.tcp:
-  host: 'logstash:5044'
-  port: 5044
+output.logstash:
+  host: ["logstash:5044"]
+  ssl.certificate_authorities: ["/usr/share/filebeat/config/certs/ca.crt"]
+  ssl.certificate: "/usr/share/filebeat/config/certs/filebeat.crt"          
+  ssl.key: "/usr/share/filebeat/config/certs/filebeat.key"                  
 
 logging.level: debug
 
@@ -41,7 +43,7 @@ filebeat.modules:
 
 processors:
   - add_docker_metadata:
-    host: "unix:///var/run/docker.sock"
+      host: "unix:///var/run/docker.sock"
   - drop_event:
       when:
         not:

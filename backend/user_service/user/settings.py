@@ -15,7 +15,12 @@ import os
 from dotenv import load_dotenv
 import logging
 import logging.handlers
+import json
+import logstash
 import sys
+from .jsonSocketHandler import JSONSocketHandler
+
+APP_NAME = 'user_service'
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'. -----> BASE_DIR=/user_service/
@@ -30,7 +35,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS","127.0.0.1").split(",")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '172.18.0.3']
 
 
 # Application definition
@@ -92,50 +97,79 @@ DATABASES = {
     }
 }
 
+class AddAppNameFilter(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, 'app_name'):
+            record.app_name = APP_NAME
+        return True
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {
-        'tcp': {
-            'level': 'INFO',
-            'class': 'logging.handlers.SocketHandler',
-            'host': 'logstash',
-            'port': 5044,
-            'formatter': 'jsonFormatter',
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,
-            'formatter': 'simpleFormatter',
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
         },
     },
     'formatters': {
-        'formatters': {
-            'jsonFormatter': {
-                '()': 'django.utils.log.ServerFormatter',
-                'format': '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "module": "%(module)s", "message": "%(message)s", "logger": "%(name)s", "threadName": "%(threadName)s", "process": "%(process)d"}'
-            },
-            'simpleFormatter': {
-                'format': '%(asctime)s %(levelname)s %(module)s - %(message)s'
-            },
+        'json': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
         },
-        'loggers': {
-            'django': {
-                'handlers': ['tcp'], # Use the TCP handler
-                'level': 'INFO',
-                'propagate': True,
-            },
-            'user_service': {
-                'handlers': ['tcp'], # Use the TCP handler
-                'level': 'DEBUG',
-                'propagate': False,
-            },
+    },
+    'handlers': {
+        'tcp': {
+            'level': 'INFO',
+            # 'class': 'logstash.TCPLogstashHandler',
+            'class': 'user.jsonSocketHandler.JSONSocketHandler',
+            'host': 'logstash', 
+            'port': 6000,
+            # 'version': 1,
+            'tag': APP_NAME,
+            'formatter': 'json',
+            'filters': ['add_app_name'],
         },
-        'root': {
-            'handlers': ['tcp'], # Use the TCP handler
+        'console': {  
             'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'json',
+            'filters': ['add_app_name'],
+        }
+    },
+    # 'handlers': {
+    #     'tcp': {
+    #         'level': 'INFO',
+    #         'class': 'user.jsonSocketHandler.JSONSocketHandler',
+    #         # 'class': 'logstash.TCPLogstashHandler',
+    #         'host': 'logstash',
+    #         'port': 6000,
+    #         # 'version': 1,
+    #         # 'message_type': 'django',
+    #         'tag': 'user_service',
+    #         'formatter': 'jsonFormatter',
+    #     },
+    #     'console': {
+    #         'class': 'logging.StreamHandler',
+    #         'stream': sys.stdout,
+    #         'formatter': 'simpleFormatter',
+    #     },
+    # },
+    'loggers': {
+        'django': {
+            'handlers': ['tcp', 'console'], # Use the TCP handler
+            'level': 'INFO',
+            'propagate': True,
         },
-    }
+        'user_service': {
+            'handlers': ['tcp', 'console'], # Use the TCP handler
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+    'root': {
+        'handlers': ['tcp', 'console'], # Use the TCP handler
+        'level': 'DEBUG',
+    },
 }
 
 

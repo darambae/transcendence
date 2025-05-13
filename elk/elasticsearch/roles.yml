@@ -1,0 +1,15 @@
+# roles.yml
+- name: kibana_system
+  cluster:
+    - monitor
+  indices:
+    - names: ["*"]
+      privileges: ["read", "view_index_metadata"]
+
+- name: logstash_writer
+  cluster:
+    - manage_index_templates
+    - monitor
+  indices:
+    - names: ["logstash-*"]
+      privileges: ["write", "create", "create_index", "manage"]

@@ -3,3 +3,5 @@ Django
 pip
 psycopg2-binary
 Pillow
+python-logstash
+python-json-logger
