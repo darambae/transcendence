@@ -4,6 +4,7 @@ RUN mkdir /user_service
 WORKDIR /user_service/
 
 RUN apt-get update && apt-get install -y ca-certificates
+RUN apt-get update && apt-get install -y curl
 RUN apt-get install -y --no-install-recommends \
     build-essential libpq-dev
 RUN pip install --upgrade pip
