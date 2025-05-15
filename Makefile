@@ -7,6 +7,25 @@ PREP_DOCKER_FILE=elk-docker-compose.yml
 PRE_COMPOSE=docker compose -f ${PREP_DOCKER_FILE} -p ${PREP_NAME}
 COMPOSE=docker compose -f ${MAIN_DOCKER_FILE} -p ${NAME}
 
+CA=.elk/setup/certs/ca/
+CA_CRT=$(CA)ca.crt
+CA_KEY=$(CA)ca.key
+
+# Add CA to the system
+add-ca:
+	@sudo true
+	@echo "Adding CA certificate to system trust store..."
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ${CA_CRT}; \
+		echo "CA added to macOS System keychain."; \
+	elif [ "$$(uname)" = "Linux" ]; then \
+		sudo cp ${CA_CRT} /usr/local/share/ca-certificates/ca.crt; \
+		sudo update-ca-certificates; \
+		echo "CA added to Linux trust store."; \
+	else \
+		echo "Automatic CA installation not supported for this OS."; \
+	fi
+
 # Build the ELK stack
 build-elk:
 	@echo "Building ELK stack..."

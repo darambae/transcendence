@@ -2,27 +2,17 @@
 
 set -e
 
-# Generate SSL certificates
-# if [ ! -f /usr/share/elasticsearch/config/certs/cert.pem ]; then
-#     echo "Generating SSL certificates..."
-#     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-#     -keyout /usr/share/elasticsearch/config/certs/private.key \
-#     -out /usr/share/elasticsearch/config/certs/certificate.crt \
-#     -config /usr/share/elasticsearch/config/ssl.conf
-# else
-#     echo "SSL certificates already exist. Skipping generation."
+# Generate CA certificate if it doesn't exist
+# if [ ! -f config/certs/ca/ca.zip ]; then
+#   echo "Creating CA..."
+#   bin/elasticsearch-certutil ca --silent --pem -out "config/certs/ca/ca.zip"
+#   unzip config/certs/ca/ca.zip -d config/certs
 # fi
 
-# Generate CA certificate if it doesn't exist
-if [ ! -f config/certs/ca.zip ]; then
-  echo "Creating CA..."
-  bin/elasticsearch-certutil ca --silent --pem -out "config/certs/ca.zip"
-  unzip config/certs/ca.zip -d config/certs
-fi
 # Create extfile for SAN
 echo "Creating SAN extfile..."
 cat <<EOF > /usr/share/elasticsearch/config/certs/san.ext
-subjectAltName = DNS:transcendence.42.fr, DNS:localhost
+subjectAltName = DNS:transcendence.42.fr, DNS:localhost, IP:127.0.0.1
 EOF
 
 echo "Generating private key and CSR for the server..."

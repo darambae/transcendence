@@ -24,7 +24,7 @@ echo "jJkJ_p7EwHa0k+EgBgNW" | bin/elasticsearch-keystore -E path.config=/usr/sha
 echo "jJkJ_p7EwHa0k+EgBgNW" | bin/elasticsearch-keystore -E path.config=/usr/share/elasticsearch/config add --force xpack.security.transport.ssl.truststore.secure_password --stdin
 echo "jJkJ_p7EwHa0k+EgBgNW" | bin/elasticsearch-keystore -E path.config=/usr/share/elasticsearch/config add --force xpack.security.http.ssl.truststore.secure_password --stdin
 echo "jJkJ_p7EwHa0k+EgBgNW" | bin/elasticsearch-keystore -E path.config=/usr/share/elasticsearch/config add --force xpack.security.http.ssl.keystore.secure_password --stdin
-                                                                                                                                                          
+                                                                                                                                            
 gosu elasticsearch bin/elasticsearch &
 sleep 40
 
