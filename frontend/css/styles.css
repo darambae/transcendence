@@ -88,8 +88,8 @@ nav a:hover {
 
 @font-face {
 	font-family: 'Sankyu'; /* Nom de la police que vous utiliserez dans CSS */
-	src: url('/static/assets/fonts/sankyu/Sankyu.otf') format('opentype'),
-	url('/static/assets/fonts/sankyu/Sankyu.ttf') format('truetype');
+	src: url('/assets/fonts/sankyu/Sankyu.otf') format('opentype'),
+	url('/assets/fonts/sankyu/Sankyu.ttf') format('truetype');
 	font-weight: normal;
 	font-style: normal;
 }

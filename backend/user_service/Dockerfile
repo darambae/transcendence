@@ -19,5 +19,5 @@ COPY . /user_service/
 
 EXPOSE 8010
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["sh", "-c", "daphne -e ssl:8010:privateKey=/certs/private.key:certKey=/certs/fullchain.crt -b 0.0.0.0 user.asgi:application"]
+CMD ["sh", "-c", "daphne -e ssl:8010:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 user.asgi:application"]
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
