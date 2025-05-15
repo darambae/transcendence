@@ -25,8 +25,10 @@ APP_NAME = 'user_service'
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'. -----> BASE_DIR=/user_service/
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+BACKEND_DIR = BASE_DIR.parent
+PROJECT_DIR = BACKEND_DIR.parent
+FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
+print(f"FRONTEND_DIR: {FRONTEND_DIR}")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -66,7 +68,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / 'user/templates',
+            FRONTEND_DIR,
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -214,10 +216,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'user/static'),
-]
+STATIC_ROOT = FRONTEND_DIR
+# STATICFILES_DIRS = [
+#     FRONTEND_DIR, 
+# ]
+
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
