@@ -8,6 +8,8 @@ services:
     container_name: setup
     networks:
         - shared_network
+    env_file:
+      - .env
   logstash:
     build:
       context: ./elk/logstash
@@ -37,7 +39,7 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-  
+    restart: unless-stopped
   # filebeat:
   #   image: docker.elastic.co/beats/filebeat:${ELK_VERSION}
   #   container_name: filebeat

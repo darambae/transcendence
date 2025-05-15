@@ -23,9 +23,9 @@ build:
 no-cache:
 	@echo "Building ELK stack..."
 	@${PRE_COMPOSE} build --no-cache
-	# @echo "Building Transcendence..."
-	# @${COMPOSE} build --no-cache
-	# @echo "Transcendence built successfully."
+	@echo "Building Transcendence..."
+	@${COMPOSE} build --no-cache
+	@echo "Transcendence built successfully."
 
 up-elk:
 	@echo "Building ELK stack..."

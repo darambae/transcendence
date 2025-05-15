@@ -2,6 +2,17 @@
 
 set -e
 
+# Generate SSL certificates
+if [ ! -f /usr/share/elasticsearch/config/certs/cert.pem ]; then
+    echo "Generating SSL certificates..."
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /usr/share/elasticsearch/config/certs/private.key \
+    -out /usr/share/elasticsearch/config/certs/certificate.crt \
+    -config /usr/share/elasticsearch/config/ssl.conf
+else
+    echo "SSL certificates already exist. Skipping generation."
+fi
+
 # Generate CA certificate if it doesn't exist
 if [ ! -f config/certs/ca.zip ]; then
   echo "Creating CA..."
@@ -9,7 +20,12 @@ if [ ! -f config/certs/ca.zip ]; then
   unzip config/certs/ca.zip -d config/certs
 fi
 
-# Generate certificates if they don't exist
+# Combine certificate.crt and ca.crt into fullchain.crt
+echo "Combining certificate.crt and ca.crt into fullchain.crt..."
+cat /usr/share/elasticsearch/config/certs/certificate.crt /usr/share/elasticsearch/config/certs/ca/ca.crt > /usr/share/elasticsearch/config/certs/fullchain.crt
+
+
+# Generate certificates for ELK if they don't exist
 if [ ! -f config/certs/certs.zip ]; then
   echo "Creating certificates..."
   cat <<EOF > config/certs/instances.yml
@@ -25,14 +41,6 @@ instances:
   - name: logstash
     dns:
       - logstash
-      - localhost
-  - name: user_service
-    dns:
-      - user_service
-      - localhost
-  - name: nginx
-    dns:
-      - nginx
       - localhost
 EOF
   bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key
