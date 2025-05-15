@@ -5,3 +5,6 @@ psycopg2-binary
 Pillow
 python-logstash
 python-json-logger
+daphne
+channels
+channels-redis

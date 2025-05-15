@@ -4,8 +4,8 @@ from .models import User
 
 class RegisterForm(UserCreationForm):
     class Meta:
-        model = User  # Use CustomUser here
-        fields = ['username', 'nickname', 'email', 'avatar'] # Removed password1, password2
+        model = User 
+        fields = ['username', 'nickname', 'email', 'avatar']
         widgets = {
             'avatar': forms.FileInput()
         }

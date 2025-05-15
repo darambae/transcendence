@@ -1,22 +1,11 @@
 services:
   postgres:
     image: postgres:latest
-    # user: "999:999"
     ports:
       - "5431:5431"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # - elk_logs:/var/log/postgresql
-      # - ./postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
     container_name: postgres
-    # labels:
-    #     co.elastic.logs/module: "postgresql"
-    # command: >
-    #     bash -c "
-    #     find /var/log/postgresql -writable -exec chown postgres:postgres {};
-    #     chmod -R 755 /var/log/postgresql;
-    #     postgres -c config_file=/etc/postgresql/postgresql.conf;
-    #     "
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -26,11 +15,6 @@ services:
       - .env
     networks:
       - shared_network
-    # logging:
-    #     driver: "json-file"
-    #     options:
-    #         max-size: "10m"
-    #         max-file: "3"
 
   user_service:
     build:
@@ -40,31 +24,17 @@ services:
     # labels:
     #     co.elastic.logs/module: "django"
     ports:
-      - "8000:8000"
+      - "8010:8010"
+    volumes:
+      - certs:/certs
     depends_on:
       postgres:
         condition: service_healthy
-    # environment:
-    #   POSTGRES_USER: ${POSTGRES_USER}
-    #   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    #   POSTGRES_DB: ${POSTGRES_DB}
-    #   POSTGRES_PORT: 5432
-    #   POSTGRES_HOST: postgres
-    #   DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
-    #   DJANGO_SUPERUSER: ${DJANGO_SUPERUSER}
-    #   DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD}
-    #   DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL}
     env_file:
       - .env
     restart: always
     networks:
       - shared_network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
   nginx:
     image: nginx:latest
@@ -74,19 +44,28 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    depends_on:
-      user_service:
-        condition: service_healthy
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      # - elk_logs:/var/log/nginx
+      - ./frontend:/usr/share/nginx/html
       - certs:/etc/nginx/certs
+    command: /bin/bash -c "nginx -g 'daemon off;'"
     restart: always
+    depends_on:
+      - user_service
+    env_file:
+      - .env
     # logging:
     #     driver: "json-file"
     networks:
       - shared_network
-
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - shared_network
+    restart: always
 volumes:
   postgres_data:
     name: postgres_data
