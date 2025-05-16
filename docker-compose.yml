@@ -43,6 +43,8 @@ services:
     ports:
       - "8443:443"
     volumes:
+      - ./frontend:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
       - ./nginx_modsecurity/log:/var/log/modsecurity:rw
     depends_on:
       - user_service
