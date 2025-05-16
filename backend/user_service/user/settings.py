@@ -105,74 +105,58 @@ class AddAppNameFilter(logging.Filter):
             record.app_name = APP_NAME
         return True
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'add_app_name': {
-            '()': AddAppNameFilter,
-        },
-    },
-    'formatters': {
-        'json': {
-            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-            'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-        },
-    },
-    'handlers': {
-        'tcp': {
-            'level': 'INFO',
-            # 'class': 'logstash.TCPLogstashHandler',
-            'class': 'user.jsonSocketHandler.JSONSocketHandler',
-            'host': 'logstash', 
-            'port': 6000,
-            # 'version': 1,
-            'tag': APP_NAME,
-            'formatter': 'json',
-            'filters': ['add_app_name'],
-        },
-        'console': {  
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'json',
-            'filters': ['add_app_name'],
-        }
-    },
-    # 'handlers': {
-    #     'tcp': {
-    #         'level': 'INFO',
-    #         'class': 'user.jsonSocketHandler.JSONSocketHandler',
-    #         # 'class': 'logstash.TCPLogstashHandler',
-    #         'host': 'logstash',
-    #         'port': 6000,
-    #         # 'version': 1,
-    #         # 'message_type': 'django',
-    #         'tag': 'user_service',
-    #         'formatter': 'jsonFormatter',
-    #     },
-    #     'console': {
-    #         'class': 'logging.StreamHandler',
-    #         'stream': sys.stdout,
-    #         'formatter': 'simpleFormatter',
-    #     },
-    # },
-    'loggers': {
-        'django': {
-            'handlers': ['tcp', 'console'], # Use the TCP handler
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'user_service': {
-            'handlers': ['tcp', 'console'], # Use the TCP handler
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-    'root': {
-        'handlers': ['tcp', 'console'], # Use the TCP handler
-        'level': 'DEBUG',
-    },
-}
+# Custom logging configuration for ELK stack
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'filters': {
+#         'add_app_name': {
+#             '()': AddAppNameFilter,
+#         },
+#     },
+#     'formatters': {
+#         'json': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+#         },
+#     },
+#     'handlers': {
+#         'tcp': {
+#             'level': 'INFO',
+#             # 'class': 'logstash.TCPLogstashHandler',
+#             'class': 'user.jsonSocketHandler.JSONSocketHandler',
+#             'host': 'logstash', 
+#             'port': 6000,
+#             # 'version': 1,
+#             'tag': APP_NAME,
+#             'formatter': 'json',
+#             'filters': ['add_app_name'],
+#         },
+#         'console': {  
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'json',
+#             'filters': ['add_app_name'],
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['tcp', 'console'], # Use the TCP handler
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#         'user_service': {
+#             'handlers': ['tcp', 'console'], # Use the TCP handler
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+#     'root': {
+#         'handlers': ['tcp', 'console'], # Use the TCP handler
+#         'level': 'DEBUG',
+#     },
+# }
 
 
 #Set custom user model
