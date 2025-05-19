@@ -50,6 +50,8 @@ services:
       - user_service
     networks:
       - nginx_network
+    env_file:
+      - .env
     restart: always
   
   redis:

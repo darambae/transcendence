@@ -46,17 +46,29 @@ no-cache:
 	@${COMPOSE} build --no-cache
 	@echo "Transcendence built successfully."
 
-up-elk:
-	@echo "Building ELK stack..."
+up-elk: add-ca
+	@echo "Building & starting ELK stack..."
 	@${PRE_COMPOSE} up
 
-up-main:
-	@echo "Building Transcendence..."
+up-main: add-ca
+	@echo "Building & starting Transcendence..."
 	@${COMPOSE} up
 
-up:
-	@echo "Starting ELK stack..."
+up: add-ca
+	@echo "Building and starting ELK stack..."
 	@make up-elk & make up-main 
+
+start-elk:
+	@echo "Starting ELK stack..."
+	@${PRE_COMPOSE} start
+
+start-main:
+	@echo "Starting Transcendence..."
+	@${COMPOSE} start
+
+start:
+	@echo "Starting ELK stack..."
+	@make start-elk & make start-main
 
 down-elk:
 	@echo "Stopping ELK stack..."

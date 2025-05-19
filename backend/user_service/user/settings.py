@@ -15,8 +15,8 @@ import os
 from dotenv import load_dotenv
 import logging
 import logging.handlers
-import json
-import logstash
+from logstash_async.formatter import LogstashFormatter
+from logstash_async.handler import AsynchronousLogstashHandler
 import sys
 from .jsonSocketHandler import JSONSocketHandler
 
@@ -103,10 +103,75 @@ class AddAppNameFilter(logging.Filter):
     def filter(self, record):
         if not hasattr(record, 'app_name'):
             record.app_name = APP_NAME
+        else:
+            record.app_name = "unknown"
         return True
 
 # Custom logging configuration for ELK stack
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
+        },
+    },
+    'formatters': {
+        'json': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+        },
+        'text': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'logging.Formatter',
+        },
+        'logstash': {
+            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'INFO',
+            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+            'host': 'logstash',
+            'port': 6006,
+            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+            'ssl_enable': False,
+            'formatter': 'logstash',
+            'ensure_ascii': True,
+            'filters': ['add_app_name'],
+        },
+        'console': {  
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'text',
+            'filters': ['add_app_name'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['logstash'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'user_service': {
+            'handlers': ['logstash'], 
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'logstash'],
+        'level': 'WARNING',
+    },
+}
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
@@ -120,40 +185,61 @@ class AddAppNameFilter(logging.Filter):
 #             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
 #             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
 #         },
+#         'text': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'logging.Formatter',
+#         },
+#         'logstash': {
+#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+#             'message_type': 'python-logstash',
+#             'fqdn': False, # Fully qualified domain name. Default value: false.
+#             'extra_prefix': 'dev', #
+#             'extra': {
+#                 'application': APP_NAME,
+#                 'project_path': BASE_DIR,
+#                 'environment': 'production'
+#             }
+#         },
 #     },
 #     'handlers': {
-#         'tcp': {
+#         'logstash': {
 #             'level': 'INFO',
 #             # 'class': 'logstash.TCPLogstashHandler',
-#             'class': 'user.jsonSocketHandler.JSONSocketHandler',
-#             'host': 'logstash', 
-#             'port': 6000,
-#             # 'version': 1,
-#             'tag': APP_NAME,
-#             'formatter': 'json',
+#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+#             'host': 'logstash',
+#             'port': 6006,
+#             'database_path': None,
+#             'ssl_enable': False,
+#             'formatter': 'logstash',
+#             'ensure_ascii': True,
 #             'filters': ['add_app_name'],
 #         },
 #         'console': {  
 #             'level': 'DEBUG',
 #             'class': 'logging.StreamHandler',
-#             'formatter': 'json',
+#             'formatter': 'text',
 #             'filters': ['add_app_name'],
 #         }
 #     },
 #     'loggers': {
 #         'django': {
-#             'handlers': ['tcp', 'console'], # Use the TCP handler
+#             'handlers': ['console'],
 #             'level': 'INFO',
 #             'propagate': True,
 #         },
-#         'user_service': {
-#             'handlers': ['tcp', 'console'], # Use the TCP handler
+#         'django.request': {
+#             'handlers': ['logstash'],
 #             'level': 'DEBUG',
 #             'propagate': True,
 #         },
+#         # 'user_service': {
+#         #     'handlers': ['logstash'], 
+#         #     'level': 'DEBUG',
+#         #     'propagate': True,
+#         # },
 #     },
 #     'root': {
-#         'handlers': ['tcp', 'console'], # Use the TCP handler
+#         'handlers': ['console'], # Use the TCP handler
 #         'level': 'DEBUG',
 #     },
 # }
