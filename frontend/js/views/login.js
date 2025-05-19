@@ -1,5 +1,5 @@
 
-export function userController() {
+export function loginController() {
 	const modalContainer = document.getElementById("modal-container");
 	const loginForm = document.getElementById("login-form");
 	const closeBtn = document.getElementById("close-login-form");
