@@ -37,6 +37,18 @@ openssl x509 -req -in /usr/share/elasticsearch/config/certs/server.csr \
 echo "Combining certificate.crt and ca.crt into fullchain.crt..."
 cat /usr/share/elasticsearch/config/certs/server.crt config/certs/ca/ca.crt > /usr/share/elasticsearch/config/certs/fullchain.crt
 
+# echo "Adding CA certificate to system trust store..."
+# if [ "$(uname)" = "Darwin" ]; then
+# 	security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /usr/share/elasticsearch/config/certs/fullchain.crt
+#     echo "CA added to macOS System keychain."
+# elif [ "$(uname)" = "Linux" ]; then
+#     cp /usr/share/elasticsearch/config/certs/fullchain.crt /usr/local/share/ca-certificates/ca.crt
+# 	update-ca-certificates
+#     echo "CA added to Linux trust store."
+# else
+#     echo "Automatic CA installation not supported for this OS."
+# fi
+
 # Generate certificates for ELK if they don't exist
 if [ ! -f config/certs/certs.zip ]; then
   echo "Creating certificates..."

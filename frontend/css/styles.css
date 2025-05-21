@@ -1,4 +1,5 @@
-@import url('./user.css');
+@import url('./login.css');
+@import url('./signup.css');
 
 h1 {
 	display: flex;
@@ -8,12 +9,10 @@ h1 {
 	font-family: 'Sankyu', sans-serif;
 	font-size: 65px;
 	margin-bottom: 10px;
-	padding: 10px; /* Ajoute un espace pour le contour */
+	padding: 10px; 
 	color: black;
-	animation: blink-outline 1s infinite; /* Applique l'animation */
+	animation: blink-outline 1s infinite; /* apply animation */
 }
-
-
 
 html, body {
 	height: 100%;
@@ -31,40 +30,31 @@ main {
 	margin-top: 0;
 }
 
-.vertical-nav {
+.home-menu{
 	display: flex;
 	flex-direction: column;
 	align-items: center; 
 	height: 100vh;
 }
 
-.vertical-nav a {
+.home-menu a {
 	text-decoration: none;
 	color: black;
-	margin: 10px 0; /* espace vertical entre les liens */
+	margin: 10px 0; 
 	font-size: 25px;
-	animation: blink-outline 1s infinite; /* Applique l'animation */
+	animation: blink-outline 1s infinite; /* apply animation */
 }
 
-.vertical-nav a:hover {
+.home-menu a:hover {
 	text-decoration: underline;
 }
 
-.nav-right {
+.connexion {
 	position: absolute;
-	color: black;
+	font-family: 'Sankyu', sans-serif;
+	color: antiquewhite;
 	margin-top: 20px;
 	right: 10px;
-}
-
-nav a {
-	text-decoration: none;
-	/* color: #007bff; */
-	margin: 0 10px;
-}
-
-nav a:hover {
-	text-decoration: underline;
 }
 
 .header-image {
@@ -76,33 +66,33 @@ nav a:hover {
 }
 
 #modal-container {
-	display: none; /* Masqué par défaut */
+	display: none; /* hidden by default */
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+	background-color: rgba(0, 0, 0, 0.5); 
 	z-index: 999;
   }
 
 @font-face {
-	font-family: 'Sankyu'; /* Nom de la police que vous utiliserez dans CSS */
+	font-family: 'Sankyu';
 	src: url('/assets/fonts/sankyu/Sankyu.otf') format('opentype'),
 	url('/assets/fonts/sankyu/Sankyu.ttf') format('truetype');
 	font-weight: normal;
 	font-style: normal;
 }
 
-/* Animation pour le clignotement des contours */
+/* blinking animation */
 @keyframes blink-outline {
 	0% {
-	  text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255); /* Contours lumineux */
+	  text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255); 
 	}
 	50% {
-	  text-shadow: 0 0 5px transparent, 0 0 10px transparent, 0 0 15px transparent; /* Contours invisibles */
+	  text-shadow: 0 0 5px transparent, 0 0 10px transparent, 0 0 15px transparent; 
 	}
 	100% {
-		text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255); /* Contours lumineux */
+		text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255); 
 	}
 }
