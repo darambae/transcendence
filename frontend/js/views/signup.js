@@ -1,5 +1,6 @@
 export async function handleSignupSubmit(event) {
 	event.preventDefault();
+	console.log("here in signup form handling function");
 
 	const form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
@@ -36,8 +37,10 @@ export function signupController() {
 	const modalContainer = document.getElementById("modal-container");
 
 	//close the login form window
-	modalContainer.style.display = "none";
-	loginForm.classList.remove("active");
+	if (loginForm) {
+		modalContainer.style.display = "none";
+		loginForm.classList.remove("active");
+	}
 
 	//password check
 	const passwordInput = document.getElementById("inputPassword");
@@ -79,6 +82,7 @@ export function signupController() {
 
 	const form = document.querySelector("#signup-form form");
 	if (form) {
+		console.log("here 1");
 		form.addEventListener("submit", handleSignupSubmit);
 	}
 }

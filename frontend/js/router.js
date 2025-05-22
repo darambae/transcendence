@@ -22,7 +22,7 @@ export async function navigate() {
 		view = routes[hash];
 	}
 	
-	const content = document.getElementById("content");
+	const content = document.getElementById("main-content");
 	const modalContainer = document.getElementById("modal-container");
 
 	if (!view) {
