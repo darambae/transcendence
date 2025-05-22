@@ -54,6 +54,41 @@ services:
       - .env
     restart: always
   
+  ############### Game import ##################
+  djangopong:
+    build: 
+      context: ./backend/apiApp/
+      dockerfile: ./Dockerfile
+    container_name: djangopong_container
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/apiApp:/app
+    networks:
+      - redispong_network
+      - nginx_network
+
+  aimodule:
+    build :
+      context : ./backend/AI-docker/
+      dockerfile: ./Dockerfile
+    container_name : iaDocker
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./backend/AI-docker:/app
+    networks:
+      - redispong_network
+
+  redispong:
+    image: "redis:latest"
+    ports:
+      - "6380:6379"
+    networks:
+      - redispong_network
+
+########################################
+
   redis:
     image: redis:latest
     container_name: redis
@@ -75,3 +110,6 @@ networks:
   shared_network:
     name: shared_network
     external: true
+    ######## Game network #########
+  redispong_network:
+    driver: bridge
