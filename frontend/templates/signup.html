@@ -1,0 +1,42 @@
+<a href="#home" class="back-home"> back to home page </a>
+<div class="signup-form" id="signup-form">
+	<h2> SIGN IN AND JOIN THE RETRO GAMING EXPERIENCE</h2>
+	<form class="needs-validation">
+		<div class="mb-3">
+			<label for="username" class="form-label">Username</label>
+			<input type="text" class="form-control" id="username" name="username" placeholder="username" required>
+		</div>
+		<div class="mb-3">
+			<label for="mail" class="form-label">Mail</label>
+			<input type="email" class="form-control" id="mail" name="mail" placeholder="mail" required>
+	  	</div>
+		<div class="mb-3">
+			<label for="first name" class="form-label">First name</label>
+			<input type="text" class="form-control" id="first-name" name="firstName" placeholder="first name" required>
+		</div>
+		<div class="mb-3">
+			<label for="last name" class="form-label">Last name</label>
+			<input type="text" class="form-control" id="last-name" name="lastName" placeholder="last name" required>
+		</div>
+	  	<div class="mb-3">
+			<label for="inputPassword" class="form-label">Password</label>
+			<input type="password" class="form-control" id="inputPassword" aria-describedby="passwordHelpBlock" placeholder="password">
+			<div id="passwordHelpBlock" class="form-text">
+  				Your password must contain at least :
+				<ul id="password-rules">
+					<li id="rule-uppercase" class="invalid"> 1 uppercase</li>
+					<li id="rule-number" class="invalid"> 1 number</li>
+					<li id="rule-special-char" class="invalid"> 1 special character</li>
+				</ul>
+			</div>
+		</div>
+		<div class="mb-3">
+			<label for="password-confirmation" class="form-label">Password Confirmation</label>
+			<input type="password" class="form-control" id="password-confirmation" name="password_confirmation" placeholder="password confirmation" required>
+			<div id="passwordConfirmationCheck" class="form-text">
+				input must be the same as password !
+			</div>
+		</div>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+</div>

@@ -1,0 +1,72 @@
+.signup-form {
+	font-family: 'sukoro', sans-serif;
+	color: antiquewhite;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	min-height: 100vh;
+	text-shadow:
+    -1px -1px 0 black,
+     1px -1px 0 black,
+    -1px  1px 0 black,
+     1px  1px 0 black;
+	/* padding-top: 40px; */
+}
+
+.signup-form form {
+	width: 100%;
+	max-width: 400px;
+}
+
+.signup-form button[type="submit"] {
+	display: block;
+	margin: 30px auto 0 auto;
+}
+
+.signup-form .form-text {
+	text-shadow: none;
+	font-size: smaller;
+	font-family: 'arial', sans-serif !important;
+	color: antiquewhite !important;
+}
+
+h2 {
+	font-size: medium;
+	text-align: center;
+	animation: h2-blink-outline 1s infinite;
+}
+
+.back-home {
+	display: block;
+	font-family: 'sukoro';
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.valid {
+	color: rgb(5, 145, 14);
+}
+
+.invalid {
+	color: antiquewhite;
+}
+
+@keyframes h2-blink-outline {
+	0%, 100% {
+	  text-shadow:
+	    -1px -1px 0 black,
+    	1px -1px 0 black,
+    	-1px  1px 0 black,
+     	1px  1px 0 black,
+		0 0 5px rgb(253, 246, 28), 0 0 10px rgb(253, 246, 28), 0 0 15px rgb(253, 246, 28); 
+	}
+	50% {
+		text-shadow: 
+		-1px -1px 0 black,
+   	 	1px -1px 0 black,
+    	-1px  1px 0 black,
+    	1px  1px 0 black,
+		0 0 5px transparent, 0 0 10px transparent, 0 0 15px transparent; 
+	}
+}

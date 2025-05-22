@@ -9,7 +9,7 @@ services:
     networks:
         - shared_network
     env_file:
-      - .env
+      - .env    
   logstash:
     build:
       context: ./elk/logstash

@@ -7,7 +7,7 @@ PREP_DOCKER_FILE=elk-docker-compose.yml
 PRE_COMPOSE=docker compose -f ${PREP_DOCKER_FILE} -p ${PREP_NAME}
 COMPOSE=docker compose -f ${MAIN_DOCKER_FILE} -p ${NAME}
 
-CA=.elk/setup/certs/ca/
+CA=./elk/setup/certs/ca/
 CA_CRT=$(CA)ca.crt
 CA_KEY=$(CA)ca.key
 
@@ -50,7 +50,7 @@ up-elk: add-ca
 	@echo "Building & starting ELK stack..."
 	@${PRE_COMPOSE} up
 
-up-main: add-ca
+up-main:
 	@echo "Building & starting Transcendence..."
 	@${COMPOSE} up
 
