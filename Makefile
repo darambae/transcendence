@@ -8,6 +8,7 @@ PRE_COMPOSE=docker compose -f ${PREP_DOCKER_FILE} -p ${PREP_NAME}
 COMPOSE=docker compose -f ${MAIN_DOCKER_FILE} -p ${NAME}
 
 CA=./elk/setup/certs/ca/
+CA=./elk/setup/certs/ca/
 CA_CRT=$(CA)ca.crt
 CA_KEY=$(CA)ca.key
 
@@ -62,7 +63,7 @@ up-main:
 	@echo "Building & starting Transcendence..."
 	@${COMPOSE} up
 
-up: add-ca
+up: #add-ca
 	@echo "Building and starting ELK stack..."
 	@make up-elk & make up-main 
 

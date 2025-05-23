@@ -1,0 +1,2 @@
+
+dictInfoRackets:dict = {}
