@@ -40,23 +40,9 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
-  # filebeat:
-  #   image: docker.elastic.co/beats/filebeat:${ELK_VERSION}
-  #   container_name: filebeat
-  #   volumes:
-  #     - ./elk/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - elk_logs:/var/log
-  #     - certs:/usr/share/logstash/config/certs
-  #   depends_on:
-  #     - logstash
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - elk_network
 
   elasticsearch:
-    build: 
+    build:
       context: ./elk/elasticsearch
       dockerfile: Dockerfile
     container_name: elasticsearch
@@ -101,7 +87,7 @@ services:
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
-      - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
+      # - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -118,8 +104,6 @@ volumes:
   elk_data:
     driver: local
     name: elk_data
-  # elk_logs: // For filebeat
-  #   driver: local
   certs:
     name: certs
     driver: local

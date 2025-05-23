@@ -9,3 +9,4 @@ elasticsearch.password: "jJkJ_p7EwHa0k+EgBgNW"
 elasticsearch.hosts: ["https://elasticsearch:9200"]
 elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca/ca.crt"]
 elasticsearch.ssl.verificationMode: certificate
+xpack.encryptedSavedObjects.encryptionKey: "foewhjoitgufopertjkfl;wejrfloweihrilotewjtfl;ewjflkewshnj" # Replace with a secure key

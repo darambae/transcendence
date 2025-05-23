@@ -26,6 +26,14 @@ add-ca:
 		echo "Automatic CA installation not supported for this OS."; \
 	fi
 
+# Run only the 'setup' contianer to generate the CA
+setup: add-ca
+	@echo "Building setup container..."
+	@${PRE_COMPOSE} build setup
+	@echo "Generating CA..."
+	@${PRE_COMPOSE} run --rm setup
+	@echo "CA generated successfully." 
+
 # Build the ELK stack
 build-elk:
 	@echo "Building ELK stack..."
@@ -46,7 +54,7 @@ no-cache:
 	@${COMPOSE} build --no-cache
 	@echo "Transcendence built successfully."
 
-up-elk: add-ca
+up-elk:
 	@echo "Building & starting ELK stack..."
 	@${PRE_COMPOSE} up
 

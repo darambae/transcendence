@@ -5,11 +5,11 @@ set -e
 mkdir -p /tmp/certs
 chown -R kibana:kibana /usr/share/kibana/config/certs
 chmod -R 750 /usr/share/kibana/config/certs
-cp /usr/share/kibana/config/certs/kibana/kibana.key /tmp/certs/kibana.key
-cp /usr/share/kibana/config/certs/kibana/kibana.crt /tmp/certs/kibana.crt
+cp /usr/share/kibana/config/certs/ca/ca.key /tmp/certs/ca.key
+cp /usr/share/kibana/config/certs/fullchain.crt /tmp/certs/fullchain.crt
 echo "Generating kibana.p12 keystore..."
-openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/certs/kibana.key -nocrypt -out /tmp/certs/kibana.pk8
-openssl pkcs12 -export -in /tmp/certs/kibana.crt -inkey /tmp/certs/kibana.key -out /tmp/certs/kibana.p12 -name kibana -passout pass:jJkJ_p7EwHa0k+EgBgNW
+openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/certs/ca.key -nocrypt -out /tmp/certs/kibana.pk8
+openssl pkcs12 -export -in /tmp/certs/fullchain.crt -inkey /tmp/certs/ca.key -out /tmp/certs/kibana.p12 -name kibana -passout pass:jJkJ_p7EwHa0k+EgBgNW
 mv /tmp/certs/kibana.p12 /usr/share/kibana/config/certs/kibana.p12
 chown kibana:kibana /usr/share/kibana/config/certs/kibana.p12 || true
 echo "Creating Kibana Keystore...";
