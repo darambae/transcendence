@@ -19,6 +19,7 @@ from logstash_async.formatter import LogstashFormatter
 from logstash_async.handler import AsynchronousLogstashHandler
 import sys
 from .jsonSocketHandler import JSONSocketHandler
+import dj_database_url
 
 APP_NAME = 'user_service'
 
@@ -28,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR.parent
 PROJECT_DIR = BACKEND_DIR.parent
 FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
-print(f"FRONTEND_DIR: {FRONTEND_DIR}")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -37,13 +38,14 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '172.18.0.3', 'user_service', os.getenv('DOMAIN')]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', os.getenv('DOMAIN')]
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'user',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,162 +89,89 @@ WSGI_APPLICATION = 'user.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_NAME'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT')
-    }
+    'default': dj_database_url.parse(DATABASE_URL),
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': os.getenv('POSTGRES_NAME'),
+        # 'USER': os.getenv('POSTGRES_USER'),
+        # 'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        # 'HOST': os.getenv('POSTGRES_HOST'),
+        # 'PORT': os.getenv('POSTGRES_PORT')
 }
-
+# Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 class AddAppNameFilter(logging.Filter):
     def filter(self, record):
         if not hasattr(record, 'app_name'):
             record.app_name = APP_NAME
-        else:
-            record.app_name = "unknown"
         return True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
+        },
+    },
+    'formatters': {
+        'json': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+        },
+        'text': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'logging.Formatter',
+        },
+        'logstash': {
+            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+            # You might want to explore additional options in DjangoLogstashFormatter
+            # For example, 'extra_fields': {'environment': 'production'}
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+            'host': 'logstash',
+            'port': 6006,
+            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+            'ssl_enable': False,
+            'formatter': 'logstash',
+            'ensure_ascii': True,
+            'filters': ['add_app_name'],
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'text',
+            'filters': ['add_app_name'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'], # Only send Django logs to console by default
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger
+        },
+        'django.request': {
+            'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger
+        },
+        'user_service': {
+            'handlers': ['console' ,'logstash'],
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger if needed
+        },
+    },
+    'root': {
+        'handlers': ['console', 'logstash'],
+        'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
+    },
+}
 
-# Custom logging configuration for ELK stack
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'add_app_name': {
-#             '()': AddAppNameFilter,
-#         },
-#     },
-#     'formatters': {
-#         'json': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-#         },
-#         'text': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'logging.Formatter',
-#         },
-#         'logstash': {
-#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-
-#         },
-#     },
-#     'handlers': {
-#         'logstash': {
-#             'level': 'INFO',
-#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-#             'host': 'logstash',
-#             'port': 6006,
-#             'database_path': os.path.join(BASE_DIR, 'logstash.db'),
-#             'ssl_enable': False,
-#             'formatter': 'logstash',
-#             'ensure_ascii': True,
-#             'filters': ['add_app_name'],
-#         },
-#         'console': {  
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'text',
-#             'filters': ['add_app_name'],
-#         }
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#         'django.request': {
-#             'handlers': ['logstash'],
-#             'level': 'DEBUG',
-#             'propagate': False,
-#         },
-#         'user_service': {
-#             'handlers': ['logstash'], 
-#             'level': 'DEBUG',
-#             'propagate': False,
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console', 'logstash'],
-#         'level': 'WARNING',
-#     },
-# }
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'add_app_name': {
-#             '()': AddAppNameFilter,
-#         },
-#     },
-#     'formatters': {
-#         'json': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-#         },
-#         'text': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'logging.Formatter',
-#         },
-#         'logstash': {
-#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-#             'message_type': 'python-logstash',
-#             'fqdn': False, # Fully qualified domain name. Default value: false.
-#             'extra_prefix': 'dev', #
-#             'extra': {
-#                 'application': APP_NAME,
-#                 'project_path': BASE_DIR,
-#                 'environment': 'production'
-#             }
-#         },
-#     },
-#     'handlers': {
-#         'logstash': {
-#             'level': 'INFO',
-#             # 'class': 'logstash.TCPLogstashHandler',
-#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-#             'host': 'logstash',
-#             'port': 6006,
-#             'database_path': None,
-#             'ssl_enable': False,
-#             'formatter': 'logstash',
-#             'ensure_ascii': True,
-#             'filters': ['add_app_name'],
-#         },
-#         'console': {  
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'text',
-#             'filters': ['add_app_name'],
-#         }
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#         'django.request': {
-#             'handlers': ['logstash'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         # 'user_service': {
-#         #     'handlers': ['logstash'], 
-#         #     'level': 'DEBUG',
-#         #     'propagate': True,
-#         # },
-#     },
-#     'root': {
-#         'handlers': ['console'], # Use the TCP handler
-#         'level': 'DEBUG',
-#     },
-# }
 
 
 #Set custom user model
@@ -285,14 +214,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = FRONTEND_DIR
 # STATICFILES_DIRS = [
 #     FRONTEND_DIR, 
 # ]
 
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

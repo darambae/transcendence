@@ -7,7 +7,7 @@ PREP_DOCKER_FILE=elk-docker-compose.yml
 PRE_COMPOSE=docker compose -f ${PREP_DOCKER_FILE} -p ${PREP_NAME}
 COMPOSE=docker compose -f ${MAIN_DOCKER_FILE} -p ${NAME}
 
-CA=.elk/setup/certs/ca/
+CA=./elk/setup/certs/ca/
 CA_CRT=$(CA)ca.crt
 CA_KEY=$(CA)ca.key
 
@@ -25,6 +25,14 @@ add-ca:
 	else \
 		echo "Automatic CA installation not supported for this OS."; \
 	fi
+
+# Run only the 'setup' contianer to generate the CA
+setup: add-ca
+	@echo "Building setup container..."
+	@${PRE_COMPOSE} build setup
+	@echo "Generating CA..."
+	@${PRE_COMPOSE} run --rm setup
+	@echo "CA generated successfully." 
 
 # Build the ELK stack
 build-elk:
@@ -46,11 +54,11 @@ no-cache:
 	@${COMPOSE} build --no-cache
 	@echo "Transcendence built successfully."
 
-up-elk: add-ca
+up-elk:
 	@echo "Building & starting ELK stack..."
 	@${PRE_COMPOSE} up
 
-up-main: add-ca
+up-main:
 	@echo "Building & starting Transcendence..."
 	@${COMPOSE} up
 

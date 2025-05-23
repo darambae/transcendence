@@ -32,5 +32,4 @@ COPY ./conf/modsecurity.conf /etc/nginx/modsec/modsecurity.conf
 #USER nginx
 
 EXPOSE 443
-EXPOSE 80
 CMD ["nginx", "-c", "/etc/nginx/nginx.conff", "-g", "daemon off;"]

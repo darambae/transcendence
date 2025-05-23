@@ -21,12 +21,32 @@ services:
       context: ./backend/user_service
       dockerfile: Dockerfile
     container_name: user_service
-    # labels:
-    #     co.elastic.logs/module: "django"
-    #ports:
-    #  - "8010:8010"
+    ports:
+      - "8010:8010"
     volumes:
       - certs:/certs
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - shared_network
+      - nginx_network
+  pong:
+    build:
+      context: ./backend/pong
+      dockerfile: Dockerfile
+    container_name: pong
+    ports:
+      - "8020:8020"
+    volumes:
+      - certs:/certs
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       postgres:
         condition: service_healthy
@@ -48,6 +68,7 @@ services:
       - ./nginx_modsecurity/log:/var/log/modsecurity:rw
     depends_on:
       - user_service
+      - pong
     networks:
       - nginx_network
     env_file:
@@ -62,6 +83,7 @@ services:
     networks:
       - shared_network
     restart: always
+
 volumes:
   postgres_data:
     name: postgres_data

@@ -16,10 +16,6 @@ subjectAltName = DNS:transcendence.42.fr, DNS:localhost, IP:127.0.0.1
 EOF
 
 echo "Generating private key and CSR for the server..."
-# openssl req -new -nodes -newkey rsa:2048 \
-#   -keyout /usr/share/elasticsearch/config/certs/server.key \
-#   -out /usr/share/elasticsearch/config/certs/server.csr \
-#   -subj "/C=FR/ST=Occitanie/L=Perpignan/O=Transcendence Project/OU=Development Team/CN=transcendence.42.fr"
 
 openssl req -new -newkey rsa:4096 -nodes \
 -out /usr/share/elasticsearch/config/certs/server.csr \
@@ -34,7 +30,7 @@ openssl x509 -req -in /usr/share/elasticsearch/config/certs/server.csr \
   -extfile /usr/share/elasticsearch/config/certs/san.ext
 
 # Combine certificate.crt and ca.crt into fullchain.crt
-echo "Combining certificate.crt and ca.crt into fullchain.crt..."
+echo "Combining server.crt and ca.crt into fullchain.crt..."
 cat /usr/share/elasticsearch/config/certs/server.crt config/certs/ca/ca.crt > /usr/share/elasticsearch/config/certs/fullchain.crt
 
 # Generate certificates for ELK if they don't exist
