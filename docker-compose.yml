@@ -24,6 +24,7 @@ services:
     ports:
       - "8010:8010"
     volumes:
+      - ./backend/user_service/user_management:/user_service
       - certs:/certs
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
