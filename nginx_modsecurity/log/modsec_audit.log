@@ -9883,3 +9883,3714 @@ ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-
 
 ---ObqsIdDT---Z--
 
+---Lb5I7TPd---A--
+[24/May/2025:10:55:06 +0000] 174808410625.894440 172.18.0.1 41240 172.18.0.4 443
+---Lb5I7TPd---B--
+GET / HTTP/1.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: none
+sec-ch-ua-platform: "Linux"
+Upgrade-Insecure-Requests: 1
+sec-ch-ua-mobile: ?0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Cache-Control: max-age=0
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-User: ?1
+Sec-Fetch-Mode: navigate
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---Lb5I7TPd---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 1123
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-463"
+
+---Lb5I7TPd---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/"] [unique_id "174808410625.894440"] [ref "o0,14o0,9o9,5v21,14"]
+
+---Lb5I7TPd---Z--
+
+---IqYAQApU---A--
+[24/May/2025:10:55:06 +0000] 17480841068.921854 172.18.0.1 41240 172.18.0.4 443
+---IqYAQApU---B--
+GET /css/styles.css HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---IqYAQApU---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 1993
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-7c9"
+
+---IqYAQApU---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/styles.css"] [unique_id "17480841068.921854"] [ref "o0,14o0,9o9,5v35,14"]
+
+---IqYAQApU---Z--
+
+---fQNyR1dw---A--
+[24/May/2025:10:55:06 +0000] 174808410670.978838 172.18.0.1 41240 172.18.0.4 443
+---fQNyR1dw---B--
+GET /js/main.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---fQNyR1dw---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 165
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-a5"
+
+---fQNyR1dw---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/main.js"] [unique_id "174808410670.978838"] [ref "o0,14o0,9o9,5v31,14"]
+
+---fQNyR1dw---Z--
+
+---VoFTLOwe---A--
+[24/May/2025:10:55:06 +0000] 174808410665.162365 172.18.0.1 41240 172.18.0.4 443
+---VoFTLOwe---B--
+GET /css/login.css HTTP/1.1
+Referer: https://127.0.0.1:8443/css/styles.css
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---VoFTLOwe---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 840
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-348"
+
+---VoFTLOwe---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/login.css"] [unique_id "174808410665.162365"] [ref "o0,14o0,9o9,5v34,14"]
+
+---VoFTLOwe---Z--
+
+---ajbd6J0X---A--
+[24/May/2025:10:55:06 +0000] 17480841068.871953 172.18.0.1 41274 172.18.0.4 443
+---ajbd6J0X---B--
+GET /css/signup.css HTTP/1.1
+Referer: https://127.0.0.1:8443/css/styles.css
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---ajbd6J0X---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 1303
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-517"
+
+---ajbd6J0X---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/signup.css"] [unique_id "17480841068.871953"] [ref "o0,14o0,9o9,5v35,14"]
+
+---ajbd6J0X---Z--
+
+---j88aPMeY---A--
+[24/May/2025:10:55:06 +0000] 174808410699.658158 172.18.0.1 41262 172.18.0.4 443
+---j88aPMeY---B--
+GET /js/router.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/main.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---j88aPMeY---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 1481
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-5c9"
+
+---j88aPMeY---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/router.js"] [unique_id "174808410699.658158"] [ref "o0,14o0,9o9,5v33,14"]
+
+---j88aPMeY---Z--
+
+---z1v4UIgn---A--
+[24/May/2025:10:55:06 +0000] 174808410653.982428 172.18.0.1 41240 172.18.0.4 443
+---z1v4UIgn---B--
+GET /assets/img/header.png HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---z1v4UIgn---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 616255
+Content-Type: image/png
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-9673f"
+
+---z1v4UIgn---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/img/header.png"] [unique_id "174808410653.982428"] [ref "o0,14o0,9o9,5v42,14"]
+
+---z1v4UIgn---Z--
+
+---8CvZNk32---A--
+[24/May/2025:10:55:06 +0000] 174808410612.969243 172.18.0.1 41240 172.18.0.4 443
+---8CvZNk32---B--
+GET /assets/fonts/sankyu/Sankyu.otf HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/styles.css
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: font
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---8CvZNk32---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 59184
+Content-Type: application/octet-stream
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-e730"
+
+---8CvZNk32---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/fonts/sankyu/Sankyu.otf"] [unique_id "174808410612.969243"] [ref "o0,14o0,9o9,5v51,14"]
+
+---8CvZNk32---Z--
+
+---8P1XQcTt---A--
+[24/May/2025:10:55:06 +0000] 174808410624.422716 172.18.0.1 41240 172.18.0.4 443
+---8P1XQcTt---B--
+GET /js/routes.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/router.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---8P1XQcTt---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 804
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-324"
+
+---8P1XQcTt---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/routes.js"] [unique_id "174808410624.422716"] [ref "o0,14o0,9o9,5v33,14"]
+
+---8P1XQcTt---Z--
+
+---QgNk5HO2---A--
+[24/May/2025:10:55:06 +0000] 174808410667.449957 172.18.0.1 41240 172.18.0.4 443
+---QgNk5HO2---B--
+GET /js/views/home.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---QgNk5HO2---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 673
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-2a1"
+
+---QgNk5HO2---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/home.js"] [unique_id "174808410667.449957"] [ref "o0,14o0,9o9,5v37,14"]
+
+---QgNk5HO2---Z--
+
+---tjNOi1tV---A--
+[24/May/2025:10:55:06 +0000] 174808410660.534495 172.18.0.1 41262 172.18.0.4 443
+---tjNOi1tV---B--
+GET /js/views/singlePlay.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---tjNOi1tV---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 80
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-50"
+
+---tjNOi1tV---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/singlePlay.js"] [unique_id "174808410660.534495"] [ref "o0,14o0,9o9,5v43,14"]
+
+---tjNOi1tV---Z--
+
+---4bStGBLN---A--
+[24/May/2025:10:55:06 +0000] 174808410672.748275 172.18.0.1 41274 172.18.0.4 443
+---4bStGBLN---B--
+GET /js/views/multiplayer.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---4bStGBLN---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 84
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-54"
+
+---4bStGBLN---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/multiplayer.js"] [unique_id "174808410672.748275"] [ref "o0,14o0,9o9,5v44,14"]
+
+---4bStGBLN---Z--
+
+---yygici7h---A--
+[24/May/2025:10:55:06 +0000] 174808410613.084185 172.18.0.1 41262 172.18.0.4 443
+---yygici7h---B--
+GET /js/views/signup.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---yygici7h---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 3190
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-c76"
+
+---yygici7h---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/signup.js"] [unique_id "174808410613.084185"] [ref "o0,14o0,9o9,5v39,14"]
+
+---yygici7h---Z--
+
+---JH7lanWi---A--
+[24/May/2025:10:55:06 +0000] 174808410698.299988 172.18.0.1 41240 172.18.0.4 443
+---JH7lanWi---B--
+GET /js/views/duel.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---JH7lanWi---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 71
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-47"
+
+---JH7lanWi---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/duel.js"] [unique_id "174808410698.299988"] [ref "o0,14o0,9o9,5v37,14"]
+
+---JH7lanWi---Z--
+
+---cKpncPQC---A--
+[24/May/2025:10:55:06 +0000] 174808410617.560531 172.18.0.1 41274 172.18.0.4 443
+---cKpncPQC---B--
+GET /js/views/login.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---cKpncPQC---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 1707
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-6ab"
+
+---cKpncPQC---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/login.js"] [unique_id "174808410617.560531"] [ref "o0,14o0,9o9,5v38,14"]
+
+---cKpncPQC---Z--
+
+---rPVk5Eqd---A--
+[24/May/2025:10:55:06 +0000] 174808410679.541070 172.18.0.1 41274 172.18.0.4 443
+---rPVk5Eqd---B--
+GET /templates/home.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---rPVk5Eqd---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 139
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-8b"
+
+---rPVk5Eqd---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/home.html"] [unique_id "174808410679.541070"] [ref "o0,14o0,9o9,5v40,14"]
+
+---rPVk5Eqd---Z--
+
+---zRFM9HNH---A--
+[24/May/2025:10:55:06 +0000] 174808410659.388779 172.18.0.1 41240 172.18.0.4 443
+---zRFM9HNH---B--
+GET /favicon.ico HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---zRFM9HNH---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:06 GMT
+Content-Length: 166115
+Content-Type: image/x-icon
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-288e3"
+
+---zRFM9HNH---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/favicon.ico"] [unique_id "174808410659.388779"] [ref "o0,14o0,9o9,5v32,14"]
+
+---zRFM9HNH---Z--
+
+---gMm4yEyN---A--
+[24/May/2025:10:55:08 +0000] 174808410873.430292 172.18.0.1 41240 172.18.0.4 443
+---gMm4yEyN---B--
+GET /templates/duel.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---gMm4yEyN---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:08 GMT
+Content-Length: 60
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-3c"
+
+---gMm4yEyN---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/duel.html"] [unique_id "174808410873.430292"] [ref "o0,14o0,9o9,5v40,14"]
+
+---gMm4yEyN---Z--
+
+---uJ7zaT0r---A--
+[24/May/2025:10:55:10 +0000] 174808411076.078331 172.18.0.1 41240 172.18.0.4 443
+---uJ7zaT0r---B--
+GET /templates/login.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---uJ7zaT0r---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:10 GMT
+Content-Length: 855
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-357"
+
+---uJ7zaT0r---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/login.html"] [unique_id "174808411076.078331"] [ref "o0,14o0,9o9,5v41,14"]
+
+---uJ7zaT0r---Z--
+
+---l7dLs71r---A--
+[24/May/2025:10:55:10 +0000] 17480841108.057530 172.18.0.1 41240 172.18.0.4 443
+---l7dLs71r---B--
+GET /assets/fonts/sukoro/sukoro.otf HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/login.css
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: font
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---l7dLs71r---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:10 GMT
+Content-Length: 1275280
+Content-Type: application/octet-stream
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-137590"
+
+---l7dLs71r---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/fonts/sukoro/sukoro.otf"] [unique_id "17480841108.057530"] [ref "o0,14o0,9o9,5v51,14"]
+
+---l7dLs71r---Z--
+
+---ZHCgYZyC---A--
+[24/May/2025:10:55:12 +0000] 174808411213.217027 172.18.0.1 41240 172.18.0.4 443
+---ZHCgYZyC---B--
+GET /templates/signup.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---ZHCgYZyC---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:12 GMT
+Content-Length: 2006
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-7d6"
+
+---ZHCgYZyC---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/signup.html"] [unique_id "174808411213.217027"] [ref "o0,14o0,9o9,5v42,14"]
+
+---ZHCgYZyC---Z--
+
+---viGrwCCr---A--
+[24/May/2025:10:55:52 +0000] 174808415215.684478 172.18.0.1 41240 172.18.0.4 443
+---viGrwCCr---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---viGrwCCr---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---viGrwCCr---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 10:55:57 GMT
+Content-Length: 100886
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---viGrwCCr---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174808415215.684478"] [ref "o0,14o0,9o9,5v42,14"]
+
+---viGrwCCr---Z--
+
+---RcrEncc5---A--
+[24/May/2025:11:24:33 +0000] 174808587389.753863 172.18.0.1 56658 172.18.0.4 443
+---RcrEncc5---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---RcrEncc5---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---RcrEncc5---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 11:24:34 GMT
+Content-Length: 101207
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---RcrEncc5---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174808587389.753863"] [ref "o0,14o0,9o9,5v42,14"]
+
+---RcrEncc5---Z--
+
+---c9XrBmkG---A--
+[24/May/2025:12:49:27 +0000] 174809096747.705117 172.18.0.1 41594 172.18.0.4 443
+---c9XrBmkG---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---c9XrBmkG---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---c9XrBmkG---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 12:49:28 GMT
+Content-Length: 148788
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---c9XrBmkG---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809096747.705117"] [ref "o0,14o0,9o9,5v42,14"]
+
+---c9XrBmkG---Z--
+
+---Qnkzs3Qt---A--
+[24/May/2025:12:51:41 +0000] 174809110178.961975 172.18.0.1 41484 172.18.0.4 443
+---Qnkzs3Qt---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---Qnkzs3Qt---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---Qnkzs3Qt---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 12:51:43 GMT
+Content-Length: 72
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---Qnkzs3Qt---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809110178.961975"] [ref "o0,14o0,9o9,5v42,14"]
+
+---Qnkzs3Qt---Z--
+
+---Elxjfp1F---A--
+[24/May/2025:13:03:02 +0000] 174809178287.348006 172.18.0.1 48220 172.18.0.4 443
+---Elxjfp1F---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---Elxjfp1F---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---Elxjfp1F---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:03:02 GMT
+Content-Length: 82564
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---Elxjfp1F---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809178287.348006"] [ref "o0,14o0,9o9,5v42,14"]
+
+---Elxjfp1F---Z--
+
+---b1DZGf49---A--
+[24/May/2025:13:04:55 +0000] 174809189522.655643 172.18.0.1 55058 172.18.0.4 443
+---b1DZGf49---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---b1DZGf49---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---b1DZGf49---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:04:57 GMT
+Content-Length: 72
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---b1DZGf49---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809189522.655643"] [ref "o0,14o0,9o9,5v42,14"]
+
+---b1DZGf49---Z--
+
+---VpCbBNal---A--
+[24/May/2025:13:08:09 +0000] 174809208921.018182 172.18.0.1 49518 172.18.0.4 443
+---VpCbBNal---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 134
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---VpCbBNal---C--
+{"username":"mamar","mail":"omar_felk@hotmail.fr","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---VpCbBNal---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:08:11 GMT
+Content-Length: 72
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---VpCbBNal---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809208921.018182"] [ref "o0,14o0,9o9,5v42,14"]
+
+---VpCbBNal---Z--
+
+---90tp8iEq---A--
+[24/May/2025:13:25:12 +0000] 174809311239.107836 172.18.0.1 35768 172.18.0.4 443
+---90tp8iEq---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 134
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---90tp8iEq---C--
+{"username":"mamar","mail":"omar_felk@hotmail.fr","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---90tp8iEq---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:25:12 GMT
+Content-Length: 66453
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---90tp8iEq---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809311239.107836"] [ref "o0,14o0,9o9,5v42,14"]
+
+---90tp8iEq---Z--
+
+---jPNiJjBX---A--
+[24/May/2025:13:27:32 +0000] 174809325274.738057 172.18.0.1 36468 172.18.0.4 443
+---jPNiJjBX---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 134
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---jPNiJjBX---C--
+{"username":"mamar","mail":"omar_felk@hotmail.fr","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---jPNiJjBX---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:27:34 GMT
+Content-Length: 53
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---jPNiJjBX---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809325274.738057"] [ref "o0,14o0,9o9,5v42,14"]
+
+---jPNiJjBX---Z--
+
+---5sUEdbBK---A--
+[24/May/2025:13:29:28 +0000] 174809336818.388287 172.18.0.1 48066 172.18.0.4 443
+---5sUEdbBK---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---5sUEdbBK---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"omar","lastName":"felk","password":"A@1","password_confirmation":"A@1"}
+
+---5sUEdbBK---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:29:29 GMT
+Content-Length: 53
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---5sUEdbBK---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809336818.388287"] [ref "o0,14o0,9o9,5v42,14"]
+
+---5sUEdbBK---Z--
+
+---5e96duhm---A--
+[24/May/2025:13:30:10 +0000] 174809341085.971006 172.18.0.1 48066 172.18.0.4 443
+---5e96duhm---B--
+GET / HTTP/1.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+sec-ch-ua-platform: "Linux"
+Upgrade-Insecure-Requests: 1
+sec-ch-ua-mobile: ?0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Cache-Control: max-age=0
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-User: ?1
+Sec-Fetch-Mode: navigate
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---5e96duhm---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 1123
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-463"
+
+---5e96duhm---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/"] [unique_id "174809341085.971006"] [ref "o0,14o0,9o9,5v21,14"]
+
+---5e96duhm---Z--
+
+---sba0Hmo1---A--
+[24/May/2025:13:30:10 +0000] 174809341090.539082 172.18.0.1 48066 172.18.0.4 443
+---sba0Hmo1---B--
+GET /css/styles.css HTTP/1.1
+If-Modified-Since: Fri, 23 May 2025 13:49:47 GMT
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+If-None-Match: "68307cfb-7c9"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Sec-Fetch-Mode: no-cors
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: style
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---sba0Hmo1---F--
+HTTP/1.1 304
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-7c9"
+
+---sba0Hmo1---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/styles.css"] [unique_id "174809341090.539082"] [ref "o0,14o0,9o9,5v35,14"]
+
+---sba0Hmo1---Z--
+
+---9BhTsq0x---A--
+[24/May/2025:13:30:10 +0000] 174809341071.532534 172.18.0.1 48066 172.18.0.4 443
+---9BhTsq0x---B--
+GET /js/main.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---9BhTsq0x---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 165
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-a5"
+
+---9BhTsq0x---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/main.js"] [unique_id "174809341071.532534"] [ref "o0,14o0,9o9,5v31,14"]
+
+---9BhTsq0x---Z--
+
+---iSAM3Le9---A--
+[24/May/2025:13:30:10 +0000] 174809341027.056392 172.18.0.1 48066 172.18.0.4 443
+---iSAM3Le9---B--
+GET /css/login.css HTTP/1.1
+If-Modified-Since: Fri, 23 May 2025 13:49:47 GMT
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+If-None-Match: "68307cfb-348"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/styles.css
+Sec-Fetch-Mode: no-cors
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: style
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---iSAM3Le9---F--
+HTTP/1.1 304
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-348"
+
+---iSAM3Le9---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/login.css"] [unique_id "174809341027.056392"] [ref "o0,14o0,9o9,5v34,14"]
+
+---iSAM3Le9---Z--
+
+---xlFYfwKV---A--
+[24/May/2025:13:30:10 +0000] 174809341020.567678 172.18.0.1 48066 172.18.0.4 443
+---xlFYfwKV---B--
+GET /css/signup.css HTTP/1.1
+If-Modified-Since: Fri, 23 May 2025 13:49:47 GMT
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+If-None-Match: "68307cfb-517"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/styles.css
+Sec-Fetch-Mode: no-cors
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: style
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---xlFYfwKV---F--
+HTTP/1.1 304
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-517"
+
+---xlFYfwKV---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/signup.css"] [unique_id "174809341020.567678"] [ref "o0,14o0,9o9,5v35,14"]
+
+---xlFYfwKV---Z--
+
+---VsTndFmm---A--
+[24/May/2025:13:30:10 +0000] 174809341060.174254 172.18.0.1 48066 172.18.0.4 443
+---VsTndFmm---B--
+GET /js/router.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/main.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---VsTndFmm---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 1481
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-5c9"
+
+---VsTndFmm---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/router.js"] [unique_id "174809341060.174254"] [ref "o0,14o0,9o9,5v33,14"]
+
+---VsTndFmm---Z--
+
+---kmR6fTVf---A--
+[24/May/2025:13:30:10 +0000] 174809341063.571899 172.18.0.1 49140 172.18.0.4 443
+---kmR6fTVf---B--
+GET /assets/img/header.png HTTP/1.1
+If-Modified-Since: Fri, 23 May 2025 13:49:47 GMT
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+If-None-Match: "68307cfb-9673f"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Sec-Fetch-Mode: no-cors
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: image
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---kmR6fTVf---F--
+HTTP/1.1 304
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-9673f"
+
+---kmR6fTVf---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/img/header.png"] [unique_id "174809341063.571899"] [ref "o0,14o0,9o9,5v42,14"]
+
+---kmR6fTVf---Z--
+
+---QTFHJDC0---A--
+[24/May/2025:13:30:10 +0000] 174809341013.830589 172.18.0.1 48066 172.18.0.4 443
+---QTFHJDC0---B--
+GET /js/routes.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/router.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---QTFHJDC0---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 804
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-324"
+
+---QTFHJDC0---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/routes.js"] [unique_id "174809341013.830589"] [ref "o0,14o0,9o9,5v33,14"]
+
+---QTFHJDC0---Z--
+
+---ZbCHA8n1---A--
+[24/May/2025:13:30:10 +0000] 174809341075.867253 172.18.0.1 49140 172.18.0.4 443
+---ZbCHA8n1---B--
+GET /assets/fonts/sankyu/Sankyu.otf HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+If-Modified-Since: Fri, 23 May 2025 13:49:47 GMT
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+If-None-Match: "68307cfb-e730"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/styles.css
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: font
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---ZbCHA8n1---F--
+HTTP/1.1 304
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-e730"
+
+---ZbCHA8n1---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/fonts/sankyu/Sankyu.otf"] [unique_id "174809341075.867253"] [ref "o0,14o0,9o9,5v51,14"]
+
+---ZbCHA8n1---Z--
+
+---fMKjhysc---A--
+[24/May/2025:13:30:10 +0000] 174809341030.493431 172.18.0.1 48066 172.18.0.4 443
+---fMKjhysc---B--
+GET /js/views/singlePlay.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---fMKjhysc---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 80
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-50"
+
+---fMKjhysc---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/singlePlay.js"] [unique_id "174809341030.493431"] [ref "o0,14o0,9o9,5v43,14"]
+
+---fMKjhysc---Z--
+
+---BUdnFsOZ---A--
+[24/May/2025:13:30:10 +0000] 174809341056.430798 172.18.0.1 49150 172.18.0.4 443
+---BUdnFsOZ---B--
+GET /js/views/duel.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---BUdnFsOZ---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 71
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-47"
+
+---BUdnFsOZ---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/duel.js"] [unique_id "174809341056.430798"] [ref "o0,14o0,9o9,5v37,14"]
+
+---BUdnFsOZ---Z--
+
+---wFhHxOCF---A--
+[24/May/2025:13:30:10 +0000] 174809341087.406344 172.18.0.1 49140 172.18.0.4 443
+---wFhHxOCF---B--
+GET /js/views/home.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---wFhHxOCF---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 673
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-2a1"
+
+---wFhHxOCF---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/home.js"] [unique_id "174809341087.406344"] [ref "o0,14o0,9o9,5v37,14"]
+
+---wFhHxOCF---Z--
+
+---ZU0iJKSo---A--
+[24/May/2025:13:30:10 +0000] 174809341071.640058 172.18.0.1 49166 172.18.0.4 443
+---ZU0iJKSo---B--
+GET /js/views/multiplayer.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---ZU0iJKSo---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 84
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-54"
+
+---ZU0iJKSo---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/multiplayer.js"] [unique_id "174809341071.640058"] [ref "o0,14o0,9o9,5v44,14"]
+
+---ZU0iJKSo---Z--
+
+---k5AN1TrX---A--
+[24/May/2025:13:30:10 +0000] 174809341037.893232 172.18.0.1 48066 172.18.0.4 443
+---k5AN1TrX---B--
+GET /js/views/login.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---k5AN1TrX---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 1707
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-6ab"
+
+---k5AN1TrX---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/login.js"] [unique_id "174809341037.893232"] [ref "o0,14o0,9o9,5v38,14"]
+
+---k5AN1TrX---Z--
+
+---PqIUuuiF---A--
+[24/May/2025:13:30:10 +0000] 174809341058.837968 172.18.0.1 49150 172.18.0.4 443
+---PqIUuuiF---B--
+GET /js/views/signup.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---PqIUuuiF---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 3190
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-c76"
+
+---PqIUuuiF---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/signup.js"] [unique_id "174809341058.837968"] [ref "o0,14o0,9o9,5v39,14"]
+
+---PqIUuuiF---Z--
+
+---LKIya4ly---A--
+[24/May/2025:13:30:10 +0000] 174809341069.758920 172.18.0.1 48066 172.18.0.4 443
+---LKIya4ly---B--
+GET /templates/signup.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---LKIya4ly---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 2006
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-7d6"
+
+---LKIya4ly---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/signup.html"] [unique_id "174809341069.758920"] [ref "o0,14o0,9o9,5v42,14"]
+
+---LKIya4ly---Z--
+
+---YTwjwOiq---A--
+[24/May/2025:13:30:10 +0000] 174809341051.091365 172.18.0.1 49150 172.18.0.4 443
+---YTwjwOiq---B--
+GET /favicon.ico HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---YTwjwOiq---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Content-Length: 166115
+Content-Type: image/x-icon
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-288e3"
+
+---YTwjwOiq---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/favicon.ico"] [unique_id "174809341051.091365"] [ref "o0,14o0,9o9,5v32,14"]
+
+---YTwjwOiq---Z--
+
+---G7N9dRWp---A--
+[24/May/2025:13:30:10 +0000] 174809341076.116188 172.18.0.1 49150 172.18.0.4 443
+---G7N9dRWp---B--
+GET /assets/fonts/sukoro/sukoro.otf HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+If-Modified-Since: Fri, 23 May 2025 13:49:47 GMT
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+If-None-Match: "68307cfb-137590"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/login.css
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: font
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---G7N9dRWp---F--
+HTTP/1.1 304
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:10 GMT
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-137590"
+
+---G7N9dRWp---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/fonts/sukoro/sukoro.otf"] [unique_id "174809341076.116188"] [ref "o0,14o0,9o9,5v51,14"]
+
+---G7N9dRWp---Z--
+
+---w9a90yjP---A--
+[24/May/2025:13:30:34 +0000] 174809343472.383975 172.18.0.1 49150 172.18.0.4 443
+---w9a90yjP---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 136
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---w9a90yjP---C--
+{"username":"mamar","mail":"omarfelk@hotmail.com","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---w9a90yjP---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:30:35 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---w9a90yjP---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809343472.383975"] [ref "o0,14o0,9o9,5v42,14"]
+
+---w9a90yjP---Z--
+
+---nzrhuYwQ---A--
+[24/May/2025:13:32:53 +0000] 174809357387.861164 172.18.0.1 38764 172.18.0.4 443
+---nzrhuYwQ---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 136
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---nzrhuYwQ---C--
+{"username":"mamar","mail":"omarfelk@hotmail.com","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---nzrhuYwQ---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:32:55 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---nzrhuYwQ---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809357387.861164"] [ref "o0,14o0,9o9,5v42,14"]
+
+---nzrhuYwQ---Z--
+
+---1r9vFpjV---A--
+[24/May/2025:13:33:19 +0000] 174809359968.084652 172.18.0.1 38764 172.18.0.4 443
+---1r9vFpjV---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 137
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---1r9vFpjV---C--
+{"username":"mamar","mail":"omar_felk@hotmail.com","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---1r9vFpjV---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:33:21 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---1r9vFpjV---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809359968.084652"] [ref "o0,14o0,9o9,5v42,14"]
+
+---1r9vFpjV---Z--
+
+---guoJrIbg---A--
+[24/May/2025:13:36:26 +0000] 174809378628.453771 172.18.0.1 34136 172.18.0.4 443
+---guoJrIbg---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 145
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---guoJrIbg---C--
+{"username":"mamar","mail":"omar_felkfeegegzd@hotmail.com","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---guoJrIbg---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:36:29 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---guoJrIbg---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809378628.453771"] [ref "o0,14o0,9o9,5v42,14"]
+
+---guoJrIbg---Z--
+
+---EirsPTmx---A--
+[24/May/2025:13:47:00 +0000] 174809442042.203041 172.18.0.1 52304 172.18.0.4 443
+---EirsPTmx---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 145
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---EirsPTmx---C--
+{"username":"mamar","mail":"omar_felkfeegegzd@hotmail.com","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---EirsPTmx---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:47:01 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---EirsPTmx---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809442042.203041"] [ref "o0,14o0,9o9,5v42,14"]
+
+---EirsPTmx---Z--
+
+---dQwND88b---A--
+[24/May/2025:13:47:12 +0000] 174809443218.177624 172.18.0.1 52304 172.18.0.4 443
+---dQwND88b---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 132
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---dQwND88b---C--
+{"username":"mamar","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---dQwND88b---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:47:13 GMT
+Content-Length: 148798
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---dQwND88b---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809443218.177624"] [ref "o0,14o0,9o9,5v42,14"]
+
+---dQwND88b---Z--
+
+---vtYnuyeU---A--
+[24/May/2025:13:47:48 +0000] 174809446811.406798 172.18.0.1 52304 172.18.0.4 443
+---vtYnuyeU---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---vtYnuyeU---C--
+{"username":"mamarDDA","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---vtYnuyeU---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:47:49 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---vtYnuyeU---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809446811.406798"] [ref "o0,14o0,9o9,5v42,14"]
+
+---vtYnuyeU---Z--
+
+---ReCkwcXA---A--
+[24/May/2025:13:49:03 +0000] 174809454365.430274 172.18.0.1 52212 172.18.0.4 443
+---ReCkwcXA---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---ReCkwcXA---C--
+{"username":"mamarDDA","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---ReCkwcXA---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:04 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---ReCkwcXA---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809454365.430274"] [ref "o0,14o0,9o9,5v42,14"]
+
+---ReCkwcXA---Z--
+
+---IM2fqoaR---A--
+[24/May/2025:13:49:59 +0000] 174809459969.854081 172.18.0.1 52212 172.18.0.4 443
+---IM2fqoaR---B--
+GET / HTTP/1.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+sec-ch-ua-platform: "Linux"
+Upgrade-Insecure-Requests: 1
+sec-ch-ua-mobile: ?0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Cache-Control: max-age=0
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-User: ?1
+Sec-Fetch-Mode: navigate
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---IM2fqoaR---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 1123
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-463"
+
+---IM2fqoaR---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/"] [unique_id "174809459969.854081"] [ref "o0,14o0,9o9,5v21,14"]
+
+---IM2fqoaR---Z--
+
+---CWoOewxZ---A--
+[24/May/2025:13:49:59 +0000] 174809459913.129895 172.18.0.1 52212 172.18.0.4 443
+---CWoOewxZ---B--
+GET /css/styles.css HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---CWoOewxZ---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 1993
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-7c9"
+
+---CWoOewxZ---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/styles.css"] [unique_id "174809459913.129895"] [ref "o0,14o0,9o9,5v35,14"]
+
+---CWoOewxZ---Z--
+
+---nWKiSyCt---A--
+[24/May/2025:13:49:59 +0000] 174809459998.645641 172.18.0.1 52212 172.18.0.4 443
+---nWKiSyCt---B--
+GET /js/main.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---nWKiSyCt---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 165
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-a5"
+
+---nWKiSyCt---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/main.js"] [unique_id "174809459998.645641"] [ref "o0,14o0,9o9,5v31,14"]
+
+---nWKiSyCt---Z--
+
+---J9ElrfT5---A--
+[24/May/2025:13:49:59 +0000] 174809459976.820535 172.18.0.1 32862 172.18.0.4 443
+---J9ElrfT5---B--
+GET /assets/img/header.png HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---J9ElrfT5---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 616255
+Content-Type: image/png
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-9673f"
+
+---J9ElrfT5---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/img/header.png"] [unique_id "174809459976.820535"] [ref "o0,14o0,9o9,5v42,14"]
+
+---J9ElrfT5---Z--
+
+---cMeYw9iE---A--
+[24/May/2025:13:49:59 +0000] 174809459988.171429 172.18.0.1 52212 172.18.0.4 443
+---cMeYw9iE---B--
+GET /css/signup.css HTTP/1.1
+Referer: https://127.0.0.1:8443/css/styles.css
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---cMeYw9iE---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 1303
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-517"
+
+---cMeYw9iE---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/signup.css"] [unique_id "174809459988.171429"] [ref "o0,14o0,9o9,5v35,14"]
+
+---cMeYw9iE---Z--
+
+---dJhFZfcw---A--
+[24/May/2025:13:49:59 +0000] 174809459989.702761 172.18.0.1 32870 172.18.0.4 443
+---dJhFZfcw---B--
+GET /js/router.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/main.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---dJhFZfcw---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 1481
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-5c9"
+
+---dJhFZfcw---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/router.js"] [unique_id "174809459989.702761"] [ref "o0,14o0,9o9,5v33,14"]
+
+---dJhFZfcw---Z--
+
+---GOiwMK4B---A--
+[24/May/2025:13:49:59 +0000] 174809459990.179901 172.18.0.1 32862 172.18.0.4 443
+---GOiwMK4B---B--
+GET /css/login.css HTTP/1.1
+Referer: https://127.0.0.1:8443/css/styles.css
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---GOiwMK4B---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 840
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-348"
+
+---GOiwMK4B---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/login.css"] [unique_id "174809459990.179901"] [ref "o0,14o0,9o9,5v34,14"]
+
+---GOiwMK4B---Z--
+
+---2qEgfcZW---A--
+[24/May/2025:13:49:59 +0000] 17480945994.021942 172.18.0.1 32862 172.18.0.4 443
+---2qEgfcZW---B--
+GET /js/routes.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/router.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---2qEgfcZW---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 804
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-324"
+
+---2qEgfcZW---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/routes.js"] [unique_id "17480945994.021942"] [ref "o0,14o0,9o9,5v33,14"]
+
+---2qEgfcZW---Z--
+
+---isTDuN1D---A--
+[24/May/2025:13:49:59 +0000] 17480945999.139300 172.18.0.1 32862 172.18.0.4 443
+---isTDuN1D---B--
+GET /assets/fonts/sankyu/Sankyu.otf HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/styles.css
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: font
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---isTDuN1D---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 59184
+Content-Type: application/octet-stream
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-e730"
+
+---isTDuN1D---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/fonts/sankyu/Sankyu.otf"] [unique_id "17480945999.139300"] [ref "o0,14o0,9o9,5v51,14"]
+
+---isTDuN1D---Z--
+
+---VitLUTmf---A--
+[24/May/2025:13:49:59 +0000] 174809459982.475558 172.18.0.1 52212 172.18.0.4 443
+---VitLUTmf---B--
+GET /js/views/singlePlay.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---VitLUTmf---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 80
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-50"
+
+---VitLUTmf---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/singlePlay.js"] [unique_id "174809459982.475558"] [ref "o0,14o0,9o9,5v43,14"]
+
+---VitLUTmf---Z--
+
+---zY3bTyAG---A--
+[24/May/2025:13:49:59 +0000] 174809459923.365006 172.18.0.1 52212 172.18.0.4 443
+---zY3bTyAG---B--
+GET /js/views/signup.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---zY3bTyAG---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 3190
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-c76"
+
+---zY3bTyAG---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/signup.js"] [unique_id "174809459923.365006"] [ref "o0,14o0,9o9,5v39,14"]
+
+---zY3bTyAG---Z--
+
+---HbVfiutm---A--
+[24/May/2025:13:49:59 +0000] 174809459933.014751 172.18.0.1 32870 172.18.0.4 443
+---HbVfiutm---B--
+GET /js/views/home.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---HbVfiutm---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 673
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-2a1"
+
+---HbVfiutm---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/home.js"] [unique_id "174809459933.014751"] [ref "o0,14o0,9o9,5v37,14"]
+
+---HbVfiutm---Z--
+
+---UUyxS8q2---A--
+[24/May/2025:13:49:59 +0000] 174809459999.927068 172.18.0.1 52212 172.18.0.4 443
+---UUyxS8q2---B--
+GET /js/views/duel.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---UUyxS8q2---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 71
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-47"
+
+---UUyxS8q2---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/duel.js"] [unique_id "174809459999.927068"] [ref "o0,14o0,9o9,5v37,14"]
+
+---UUyxS8q2---Z--
+
+---aVwgMlvj---A--
+[24/May/2025:13:49:59 +0000] 174809459967.628475 172.18.0.1 32870 172.18.0.4 443
+---aVwgMlvj---B--
+GET /js/views/multiplayer.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---aVwgMlvj---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 84
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-54"
+
+---aVwgMlvj---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/multiplayer.js"] [unique_id "174809459967.628475"] [ref "o0,14o0,9o9,5v44,14"]
+
+---aVwgMlvj---Z--
+
+---UDzMsQR6---A--
+[24/May/2025:13:49:59 +0000] 174809459914.288880 172.18.0.1 32862 172.18.0.4 443
+---UDzMsQR6---B--
+GET /js/views/login.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---UDzMsQR6---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 1707
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-6ab"
+
+---UDzMsQR6---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/login.js"] [unique_id "174809459914.288880"] [ref "o0,14o0,9o9,5v38,14"]
+
+---UDzMsQR6---Z--
+
+---p819S3IT---A--
+[24/May/2025:13:49:59 +0000] 174809459984.553228 172.18.0.1 32862 172.18.0.4 443
+---p819S3IT---B--
+GET /templates/signup.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---p819S3IT---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 2006
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-7d6"
+
+---p819S3IT---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/signup.html"] [unique_id "174809459984.553228"] [ref "o0,14o0,9o9,5v42,14"]
+
+---p819S3IT---Z--
+
+---DiNpFZFq---A--
+[24/May/2025:13:49:59 +0000] 17480945992.740008 172.18.0.1 32870 172.18.0.4 443
+---DiNpFZFq---B--
+GET /favicon.ico HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---DiNpFZFq---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 166115
+Content-Type: image/x-icon
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-288e3"
+
+---DiNpFZFq---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/favicon.ico"] [unique_id "17480945992.740008"] [ref "o0,14o0,9o9,5v32,14"]
+
+---DiNpFZFq---Z--
+
+---qw5NaiKp---A--
+[24/May/2025:13:49:59 +0000] 17480945994.238671 172.18.0.1 32870 172.18.0.4 443
+---qw5NaiKp---B--
+GET /assets/fonts/sukoro/sukoro.otf HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/css/login.css
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: font
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---qw5NaiKp---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:49:59 GMT
+Content-Length: 1275280
+Content-Type: application/octet-stream
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-137590"
+
+---qw5NaiKp---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/assets/fonts/sukoro/sukoro.otf"] [unique_id "17480945994.238671"] [ref "o0,14o0,9o9,5v51,14"]
+
+---qw5NaiKp---Z--
+
+---tX9W7h1p---A--
+[24/May/2025:13:51:21 +0000] 174809468127.541159 172.18.0.1 54848 172.18.0.4 443
+---tX9W7h1p---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---tX9W7h1p---C--
+{"username":"mamarDDA","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---tX9W7h1p---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:51:23 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---tX9W7h1p---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809468127.541159"] [ref "o0,14o0,9o9,5v42,14"]
+
+---tX9W7h1p---Z--
+
+---XU2Rp1fK---A--
+[24/May/2025:13:52:36 +0000] 174809475612.058252 172.18.0.1 42278 172.18.0.4 443
+---XU2Rp1fK---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---XU2Rp1fK---C--
+{"username":"mamarDDA","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---XU2Rp1fK---F--
+HTTP/1.1 400
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:52:36 GMT
+Content-Length: 35
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---XU2Rp1fK---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809475612.058252"] [ref "o0,14o0,9o9,5v42,14"]
+
+---XU2Rp1fK---Z--
+
+---HpSzkLjI---A--
+[24/May/2025:13:55:54 +0000] 174809495480.272515 172.18.0.1 58096 172.18.0.4 443
+---HpSzkLjI---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---HpSzkLjI---C--
+{"username":"mamarDDA","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---HpSzkLjI---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:55:56 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---HpSzkLjI---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809495480.272515"] [ref "o0,14o0,9o9,5v42,14"]
+
+---HpSzkLjI---Z--
+
+---qfyAPrra---A--
+[24/May/2025:13:57:07 +0000] 174809502723.004525 172.18.0.1 40904 172.18.0.4 443
+---qfyAPrra---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 135
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---qfyAPrra---C--
+{"username":"mamarDDA","mail":"ucuyuv@ojzoiv.fr","firstName":"mamar","lastName":"mamar","password":"A@1","password_confirmation":"A@1"}
+
+---qfyAPrra---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 13:57:09 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---qfyAPrra---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809502723.004525"] [ref "o0,14o0,9o9,5v42,14"]
+
+---qfyAPrra---Z--
+
+---5kWyaE5q---A--
+[24/May/2025:14:18:40 +0000] 174809632021.254312 172.18.0.1 36012 172.18.0.4 443
+---5kWyaE5q---B--
+GET / HTTP/1.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+sec-ch-ua-platform: "Linux"
+Upgrade-Insecure-Requests: 1
+sec-ch-ua-mobile: ?0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Cache-Control: max-age=0
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Sec-Fetch-User: ?1
+Sec-Fetch-Mode: navigate
+Connection: keep-alive
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---5kWyaE5q---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 1123
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-463"
+
+---5kWyaE5q---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/"] [unique_id "174809632021.254312"] [ref "o0,14o0,9o9,5v21,14"]
+
+---5kWyaE5q---Z--
+
+---N7q32QTi---A--
+[24/May/2025:14:18:40 +0000] 174809632060.573054 172.18.0.1 36012 172.18.0.4 443
+---N7q32QTi---B--
+GET /css/styles.css HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: text/css,*/*;q=0.1
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: style
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---N7q32QTi---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 1993
+Content-Type: text/css
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-7c9"
+
+---N7q32QTi---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/css/styles.css"] [unique_id "174809632060.573054"] [ref "o0,14o0,9o9,5v35,14"]
+
+---N7q32QTi---Z--
+
+---BowAwKjm---A--
+[24/May/2025:14:18:40 +0000] 174809632093.972789 172.18.0.1 36012 172.18.0.4 443
+---BowAwKjm---B--
+GET /js/main.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---BowAwKjm---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 165
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-a5"
+
+---BowAwKjm---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/main.js"] [unique_id "174809632093.972789"] [ref "o0,14o0,9o9,5v31,14"]
+
+---BowAwKjm---Z--
+
+---LvTSlRGq---A--
+[24/May/2025:14:18:40 +0000] 174809632045.817121 172.18.0.1 36012 172.18.0.4 443
+---LvTSlRGq---B--
+GET /js/router.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/main.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---LvTSlRGq---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 1481
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-5c9"
+
+---LvTSlRGq---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/router.js"] [unique_id "174809632045.817121"] [ref "o0,14o0,9o9,5v33,14"]
+
+---LvTSlRGq---Z--
+
+---9mmkzsaM---A--
+[24/May/2025:14:18:40 +0000] 174809632012.535758 172.18.0.1 36012 172.18.0.4 443
+---9mmkzsaM---B--
+GET /js/routes.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/router.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---9mmkzsaM---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 804
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-324"
+
+---9mmkzsaM---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/routes.js"] [unique_id "174809632012.535758"] [ref "o0,14o0,9o9,5v33,14"]
+
+---9mmkzsaM---Z--
+
+---L1Yq1JUa---A--
+[24/May/2025:14:18:40 +0000] 174809632054.955289 172.18.0.1 36078 172.18.0.4 443
+---L1Yq1JUa---B--
+GET /js/views/duel.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---L1Yq1JUa---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 71
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-47"
+
+---L1Yq1JUa---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/duel.js"] [unique_id "174809632054.955289"] [ref "o0,14o0,9o9,5v37,14"]
+
+---L1Yq1JUa---Z--
+
+---xPNznrhz---A--
+[24/May/2025:14:18:40 +0000] 174809632049.635874 172.18.0.1 36012 172.18.0.4 443
+---xPNznrhz---B--
+GET /js/views/home.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---xPNznrhz---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 673
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-2a1"
+
+---xPNznrhz---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/home.js"] [unique_id "174809632049.635874"] [ref "o0,14o0,9o9,5v37,14"]
+
+---xPNznrhz---Z--
+
+---U5cgrKu3---A--
+[24/May/2025:14:18:40 +0000] 174809632024.665906 172.18.0.1 36088 172.18.0.4 443
+---U5cgrKu3---B--
+GET /js/views/singlePlay.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---U5cgrKu3---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 80
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-50"
+
+---U5cgrKu3---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/singlePlay.js"] [unique_id "174809632024.665906"] [ref "o0,14o0,9o9,5v43,14"]
+
+---U5cgrKu3---Z--
+
+---uOjd1A1e---A--
+[24/May/2025:14:18:40 +0000] 174809632064.098995 172.18.0.1 36078 172.18.0.4 443
+---uOjd1A1e---B--
+GET /js/views/multiplayer.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---uOjd1A1e---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 84
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-54"
+
+---uOjd1A1e---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/multiplayer.js"] [unique_id "174809632064.098995"] [ref "o0,14o0,9o9,5v44,14"]
+
+---uOjd1A1e---Z--
+
+---BeaEZluf---A--
+[24/May/2025:14:18:40 +0000] 17480963202.944134 172.18.0.1 36080 172.18.0.4 443
+---BeaEZluf---B--
+GET /js/views/signup.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---BeaEZluf---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 3190
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-c76"
+
+---BeaEZluf---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/signup.js"] [unique_id "17480963202.944134"] [ref "o0,14o0,9o9,5v39,14"]
+
+---BeaEZluf---Z--
+
+---fc9ZwsMF---A--
+[24/May/2025:14:18:40 +0000] 174809632067.601499 172.18.0.1 36012 172.18.0.4 443
+---fc9ZwsMF---B--
+GET /js/views/login.js HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/js/routes.js
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: script
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---fc9ZwsMF---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 1707
+Content-Type: application/javascript
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-6ab"
+
+---fc9ZwsMF---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/js/views/login.js"] [unique_id "174809632067.601499"] [ref "o0,14o0,9o9,5v38,14"]
+
+---fc9ZwsMF---Z--
+
+---lnfUEvKL---A--
+[24/May/2025:14:18:40 +0000] 17480963206.163000 172.18.0.1 36012 172.18.0.4 443
+---lnfUEvKL---B--
+GET /templates/signup.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---lnfUEvKL---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 2006
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 17:23:04 GMT
+Connection: keep-alive
+ETag: "6830aef8-7d6"
+
+---lnfUEvKL---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/signup.html"] [unique_id "17480963206.163000"] [ref "o0,14o0,9o9,5v42,14"]
+
+---lnfUEvKL---Z--
+
+---XF1CzuDA---A--
+[24/May/2025:14:18:40 +0000] 174809632043.614005 172.18.0.1 36078 172.18.0.4 443
+---XF1CzuDA---B--
+GET /favicon.ico HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---XF1CzuDA---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:18:40 GMT
+Content-Length: 166115
+Content-Type: image/x-icon
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-288e3"
+
+---XF1CzuDA---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/favicon.ico"] [unique_id "174809632043.614005"] [ref "o0,14o0,9o9,5v32,14"]
+
+---XF1CzuDA---Z--
+
+---S0U82VwO---A--
+[24/May/2025:14:19:29 +0000] 174809636975.052028 172.18.0.1 36078 172.18.0.4 443
+---S0U82VwO---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 163
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---S0U82VwO---C--
+{"username":"sosoyak","mail":"sonia.yakhelef85@gmail.com","firstName":"sonia","lastName":"yakhelef","password":"Password12@","password_confirmation":"Password12@"}
+
+---S0U82VwO---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:19:31 GMT
+Content-Length: 54
+Content-Type: application/json
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---S0U82VwO---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809636975.052028"] [ref "o0,14o0,9o9,5v42,14"]
+
+---S0U82VwO---Z--
+
+---UUCTlg3d---A--
+[24/May/2025:14:20:14 +0000] 174809641458.423212 172.18.0.1 36078 172.18.0.4 443
+---UUCTlg3d---B--
+POST /user-service/signup/ HTTP/1.1
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+Sec-Fetch-Site: same-origin
+X-CSRFToken: p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 163
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---UUCTlg3d---C--
+{"username":"sosoyak","mail":"sonia.yakhelef85@gmail.com","firstName":"sonia","lastName":"yakhelef","password":"Password12@","password_confirmation":"Password12@"}
+
+---UUCTlg3d---F--
+HTTP/1.1 500
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:20:14 GMT
+Content-Length: 149162
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+X-Frame-Options: DENY
+Vary: Cookie
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+
+---UUCTlg3d---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user-service/signup/"] [unique_id "174809641458.423212"] [ref "o0,14o0,9o9,5v42,14"]
+
+---UUCTlg3d---Z--
+
+---IGCgD659---A--
+[24/May/2025:14:21:47 +0000] 174809650796.837333 172.18.0.1 34464 172.18.0.4 443
+---IGCgD659---B--
+GET /templates/login.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---IGCgD659---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:21:47 GMT
+Content-Length: 855
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-357"
+
+---IGCgD659---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/login.html"] [unique_id "174809650796.837333"] [ref "o0,14o0,9o9,5v41,14"]
+
+---IGCgD659---Z--
+
+---h5JcB6wz---A--
+[24/May/2025:14:22:44 +0000] 17480965640.887695 172.18.0.1 34464 172.18.0.4 443
+---h5JcB6wz---B--
+POST /user_service/login/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://127.0.0.1:8443
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+sec-ch-ua-platform: "Linux"
+Referer: https://127.0.0.1:8443/
+Content-Length: 62
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: 127.0.0.1:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---h5JcB6wz---C--
+{"mail":"sonia.yakhelef85@gmail.com","password":"Password12@"}
+
+---h5JcB6wz---F--
+HTTP/1.1 405
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:22:44 GMT
+Content-Length: 559
+Content-Type: text/html
+Connection: keep-alive
+
+---h5JcB6wz---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/user_service/login/"] [unique_id "17480965640.887695"] [ref "o0,14o0,9o9,5v41,14"]
+
+---h5JcB6wz---Z--
+
+---2kG1uFgP---A--
+[24/May/2025:14:25:27 +0000] 174809672757.766463 172.18.0.1 45290 172.18.0.4 443
+---2kG1uFgP---B--
+GET /templates/home.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---2kG1uFgP---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:25:27 GMT
+Content-Length: 139
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-8b"
+
+---2kG1uFgP---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/home.html"] [unique_id "174809672757.766463"] [ref "o0,14o0,9o9,5v40,14"]
+
+---2kG1uFgP---Z--
+
+---VfaUZnez---A--
+[24/May/2025:14:28:12 +0000] 17480968923.408352 172.18.0.1 52250 172.18.0.4 443
+---VfaUZnez---B--
+GET /templates/multiplayer.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---VfaUZnez---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:28:12 GMT
+Content-Length: 71
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-47"
+
+---VfaUZnez---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/multiplayer.html"] [unique_id "17480968923.408352"] [ref "o0,14o0,9o9,5v47,14"]
+
+---VfaUZnez---Z--
+
+---l68nZ493---A--
+[24/May/2025:14:28:14 +0000] 174809689467.648215 172.18.0.1 52250 172.18.0.4 443
+---l68nZ493---B--
+GET /templates/home.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---l68nZ493---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:28:14 GMT
+Content-Length: 139
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-8b"
+
+---l68nZ493---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/home.html"] [unique_id "174809689467.648215"] [ref "o0,14o0,9o9,5v40,14"]
+
+---l68nZ493---Z--
+
+---WJUHxVvy---A--
+[24/May/2025:14:28:15 +0000] 174809689522.532684 172.18.0.1 52250 172.18.0.4 443
+---WJUHxVvy---B--
+GET /templates/singlePlay.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---WJUHxVvy---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:28:15 GMT
+Content-Length: 69
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-45"
+
+---WJUHxVvy---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/singlePlay.html"] [unique_id "174809689522.532684"] [ref "o0,14o0,9o9,5v46,14"]
+
+---WJUHxVvy---Z--
+
+---F9z8PfVs---A--
+[24/May/2025:14:28:16 +0000] 174809689632.807800 172.18.0.1 52250 172.18.0.4 443
+---F9z8PfVs---B--
+GET /templates/home.html HTTP/1.1
+Referer: https://127.0.0.1:8443/
+sec-ch-ua-platform: "Linux"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Accept: */*
+sec-ch-ua: "Chromium";v="134", "Not:A-Brand";v="24", "Google Chrome";v="134"
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: 127.0.0.1:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=p3I2jqpgHmKPK4IIxtWgPxthqZnWFTg0
+Accept-Language: en-US,en;q=0.9,fr;q=0.8
+
+---F9z8PfVs---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 24 May 2025 14:28:16 GMT
+Content-Length: 139
+Content-Type: text/html
+Last-Modified: Fri, 23 May 2025 13:49:47 GMT
+Connection: keep-alive
+ETag: "68307cfb-8b"
+
+---F9z8PfVs---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `127.0.0.1:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "127.0.0.1:8443"] [severity "4"] [ver "OWASP_CRS/4.15.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.4"] [uri "/templates/home.html"] [unique_id "174809689632.807800"] [ref "o0,14o0,9o9,5v40,14"]
+
+---F9z8PfVs---Z--
+
