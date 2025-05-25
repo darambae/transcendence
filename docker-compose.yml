@@ -21,8 +21,8 @@ services:
       context: ./backend/user_service
       dockerfile: Dockerfile
     container_name: user_service
-    ports:
-      - "8010:8010"
+    # ports:
+    #   - "8010:8010"
     volumes:
       - certs:/certs
     environment:
@@ -41,8 +41,8 @@ services:
       context: ./backend/pong
       dockerfile: Dockerfile
     container_name: pong
-    ports:
-      - "8020:8020"
+    # ports:
+    #   - "8020:8020"
     volumes:
       - certs:/certs
     environment:
@@ -74,9 +74,17 @@ services:
     env_file:
       - .env
     restart: always
-  
+  redis:
+    image: redis:latest
+    container_name: redis
+    #ports:
+    #  - "6379:6379"
+    networks:
+      - shared_network
+    restart: always
+
   ############### Game import ##################
-  djangopong:
+  server_pong:
     build: 
       context: ./backend/apiApp/
       dockerfile: ./Dockerfile
@@ -89,7 +97,7 @@ services:
       - redispong_network
       - nginx_network
 
-  aimodule:
+  ai_pong:
     build :
       context : ./backend/AI-docker/
       dockerfile: ./Dockerfile
@@ -109,16 +117,6 @@ services:
       - redispong_network
 
 ########################################
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    #ports:
-    #  - "6379:6379"
-    networks:
-      - shared_network
-    restart: always
-
 volumes:
   postgres_data:
     name: postgres_data
