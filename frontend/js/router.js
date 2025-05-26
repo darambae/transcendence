@@ -1,15 +1,10 @@
 
 import { routes } from './routes.js';
+import { actualizeIndexPage } from './utils.js';
 
+window.addEventListener('hashchange', navigate);
+window.addEventListener('DOMContentLoaded', navigate);
 
-export async function loadTemplate(viewName) {
-	const response = await fetch(`templates/${viewName}.html`);
-	if (!response.ok) {
-	  throw new Error(`Unable to load template ${viewName}`);
-	}
-	return await response.text();
-  }
-  
 
 export async function navigate() {
 	const hash = location.hash.slice(1);
@@ -21,9 +16,6 @@ export async function navigate() {
 	} else {
 		view = routes[hash];
 	}
-	
-	const content = document.getElementById("main-content");
-	const modalContainer = document.getElementById("modal-container");
 
 	if (!view) {
 		content.innerHTML = `<h2>404</h2><p>Page not Found</p>`;
@@ -31,21 +23,10 @@ export async function navigate() {
 	}
 
 	try {
-		//load html file of the corresponding route
-		const html = await loadTemplate(view.template);
-
-		if(view.isModal) {
-			modalContainer.innerHTML = html;
-			modalContainer.style.display = 'block';
-
-			if (typeof view.controller === 'function') {
-				view.controller();
-			}
+		if (view.isModal) {
+			actualizeIndexPage('modal-container', view);
 		} else {
-			content.innerHTML = html;
-			if (typeof view.controller === 'function') {
-				view.controller();
-			}
+			actualizeIndexPage('main-content', view);
 		}
 	} catch (error) {
 		console.error('Error loading template ', error);
