@@ -1,3 +1,4 @@
+import { routes } from "../routes.js";
 
 export async function handleLoginSubmit(event) {
 	event.preventDefault();
@@ -22,8 +23,19 @@ export async function handleLoginSubmit(event) {
 			body: JSON.stringify(data)
 		});
 
+		//tokens returned in the JWT to communicate with protected roads
+		let	accessToken = null; //Token to put in the authorization header of request trying to access protected roads
+		let	refreshToken = null; // Token to get a new acccess token if needed without having to reconnect
+		
+		const data = await response.json();
 		if (response.ok) {
-			console.log("successfully connected");
+			accessToken = data.access;
+			refreshToken = data.refreshToken;
+			localStorage.setItem(accessToken);
+			localStorage.setItem(refreshToken);
+
+			actualizePage('toggle-login', routes[user]);
+			console.log("User successfully connected");
 		} else {
 			console.log("Couldn't connect");
 			//Error handling (wrong password, mail address not known, etc...)
