@@ -18,6 +18,4 @@ EXPOSE 8010
 
 ENTRYPOINT ["/tmp/entrypoint.sh"]
 
-#CMD ["sh", "-c", "daphne -e ssl:8010:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 user_management.asgi:application"]
-
-#CMD ["python", "manage.py", "runserver", "0.0.0.0:8010"]
+CMD ["sh", "-c", "daphne -e ssl:8010:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 user_management.asgi:application"]

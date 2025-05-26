@@ -12,7 +12,7 @@ class USER(models.Model):
 	online = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	last_login = models.DateTimeField(null=True, blank=True)
-	avatar = models.CharField(max_length=100, blank=True, null=True)
+	avatar = models.ImageField(upload_to='imgs/', default='imgs/default.png')
 
 	def __str__(self):
 		return self.user_name

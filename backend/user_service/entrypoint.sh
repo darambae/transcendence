@@ -17,4 +17,6 @@ python manage.py migrate --noinput
 #  sleep 15
 #done
 
-python manage.py runserver 0.0.0.0:8010
+exec "$@"
+
+#python manage.py runserver 0.0.0.0:8010
