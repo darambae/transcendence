@@ -1,2 +1,114 @@
 services:
-  
+  setup:
+    build:
+      context: ./elk/setup
+      dockerfile: Dockerfile
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+    container_name: setup
+    networks:
+        - shared_network
+    env_file:
+      - .env    
+  logstash:
+    build:
+      context: ./elk/logstash
+      dockerfile: Dockerfile 
+    container_name: logstash
+    ports:
+      - "9600:9600"
+      - "5044:5044"
+      - "6006:6006"
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - certs:/usr/share/logstash/config/certs
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    #     - kibana
+    env_file:
+      - .env
+    networks:
+      - shared_network
+    environment:
+      LS_JAVA_OPTS: "-Xmx1g -Xms1g"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f https://localhost:6000/_node/stats"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  elasticsearch:
+    build:
+      context: ./elk/elasticsearch
+      dockerfile: Dockerfile
+    container_name: elasticsearch
+    labels:
+      co.elastic.logs/module: "elasticsearch"
+    depends_on:
+      - setup
+    environment:
+      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      - ELASTIC_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      - NODE_OPTIONS=--openssl-legacy-provider
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - elk_data:/usr/share/elasticsearch/data
+      - ./elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - ${ELASTICSEARCH_PORT}:9200
+      - 9300:9300
+    env_file:
+      - .env
+    networks:
+      - shared_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -u logstash_system:${ELASTIC_PASSWORD} --silent --fail https://elasticsearch:9200/_cluster/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    # restart: unless-stopped
+  kibana:
+    build:
+      context: ./elk/kibana
+      dockerfile: Dockerfile
+    container_name: kibana
+    labels:
+      co.elastic.logs/module: "kibana"
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - NODE_OPTIONS=openssl-legacy-provider
+      - ES_PATH_CONF=/usr/share/elasticsearch/config
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      # - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    env_file:
+      - .env
+
+    networks:
+      - shared_network
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - ./elk/kibana/my_kibana.yml:/usr/share/kibana/config/my_kibana.yml
+
+volumes:
+  elk_data:
+    driver: local
+    name: elk_data
+  certs:
+    name: certs
+    driver: local
+
+networks:
+  shared_network:
+    name: shared_network
+    driver: bridge

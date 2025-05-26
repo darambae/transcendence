@@ -12,7 +12,7 @@ set -e
 # Create extfile for SAN
 echo "Creating SAN extfile..."
 cat <<EOF > /usr/share/elasticsearch/config/certs/san.ext
-subjectAltName = DNS:localhost, DNS:localhost, IP:127.0.0.1
+subjectAltName = DNS:transcendence.42.fr, DNS:localhost, IP:127.0.0.1
 EOF
 
 echo "Generating private key and CSR for the server..."

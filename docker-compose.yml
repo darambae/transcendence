@@ -1,4 +1,13 @@
 services:
+  certs_generator:
+    container_name: certs_generator
+    build:
+      context: ./elk/setup
+      dockerfile: Dockerfile
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+    env_file:
+      - .env
   postgres:
     image: postgres:latest
     #ports:
@@ -14,8 +23,29 @@ services:
     env_file:
       - .env
     networks:
-      - shared_network
-
+      - nginx_network
+  nginx_modsecurity:
+    build: ./nginx_modsecurity
+    container_name: nginx_modsecurity
+    ports:
+      - "8443:443"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - ./nginx_modsecurity/log:/var/log/modsecurity:rw
+    # Add all django services as dependencies
+    depends_on:
+      - certs_generator
+      - user_service
+      - pong
+      - ai_pong
+      - server_pong
+    networks:
+      - nginx_network
+    env_file:
+      - .env
+    restart: always
+  ################## Django Services ##################
   user_service:
     build:
       context: ./backend/user_service
@@ -28,13 +58,16 @@ services:
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
-      postgres:
+      redis:
         condition: service_healthy
+      certs_generator:
+        condition: service_completed_successfully
+
     env_file:
       - .env
     restart: always
     networks:
-      - shared_network
+      - elk_network
       - nginx_network
   pong:
     build:
@@ -48,88 +81,181 @@ services:
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
-      postgres:
+      redis:
         condition: service_healthy
+      certs_generator:
+        condition: service_completed_successfully
     env_file:
       - .env
     restart: always
     networks:
-      - shared_network
+      - elk_network
       - nginx_network
 
-  nginx_modsecurity:
-    build: ./nginx_modsecurity
-    container_name: nginx_modsecurity
-    ports:
-      - "8443:443"
-    volumes:
-      - ./frontend:/usr/share/nginx/html
-      - certs:/etc/nginx/certs
-      - ./nginx_modsecurity/log:/var/log/modsecurity:rw
-    depends_on:
-      - user_service
-      - pong
-    networks:
-      - nginx_network
-    env_file:
-      - .env
-    restart: always
   redis:
     image: redis:latest
     container_name: redis
     #ports:
     #  - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     networks:
-      - shared_network
+      - nginx_network
     restart: always
 
   ############### Game import ##################
   server_pong:
     build: 
-      context: ./backend/apiApp/
+      context: ./backend/server_pong/
       dockerfile: ./Dockerfile
-    container_name: djangopong_container
-    ports:
-      - "8000:8000"
+    container_name: server_pong
+    depends_on:
+      - game_redis:
+        condition: service_healthy
+      - certs_generator:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    restart: always
     volumes:
-      - ./backend/apiApp:/app
+      - certs:/certs
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    # volumes:
+    #   - ./backend/server_pong:/app
     networks:
-      - redispong_network
+      - game_network
       - nginx_network
+      - elk_network
 
   ai_pong:
     build :
-      context : ./backend/AI-docker/
+      context : ./backend/AI_pong/
       dockerfile: ./Dockerfile
-    container_name : iaDocker
-    ports:
-      - "8003:8000"
+    container_name : ai_pong
+    depends_on:
+      - game_redis
     volumes:
-      - ./backend/AI-docker:/app
+      - ./backend/AI_pong:/app
     networks:
-      - redispong_network
+      - game_network
+      - elk_network
+      - nginx_network
 
-  redispong:
+  game_redis:
+    container_name: game_redis
     image: "redis:latest"
-    ports:
-      - "6380:6379"
+    # ports:
+    #   - "6380:6379"
     networks:
-      - redispong_network
+      - game_network
 
-########################################
+  ################# ELK Stack ##################
+  logstash:
+    container_name: logstash
+    build:
+      context: ./elk/logstash
+      dockerfile: Dockerfile 
+    ports:
+      - "9600:9600"
+      - "5044:5044"
+      - "6006:6006"
+    volumes:
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - certs:/usr/share/logstash/config/certs
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - elk_network
+    environment:
+      LS_JAVA_OPTS: "-Xmx1g -Xms1g"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f https://localhost:6000/_node/stats"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  elasticsearch:
+    build:
+      context: ./elk/elasticsearch
+      dockerfile: Dockerfile
+    container_name: elasticsearch
+    depends_on:
+      certs_generator:
+        condition: service_completed_successfully
+    environment:
+      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      - ELASTIC_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      - NODE_OPTIONS=--openssl-legacy-provider
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+      - elk_data:/usr/share/elasticsearch/data
+      - ./elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    ports:
+      - ${ELASTICSEARCH_PORT}:9200
+      - 9300:9300
+    env_file:
+      - .env
+    networks:
+      - elk_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -u logstash_system:${ELASTIC_PASSWORD} --silent --fail https://elasticsearch:9200/_cluster/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    # restart: unless-stopped
+  kibana:
+    build:
+      context: ./elk/kibana
+      dockerfile: Dockerfile
+    container_name: kibana
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - NODE_OPTIONS=openssl-legacy-provider
+      - ES_PATH_CONF=/usr/share/elasticsearch/config
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      # - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - elk_network
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - ./elk/kibana/my_kibana.yml:/usr/share/kibana/config/my_kibana.yml
+
+#################### VOLUMES #########################
 volumes:
   postgres_data:
     name: postgres_data
     driver: local
+  elk_data:
+    name: elk_data
+    driver: local
   certs:
-    external: true
+    name: certs
+    driver: local
 
+#################### NETWORKS #########################
 networks:
   nginx_network:
     name: nginx_network
-  shared_network:
-    name: shared_network
-    external: true
-    ######## Game network #########
-  redispong_network:
+  elk_network:
+    name: elk_network
+  game_network:
     driver: bridge

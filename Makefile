@@ -45,7 +45,7 @@ build-main:
 	@${COMPOSE} build
 
 build:
-	@make build-elk
+	# @make build-elk
 	@make build-main
 
 no-cache:
@@ -59,7 +59,7 @@ up-elk:
 	@echo "Building & starting ELK stack..."
 	@${PRE_COMPOSE} up
 
-up-main:
+up-main: add-ca
 	@echo "Building & starting Transcendence..."
 	@${COMPOSE} up
 
