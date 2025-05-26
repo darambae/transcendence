@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth.views import LogoutView, PasswordChangeView, PasswordChangeDoneView
-from . import views
+from api import views
 from django.urls import path, include
 from django.views.generic.base import TemplateView
 

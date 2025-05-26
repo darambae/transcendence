@@ -11,22 +11,31 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
+import logging
+from logstash_async.formatter import LogstashFormatter
+from logstash_async.handler import AsynchronousLogstashHandler
+from .jsonSocketHandler import JSONSocketHandler
+
+APP_NAME = 'AI_pong'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+BACKEND_DIR = BASE_DIR.parent
+PROJECT_DIR = BACKEND_DIR.parent
+FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2-6usc!n^#z4_f4pni*(@)@vhff=d)fv)802&3#2ii46fn^aoh'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -52,12 +61,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ai_pong.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': FRONTEND_DIR,
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,17 +78,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ai_pong.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(DATABASE_URL)
 }
 
 
@@ -118,8 +124,83 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = FRONTEND_DIR
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+class AddAppNameFilter(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, 'app_name'):
+            record.app_name = APP_NAME
+        return True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
+        },
+    },
+    'formatters': {
+        'json': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+        },
+        'text': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'logging.Formatter',
+        },
+        'logstash': {
+            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+            # You might want to explore additional options in DjangoLogstashFormatter
+            # For example, 'extra_fields': {'environment': 'production'}
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+            'host': 'logstash',
+            'port': 6006,
+            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+            'ssl_enable': False,
+            'formatter': 'logstash',
+            'ensure_ascii': True,
+            'filters': ['add_app_name'],
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'text',
+            'filters': ['add_app_name'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'], # Only send Django logs to console by default
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger
+        },
+        'django.request': {
+            'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger
+        },
+        'user_service': {
+            'handlers': ['console' ,'logstash'],
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger if needed
+        },
+    },
+    'root': {
+        'handlers': ['console', 'logstash'],
+        'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
+    },
+}
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

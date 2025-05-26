@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 import logging
 import logging.handlers
 from logstash_async.formatter import LogstashFormatter

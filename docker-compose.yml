@@ -35,9 +35,7 @@ services:
       - ./nginx_modsecurity/log:/var/log/modsecurity:rw
     # Add all django services as dependencies
     depends_on:
-      - certs_generator
       - user_service
-      - pong
       - ai_pong
       - server_pong
     networks:
@@ -51,38 +49,14 @@ services:
       context: ./backend/user_service
       dockerfile: Dockerfile
     container_name: user_service
-    # ports:
-    #   - "8010:8010"
     volumes:
       - certs:/certs
+      - ./backend/user_service:/app
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       redis:
-        condition: service_healthy
-      certs_generator:
-        condition: service_completed_successfully
-
-    env_file:
-      - .env
-    restart: always
-    networks:
-      - elk_network
-      - nginx_network
-  pong:
-    build:
-      context: ./backend/pong
-      dockerfile: Dockerfile
-    container_name: pong
-    # ports:
-    #   - "8020:8020"
-    volumes:
-      - certs:/certs
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-    depends_on:
-      redis:
-        condition: service_healthy
+        condition: service_started
       certs_generator:
         condition: service_completed_successfully
     env_file:
@@ -91,17 +65,37 @@ services:
     networks:
       - elk_network
       - nginx_network
+  # pong:
+  #   build:
+  #     context: ./backend/pong
+  #     dockerfile: Dockerfile
+  #   container_name: pong
+  #   # ports:
+  #   #   - "8020:8020"
+  #   volumes:
+  #     - certs:/certs
+  #   environment:
+  #     - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #     certs_generator:
+  #       condition: service_completed_successfully
+  #   env_file:
+  #     - .env
+  #   restart: always
+  #   networks:
+  #     - elk_network
+  #     - nginx_network
 
   redis:
     image: redis:latest
     container_name: redis
-    #ports:
-    #  - "6379:6379"
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
     networks:
       - nginx_network
     restart: always
@@ -113,23 +107,22 @@ services:
       dockerfile: ./Dockerfile
     container_name: server_pong
     depends_on:
-      - game_redis:
-        condition: service_healthy
-      - certs_generator:
+      game_redis:
+        condition: service_started
+      certs_generator:
         condition: service_completed_successfully
     env_file:
       - .env
-    restart: always
     volumes:
       - certs:/certs
+      - ./backend/server_pong:/app
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-    # volumes:
-    #   - ./backend/server_pong:/app
     networks:
       - game_network
       - nginx_network
       - elk_network
+    restart: always
 
   ai_pong:
     build :
@@ -137,9 +130,17 @@ services:
       dockerfile: ./Dockerfile
     container_name : ai_pong
     depends_on:
-      - game_redis
+      game_redis:
+        condition: service_started
+      certs_generator:
+        condition: service_completed_successfully
     volumes:
+      - certs:/certs
       - ./backend/AI_pong:/app
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    env_file:
+      - .env
     networks:
       - game_network
       - elk_network
@@ -148,8 +149,6 @@ services:
   game_redis:
     container_name: game_redis
     image: "redis:latest"
-    # ports:
-    #   - "6380:6379"
     networks:
       - game_network
 
