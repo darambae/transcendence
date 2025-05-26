@@ -20,6 +20,6 @@ EXPOSE 8000
 # Commande pour lancer Django
 # CMD ["tail", "-f", "/dev/null"]
 # CMD ["python",  "manage.py", "runserver"]
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "ai_pong.asgi:application"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
 # CMD ["ls", "-R", "/app"]
 # daphne -b 0.0.0.0 -p 8000 myproject.asgi:application
