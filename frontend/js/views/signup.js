@@ -1,3 +1,5 @@
+import { actualizeIndexPage } from '../utils.js'
+
 export async function handleSignupSubmit(event) {
 	function getCookie(name) {
 		let cookieValue = null;
@@ -22,10 +24,12 @@ export async function handleSignupSubmit(event) {
 	const formData = new FormData(form);
 	const data = Object.fromEntries(formData.entries());
 
+	console.log(data);
+
 	try {
 		submitButton.disabled = true;
-
-		const response = await fetch("/user-service/signup/", {
+		
+		const response = await fetch('user-service/signup/', {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -34,8 +38,17 @@ export async function handleSignupSubmit(event) {
 			body: JSON.stringify(data)
 		})
 
+		// const text = await response.text();
+		// try {
+		// 	const result = JSON.parse(text);
+		// 	console.log(result);
+		// } catch (e) {
+		// 	console.error("Réponse non JSON :", text);
+		// }
+
 		if (response.ok) {
 			console.log("signin form successfully submitted");
+			actualizeIndexPage('main-content', signupSucess);
 		} else {
 			console.log("signup form couldn't connect")
 			//signup form error handling (already existing, password etc..)

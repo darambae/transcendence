@@ -1,4 +1,3 @@
-
 export async function loadTemplate(viewName) {
 	const response = await fetch(`templates/${viewName}.html`);
 	if (!response.ok) {

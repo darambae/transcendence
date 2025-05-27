@@ -12,7 +12,7 @@ def generate_otp_send_mail(user):
 	opt = "-".join(tab)
 
 	subject = "PongPong two factor Authentication"
-	message = f"HELLO {user.user_name},\n\nenter this code to connect to ponpon\n\n" + opt
+	message = f"HELLO {user.user_name},\n\nenter this code to connect to PongPong\n\n" + opt
 	from_email = settings.DEFAULT_FROM_EMAIL
 	recipient_list = [user.mail]
 
