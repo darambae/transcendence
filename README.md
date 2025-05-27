@@ -13,12 +13,12 @@
 
 ## Project Structure
 
-![Project Structure Diagram](project_structure(transcendence).png)
+![Project Structure Diagram](doc/project_structure(transcendence).png)
 
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure you have the following installed
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
