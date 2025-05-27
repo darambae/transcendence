@@ -36,5 +36,8 @@ export const routes = {
 	user: {
 		template: 'user',
 		controller: userController,
+	},
+	signupSuccess: {
+		template: 'signupSuccess',
 	}
   };
