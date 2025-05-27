@@ -13,7 +13,7 @@ find /usr/share/elasticsearch/config/certs -type d -exec chmod 750 {} \;
 find /usr/share/elasticsearch/config/certs -type f -exec chmod 640 {} \;
 
 echo "Waiting for setup to finish..."
-until [ -f /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.key ]; do
+until [ -f /usr/share/elasticsearch/config/certs/elasticsearch.p12 ]; do
     echo "Waiting for certs to be created..."
     sleep 9
 done
