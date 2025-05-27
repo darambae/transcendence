@@ -50,9 +50,8 @@ services:
       dockerfile: Dockerfile
     container_name: user_service
     volumes:
-      - ./backend/user_service/user_management:/user_service
+      - ./backend/user_service/user_management:/app
       - certs:/certs
-      - ./backend/user_service:/app
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
