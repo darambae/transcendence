@@ -1,0 +1,12 @@
+requests
+daphne
+channels
+channels-redis
+django
+djangorestframework
+numpy
+dj-database-url
+redis
+python-logstash-async
+python-json-logger
+psycopg2-binary

@@ -1,12 +1,25 @@
-NAME=transcendence
-PREP_NAME=elk
+#### MAIN = transcendence without ELK stack ####
+MAIN=transcendence
+ELK=elk
 
-MAIN_DOCKER_FILE=docker-compose.yml
-PREP_DOCKER_FILE=elk-docker-compose.yml
+DOCKER_FILE=docker-compose.yml
 
-PRE_COMPOSE=docker compose -f ${PREP_DOCKER_FILE} -p ${PREP_NAME}
-COMPOSE=docker compose -f ${MAIN_DOCKER_FILE} -p ${NAME}
+MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis
+ELK_CONTAINERS=elasticsearch kibana logstash
 
+# POUR GAUTIER & OMAR
+USER_CONTAINER=user_service nginx_modsecurity postgres redis
+
+# POUR RAFAEL
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
+
+# POUR KELLY PLUS TARD
+CHAT_CONTAINER=chat nginx_modsecurity postgres redis
+
+ELK_COMPOSE=docker compose -f ${DOCKER_FILE} -p ${ELK}
+COMPOSE=docker compose -f ${DOCKER_FILE} -p ${MAIN}
+
+CA=./elk/setup/certs/ca/
 CA=./elk/setup/certs/ca/
 CA_CRT=$(CA)ca.crt
 CA_KEY=$(CA)ca.key
@@ -26,22 +39,30 @@ add-ca:
 		echo "Automatic CA installation not supported for this OS."; \
 	fi
 
-# Run only the 'setup' contianer to generate the CA
-setup: add-ca
-	@echo "Building setup container..."
-	@${PRE_COMPOSE} build setup
+# Run only the 'certs_generator' contianer to generate the CA certificates
+certs_generator: add-ca
+	@echo "Building certs_generator container..."
+	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
-	@${PRE_COMPOSE} run --rm setup
+	@${COMPOSE} run --rm certs_generator
 	@echo "CA generated successfully." 
 
 # Build the ELK stack
-build-elk:
-	@echo "Building ELK stack..."
-	@${PRE_COMPOSE} build
+build-user: certs_generator
+	@echo "Building user service..."
+	@${COMPOSE} build ${USER_CONTAINER[@]}
 
-build-main:
-	@echo "Building Transcendence..."
-	@${COMPOSE} build
+build-game: certs_generator
+	@echo "Building game service..."
+	@${COMPOSE} build ${GAME_CONTAINER[@]}
+
+build-elk: certs_generator
+	@echo "Building ELK stack..."
+	@${ELK_COMPOSE} build ${ELK_CONTAINERS[@]}
+
+build-main: certs_generator
+	@echo "Building Django services..."
+	@${COMPOSE} build ${MAIN_CONTAINERS[@]}
 
 build:
 	@make build-elk
@@ -49,53 +70,55 @@ build:
 
 no-cache:
 	@echo "Building ELK stack..."
-	@${PRE_COMPOSE} build --no-cache
+	@${ELK_COMPOSE} build --no-cache
 	@echo "Building Transcendence..."
 	@${COMPOSE} build --no-cache
 	@echo "Transcendence built successfully."
 
+up-user:
+	@echo "Building & starting user service..."
+	@${COMPOSE} up ${USER_CONTAINER[@]}
+
+up-game:
+	@echo "Building & starting game service..."
+	@${COMPOSE} up ${GAME_CONTAINER[@]}
+
 up-elk:
 	@echo "Building & starting ELK stack..."
-	@${PRE_COMPOSE} up
+	@${ELK_COMPOSE} up ${ELK_CONTAINERS[@]} 
 
 up-main:
 	@echo "Building & starting Transcendence..."
-	@${COMPOSE} up
+	@${COMPOSE} up ${MAIN_CONTAINERS[@]}
 
-up: add-ca
-	@echo "Building and starting ELK stack..."
+up:
 	@make up-elk & make up-main 
+
+start-user:
+	@echo "Starting user service..."
+	@${COMPOSE} start ${USER_CONTAINER[@]}
+
+start-game:
+	@echo "Starting game service..."
+	@${COMPOSE} start ${GAME_CONTAINER[@]}
 
 start-elk:
 	@echo "Starting ELK stack..."
-	@${PRE_COMPOSE} start
+	@${ELK_COMPOSE} start
 
 start-main:
 	@echo "Starting Transcendence..."
 	@${COMPOSE} start
 
 start:
-	@echo "Starting ELK stack..."
 	@make start-elk & make start-main
 
-down-elk:
-	@echo "Stopping ELK stack..."
-	@${PRE_COMPOSE} down -v
-	@echo "ELK stack stopped."
-
-down-main:
+down:
 	@echo "Stopping Transcendence..."
 	@${COMPOSE} down -v
 	@echo "Transcendence stopped."
 
-down:
-	@make down-main
-	@make down-elk
-
 destroy:
-	@echo "Destroying ELK stack..."
-	@${PRE_COMPOSE} down -v --rmi all --remove-orphans
-	@echo "ELK stack destroyed."
 	@echo "Destroying Transcendence..."
 	@${COMPOSE} down -v --rmi all --remove-orphans
 
