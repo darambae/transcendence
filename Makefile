@@ -64,7 +64,7 @@ build-main: certs_generator
 	@echo "Building Django services..."
 	@${COMPOSE} build ${MAIN_CONTAINERS}
 
-build:
+build: certs_generator
 	@echo "Building Transcendence..."
 	@${COMPOSE} build ${MAIN_CONTAINERS} ${ELK_CONTAINERS}
 
@@ -104,11 +104,11 @@ start-game:
 
 start-elk:
 	@echo "Starting ELK stack..."
-	@${ELK_COMPOSE} start
+	@${ELK_COMPOSE} start ${ELK_CONTAINERS}
 
 start-main:
 	@echo "Starting Transcendence..."
-	@${COMPOSE} start
+	@${COMPOSE} start ${MAIN_CONTAINERS}
 
 start:
 	@make start-elk & make start-main

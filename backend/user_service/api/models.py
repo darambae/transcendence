@@ -1,13 +1,18 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-class User(AbstractUser):
-    nickname = models.CharField(max_length=150, unique=True)
-    online = models.BooleanField(default=False)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+# Create your models here.
 
-    class Meta:
-        db_table = 'user'
+class USER(models.Model):
+	user_name = models.CharField(max_length=15, unique=True)
+	first_name = models.CharField(max_length=15)
+	last_name = models.CharField(max_length=15)
+	mail = models.EmailField(unique=True)
+	password = models.CharField(max_length=128)
+	two_factor_Auth = models.CharField(max_length=255)
+	online = models.BooleanField(default=False)
+	created_at = models.DateTimeField(auto_now_add=True)
+	last_login = models.DateTimeField(null=True, blank=True)
+	avatar = models.ImageField(upload_to='imgs/', default='imgs/default.png')
 
-    def __str__(self):
-        return self.username
+	def __str__(self):
+		return self.user_name
