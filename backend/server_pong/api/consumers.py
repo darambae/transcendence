@@ -191,7 +191,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 							self.gameSimulation.stopSimulation()
 						if self.usrID <= 1 :
 							await self.gameSimulation.setRedisCache(self.room_group_name)
-						r = redis.Redis(host='redispong', port=6379, db=0)
+						r = redis.Redis(host='game_redis', port=6379, db=0)
 						cles_redis = r.keys('*')
 						# #print([clé.decode('utf-8') for clé in cles_redis], file=sys.stderr)
 						stats = cache.get(f'simulation_state_{self.room_group_name}')
@@ -212,7 +212,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			await self.t2
 
 def checkCache() :
-    r = redis.Redis(host='redispong', port = 6379, db=0)
+    r = redis.Redis(host='game_redis', port = 6379, db=0)
     cleRedis = r.keys('*')
     #print([c.decode('utf-8') for c in cleRedis], file=sys.stderr)
 

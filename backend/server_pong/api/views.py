@@ -14,7 +14,7 @@ from http import HTTPStatus
 
 channel_layer = get_channel_layer()
 
-uri = "ws://djangopong:8000/ws/game/"
+uri = "ws://server_pong:8030/ws/game/"
 
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
