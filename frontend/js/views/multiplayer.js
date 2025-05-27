@@ -1,4 +1,5 @@
 import { sendGameCreation } from './utils/createGame.js'
+import { sendGameJoining } from './utils/joinGame.js'
 import {setCanvasAndContext} from './utils/commonFunctions.js'
 
 
@@ -6,7 +7,7 @@ import {setCanvasAndContext} from './utils/commonFunctions.js'
 //   return (sendGameCreation());
 // }
 
-export function multiplayerController() {
+export async function multiplayerController() {
 	setCanvasAndContext();
 	const createButton = document.getElementById("create-game")
 	const joinButton = document.getElementById("join-game")
@@ -16,7 +17,7 @@ export function multiplayerController() {
 	});
 
   joinButton.addEventListener("click", (event) => {
-    sendGameJoining();
+    	sendGameJoining();
   })
 
 

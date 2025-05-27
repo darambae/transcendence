@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'server_pong.urls'
+ROOT_URLCONF = 'config.urls'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -76,8 +76,8 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'server_pong.wsgi.application'
-ASGI_APPLICATION = 'server_pong.asgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
