@@ -33,7 +33,7 @@ export async function sendGameCreation() {
       // ctx.clearRect(150, 220 - 20, 650, 50);
       // ctx.fillText(`Game state : ${isGamePlayable}`, 150, 220);
       if (isGamePlayable == "Game can start") {
-        return handleGame2Players(apiKey, 1, 0, ctx, canvas);
+        return handleGame2Players(apiKey, 1, 0);
       }
       await sleep(500);
     }

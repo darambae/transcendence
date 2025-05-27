@@ -76,6 +76,7 @@ services:
   server_pong:
     build: 
       context: ./backend/server_pong/
+      context: ./backend/server_pong/
       dockerfile: ./Dockerfile
     container_name: server_pong
     depends_on:
@@ -98,6 +99,7 @@ services:
 
   ai_pong:
     build :
+      context : ./backend/AI_pong/
       context : ./backend/AI_pong/
       dockerfile: ./Dockerfile
     container_name : ai_pong

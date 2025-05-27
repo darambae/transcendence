@@ -1,5 +1,5 @@
 """
-WSGI config for ai_pong project.
+WSGI config for AI project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

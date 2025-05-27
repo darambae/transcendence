@@ -1,5 +1,5 @@
 """
-ASGI config for ai_pong project.
+ASGI config for AI project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

@@ -1,5 +1,5 @@
 """
-WSGI config for myproject project.
+WSGI config for server_pong project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
