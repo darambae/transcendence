@@ -20,7 +20,6 @@ from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'server_pong'
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR.parent
@@ -94,7 +93,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redispong', 6379)],
+            "hosts": [('game_redis', 6379)],
         },
     },
 }

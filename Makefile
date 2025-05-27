@@ -16,8 +16,8 @@ GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=chat nginx_modsecurity postgres redis
 
-ELK_COMPOSE=docker compose -f ${DOCKER_FILE} -p ${ELK}
-COMPOSE=docker compose -f ${DOCKER_FILE} -p ${MAIN}
+ELK_COMPOSE=docker compose -f ${DOCKER_FILE}
+COMPOSE=docker compose -f ${DOCKER_FILE}
 
 CA=./elk/setup/certs/ca/
 CA=./elk/setup/certs/ca/

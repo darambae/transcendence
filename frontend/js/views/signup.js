@@ -25,6 +25,13 @@ export async function handleSignupSubmit(event) {
 	const data = Object.fromEntries(formData.entries());
 
 	console.log(data);
+	const csrf = getCookie('csrftoken');
+	if (!csrf) {
+		console.error("CSRF token not found");
+		return;
+	} else { 
+		console.log("CSRF token found: ", csrf);
+	}
 
 	try {
 		submitButton.disabled = true;

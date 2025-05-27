@@ -34,10 +34,8 @@ def login(request):
 
 
 def signup(request):
-
 	if request.method == 'POST':
 		try:
-
 			data = json.loads(request.body)
 
 			email = data.get('mail')

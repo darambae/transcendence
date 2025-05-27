@@ -151,6 +151,7 @@ APPEND_SLASH = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://127.0.0.1:8443",
+    "https://transcendence.42.fr:8443",
 ]
 
 # Setting Email
