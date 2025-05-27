@@ -3,18 +3,16 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # RUN apt-get update && apt-get install -y ca-certificates
-RUN apt-get update && apt-get install -y curl
-RUN apt-get install -y --no-install-recommends \
-    build-essential libpq-dev
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl build-essential libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip
-
 RUN echo "copying bash script......"
 COPY entrypoint.sh /entrypoint.sh
 COPY requirements.txt /app
 RUN chmod +x /app/requirements.txt
 RUN chmod +x /entrypoint.sh
 RUN pip install --no-cache-dir -r /app/requirements.txt
-
 
 EXPOSE 8010
 ENTRYPOINT ["/entrypoint.sh"]

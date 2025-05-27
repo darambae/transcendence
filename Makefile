@@ -50,23 +50,23 @@ certs_generator: add-ca
 # Build the ELK stack
 build-user: certs_generator
 	@echo "Building user service..."
-	@${COMPOSE} build ${USER_CONTAINER[@]}
+	@${COMPOSE} build ${USER_CONTAINER}
 
 build-game: certs_generator
 	@echo "Building game service..."
-	@${COMPOSE} build ${GAME_CONTAINER[@]}
+	@${COMPOSE} build ${GAME_CONTAINER}
 
 build-elk: certs_generator
 	@echo "Building ELK stack..."
-	@${ELK_COMPOSE} build ${ELK_CONTAINERS[@]}
+	@${ELK_COMPOSE} build ${ELK_CONTAINERS}
 
 build-main: certs_generator
 	@echo "Building Django services..."
-	@${COMPOSE} build ${MAIN_CONTAINERS[@]}
+	@${COMPOSE} build ${MAIN_CONTAINERS}
 
 build:
-	@make build-elk
-	@make build-main
+	@echo "Building Transcendence..."
+	@${COMPOSE} build ${MAIN_CONTAINERS} ${ELK_CONTAINERS}
 
 no-cache:
 	@echo "Building ELK stack..."
@@ -77,30 +77,30 @@ no-cache:
 
 up-user:
 	@echo "Building & starting user service..."
-	@${COMPOSE} up ${USER_CONTAINER[@]}
+	@${COMPOSE} up ${USER_CONTAINER}
 
 up-game:
 	@echo "Building & starting game service..."
-	@${COMPOSE} up ${GAME_CONTAINER[@]}
+	@${COMPOSE} up ${GAME_CONTAINER}
 
 up-elk:
 	@echo "Building & starting ELK stack..."
-	@${ELK_COMPOSE} up ${ELK_CONTAINERS[@]} 
+	@${ELK_COMPOSE} up ${ELK_CONTAINERS} 
 
 up-main:
 	@echo "Building & starting Transcendence..."
-	@${COMPOSE} up ${MAIN_CONTAINERS[@]}
+	@${COMPOSE} up ${MAIN_CONTAINERS}
 
 up:
 	@make up-elk & make up-main 
 
 start-user:
 	@echo "Starting user service..."
-	@${COMPOSE} start ${USER_CONTAINER[@]}
+	@${COMPOSE} start ${USER_CONTAINER}
 
 start-game:
 	@echo "Starting game service..."
-	@${COMPOSE} start ${GAME_CONTAINER[@]}
+	@${COMPOSE} start ${GAME_CONTAINER}
 
 start-elk:
 	@echo "Starting ELK stack..."
