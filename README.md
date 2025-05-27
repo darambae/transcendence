@@ -4,5 +4,6 @@
 
 ## Project Structure
 
-![Project Structure Diagram](images/structure.png)
+![Project Structure Diagram](project_structure(transcendence).png)
+
 ### Data structure

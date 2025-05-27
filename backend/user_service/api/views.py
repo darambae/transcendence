@@ -1,76 +1,67 @@
-from django.views import View
-from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from .utils import send_confirmation_email
+from .utils import generate_otp_send_mail
+from .models import USER
 from django.contrib.auth.hashers import make_password
-from .models import User
-from .forms import LoginForm, RegisterForm
-from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
+from django.http import JsonResponse
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import json
 
-User = get_user_model()
+# Create your views here.
 
-class index_view(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            return render(request, 'index.html', {'nickname': request.user.username})
-        else:
-            return render(request, 'index.html')
+def login(request):
+	print("Requête reçue :", request.method)
+	if (request.method == 'POST'):
+		try:
+			data = json.loads(request.body)
+		except KeyError as e:
+			return JsonResponse({'error': f'Missing field : {str(e)}'}, status=400)
+		
+		try:
+			user = USER.objects.get(mail=data.get('mail'))
+			if check_password(data.get('password'), user.password):
+				user.two_factor_Auth = make_password(generate_otp_send_mail(user))
+				user.online = True
+				user.save()
+				return JsonResponse({'succes': 'Login successful', 'user_id': user.id}, status=200)
+			else:
+				return JsonResponse({'error': 'Invalid password'}, status=401)
+		except USER.DoesNotExist:
+			return JsonResponse({'error': 'User not found'}, status=404)
+	else:
+		return JsonResponse({'error': 'Unauthorized'}, status=405)
 
 
-class login_view(View):  # Assuming you are using a class-based view
-    def get(self, request):
-        form = LoginForm()
-        return render(request, 'login.html', {'form': form})
+def signup(request):
 
-    def post(self, request):
-        form = LoginForm(request.POST)  # Use 'form' for consistency
+	if request.method == 'POST':
+		try:
 
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+			data = json.loads(request.body)
 
-            user = authenticate(request, username=username, password=password)  # Authenticate
+			email = data.get('mail')
+			validate_email(email)
 
-            if user is not None:
-                login(request, user)  # Log the user in
-                # Set user online status (if applicable)
-                if hasattr(user, 'online'):  # Check if 'online' attribute exists
-                    user.online = True
-                    user.save()
-                return redirect('index')  # Redirect on success
-            else:
-                form.add_error(None, "Invalid username or password")  # Add a form error
-                return render(request, 'login.html', {'form': form}) # Render with errors
+			user = USER.objects.create(
+				user_name = data['username'],
+				first_name = data['firstName'],
+				last_name = data['lastName'],
+				mail = data['mail'],
+				password = make_password(data['password'])
+			)
 
-        else:
-            return render(request, 'login.html', {'form': form})  # Render form with errors
+		except KeyError as e:
+			return JsonResponse({'error': f'Missing field : {str(e)}'}, status=400)
+		except ValidationError:
+			return JsonResponse({'error': 'Invalid e-mail address'}, status=400)
 
-class register_view(View):
-    def get(self, request):
-        user_registration_form = RegisterForm()
-        return render(request, 'register.html', {'form': user_registration_form})
+		try:
+			send_confirmation_email(user)
+		except Exception as e:
+			return JsonResponse({'error': f'for sending mail: {str(e)} {user.user_name}'}, status=400)
+	
+	else:
+		return JsonResponse({'error': 'Unauthorized method'}, status=405)
 
-    def post(self, request):
-        user_registration_form = RegisterForm(request.POST, request.FILES)
-        if user_registration_form.is_valid():
-            user = user_registration_form.save() # Save the user!
-            login(request, user)
-            return redirect('login')  # Or wherever you want to redirect
-        else:
-            return render(request, 'register.html', {'form': user_registration_form})
-
-class profile_view(View):
-    def get(self, request):
-        user = User.objects.get(id=request.user.id)
-        return render(request, 'profile.html', {'user': user})
-
-    def post(self, request):
-        user = User.objects.get(id=request.user.id)
-        user_profile_form = RegisterForm(request.POST, request.FILES, instance=user)
-        if user_profile_form.is_valid():
-            user_profile_form.save()
-            # Redirect to a success page or render a success template
-        else:
-            # Handle form errors
-            return render(request, 'profile.html', {'form': user_profile_form})
-        
+	return JsonResponse({'succes': 'User successfully created', 'user_id': user.id},  status=200)
