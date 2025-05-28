@@ -1,6 +1,11 @@
-import { actualizeIndexPage } from '../utils.js'
+import { actualizeIndexPage } from '../utils.js';
+import { routes } from '../routes.js';
 
 export async function handleSignupSubmit(event) {
+	
+	event.preventDefault();
+	console.log("here in signup form handling function");
+
 	function getCookie(name) {
 		let cookieValue = null;
 		if (document.cookie && document.cookie !== '') {
@@ -15,8 +20,6 @@ export async function handleSignupSubmit(event) {
 		}
 		return cookieValue;
 	}
-	event.preventDefault();
-	console.log("here in signup form handling function");
 
 	const form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
@@ -24,10 +27,16 @@ export async function handleSignupSubmit(event) {
 	const formData = new FormData(form);
 	const data = Object.fromEntries(formData.entries());
 
+
 	console.log(data);
+	const csrf = getCookie('csrftoken');
+	console.log(csrf);
 
 	try {
 		submitButton.disabled = true;
+		
+		const { username, mail, firstName, lastName, password } = data;
+		const cleanData = { username, mail, firstName, lastName, password };
 		
 		const response = await fetch('user-service/signup/', {
 			method: "POST",
@@ -35,20 +44,13 @@ export async function handleSignupSubmit(event) {
 				"Content-Type": "application/json",
 				'X-CSRFToken': getCookie('csrftoken'),
 			},
-			body: JSON.stringify(data)
+			body: JSON.stringify(cleanData),
+			credentials: 'include'
 		})
-
-		// const text = await response.text();
-		// try {
-		// 	const result = JSON.parse(text);
-		// 	console.log(result);
-		// } catch (e) {
-		// 	console.error("Réponse non JSON :", text);
-		// }
 
 		if (response.ok) {
 			console.log("signin form successfully submitted");
-			actualizeIndexPage('main-content', signupSucess);
+			await actualizeIndexPage('main-content', routes.signupSuccess);
 		} else {
 			console.log("signup form couldn't connect")
 			//signup form error handling (already existing, password etc..)

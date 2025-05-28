@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-#g5=^b=k86cn^*v!#m441k5v5arf7q!*pb!c&cyl@xci!)2axv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['user_service', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['user_service', 'localhost', '127.0.0.1', 'transcendence.42.fr']
 
 # Application definition
 
@@ -132,7 +132,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://127.0.0.1:8443",
+    # "https://127.0.0.1:8443", 
+	"https://transcendence.42.fr:8443",
 ]
 
 # Setting Email
