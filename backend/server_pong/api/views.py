@@ -5,6 +5,7 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import sys
+import ssl
 import uuid
 import websockets
 import json
@@ -55,12 +56,19 @@ def getSimulationState(request):
 
 async def  checkForUpdates(uriKey, key) :
     try :
-        async with websockets.connect(uriKey) as ws:
+        print("0", file=sys.stderr)
+        ssl_context = ssl.create_default_context()
+        ssl_context.load_verify_locations('/certs/fullchain.crt')
+        async with websockets.connect(uriKey, ssl=ssl_context) as ws:
+            print("1", file=sys.stderr)
             while True:
+                print("2", file=sys.stderr)
                 message = await ws.recv()
+                print("3", file=sys.stderr)
                 yield f"data: {message}\n\n"
     except Exception as e :
-        yield f"data: WebSocket stop\n\n"
+        print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
+        yield f"data: WebSocket stop, error : {e}\n\n"
 
 
 
