@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import check_password
 from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 
 # Create your views here.
@@ -34,8 +35,11 @@ def login(request):
 
 
 def signup(request):
+	print("Méthode reçue :", request.method)
+
 	if request.method == 'POST':
 		try:
+
 			data = json.loads(request.body)
 
 			email = data.get('mail')
@@ -60,6 +64,10 @@ def signup(request):
 			return JsonResponse({'error': f'for sending mail: {str(e)} {user.user_name}'}, status=400)
 	
 	else:
-		return JsonResponse({'error': 'Unauthorized method'}, status=405)
+		return JsonResponse({'error': 'Unauthorized method dede'}, status=405)
 
 	return JsonResponse({'succes': 'User successfully created', 'user_id': user.id},  status=200)
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+	return JsonResponse({"message": "CSRF cookie set"})
