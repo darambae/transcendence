@@ -16,8 +16,7 @@ GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=chat nginx_modsecurity postgres redis
 
-ELK_COMPOSE=docker compose -f ${DOCKER_FILE} -p ${ELK}
-COMPOSE=docker compose -f ${DOCKER_FILE} -p ${MAIN}
+COMPOSE=docker compose -f ${DOCKER_FILE}
 
 CA=./elk/setup/certs/ca/
 CA=./elk/setup/certs/ca/
@@ -58,19 +57,19 @@ build-game: certs_generator
 
 build-elk: certs_generator
 	@echo "Building ELK stack..."
-	@${ELK_COMPOSE} build ${ELK_CONTAINERS}
+	@${COMPOSE} build ${ELK_CONTAINERS}
 
 build-main: certs_generator
 	@echo "Building Django services..."
 	@${COMPOSE} build ${MAIN_CONTAINERS}
 
-build:
-	@make build-elk
-	@make build-main
+build: certs_generator
+	@echo "Building Transcendence..."
+	@${COMPOSE} build ${MAIN_CONTAINERS} ${ELK_CONTAINERS}
 
 no-cache:
 	@echo "Building ELK stack..."
-	@${ELK_COMPOSE} build --no-cache
+	@${COMPOSE} build --no-cache
 	@echo "Building Transcendence..."
 	@${COMPOSE} build --no-cache
 	@echo "Transcendence built successfully."
@@ -85,7 +84,7 @@ up-game:
 
 up-elk:
 	@echo "Building & starting ELK stack..."
-	@${ELK_COMPOSE} up ${ELK_CONTAINERS} 
+	@${COMPOSE} up ${ELK_CONTAINERS} 
 
 up-main:
 	@echo "Building & starting Transcendence..."
@@ -104,11 +103,11 @@ start-game:
 
 start-elk:
 	@echo "Starting ELK stack..."
-	@${ELK_COMPOSE} start
+	@${COMPOSE} start ${ELK_CONTAINERS}
 
 start-main:
 	@echo "Starting Transcendence..."
-	@${COMPOSE} start
+	@${COMPOSE} start ${MAIN_CONTAINERS}
 
 start:
 	@make start-elk & make start-main

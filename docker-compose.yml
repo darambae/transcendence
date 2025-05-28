@@ -50,7 +50,7 @@ services:
       dockerfile: Dockerfile
     container_name: user_service
     volumes:
-      - ./backend/user_service/user_management:/app
+      - ./backend/user_service:/app
       - certs:/certs
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
@@ -68,11 +68,6 @@ services:
   redis:
     image: redis:latest
     container_name: redis
-    # healthcheck:
-    #   test: ["CMD-SHELL", "redis-cli ping"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 3
     networks:
       - nginx_network
     restart: always
@@ -231,7 +226,10 @@ volumes:
 networks:
   nginx_network:
     name: nginx_network
+    driver: bridge
   elk_network:
     name: elk_network
+    driver: bridge
   game_network:
+    name: game_network
     driver: bridge
