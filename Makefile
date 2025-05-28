@@ -11,10 +11,10 @@ ELK_CONTAINERS=elasticsearch kibana logstash
 USER_CONTAINER=user_service nginx_modsecurity postgres redis
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity
 
 # POUR KELLY PLUS TARD
-CHAT_CONTAINER=chat nginx_modsecurity postgres redis
+CHAT_CONTAINER=chat nginx_modsecurity redis
 
 COMPOSE=docker compose -f ${DOCKER_FILE}
 
@@ -121,4 +121,8 @@ destroy:
 	@echo "Destroying Transcendence..."
 	@${COMPOSE} down -v --rmi all --remove-orphans
 
-.PHONY: no-cache up-elk up-main up down-elk down-main down destroy
+prune:
+	@echo "Pruning unused Docker resources..."
+	@docker system prune --all --force
+
+.PHONY: no-cache up-elk up-main up down-elk down-main down destroy prune
