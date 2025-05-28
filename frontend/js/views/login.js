@@ -22,7 +22,7 @@ export async function handleLoginSubmit(event) {
 	const loadingMessage = form.querySelector("#loading-message");
 
 	const formData = new FormData(form);
-	const data = Object.fromEntries(formData.entries());
+	const dataForm = Object.fromEntries(formData.entries());
 
 	try {
 		submitButton.disabled = true;
@@ -35,7 +35,7 @@ export async function handleLoginSubmit(event) {
 				"Content-Type": "application/json",
 				'X-CSRFToken': getCookie('csrftoken'),
 			},
-			body: JSON.stringify(data)
+			body: JSON.stringify(dataForm)
 		});
 
 		//tokens returned in the JWT to communicate with protected roads
