@@ -14,7 +14,7 @@ from http import HTTPStatus
 
 channel_layer = get_channel_layer()
 
-uri = "ws://server_pong:8030/ws/game/"
+uri = "wss://server_pong:8030/ws/game/"
 
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
@@ -70,7 +70,7 @@ async def sse(request):
     idplayer = request.GET.get("idplayer")
     rq = RequestParsed(apikey, {})
     if (rq.apiKey) :
-        print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}", file=sys.stderr)
+        print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI} JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
         return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt

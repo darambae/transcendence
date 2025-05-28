@@ -9,7 +9,7 @@ import sys
 import threading
 from http import HTTPStatus
 
-urlRequests = "https://ai_pong:8020/"
+urlRequests = "https://server_pong:8030/"
 
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
@@ -26,7 +26,7 @@ except Exception as e:
 
 async def getActualPosition(apiKey) :
     try :
-        res = requests.get(f"{urlRequests}api/simulation?apikey={apiKey}")
+        res = requests.get(f"{urlRequests}api/simulation?apikey={apiKey}", verify=False)
         if res.status_code != 200 :
             return
         else :
@@ -44,11 +44,11 @@ async def sendInfo(apiKey) :
                 posYAi = (racketY[1][1] + racketY[0][1]) / 2
                 resultStats = posYAi - position["ball"]["position"][1]
                 if resultStats < -5 :
-                    requests.post(f"{urlRequests}/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "down"}'})
+                    requests.post(f"{urlRequests}/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "down"}'}, verify=False)
                     racketY[0][1] -= 5
                     racketY[1][1] -= 5
                 elif resultStats > 5 :
-                    requests.post(f"{urlRequests}/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "up"}'})
+                    requests.post(f"{urlRequests}/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "up"}'}, verify=False)
                     racketY[0][1] += 5
                     racketY[1][1] += 5
                 await asyncio.sleep(0.05)

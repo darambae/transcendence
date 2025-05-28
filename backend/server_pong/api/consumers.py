@@ -14,7 +14,7 @@ from .tournamentChallenge import dictTournament, Tournament
 from channels.generic.websocket import AsyncWebsocketConsumer
 from serverPong.ball import Movement, BallData, calcIntersections
 
-urlAI = "http://aimodule:8000/"
+urlAI = "https://ai_pong:8020/"
 
 def calcAllIntersections(walls, ptRacket1, ptRacket2) :
 	for w in walls:
@@ -39,6 +39,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		self.usrID = int(params.get('userid', [2])[0])
 		self.AI = bool(int(params.get("AI", [False])[0]))
 		print(self.AI, file=sys.stderr)
+		print("AI sys.stderr connect", file=sys.stderr)
 
 		#print("room :", self.room_group_name, file=sys.stderr)
 		#print("user ID : ", self.usrID, file=sys.stderr)
