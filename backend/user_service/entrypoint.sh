@@ -25,5 +25,3 @@ python manage.py migrate --noinput
 # fi
 # python manage.py collectstatic --noinput
 exec "$@"
-
-#python manage.py runserver 0.0.0.0:8010

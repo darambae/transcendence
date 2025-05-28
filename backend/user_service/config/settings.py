@@ -20,6 +20,8 @@ import dj_database_url
 
 APP_NAME = 'user_service'
 
+ALLOWED_HOSTS = ['transcendence.42.fr']
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR.parent
@@ -51,7 +53,6 @@ CHANNEL_LAYERS = {
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
 APPEND_SLASH = True
 # Application definition
 
@@ -81,7 +82,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            FRONTEND_DIR
+            FRONTEND_DIR, "templates"
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -104,7 +105,6 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL),
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -150,7 +150,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://127.0.0.1:8443",
     "https://transcendence.42.fr:8443",
 ]
 
@@ -168,6 +167,10 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# For my user 
+AUTH_USER_MODEL = 'api.USER'
+
 
 # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):
