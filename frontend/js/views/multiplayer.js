@@ -19,7 +19,5 @@ export function multiplayerController() {
     sendGameJoining();
   })
 
-
 	console.log("here in multiplayer ")
 }
-  

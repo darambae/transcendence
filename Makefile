@@ -91,7 +91,8 @@ up-main:
 	@${COMPOSE} up ${MAIN_CONTAINERS}
 
 up:
-	@make up-elk & make up-main 
+	@echo "Starting Transcendence with ELK stack..."
+	@${COMPOSE} up ${MAIN_CONTAINERS} ${ELK_CONTAINERS}
 
 start-user:
 	@echo "Starting user service..."
