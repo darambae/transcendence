@@ -9,7 +9,7 @@ export async function sendGameCreation() {
     let gameState  = document.getElementById("replace-state");
     gameState.innerHTML = mulTxt;
     gameState = document.getElementById('gameid')
-    await fetch(`https://${adress}:8443/pong/get-api-key`)
+    await fetch(`https://${adress}:8443/server-pong/api-key`)
       .then(response => {
         if (!response.ok) throw new Error("https Error: " + response.status);
         return response.json();
@@ -33,7 +33,7 @@ export async function sendGameCreation() {
       // ctx.clearRect(150, 220 - 20, 650, 50);
       // ctx.fillText(`Game state : ${isGamePlayable}`, 150, 220);
       if (isGamePlayable == "Game can start") {
-        return handleGame2Players(apiKey, 1, 0, ctx, canvas);
+        return handleGame2Players(apiKey, 1, 0);
       }
       await sleep(500);
     }

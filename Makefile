@@ -11,12 +11,12 @@ ELK_CONTAINERS=elasticsearch kibana logstash
 USER_CONTAINER=user_service nginx_modsecurity postgres redis
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
 
 # POUR KELLY PLUS TARD
-CHAT_CONTAINER=chat nginx_modsecurity redis
+CHAT_CONTAINER=chat nginx_modsecurity postgres redis
 
-COMPOSE=docker compose -f ${DOCKER_FILE} -p ${MAIN}
+COMPOSE=docker compose -f ${DOCKER_FILE}
 
 CA=./elk/setup/certs/ca/
 CA=./elk/setup/certs/ca/
@@ -39,7 +39,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator: add-ca
+certs_generator:
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
@@ -121,8 +121,4 @@ destroy:
 	@echo "Destroying Transcendence..."
 	@${COMPOSE} down -v --rmi all --remove-orphans
 
-prune:
-	@echo "Pruning unused Docker resources..."
-	@docker system prune --all --force
-
-.PHONY: no-cache up-elk up-main up down-elk down-main down destroy prune
+.PHONY: no-cache up-elk up-main up down-elk down-main down destroy

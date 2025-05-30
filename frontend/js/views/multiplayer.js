@@ -1,4 +1,5 @@
 import { sendGameCreation } from './utils/createGame.js'
+import { sendGameJoining } from './utils/joinGame.js'
 import {setCanvasAndContext} from './utils/commonFunctions.js'
 
 
@@ -22,4 +23,3 @@ export function multiplayerController() {
 
 	console.log("here in multiplayer ")
 }
-  
