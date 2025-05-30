@@ -15,6 +15,7 @@ set -ex
 # done
 
 python manage.py makemigrations --noinput
+#python manage.py showmigrations
 python manage.py migrate --noinput
 
 # if ! python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(is_superuser=True).exists())" | grep "True"; then

@@ -29,7 +29,7 @@ export async function handleLoginSubmit(event) {
 		if (loadingMessage) 
 			loadingMessage.style.display = "inline";
 
-		const response = await fetch("/user-service/login/", {
+		const response = await fetch("/auth/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

@@ -43,6 +43,7 @@ services:
     env_file:
       - .env
     restart: always
+
   ################## Django Services ##################
   user_service:
     build:
@@ -65,6 +66,31 @@ services:
     networks:
       - elk_network
       - nginx_network
+
+  ################## Auth ##################
+
+  auth:
+    build:
+      context: ./backend/auth
+      dockerfile: Dockerfile
+    container_name: auth
+    volumes:
+      - ./backend/auth:/app
+      - certs:/certs
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    depends_on:
+      redis:
+        condition: service_started
+      certs_generator:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - elk_network
+      - nginx_network
+
   redis:
     image: redis:latest
     container_name: redis
