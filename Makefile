@@ -11,7 +11,7 @@ ELK_CONTAINERS=elasticsearch kibana logstash
 USER_CONTAINER=user_service nginx_modsecurity postgres redis
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service
 
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=chat nginx_modsecurity postgres redis
