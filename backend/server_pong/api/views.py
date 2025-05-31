@@ -30,6 +30,29 @@ class   RequestParsed :
 
 # Create your views here.
 
+def decodeJWT(request) :
+    auth_header = request.headers.get('Authorization', None)
+    
+    if not auth_header:
+        return [None, None]
+    
+    if not auth_header.startswith("Bearer "):
+        return [None, None]
+
+    token = auth_header[len("Bearer "):]
+
+    try:
+        with grpc.insecure_channel('jwt_decoder:50051') as channel:
+            stub = jwt_decoder_pb2_grpc.JWTDecoderStub(channel)
+            request_proto = jwt_decoder_pb2.JWTRequest(token=token)
+            
+            response = stub.DecodeJWT(request_proto)
+            
+            return ["OK", response.decoded_data]
+    
+    except grpc.RpcError as e:
+        return [None, None]
+
 dictActivePlayer = {}
 apiKeysUnplayable = []
 dictApi = {}
@@ -73,6 +96,10 @@ async def  checkForUpdates(uriKey, key) :
 
 
 async def sse(request):
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = request.GET.get("idplayer")
@@ -83,6 +110,10 @@ async def sse(request):
 
 @csrf_exempt
 def setApiKeySp(request):
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     apikey = json.loads(request.body).get('apiKey')
     dictApiSp[apikey] = 1
     apiKeys.append(apikey)
@@ -91,6 +122,10 @@ def setApiKeySp(request):
 
 @csrf_exempt
 def setApiKey(request):
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     apikey = json.loads(request.body).get('apiKey')
     if apikey not in apiKeysUnplayable:
         return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
@@ -110,6 +145,10 @@ def setApiKey(request):
 
 @csrf_exempt
 def isGamePlayable(request) :
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     apikey = json.loads(request.body).get('apiKey')
     if (dictApi[apikey] > 1) :
         apiKeys.append(apikey)
@@ -121,6 +160,10 @@ def isGamePlayable(request) :
 
 
 def get_api_key(request):
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     api_key = str(uuid.uuid4())
 
     apiKeysUnplayable.append(api_key)
@@ -129,6 +172,10 @@ def get_api_key(request):
 
 @csrf_exempt
 async def sendNewJSON(request):
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     dictionnaryJson = json.loads(request.body)
     # #print(f"dictio : {dictionnaryJson}")
     rq = RequestParsed(dictionnaryJson.get("apiKey", None), dictionnaryJson.get("message", {}))
@@ -146,6 +193,10 @@ async def sendNewJSON(request):
     # #print(f"Reiceived Json : {dictionnaryJson}", file=sys.stderr)
 
 async def forfaitUser(request) :
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     apikey = request.GET.get("apikey")
     idplayer = request.GET.get("idplayer")
     rq = RequestParsed(apikey, {})
@@ -173,6 +224,10 @@ async def forfaitUser(request) :
     return HttpResponseNoContent()
 
 async def disconnectUsr(request) :
+    JWT = decodeJWT(request)
+    if not JWT[0] :
+        return HttpResponseNoContent() # Set an error 
+    print(f" Jwt : {JWT[1]}")
     apikey = request.GET.get("apikey")
     #print("disco usr", file=sys.stderr)
     await channel_layer.group_send(

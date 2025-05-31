@@ -72,6 +72,21 @@ services:
       - nginx_network
     restart: always
 
+  ############### JWT Decoder ##################
+  
+  jwt_decoder :
+    build:
+      context: ./backend/JWT_decoder
+      dockerfile: ./Dockerfile
+    container_name : jwt_decoder
+    env_file: 
+      - .env
+    volumes :
+      - ./backend/JWT_decoder:/app
+    networks :
+      - jwt_network
+    restart: always
+
   ############### Game import ##################
   server_pong:
     build: 
@@ -94,6 +109,7 @@ services:
       - game_network
       - nginx_network
       - elk_network
+      - jwt_network
     restart: always
 
   ai_pong:
@@ -232,4 +248,7 @@ networks:
     driver: bridge
   game_network:
     name: game_network
+    driver: bridge
+  jwt_network:
+    name: jwt_network
     driver: bridge

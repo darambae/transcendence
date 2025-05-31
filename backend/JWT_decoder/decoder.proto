@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package jwtdecoder;
+
+service Greeter {
+  rpc decodeJWT (jwtRequest) returns (jwtResponse);
+}
+
+message jwtRequest {
+  string coded = 1;
+}
+
+message jwtResponse {
+  string decoded = 1;
+}
