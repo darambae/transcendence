@@ -14,7 +14,7 @@ from .tournamentChallenge import dictTournament, Tournament
 from channels.generic.websocket import AsyncWebsocketConsumer
 from serverPong.ball import Movement, BallData, calcIntersections
 
-urlAI = "http://aimodule:8000/"
+urlAI = "https://ai_pong:8020/"
 
 def calcAllIntersections(walls, ptRacket1, ptRacket2) :
 	for w in walls:
@@ -39,6 +39,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		self.usrID = int(params.get('userid', [2])[0])
 		self.AI = bool(int(params.get("AI", [False])[0]))
 		print(self.AI, file=sys.stderr)
+		print("AI sys.stderr connect", file=sys.stderr)
 
 		#print("room :", self.room_group_name, file=sys.stderr)
 		#print("user ID : ", self.usrID, file=sys.stderr)
@@ -191,7 +192,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 							self.gameSimulation.stopSimulation()
 						if self.usrID <= 1 :
 							await self.gameSimulation.setRedisCache(self.room_group_name)
-						r = redis.Redis(host='redispong', port=6379, db=0)
+						r = redis.Redis(host='game_redis', port=6379, db=0)
 						cles_redis = r.keys('*')
 						# #print([clé.decode('utf-8') for clé in cles_redis], file=sys.stderr)
 						stats = cache.get(f'simulation_state_{self.room_group_name}')
@@ -212,7 +213,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			await self.t2
 
 def checkCache() :
-    r = redis.Redis(host='redispong', port = 6379, db=0)
+    r = redis.Redis(host='game_redis', port = 6379, db=0)
     cleRedis = r.keys('*')
     #print([c.decode('utf-8') for c in cleRedis], file=sys.stderr)
-
