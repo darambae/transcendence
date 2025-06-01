@@ -1,106 +1,4 @@
-# # ======================== Elasticsearch Configuration =========================
-# #
-# # NOTE: This is a minimal configuration for a single-node development cluster.
-# #       For production use, please refer to the Elasticsearch documentation:
-# #       https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
-# #
-# # ---------------------------------- Cluster -----------------------------------
-# #
-# # Use a descriptive name for your cluster:
-# #
-# cluster.name: "es-docker-cluster"
-# #
-# # ------------------------------------ Node ------------------------------------
-# #
-# # Use a descriptive name for the node:
-# #
-# node.name: "es01"
-# #
-# # Add custom attributes to the node:
-# #
-# # node.attr.rack: r1
-# #
-# # ----------------------------------- Paths ------------------------------------
-# #
-# # Path to the data directory:
-# #
-# path.data: /usr/share/elasticsearch/data
-# #
-# # Path to log files:
-# #
-# path.logs: /usr/share/elasticsearch/logs
-# #
-# # ---------------------------------- Network -----------------------------------
-# #
-# #
-# network.host: elasticsearch
-# #
-# # Set a custom port for HTTP access:
-# #
-# http.port: "9200"
-# #
-# # Enable or disable HTTP:
-# #
-# xpack.security.enabled: true
-# xpack.security.http.ssl:
-#   enabled: true
-#   keystore.path: /usr/share/elasticsearch/config/certs/elasticsearch.p12
-#   # keystore.password: jJkJ_p7EwHa0k+EgBgNW
-#   # keystore.secure_password: jJkJ_p7EwHa0k+EgBgNW
-#   certificate_authorities: /usr/share/elasticsearch/config/certs/ca/ca.crt
-# # xpack.security.autoconfiguartion.enabled: true
-# # Optional: Configure transport layer SSL as well
-# xpack.security.transport.ssl.enabled: true
-# xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elasticsearch.p12
 
-
-# # xpack.security.enabled: true
-# # xpack.security.http.ssl.enabled: true
-# # xpack.security.http.ssl.key: /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.key
-# # xpack.security.http.ssl.certificate: /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.crt
-# # xpack.security.http.ssl.certificate_authorities: /usr/share/elasticsearch/config/certs/ca/ca.crt
-# xpack.security.enrollment.enabled: false
-# #
-# # Set a custom port for transport (inter-node communication):
-# #
-# transport.port: 9300
-# #
-# # Enable or disable transport layer security:
-# #
-# xpack.security.transport.ssl.enabled: true
-# # xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.key
-# # xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.crt
-# xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certs/ca/ca.crt
-# # xpack.security.transport.ssl.verification_mode: certificate
-# #
-# # ---------------------------------- Discovery ---------------------------------
-# #
-# # Pass an initial list of hosts to perform discovery when new nodes join the cluster.
-# # Given that we are running a single-node setup for this example:
-# #
-# discovery.type: single-node
-# #
-# # ---------------------------------- Memory -----------------------------------
-# #
-# # Set the minimum and maximum JVM heap size. It is recommended to set both to 50%
-# # of your total available memory, up to a maximum of 32GB.
-# #
-# #
-# # ---------------------------------- Gateway ----------------------------------
-# #
-# # Block initial recovery after a full cluster restart until N nodes are available:
-# #
-# # gateway.recover_after: 1
-# #
-# # For more information, consult the gateway module documentation:
-# # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-gateway.html
-# #
-# # ---------------------------------- Various ----------------------------------
-# #
-# # Require explicit names when deleting indices:
-# #
-# action.destructive_requires_name: true
-#
 # NOTE: This is a minimal configuration for a single-node development cluster.
 #        For production use, please refer to the Elasticsearch documentation:
 #        https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
@@ -135,13 +33,9 @@ path.logs: /usr/share/elasticsearch/logs
 #
 #
 network.host: elasticsearch
-#
-# Set a custom port for HTTP access:
-#
+
 http.port: "9200"
-#
-# Enable or disable HTTP:
-#
+
 xpack.security.enabled: true
 xpack.security.authc.api_key.enabled: true
 xpack.security.http.ssl.enabled: true

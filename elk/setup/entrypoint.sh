@@ -9,11 +9,6 @@ subjectAltName = DNS:transcendence.42.fr, DNS:localhost, DNS:kibana, DNS:server_
 EOF
 
 echo "Generating private key and CSR for the server..."
-# openssl req -new -nodes -newkey rsa:2048 \
-#   -keyout /usr/share/elasticsearch/config/certs/server.key \
-#   -out /usr/share/elasticsearch/config/certs/server.csr \
-#   -subj "/C=FR/ST=Occitanie/L=Perpignan/O=Transcendence Project/OU=Development Team/CN=transcendence.42.fr"
-
 openssl req -new -newkey rsa:4096 -nodes \
 -out /usr/share/elasticsearch/config/certs/server.csr \
 -keyout /usr/share/elasticsearch/config/certs/server.key \
@@ -69,7 +64,7 @@ openssl pkcs12 -export \
   -name kibana \
   -CAfile /usr/share/elasticsearch/config/certs/ca/ca.crt \
   -caname root \
-  -passout pass:jJkJ_p7EwHa0k+EgBgNW
+  -passout pass:${ELASTIC_PASSWORD}
 
 # Create temporary directory for certificate processing
 echo "Creating temporary directory for certificates..."
@@ -84,9 +79,9 @@ cp /usr/share/elasticsearch/config/certs/ca/ca.crt /tmp/certs/ca.crt
 # Generate the elasticsearch.p12 keystore
 echo "Generating elasticsearch.p12 keystore..."
 openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/certs/elasticsearch.key -nocrypt -out /tmp/certs/elasticsearch.pk8
-openssl pkcs12 -export -in /tmp/certs/elasticsearch.crt -inkey /tmp/certs/elasticsearch.key -out /tmp/certs/elasticsearch.p12 -name elasticsearch -passout pass:jJkJ_p7EwHa0k+EgBgNW
+openssl pkcs12 -export -in /tmp/certs/elasticsearch.crt -inkey /tmp/certs/elasticsearch.key -out /tmp/certs/elasticsearch.p12 -name elasticsearch -passout pass:${ELASTIC_PASSWORD}
 
-keytool -import -trustcacerts -keystore /tmp/certs/elasticsearch.p12 -storetype PKCS12 -alias ca -file /tmp/certs/ca.crt -storepass jJkJ_p7EwHa0k+EgBgNW -noprompt
+keytool -import -trustcacerts -keystore /tmp/certs/elasticsearch.p12 -storetype PKCS12 -alias ca -file /tmp/certs/ca.crt -storepass ${ELASTIC_PASSWORD} -noprompt
 chown elasticsearch:elasticsearch /tmp/certs/elasticsearch.p12
 mv /tmp/certs/elasticsearch.p12 /usr/share/elasticsearch/config/certs/
 
