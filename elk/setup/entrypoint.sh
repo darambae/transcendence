@@ -2,17 +2,10 @@
 
 set -e
 
-# Generate CA certificate if it doesn't exist
-# if [ ! -f config/certs/ca/ca.zip ]; then
-#   echo "Creating CA..."
-#   bin/elasticsearch-certutil ca --silent --pem -out "config/certs/ca/ca.zip"
-#   unzip config/certs/ca/ca.zip -d config/certs
-# fi
-
 # Create extfile for SAN
 echo "Creating SAN extfile..."
 cat <<EOF > /usr/share/elasticsearch/config/certs/san.ext
-subjectAltName = DNS:transcendence.42.fr, DNS:localhost, DNS:server_pong, IP:127.0.0.1
+subjectAltName = DNS:transcendence.42.fr, DNS:localhost, DNS:kibana, DNS:server_pong, IP:127.0.0.1
 EOF
 
 echo "Generating private key and CSR for the server..."
@@ -37,18 +30,6 @@ openssl x509 -req -in /usr/share/elasticsearch/config/certs/server.csr \
 echo "Combining server.crt and ca.crt into fullchain.crt..."
 cat /usr/share/elasticsearch/config/certs/server.crt config/certs/ca/ca.crt > /usr/share/elasticsearch/config/certs/fullchain.crt
 
-# echo "Adding CA certificate to system trust store..."
-# if [ "$(uname)" = "Darwin" ]; then
-# 	security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /usr/share/elasticsearch/config/certs/fullchain.crt
-#     echo "CA added to macOS System keychain."
-# elif [ "$(uname)" = "Linux" ]; then
-#     cp /usr/share/elasticsearch/config/certs/fullchain.crt /usr/local/share/ca-certificates/ca.crt
-# 	update-ca-certificates
-#     echo "CA added to Linux trust store."
-# else
-#     echo "Automatic CA installation not supported for this OS."
-# fi
-
 # Generate certificates for ELK if they don't exist
 if [ ! -f config/certs/certs.zip ]; then
   echo "Creating certificates..."
@@ -67,17 +48,36 @@ instances:
       - logstash
       - localhost
 EOF
-  bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key
+  bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml \
+  --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key
   unzip config/certs/certs.zip -d config/certs
 fi
+
+openssl genrsa -out /usr/share/elasticsearch/config/certs/kibana/kibana.key 2048
+openssl req -new -key /usr/share/elasticsearch/config/certs/kibana/kibana.key -out /usr/share/elasticsearch/config/certs/kibana/kibana.csr -subj "/CN=localhost"
+openssl x509 -req -in /usr/share/elasticsearch/config/certs/kibana/kibana.csr \
+  -CA /usr/share/elasticsearch/config/certs/ca/ca.crt \
+  -CAkey /usr/share/elasticsearch/config/certs/ca/ca.key \
+  -CAcreateserial \
+  -out /usr/share/elasticsearch/config/certs/kibana/kibana.crt -days 365 -sha256 \
+  -extfile /usr/share/elasticsearch/config/certs/san.ext
+  
+openssl pkcs12 -export \
+  -in /usr/share/elasticsearch/config/certs/kibana/kibana.crt \
+  -inkey /usr/share/elasticsearch/config/certs/kibana/kibana.key \
+  -out /usr/share/elasticsearch/config/certs/kibana.p12 \
+  -name kibana \
+  -CAfile /usr/share/elasticsearch/config/certs/ca/ca.crt \
+  -caname root \
+  -passout pass:jJkJ_p7EwHa0k+EgBgNW
 
 # Create temporary directory for certificate processing
 echo "Creating temporary directory for certificates..."
 mkdir -p /tmp/certs
 cp /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.key /tmp/certs/elasticsearch.key
 cp /usr/share/elasticsearch/config/certs/elasticsearch/elasticsearch.crt /tmp/certs/elasticsearch.crt
-cp /usr/share/elasticsearch/config/certs/logstash/logstash.key /tmp/certs/logstash.key
-cp /usr/share/elasticsearch/config/certs/logstash/logstash.crt /tmp/certs/logstash.crt
+# cp /usr/share/elasticsearch/config/certs/logstash/logstash.key /tmp/certs/logstash.key
+# cp /usr/share/elasticsearch/config/certs/logstash/logstash.crt /tmp/certs/logstash.crt
 cp /usr/share/elasticsearch/config/certs/ca/ca.key /tmp/certs/ca.key
 cp /usr/share/elasticsearch/config/certs/ca/ca.crt /tmp/certs/ca.crt
 
