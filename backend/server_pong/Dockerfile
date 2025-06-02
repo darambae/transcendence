@@ -37,10 +37,8 @@ WORKDIR /app
 
 COPY entrypoint.sh /entrypoint.sh
 COPY requirements.txt /app/
-COPY requirementsgRPC.txt /app/
 RUN chmod +x /app/requirements.txt
 RUN chmod +x /entrypoint.sh
-RUN pip install --only-binary :all: --no-cache-dir --use-pep517 -r requirementsgRPC.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Initialise un projet Django minimal
