@@ -61,7 +61,7 @@ def signup(request):
     except IntegrityError as e:
         err_msg = str(e)
         if 'mail' in err_msg:
-           return JsonResponse({'error': 'User with this email already exists'}, status=400)
+            return JsonResponse({'error': 'User with this email already exists'}, status=400)
         elif 'user_name' in err_msg:
             return JsonResponse({'error': 'Username already taken'}, status=400)
         else:

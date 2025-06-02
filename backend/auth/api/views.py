@@ -6,6 +6,7 @@ from .utils import generate_otp_send_mail
 from .models import USER
 from rest_framework_simplejwt.tokens import RefreshToken
 import json
+
 # Create your views here.
 def login(request):
 	if (request.method == 'POST'):
@@ -19,7 +20,7 @@ def login(request):
 			if check_password(data.get('password'), user.password):
 				user.two_factor_Auth = make_password(generate_otp_send_mail(user))
 				user.save()
-				return JsonResponse({'succes': 'authentication code send', 'user_id': user.id}, status=200)
+				return JsonResponse({'success': 'authentication code sent', 'user_id': user.id}, status=200)
 			else:
 				return JsonResponse({'error': 'Invalid password'}, status=401)
 		except USER.DoesNotExist:
