@@ -52,6 +52,14 @@ h2 {
 	color: antiquewhite;
 }
 
+.error-msg {
+	font-family: Helvetica, sans-serif;
+	text-align: center;
+	color: red;
+	background-color: antiquewhite;
+	text-shadow: none;
+}
+
 @keyframes h2-blink-outline {
 	0%, 100% {
 	  text-shadow:
