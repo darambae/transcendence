@@ -46,7 +46,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8020
 # Remove the comment below so that you can run without elk
-#ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 
 # CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "ai_pong.asgi:application"]

@@ -8,7 +8,7 @@ MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redi
 ELK_CONTAINERS=elasticsearch kibana logstash
 
 # POUR GAUTIER & OMAR
-USER_CONTAINER=user_service nginx_modsecurity postgres redis
+USER_CONTAINER=user_service nginx_modsecurity postgres redis auth
 
 # POUR RAFAEL
 GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
@@ -16,7 +16,7 @@ GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=chat nginx_modsecurity postgres redis
 
-COMPOSE=docker compose -f ${DOCKER_FILE} -p ${MAIN}
+COMPOSE=docker compose -f ${DOCKER_FILE}
 
 CA=./elk/setup/certs/ca/
 CA=./elk/setup/certs/ca/
@@ -39,7 +39,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator: add-ca
+certs_generator:
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
@@ -91,7 +91,8 @@ up-main:
 	@${COMPOSE} up ${MAIN_CONTAINERS}
 
 up:
-	@make up-elk & make up-main 
+	@echo "Starting Transcendence with ELK stack..."
+	@${COMPOSE} up ${MAIN_CONTAINERS} ${ELK_CONTAINERS}
 
 start-user:
 	@echo "Starting user service..."

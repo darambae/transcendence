@@ -37,8 +37,8 @@ export function sleep(ms) {
 
 export async function handleGame2Players(key, playerID, isAiGame) {
   console.log(adress);
-  let url_sse = `https://${adress}:8443/pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}`;
-  let url_post = `https://${adress}:8443/pong/send-message`;
+  let url_sse = `https://${adress}:8443/server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}`;
+  let url_post = `https://${adress}:8443/server-pong/send-message`;
   let started = false;
   let game_stats;
   ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -92,7 +92,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
           case "q" :
               console.log("Started : ", started);
               if (started == true) {
-                fetch(`https://${adress}:8443/pong/forfait-game?apikey=${key}&idplayer=${playerID}`);
+                fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`);
               }
               break;
           case "ArrowUp" : 
@@ -143,7 +143,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
 export async function loadGamePlayable(apikey) {
   let isPlayable;
 
-    await fetch(`https://${adress}:8443/pong/is-game-playable?apikey=${apikey}`, {
+    await fetch(`https://${adress}:8443/server-pong/game-status?apikey=${apikey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -167,7 +167,7 @@ export async function loadGamePlayable(apikey) {
 
 export async function setApiKeyWeb(apikey) {
   console.log("apikey Set : ", apikey);
-  return fetch(`https://${adress}:8443/pong/set-api-key`, {
+  return fetch(`https://${adress}:8443/server-pong/api-key`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

@@ -1,0 +1,51 @@
+[1] URL
+1. Principes Clés pour la Conception d'URL
+    A. Respect des Principes RESTful (Crucial !)
+        C'est l'approche la plus courante et la plus recommandée pour concevoir des API.
+
+        Centré sur les ressources (Resource-centric) : Les URL doivent exprimer des ressources sous forme de noms, et non de verbes.
+        
+        - Exemple : Utilisez /api/users au lieu de /getUsers ou /api/getUser.
+        Utilisation de noms au pluriel : Pour représenter des collections (plusieurs éléments), utilisez des noms au pluriel.
+        
+        - Exemple : /users (utilisateurs), /games (jeux), /chats (chats).
+        Utilisation des méthodes HTTP : Les opérations CRUD (Create, Read, Update, Delete) sont exprimées par les méthodes HTTP, et non par l'URL elle-même.
+        GET : Récupérer une ressource (une collection ou une ressource spécifique).
+        POST : Créer une ressource.
+        PUT : Mettre à jour une ressource entière (remplacement complet de la ressource existante).
+        PATCH : Mettre à jour partiellement une ressource.
+        DELETE : Supprimer une ressource.
+
+B. Lisibilité et Prévisibilité
+    Les URL doivent être claires et concises.
+
+    Utilisation de minuscules : Pour une meilleure cohérence, écrivez tous les chemins en minuscules.
+    Utilisation des tirets (-) : Séparez les mots par des tirets pour une meilleure lisibilité.
+    
+    - Exemple : Préférez user-profile à user_profile.
+    Éviter l'encodage URL : Évitez les caractères spéciaux ou les espaces qui nécessiteraient un encodage URL.
+
+C. Structure Hiérarchique et Imbrication (Nesting)
+    Exprimez les relations entre les ressources à travers la hiérarchie des URL.
+
+    - Exemple :
+    Liste des jeux d'un utilisateur spécifique : /users/{user_id}/games
+    Messages dans un jeu spécifique : /games/{game_id}/messages
+    Attention : Évitez les imbrications trop profondes (généralement pas plus de 2-3 niveaux). Si la structure devient trop longue, envisagez une refonte avec des paramètres de requête ou d'autres approches.
+
+D. Traitement des Actions (Exception à l'utilisation des verbes)
+    Bien que les principes RESTful découragent l'utilisation de verbes dans les URL, il existe des exceptions limitées pour représenter des « actions » spécifiques sur une ressource.
+
+    - Cas exceptionnels : Lorsque vous devez effectuer une action spécifique qui n'est pas une simple opération CRUD (création, lecture, modification, suppression).
+    Désactiver un utilisateur : /users/{user_id}/deactivate (méthode POST)
+    Démarrer un jeu : /games/{game_id}/start (méthode POST)
+    (L'utilisation de verbes dans les requêtes GET est généralement déconseillée, mais peut être tolérée pour des actions de consultation très spécifiques.)
+
+E. Utilisation des Paramètres de Requête (Query Parameters)
+    Utilisez les paramètres de requête pour le filtrage, le tri et la pagination des ressources.
+
+    À utiliser uniquement avec les requêtes GET.
+    - Exemple :
+    Liste des jeux avec un statut spécifique : /games?status=ongoing
+    Pagination : /users?page=2&limit=10
+    Tri : /users?sort_by=username&order=asc

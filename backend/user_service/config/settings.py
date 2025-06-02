@@ -17,8 +17,11 @@ from logstash_async.handler import AsynchronousLogstashHandler
 import sys
 from .jsonSocketHandler import JSONSocketHandler
 import dj_database_url
+import logging
 
 APP_NAME = 'user_service'
+
+ALLOWED_HOSTS = ['transcendence.42.fr']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,7 +33,7 @@ DOMAIN = os.getenv('DOMAIN', 'localhost')
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv('DJANGO_USER_SERVICE_SECRET_KEY')
 
 # HTTP settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -51,7 +54,6 @@ CHANNEL_LAYERS = {
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
 APPEND_SLASH = True
 # Application definition
 
@@ -81,7 +83,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            FRONTEND_DIR
+            FRONTEND_DIR, "templates"
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -104,7 +106,6 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL),
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -150,7 +151,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://127.0.0.1:8443",
     "https://transcendence.42.fr:8443",
 ]
 
@@ -169,7 +169,11 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
+# For my user 
+AUTH_USER_MODEL = 'api.USER'
+
+
+# # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):
 #     def filter(self, record):
 #         if not hasattr(record, 'app_name'):

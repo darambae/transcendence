@@ -38,11 +38,13 @@ services:
       - user_service
       - ai_pong
       - server_pong
+      - auth
     networks:
       - nginx_network
     env_file:
       - .env
     restart: always
+
   ################## Django Services ##################
   user_service:
     build:
@@ -65,6 +67,31 @@ services:
     networks:
       - elk_network
       - nginx_network
+
+  ################## Auth ##################
+
+  auth:
+    build:
+      context: ./backend/auth
+      dockerfile: Dockerfile
+    container_name: auth
+    volumes:
+      - ./backend/auth:/app
+      - certs:/certs
+    # environment:
+    #   - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    depends_on:
+      redis:
+        condition: service_started
+      certs_generator:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - elk_network
+      - nginx_network
+
   redis:
     image: redis:latest
     container_name: redis
@@ -88,8 +115,8 @@ services:
     volumes:
       - certs:/certs
       - ./backend/server_pong:/app
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    # environment:
+    #   - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     networks:
       - game_network
       - nginx_network
@@ -109,8 +136,8 @@ services:
     volumes:
       - certs:/certs
       - ./backend/AI_pong:/app
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    # environment:
+    #   - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     env_file:
       - .env
     networks:
@@ -165,7 +192,7 @@ services:
         condition: service_completed_successfully
     environment:
       - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
-      - ELASTIC_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - NODE_OPTIONS=--openssl-legacy-provider
       - ES_JAVA_OPTS=-Xms2g -Xmx2g
     volumes:
@@ -197,7 +224,7 @@ services:
       - NODE_OPTIONS=openssl-legacy-provider
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
       # - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
     depends_on:
       elasticsearch:

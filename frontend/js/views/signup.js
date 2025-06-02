@@ -53,6 +53,8 @@ export async function handleSignupSubmit(event) {
 			credentials: 'include'
 		})
 
+		console.log(response.json());
+
 		if (response.ok) {
 			console.log("signin form successfully submitted");
 			await actualizeIndexPage('main-content', routes.signupSuccess);

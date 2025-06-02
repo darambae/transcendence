@@ -5,6 +5,7 @@ from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import sys
+import ssl
 import uuid
 import websockets
 import json
@@ -14,7 +15,7 @@ from http import HTTPStatus
 
 channel_layer = get_channel_layer()
 
-uri = "ws://djangopong:8000/ws/game/"
+uri = "wss://server_pong:8030/ws/game/"
 
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
@@ -55,12 +56,19 @@ def getSimulationState(request):
 
 async def  checkForUpdates(uriKey, key) :
     try :
-        async with websockets.connect(uriKey) as ws:
+        print("0", file=sys.stderr)
+        ssl_context = ssl.create_default_context()
+        ssl_context.load_verify_locations('/certs/fullchain.crt')
+        async with websockets.connect(uriKey, ssl=ssl_context) as ws:
+            print("1", file=sys.stderr)
             while True:
+                print("2", file=sys.stderr)
                 message = await ws.recv()
+                print("3", file=sys.stderr)
                 yield f"data: {message}\n\n"
     except Exception as e :
-        yield f"data: WebSocket stop\n\n"
+        print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
+        yield f"data: WebSocket stop, error : {e}\n\n"
 
 
 
@@ -70,7 +78,7 @@ async def sse(request):
     idplayer = request.GET.get("idplayer")
     rq = RequestParsed(apikey, {})
     if (rq.apiKey) :
-        print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}", file=sys.stderr)
+        print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI} JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
         return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt
@@ -187,6 +195,13 @@ async def disconnectUsr(request) :
         apiKeysUnplayable.remove(apikey)
         return HttpResponseNoContent()
     return HttpResponseNoContent()
+
+@csrf_exempt
+def apiKeyManager(request) :
+    if request.method == 'GET' :
+        return get_api_key(request)
+    elif request.method == 'POST' :
+        return setApiKey(request)
 
 
 
