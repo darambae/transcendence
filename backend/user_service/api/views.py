@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db import IntegrityError
 import json
 
 # Create your views here.
@@ -57,6 +58,8 @@ def signup(request):
 			return JsonResponse({'error': f'Missing field : {str(e)}'}, status=400)
 		except ValidationError:
 			return JsonResponse({'error': 'Invalid e-mail address'}, status=400)
+		except IntegrityError as e:
+			return JsonResponse({'error': 'Username or email already exists'}, status=400)
 
 		try:
 			send_confirmation_email(user)
@@ -64,7 +67,7 @@ def signup(request):
 			return JsonResponse({'error': f'for sending mail: {str(e)} {user.user_name}'}, status=400)
 	
 	else:
-		return JsonResponse({'error': 'Unauthorized method dede'}, status=405)
+		return JsonResponse({'error': 'Unauthorized method'}, status=405)
 
 	return JsonResponse({'succes': 'User successfully created', 'user_id': user.id},  status=200)
 

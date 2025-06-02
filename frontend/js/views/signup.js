@@ -56,8 +56,21 @@ export async function handleSignupSubmit(event) {
 		if (response.ok) {
 			console.log("signin form successfully submitted");
 			await actualizeIndexPage('main-content', routes.signupSuccess);
+			const mailDiv = document.querySelector('.signup-success .user-mail');
+			const mail = cleanData.mail;
+			if (mailDiv){
+				mailDiv.textContent = mail;
+			}
 		} else {
 			console.log("signup form couldn't connect")
+			const responseData = await response.json();
+			const errorMsg = responseData.error;
+
+			const errorDiv = document.querySelector('.signup-form .error-msg');
+			if (errorMsg) {
+				errorDiv.textContent = errorMsg.toUpperCase();
+			}
+			
 			//signup form error handling (already existing, password etc..)
 		}
 	} catch (error) {
