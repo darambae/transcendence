@@ -1,6 +1,38 @@
+import { versusController } from "../versusGame.js";
+import { homeController } from "../home.js";
+import { localGameController } from "../localGame.js";
+
 export let adress = "localhost"
 let canvas;
 let ctx;
+
+export const routesSp = {
+	home: {
+		template: 'home',
+		controller: homeController,
+	},
+  playerSelection: {
+    template: 'versusGame',
+    controller: versusController,
+  },
+  game : {
+    template: 'localGame',
+    controller: localGameController,
+  },
+  };
+
+let p1Name;
+let p2Name;
+let keySp;
+export function setPlayersLocalName(p1, p2, apikey) {
+  p1Name = p1;
+  p2Name = p2;
+  keySp = apikey;
+};
+
+export function getPlayersLocalName() {
+  return ([p1Name, p2Name, keySp])
+}
 
 export function setCanvasAndContext() {
   canvas = document.getElementById("gameCanvas");
@@ -15,7 +47,8 @@ function fillCircle(ctx, x, y, radius, color = 'black') {
     ctx.fillStyle = color;
     ctx.fill();
   }
-function drawMap(ballPos, Racket1Pos, Racket2Pos) {
+
+export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
   ctx.fillStyle = "purple";
   ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.fillRect(0, 0, 1000, 15);
@@ -168,6 +201,29 @@ export async function loadGamePlayable(apikey) {
 export async function setApiKeyWeb(apikey) {
   console.log("apikey Set : ", apikey);
   return fetch(`https://${adress}:8443/server-pong/api-key`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ "apiKey": apikey })
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("https Error: " + response.status);
+    return response.json();
+  })
+  .then(data => {
+    console.log("Données reçues SetKey:", data["playable"]);
+    return data["playable"];
+  })
+  .catch(error => {
+    console.error("Erreur de requête :", error);
+    throw error;
+  });
+}
+
+export async function setApiKeyWebSP(apikey) {
+  console.log("apikey Set : ", apikey);
+  return fetch(`https://${adress}:8443/server-pong/api-key-alone`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

@@ -1,3 +1,26 @@
-<h2>SINGLE PLAY</h2>
-<p>this single play mode !</p>
-<p>TO BE MADE</p>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2>Game screen</h2>
+            <canvas id="gameCanvas" width="1200" height="620" style="border:6px solid black;"></canvas>
+        </div>
+    </div>
+    <div class="row" id="replace-state">
+        <div class="col">
+            <h2>A.I game</h2>
+            <button id="AI-game" type="button" class="btn btn-outline-primary" aria-label="Close">A.I</button>
+        </div>
+        <div class="col">
+            <h2>Informations</h2>
+            <p id="Game instructions">Waiting for a game</p>
+        </div>
+        <div class="col">
+            <h2>Versus game</h2>
+            <button id="versus-game" type="button" class="btn btn-outline-secondary" aria-label="Close">Versus</button>
+        </div>
+    </div>
+    <div class="row" id="replace-state2">
+    </div>
+</div>
+
+<script src="../js/active/singlePlay.js"></script>
