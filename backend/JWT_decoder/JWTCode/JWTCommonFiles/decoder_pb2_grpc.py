@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import decoder_pb2 as decoder__pb2
+from . import decoder_pb2 as decoder__pb2
 
 
 class GreeterStub(object):

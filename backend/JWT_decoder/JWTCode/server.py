@@ -1,14 +1,16 @@
 import grpc
 from concurrent import futures
 import jwt
-import decoder_pb2
-import decoder_pb2_grpc
+import JWTCode.JWTCommonFiles.decoder_pb2 as decoder_pb2
+import JWTCode.JWTCommonFiles.decoder_pb2_grpc as decoder_pb2_grpc
 import os
+import sys
+import time
 
-class JWTDecoderServicer(jwt_decoder_pb2_grpc.JWTDecoderServicer):
-    def DecodeJWT(self, request, context):
+class JWTDecoderServicer(decoder_pb2_grpc.GreeterServicer):
+    def decodeJWT(self, request, context):
         try:
-            decoded = jwt.decode(request.token, os.getenv(JWT_SECRET), algorithms=['HS256'] options={"verify_signature": False})
+            decoded = jwt.decode(request.token, os.getenv(JWT_SECRET), algorithms=['HS256'], options={"verify_signature": False})
             
             decoded_data = str(decoded)
             print(f"Decoded data : {decoded_data}", file=sys.stderr)
@@ -26,7 +28,7 @@ class JWTDecoderServicer(jwt_decoder_pb2_grpc.JWTDecoderServicer):
 # Fonction pour démarrer le serveur gRPC
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    jwt_decoder_pb2_grpc.add_JWTDecoderServicer_to_server(JWTDecoderServicer(), server)
+    decoder_pb2_grpc.add_GreeterServicer_to_server(JWTDecoderServicer(), server)
     server.add_insecure_port('[::]:50051')
     server.start() 
     print("Server is running on port 50051...", file=sys.stderr)

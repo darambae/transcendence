@@ -14,4 +14,6 @@ RUN pip install --only-binary :all: --no-cache-dir --use-pep517 -r requirements.
 
 EXPOSE 50051
 
-CMD ["tail", "-f", "/dev/null"]
+# CMD ["tail", "-f", "/dev/null"]
+
+CMD ["python3", "-m", "JWTCode.server"]
