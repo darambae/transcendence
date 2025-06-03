@@ -13,10 +13,6 @@ from channels.layers import get_channel_layer
 from datetime import datetime
 from http import HTTPStatus
 
-import JWTCommonFiles.decoder_pb2 as decoder_pb2
-import JWTCommonFiles.decoder_pb2_grpc as decoder_pb2_grpc
-import grpc
-
 channel_layer = get_channel_layer()
 
 uri = "wss://server_pong:8030/ws/game/"
@@ -36,27 +32,6 @@ class   RequestParsed :
 
 def decodeJWT(request) :
     return ["temp", "temp"]
-    auth_header = request.headers.get('Authorization', None)
-    
-    if not auth_header:
-        return [None, None]
-    
-    if not auth_header.startswith("Bearer "):
-        return [None, None]
-
-    token = auth_header[len("Bearer "):]
-
-    try:
-        with grpc.insecure_channel('jwt_decoder:50051') as channel:
-            stub = jwt_decoder_pb2_grpc.JWTDecoderStub(channel)
-            request_proto = jwt_decoder_pb2.JWTRequest(token=token)
-            
-            response = stub.DecodeJWT(request_proto)
-            
-            return ["OK", response.decoded_data]
-    
-    except grpc.RpcError as e:
-        return [None, None]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
