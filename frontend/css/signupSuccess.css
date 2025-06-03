@@ -1,5 +1,25 @@
 .signup-success {
 	font-family: 'sukoro', sans-serif;
+	text-shadow: none;
 	text-align: center;
-	color: antiquewhite;
+	color: rgb(255, 255, 255);
+}
+
+.signup-success .mail-msg {
+	font-family: Arial, Helvetica, sans-serif !important;
+	color: rgb(255, 255, 255);
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+.signup-success .user-mail {
+	color: #0074d9;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.signup-success .login-msg {
+	font-family: Arial, Helvetica, sans-serif !important;
+	margin-bottom: 15px;
 }

@@ -31,12 +31,6 @@
 	color: antiquewhite !important;
 }
 
-h2 {
-	font-size: medium;
-	text-align: center;
-	animation: h2-blink-outline 1s infinite;
-}
-
 .back-home {
 	display: block;
 	font-family: 'sukoro';
@@ -56,8 +50,13 @@ h2 {
 	font-family: Helvetica, sans-serif;
 	text-align: center;
 	color: red;
-	background-color: antiquewhite;
+	background-color: rgb(255, 255, 255);
+	border-radius: 20px;
 	text-shadow: none;
+}
+
+.shake {
+  animation: shake 0.4s;
 }
 
 @keyframes h2-blink-outline {
@@ -77,4 +76,13 @@ h2 {
     	1px  1px 0 black,
 		0 0 5px transparent, 0 0 10px transparent, 0 0 15px transparent; 
 	}
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-8px); }
+  80% { transform: translateX(8px); }
+  100% { transform: translateX(0); }
 }
