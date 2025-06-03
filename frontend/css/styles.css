@@ -1,5 +1,6 @@
 @import url('./login.css');
 @import url('./signup.css');
+@import url('./signupSuccess.css');
 
 h1 {
 	display: flex;
@@ -10,8 +11,12 @@ h1 {
 	font-size: 65px;
 	margin-bottom: 10px;
 	padding: 10px; 
-	color: black;
 	animation: blink-outline 1s infinite; /* apply animation */
+}
+
+h1 a {
+	text-decoration: none !important;
+	color: black !important;
 }
 
 html, body {
@@ -66,6 +71,14 @@ main {
 	display: block;
 	margin-top: 10px;
 }
+
+h2 {
+	color:antiquewhite !important;
+	font-size: medium;
+	text-align: center;
+	animation: h2-blink-outline 1s infinite;
+}
+
 
 #modal-container {
 	display: none; /* hidden by default */

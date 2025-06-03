@@ -4,7 +4,6 @@ import { routes } from '../routes.js';
 export async function handleSignupSubmit(event) {
 	
 	event.preventDefault();
-	console.log("here in signup form handling function");
 
 	function getCookie(name) {
 		let cookieValue = null;
@@ -53,8 +52,11 @@ export async function handleSignupSubmit(event) {
 			credentials: 'include'
 		})
 
-		console.log(response.json());
-
+		let responseData = null; 
+		if (!response.ok) {
+			responseData = await response.json();
+		}
+		
 		if (response.ok) {
 			console.log("signin form successfully submitted");
 			await actualizeIndexPage('main-content', routes.signupSuccess);
@@ -65,12 +67,15 @@ export async function handleSignupSubmit(event) {
 			}
 		} else {
 			console.log("signup form couldn't connect")
-			const responseData = await response.json();
 			const errorMsg = responseData.error;
 
 			const errorDiv = document.querySelector('.signup-form .error-msg');
 			if (errorMsg) {
-				errorDiv.textContent = errorMsg.toUpperCase();
+				errorDiv.textContent = "ERROR: " + errorMsg.toUpperCase();
+				//shaking animation
+				errorDiv.classList.remove("shake");
+        		void errorDiv.offsetWidth;
+        		errorDiv.classList.add("shake");
 			}
 			
 			//signup form error handling (already existing, password etc..)
@@ -130,9 +135,20 @@ export function signupController() {
 		}
 	});
 
+
 	const form = document.querySelector("#signup-form form");
 	if (form) {
-		console.log("here 1");
-		form.addEventListener("submit", handleSignupSubmit);
+		form.addEventListener("submit", (event) => {
+			if (passwordConfirmationInput.value !== passwordInput.value) {
+				event.preventDefault();
+				passwordConfirmationCheck.style.display = "block";
+				//shaking animation
+				passwordConfirmationCheck.classList.remove("shake");
+        		void passwordConfirmationCheck.offsetWidth;
+        		passwordConfirmationCheck.classList.add("shake");
+            	return;
+			}
+		handleSignupSubmit(event);
+	});
 	}
 }
