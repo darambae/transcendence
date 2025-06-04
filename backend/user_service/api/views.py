@@ -30,17 +30,17 @@ def signup(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-    len_for_filds = {'username':15, 'firstName':15, 'lastName':15, 'mail':50, 'password':255}
+    len_for_fields = {'username':15, 'firstName':15, 'lastName':15, 'mail':50, 'password':255}
     required_fields = ['username', 'firstName', 'lastName', 'mail', 'password']
     for field in required_fields:
         if field not in data:
             return JsonResponse({'error': f'Missing field: {field}'}, status=400)
         if not data[field]:
             return JsonResponse({'error': f'Field {field} cannot be empty'}, status=400)
-        if len(data[field]) > len_for_filds[field]:
-            return JsonResponse({'error': f'Field {field} is too long max body is {len_for_filds[field]} caracter'}, status=400)
+        if len(data[field]) > len_for_fields[field]:
+            return JsonResponse({'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}, status=400)
         if len(data['password']) < 8:
-            return JsonResponse({'error': f'Field password is too short minimum body is 8 caracter'}, status=400)
+            return JsonResponse({'error': f'Field password is too short minimum body is 8 characters'}, status=400)
         
 
     try:

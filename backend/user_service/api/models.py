@@ -9,7 +9,7 @@ class USER(AbstractBaseUser, PermissionsMixin):
 	last_name = models.CharField(max_length=15)
 	mail = models.EmailField(max_length=50, unique=True)
 	password = models.CharField(max_length=255)
-	two_factor_Auth = models.CharField(default=False)
+	two_factor_auth = models.CharField(max_length=255, default=False)
 	online = models.BooleanField(default=False)
 	actived = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)

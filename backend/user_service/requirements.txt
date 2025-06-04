@@ -9,5 +9,5 @@ daphne
 channels
 channels-redis
 redis
-dj-database-url
+dj-database-url<1.0
 aiosmtpd
