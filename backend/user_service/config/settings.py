@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL', "postgres://admin:jJkJ_p7EwHa0k+EgBgNW@postgres:5432/transcendence_db")
 DATABASES = {
     'default': dj_database_url.parse(DATABASE_URL),
 }

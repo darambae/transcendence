@@ -18,7 +18,7 @@ def login(request):
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
 			if check_password(data.get('password'), user.password):
-				user.two_factor_Auth = make_password(generate_otp_send_mail(user))
+				user.two_factor_auth = make_password(generate_otp_send_mail(user))
 				user.save()
 				return JsonResponse({'success': 'authentication code sent', 'user_id': user.id}, status=200)
 			else:
@@ -37,7 +37,7 @@ def token(request):
 
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
-			if check_password(data.get('two'), user.two_factor_Auth):
+			if check_password(data.get('two'), user.two_factor_auth):
 
 				refresh = RefreshToken.for_user(user)
 				access_token = str(refresh.access_token)
@@ -50,8 +50,8 @@ def token(request):
 									'refresh' : str(refresh)
 									}, status=200)
 			else:
-				return JsonResponse({'error': 'Invalid two_factor_Auth'}, status=401)
+				return JsonResponse({'error': 'Invalid two_factor_auth'}, status=401)
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 	else:
-		return JsonResponse({'error': 'Unauthorized'}, status=405)
+		return JsonResponse({'error': 'Unauthorized'}, status=401)
