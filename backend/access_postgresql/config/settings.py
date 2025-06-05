@@ -11,16 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from datetime import timedelta
 import os
+import dj_database_url
+
+
+APP_NAME = 'access-postgresql'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-BACKEND_DIR = BASE_DIR.parent
-PROJECT_DIR = BACKEND_DIR.parent
-FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
-DOMAIN = os.getenv('DOMAIN', 'localhost')
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -31,9 +29,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-APP_NAME = 'auth'
-
-ALLOWED_HOSTS = ['transcendence.42.fr', 'auth']
+ALLOWED_HOSTS = ['access-postgresql']
 
 # HTTP settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -44,6 +40,8 @@ CSRF_COOKIE_SECURE = True
 APPEND_SLASH = True
 # Application definition
 
+# Application definition
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'rest_framework',
 	'api'
 ]
 
@@ -58,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -69,9 +68,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            FRONTEND_DIR, "templates"
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,10 +87,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy'
-    }
+    'default': dj_database_url.parse(DATABASE_URL),
 }
 
 # Password validation
@@ -131,36 +127,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = FRONTEND_DIR
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-APPEND_SLASH = True
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://transcendence.42.fr:8443",
-]
-
-# MEDIA FOR IMG
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-## FOR JWT
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-}
-
-#SIMPLE_JWT = {
-#    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-#    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-#    "ROTATE_REFRESH_TOKENS": True,
-#	'SIGNING_KEY':os.getenv('KEY_JWT'),
-#	'AUTH_HEADER_TYPES':('Bearer',)
-#}
+# For my user 
+AUTH_USER_MODEL = 'api.USER'
