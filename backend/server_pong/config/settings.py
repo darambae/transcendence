@@ -11,12 +11,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from .jsonSocketHandler import JSONSocketHandler
 import os
+#### REQUIRED ELK LIBRARY ####
 import dj_database_url
 import logging
 from logstash_async.formatter import LogstashFormatter
 from logstash_async.handler import AsynchronousLogstashHandler
+from .jsonSocketHandler import JSONSocketHandler
 
 APP_NAME = 'server_pong'
 
@@ -36,7 +37,6 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
-
 
 # Application definition
 

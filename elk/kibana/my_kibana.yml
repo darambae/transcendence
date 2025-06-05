@@ -5,7 +5,7 @@ server.ssl.keystore.path: /usr/share/kibana/config/certs/kibana.p12
 # server.ssl.keystore.password: jJkJ_p7EwHa0k+EgBgNW
 
 elasticsearch.username: "kibana_system"
-elasticsearch.password: "jJkJ_p7EwHa0k+EgBgNW"
+elasticsearch.password: "${ELASTIC_PASSWORD}"
 elasticsearch.hosts: ["https://elasticsearch:9200"]
 elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca/ca.crt"]
 elasticsearch.ssl.verificationMode: certificate

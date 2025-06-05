@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+#### Required ELK library ####
 import dj_database_url
 import logging
 from logstash_async.formatter import LogstashFormatter

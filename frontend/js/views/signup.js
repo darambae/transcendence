@@ -1,25 +1,9 @@
-import { actualizeIndexPage } from '../utils.js';
+import { actualizeIndexPage, getCookie } from '../utils.js';
 import { routes } from '../routes.js';
 
 export async function handleSignupSubmit(event) {
 	
 	event.preventDefault();
-	console.log("here in signup form handling function");
-
-	function getCookie(name) {
-		let cookieValue = null;
-		if (document.cookie && document.cookie !== '') {
-			const cookies = document.cookie.split(';');
-			for (let i = 0; i < cookies.length; i++) {
-				const cookie = cookies[i].trim();
-				if (cookie.substring(0, name.length + 1) === (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					break;
-				}
-			}
-		}
-		return cookieValue;
-	}
 
 	const form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
@@ -47,19 +31,38 @@ export async function handleSignupSubmit(event) {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				'X-CSRFToken': getCookie('csrftoken'),
+				'X-CSRFToken': csrf,
 			},
 			body: JSON.stringify(cleanData),
 			credentials: 'include'
 		})
 
-		console.log(response.json());
-
+		let responseData = null; 
+		if (!response.ok) {
+			responseData = await response.json();
+		}
+		
 		if (response.ok) {
 			console.log("signin form successfully submitted");
 			await actualizeIndexPage('main-content', routes.signupSuccess);
+			const mailDiv = document.querySelector('.signup-success .user-mail');
+			const mail = cleanData.mail;
+			if (mailDiv){
+				mailDiv.textContent = mail;
+			}
 		} else {
 			console.log("signup form couldn't connect")
+			const errorMsg = responseData.error;
+
+			const errorDiv = document.querySelector('.signup-form .error-msg');
+			if (errorMsg) {
+				errorDiv.textContent = "ERROR: " + errorMsg.toUpperCase();
+				//shaking animation
+				errorDiv.classList.remove("shake");
+        		void errorDiv.offsetWidth;
+        		errorDiv.classList.add("shake");
+			}
+			
 			//signup form error handling (already existing, password etc..)
 		}
 	} catch (error) {
@@ -117,9 +120,20 @@ export function signupController() {
 		}
 	});
 
+
 	const form = document.querySelector("#signup-form form");
 	if (form) {
-		console.log("here 1");
-		form.addEventListener("submit", handleSignupSubmit);
+		form.addEventListener("submit", (event) => {
+			if (passwordConfirmationInput.value !== passwordInput.value) {
+				event.preventDefault();
+				passwordConfirmationCheck.style.display = "block";
+				//shaking animation
+				passwordConfirmationCheck.classList.remove("shake");
+        		void passwordConfirmationCheck.offsetWidth;
+        		passwordConfirmationCheck.classList.add("shake");
+            	return;
+			}
+		handleSignupSubmit(event);
+	});
 	}
 }

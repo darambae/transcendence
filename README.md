@@ -4,6 +4,11 @@
 - [Transcendence](#transcendence)
   - [Table of Contents](#table-of-contents)
   - [Project Structure](#project-structure)
+  - [API list](#api-list)
+    - [Server Pong](#server-pong)
+    - [AI Pong](#ai-pong)
+    - [User Service](#user-service)
+    - [Chat](#chat)
   - [Prerequisites](#prerequisites)
   - [Building the Project](#building-the-project)
   - [Running the Project](#running-the-project)
@@ -15,6 +20,65 @@
 
 ![Project Structure Diagram](doc/project_structure(transcendence).png)
 
+## API list
+  - **Documentation format with examples**
+| Champ                      | Description                                                                 | Exemples de Valeurs                |
+|----------------------------|-----------------------------------------------------------------------------|------------------------------------|
+| **Nom de l'API**           | Nom de la fonctionnalité ou de l'action de l'API                            | Connexion utilisateur              |
+| **Endpoint**               | URL de l’API                                                                | `/user-service/login/`             |
+| **Méthode**                | Méthode HTTP utilisée                                                       | `POST`                             |
+| **Description**            | Brève description de ce que fait l’API                                      | Authentifie un utilisateur         |
+| **Authentification**       | Type d’authentification requise                                             | Aucune / Token / JWT / Session     |
+| **Paramètres de Requête**  | Paramètres attendus dans la requête                                         |                                    |
+| - Nom                      | Nom du paramètre                                                            | `username`                         |
+| - Type                     | Type de donnée                                                              | `string`                           |
+| - Obligatoire              | Oui / Non                                                                   | Oui                                |
+| - Description              | Description du paramètre                                                    | Nom d’utilisateur                  |
+| - Exemple                  | Exemple de valeur                                                           | `alice`                            |
+| **Exemple de Requête**     | Exemple complet de requête (curl, JSON, etc.)                               | `curl -X POST ...`                 |
+| **Réponse**                | Détails sur la réponse attendue                                             |                                    |
+| - Code de Statut           | Code HTTP de succès                                                         | `200 OK`                           |
+| - Corps                    | Exemple de corps de réponse                                                 | `{ "token": "..." }`               |
+| - Description des Champs   | Explication des champs du corps de réponse                                  | `token`: jeton d’authentification  |
+| **Réponses d'Erreur**      | Codes et exemples de réponses d’erreur                                      |                                    |
+| - Code de Statut           | Code HTTP d’erreur                                                          | `400 Bad Request`                  |
+| - Corps                    | Exemple de corps d’erreur                                                   | `{ "error": "Invalid credentials" }`|
+| **Remarques**              | Informations complémentaires, limitations, etc.                             |                                    |
+
+  - **Copy this form to fill in**
+| Champ                      | Description                                                                 | Exemples de Valeurs                |
+|----------------------------|-----------------------------------------------------------------------------|------------------------------------|
+| **Nom de l'API**           |                                       |                                    |
+| **Endpoint**               |                                       |                                    |
+| **Méthode**                |                                       |                                    |
+| **Description**            |                                       |                                    |
+| **Authentification**       |                                       |                                    |
+| **Paramètres de Requête**  |                                       |                                    |
+| - Nom                      |                                       |                                    |
+| - Type                     |                                       |                                    |
+| - Obligatoire              |                                       |                                    |
+| - Description              |                                       |                                    |
+| - Exemple                  |                                       |                                    |
+| **Exemple de Requête**     |                                       |                                    |
+| **Réponse**                |                                       |                                    |
+| - Code de Statut           |                                       |                                    |
+| - Corps                    |                                       |                                    |
+| - Description des Champs   |                                       |                                    |
+| **Réponses d'Erreur**      |                                       |                                    |
+| - Code de Statut           |                                       |                                    |
+| - Corps                    |                                       |                                    |
+| **Remarques**              |                                       |                                    |
+### Server Pong
+
+This document describes the API endpoints for the `server_pong` Django application, which facilitates real-time multiplayer Pong game simulations. The API provides functionalities for managing game sessions, retrieving simulation states, and handling real-time communication.
+
+---
+
+### AI Pong
+
+### User Service
+
+### Chat
 
 ## Prerequisites
 
@@ -131,6 +195,13 @@ You can also run or start specific groups of containers:
 
     ```bash
     make destroy
+    ```
+
+3.  **Remove all unused docker data from the system**
+    This command will clean your docker environment completely.
+
+    ```bash
+    make prune
     ```
 
 ## Data structure

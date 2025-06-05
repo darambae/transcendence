@@ -8,6 +8,10 @@ services:
       - certs:/usr/share/elasticsearch/config/certs
     env_file:
       - .env
+  
+
+  ################## Postgresql ##################
+
   postgres:
     image: postgres:latest
     #ports:
@@ -23,7 +27,9 @@ services:
     env_file:
       - .env
     networks:
-      - nginx_network
+      - postgresql_django_access_network
+
+  ################## Nginx_modsecurity ##################
   nginx_modsecurity:
     build: ./nginx_modsecurity
     container_name: nginx_modsecurity
@@ -38,12 +44,14 @@ services:
       - user_service
       - ai_pong
       - server_pong
+      #- auth
     networks:
       - nginx_network
     env_file:
       - .env
     restart: always
-  ################## Django Services ##################
+
+  ################## User_Services ##################
   user_service:
     build:
       context: ./backend/user_service
@@ -52,8 +60,6 @@ services:
     volumes:
       - ./backend/user_service:/app
       - certs:/certs
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     depends_on:
       redis:
         condition: service_started
@@ -63,8 +69,75 @@ services:
       - .env
     restart: always
     networks:
+      - mail_network
       - elk_network
       - nginx_network
+
+  ################## Auth ##################
+
+  auth:
+    build:
+      context: ./backend/auth
+      dockerfile: Dockerfile
+    container_name: auth
+    volumes:
+      - ./backend/auth:/app
+      - certs:/certs
+    depends_on:
+      redis:
+        condition: service_started
+      certs_generator:
+        condition: service_completed_successfully
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    restart: always
+    networks:
+      - mail_network
+      - elk_network
+      - nginx_network
+      - postgresql_django_access_network
+
+  ################## Access_posgresql ##################
+
+  access-postgresql:
+    build:
+      context: ./backend/access_postgresql
+      dockerfile: Dockerfile
+    container_name: access-postgresql
+    volumes:
+      - ./backend/access_postgresql:/app
+      - certs:/certs
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - elk_network
+      - nginx_network
+      - postgresql_django_access_network
+
+  ################## mail ##################
+
+  mail:
+    build:
+      context: ./backend/mail
+      dockerfile: Dockerfile
+    container_name: mail
+    volumes:
+      - ./backend/mail:/app
+      - certs:/certs
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+    restart: always
+    networks:
+      - mail_network
+
+
+
   redis:
     image: redis:latest
     container_name: redis
@@ -89,8 +162,6 @@ services:
     volumes:
       - certs:/certs
       - ./backend/server_pong:/app
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     networks:
       - game_network
       - nginx_network
@@ -110,8 +181,6 @@ services:
     volumes:
       - certs:/certs
       - ./backend/AI_pong:/app
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     env_file:
       - .env
     networks:
@@ -184,7 +253,7 @@ services:
         condition: service_completed_successfully
     environment:
       - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
-      - ELASTIC_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - NODE_OPTIONS=--openssl-legacy-provider
       - ES_JAVA_OPTS=-Xms2g -Xmx2g
     volumes:
@@ -216,7 +285,7 @@ services:
       - NODE_OPTIONS=openssl-legacy-provider
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=jJkJ_p7EwHa0k+EgBgNW
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
       # - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
     depends_on:
       elasticsearch:
@@ -243,6 +312,12 @@ volumes:
 
 #################### NETWORKS #########################
 networks:
+  mail_network:
+    name: mail_network
+    driver: bridge
+  postgresql_django_access_network:
+    name: postgresql_django_access_network
+    driver: bridge
   nginx_network:
     name: nginx_network
     driver: bridge

@@ -1,20 +1,55 @@
 import { routes } from "../routes.js";
+import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
+
+async function double_authenticate(data) {
+	const html = await loadTemplate('double_auth');
+	const content = document.getElementById("login-form");
+
+	if (html) {
+		content.innerHTML = html;
+	}
+	const mail = data.user_mail;
+	const mailDiv = document.querySelector('.login-form .double-auth .user-mail');
+	if (mailDiv) {
+		mailDiv.textContent = mail;
+	}
+	return new Promise((resolve, reject) => {
+		const form = document.getElementById('double-auth-form');
+		const csrf = getCookie('csrftoken');
+		console.log("csrf:", csrf);
+		form.addEventListener("submit", async (e) => {
+			e.preventDefault();
+
+			const code = document.getElementById('auth-code').value;
+			console.log("mail + code: ", code, mail);
+			const response = await fetch("auth/verify-2fa/", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					'X-CSRFToken': csrf,
+				},
+				body: JSON.stringify({ mail, two: code })
+			});
+
+			const responseData = await response.json();
+
+			if (response.ok) {
+				resolve(true);
+			} else {
+				const errorDiv = document.querySelector('.double-auth .error-msg');
+				if (errorDiv) {
+					const errorMsg = responseData.error;
+					errorDiv.textContent = errorMsg;
+					errorDiv.style.display = "block";
+				}
+				reject(new Error("invalid code"));
+			}
+		});
+	});
+}
 
 export async function handleLoginSubmit(event) {
-	function getCookie(name) {
-		let cookieValue = null;
-		if (document.cookie && document.cookie !== '') {
-			const cookies = document.cookie.split(';');
-			for (let i = 0; i < cookies.length; i++) {
-				const cookie = cookies[i].trim();
-				if (cookie.substring(0, name.length + 1) === (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					break;
-				}
-			}
-		}
-		return cookieValue;
-	}
+
 	event.preventDefault();
 	
 	const form = event.target;
@@ -28,35 +63,51 @@ export async function handleLoginSubmit(event) {
 		submitButton.disabled = true;
 		if (loadingMessage) 
 			loadingMessage.style.display = "inline";
-
-		const response = await fetch("/user-service/login/", {
+		
+		const csrf = getCookie('csrftoken');
+		console.log("csrf: ", csrf);
+		const response = await fetch("/auth/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				'X-CSRFToken': getCookie('csrftoken'),
+				'X-CSRFToken': csrf,
 			},
 			body: JSON.stringify(dataForm)
 		});
 
-		//tokens returned in the JWT to communicate with protected roads
-		let	accessToken = null; //Token to put in the authorization header of request trying to access protected roads
-		let	refreshToken = null; // Token to get a new acccess token if needed without having to reconnect
-		
 		const data = await response.json();
+		
 		if (response.ok) {
-			accessToken = data.access;
-			refreshToken = data.refreshToken;
-			localStorage.setItem(accessToken);
-			localStorage.setItem(refreshToken);
+			try {
+				await double_authenticate(data)
+				//tokens returned in the JWT to communicate with protected roads
+				let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
+				let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
 
-			actualizePage('toggle-login', routes[user]);
-			console.log("User successfully connected");
+				localStorage.setItem('accessToken', accessToken);
+				localStorage.setItem('refreshToken', refreshToken);
+
+				closeModal();
+				actualizeIndexPage('toggle-login', routes['user']);
+				console.log("User successfully connected");
+			} catch (error) {
+				console.log("Double auth error: ", error);
+			}
 		} else {
 			console.log("Couldn't connect");
 			//Error handling (wrong password, mail address not known, etc...)
+			const errorDiv = document.querySelector('.login-form .error-msg');
+			const errorMsg = data.error;
+			if (errorMsg) {
+				errorDiv.textContent = "ERROR: " + errorMsg.toUpperCase();
+				//shaking animation
+				errorDiv.classList.remove("shake");
+				void errorDiv.offsetWidth;
+				errorDiv.classList.add("shake");
+			}
 		}
 	} catch (error) {
-		console.error("Connection error: ", error);
+		console.error("Connection error: ");
 	} finally {
 		submitButton.disabled = false;
 		if (loadingMessage)
@@ -65,16 +116,10 @@ export async function handleLoginSubmit(event) {
 }
 
 
+
 export function loginController() {
 	const modalContainer = document.getElementById("modal-container");
-	const loginForm = document.getElementById("login-form");
 	const closeBtn = document.getElementById("close-login-form");
-
-	const closeModal = () => {
-		modalContainer.style.display = "none";
-		loginForm.classList.remove("active");
-		window.location = "#home";
-	};
 
 	closeBtn.addEventListener("click", (event) => {
 		closeModal();
@@ -86,8 +131,7 @@ export function loginController() {
 		}
 	});
 
-	// add specific event to the form
-	const form = document.querySelector("#login-form form");
+	const form = document.getElementById("log-form");
 	if (form) {
 	  form.addEventListener("submit", handleLoginSubmit);
 	}

@@ -9,7 +9,7 @@
 		<div class="mb-3">
 			<label for="mail" class="form-label">Mail</label>
 			<input type="email" class="form-control" id="mail" name="mail" placeholder="mail" required>
-	  	</div>
+		</div>
 		<div class="mb-3">
 			<label for="first name" class="form-label">First name</label>
 			<input type="text" class="form-control" id="first-name" name="firstName" placeholder="first name" required>
@@ -18,11 +18,11 @@
 			<label for="last name" class="form-label">Last name</label>
 			<input type="text" class="form-control" id="last-name" name="lastName" placeholder="last name" required>
 		</div>
-	  	<div class="mb-3">
+		<div class="mb-3">
 			<label for="inputPassword" class="form-label">Password</label>
 			<input type="password" class="form-control" id="inputPassword" name="password" aria-describedby="passwordHelpBlock" placeholder="password">
 			<div id="passwordHelpBlock" class="form-text">
-  				Your password must contain at least :
+				Your password must contain at least :
 				<ul id="password-rules">
 					<li id="rule-uppercase" class="invalid"> 1 uppercase</li>
 					<li id="rule-number" class="invalid"> 1 number</li>
@@ -34,9 +34,10 @@
 			<label for="password-confirmation" class="form-label">Password Confirmation</label>
 			<input type="password" class="form-control" id="password-confirmation" name="password_confirmation" placeholder="password confirmation" required>
 			<div id="passwordConfirmationCheck" class="form-text">
-				input must be the same as password !
+				input does not match with the password !
 			</div>
 		</div>
+		<div class="error-msg"></div>
 		<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
 </div>
