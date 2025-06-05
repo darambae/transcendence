@@ -148,15 +148,7 @@ CSRF_TRUSTED_ORIGINS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-<<<<<<< HEAD
-# For my user 
-AUTH_USER_MODEL = 'api.USER'
-
-
-# Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
-=======
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
->>>>>>> access_postgresql
 # class AddAppNameFilter(logging.Filter):
 #     def filter(self, record):
 #         if not hasattr(record, 'app_name'):
