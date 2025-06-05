@@ -1,6 +1,8 @@
 @import url('./login.css');
 @import url('./signup.css');
 @import url('./signupSuccess.css');
+@import url('./double_auth.css');
+@import url('./user.css');
 
 h1 {
 	display: flex;
@@ -54,7 +56,7 @@ main {
 	text-decoration: underline;
 }
 
-.connexion {
+.connexion a {
 	position: absolute;
 	font-family: 'Sankyu', sans-serif;
 	text-decoration: none;

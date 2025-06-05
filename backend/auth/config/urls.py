@@ -21,8 +21,10 @@ from api.views import data_link
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+   path('admin/', admin.site.urls),
+	path('auth/login/', views.login, name='login'),
+	path('auth/verify-2fa/', views.verify_2fa, name='verify-2fa'),
+   path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	#path('auth/login/', views.login, name='login'),
 	path('auth/token/', views.token, name='token'),
 	path('auth/activate_account/<uidb64>/<token>/', views.activate_account, name='activate_account'),

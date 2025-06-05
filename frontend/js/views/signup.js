@@ -1,24 +1,9 @@
-import { actualizeIndexPage } from '../utils.js';
+import { actualizeIndexPage, getCookie } from '../utils.js';
 import { routes } from '../routes.js';
 
 export async function handleSignupSubmit(event) {
 	
 	event.preventDefault();
-
-	function getCookie(name) {
-		let cookieValue = null;
-		if (document.cookie && document.cookie !== '') {
-			const cookies = document.cookie.split(';');
-			for (let i = 0; i < cookies.length; i++) {
-				const cookie = cookies[i].trim();
-				if (cookie.substring(0, name.length + 1) === (name + '=')) {
-					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-					break;
-				}
-			}
-		}
-		return cookieValue;
-	}
 
 	const form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
@@ -46,7 +31,7 @@ export async function handleSignupSubmit(event) {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				'X-CSRFToken': getCookie('csrftoken'),
+				'X-CSRFToken': csrf,
 			},
 			body: JSON.stringify(cleanData),
 			credentials: 'include'

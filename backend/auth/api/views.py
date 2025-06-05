@@ -64,7 +64,8 @@ class data_link(APIView):
 #		return JsonResponse({'error': 'Unauthorized'}, status=405)
 
 
-def token(request):
+def verify_2fa(request):
+
 	if (request.method == 'POST'):
 		try:
 			data = json.loads(request.body)
@@ -80,7 +81,7 @@ def token(request):
 
 				user.online = True
 				user.save()
-				return JsonResponse({'succes': 'Login successful',
+				return JsonResponse({'success': 'Login successful',
 									'user_id': user.id,
 									'access' : access_token,
 									'refresh' : str(refresh)

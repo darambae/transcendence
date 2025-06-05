@@ -1,0 +1,16 @@
+.double-auth {
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: center;
+}
+
+.validate {
+	text-align: center;
+	margin-top: 15px;
+}
+
+.user-mail {
+	color: #0074d9;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: bold;
+}

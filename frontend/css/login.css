@@ -36,6 +36,10 @@
 	font-family: 'helvetica', sans-serif;
   }
 
+  .login-form .needs-validation .loading-msg {
+	font-family: Arial, Helvetica, sans-serif !important;
+  }
+
 @font-face {
 	font-family: 'sukoro';
 	src: url('/assets/fonts/sukoro/sukoro.otf') format('opentype');
