@@ -1,8 +1,10 @@
 from django.shortcuts import render
-import shortuuid
 import random
 import sys
 import jwt
+import redis
+from .tournamentStatic import Tournament, Player, trnmtDict
+r = redis.Redis()
 
 ############ JWT ghost player #########
 '''
@@ -18,55 +20,6 @@ import jwt
 class TournamentError(Exception) :
     pass
 
-
-trnmtDict = {} # Usage : {str : Tournament}
-
-class Player() :
-    def __init__(self, jwt, username):
-        self.jwt = jwt
-        self.username = username
-
-    def __eq__(self, other) :
-        if type(other).__name__ != "Player" :
-            return False
-        if other.jwt != self.jwt or other.username != self.username :
-            return False
-        return True
-
-    def toTuple(self) :
-        return (self.username, self.jwt)
-    
-class Tournament() :
-    def __init__(self) :
-        self.tKey = "Trnmt_" + shortuuid.ShortUUID().random(length=9)
-        self.players = []
-        self.tournamentPl = []
-        self.final = []
-        self.nbPl = 0
-    def addPlayers(self, playerClass) :
-        if self.nbPl < 4 :
-            self.players.append(playerClass)
-            self.nbPl += 1
-            return True
-        else :
-            return False
-    def removePlayer(self, playerClass) :
-        if self.nbPl > 0 :
-            self.players.remove(playerClass)
-            self.nbPl -= 1
-            return True
-        return False
-    def launchTournament(self) :
-        if self.nbPl != 4 :
-            raise TournamentError("Tournament ;ust contain 4 players")
-        lstTemp = [self.players.pop(random.randint(0, 3))]
-        lstTemp.append(self.players.pop(random.randint(0, 2)))
-        self.tournamentPl = [lstTemp, players]
-        print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
-    
-    def listPlayers(self) :
-        return [P.toTuple for P in self.players]
-
 async def getJWT(request) :
     auth_header = request.headers.get('Authorization', None)
     if not auth_header:
@@ -77,59 +30,75 @@ async def getJWT(request) :
 
     return token 
 
-# Routes
-# Decode JWT (Auth)
-
-# setTournamentResult (Acces postgre)
-
-
 @csrf_exempt
 async def launchTournament(request) :
-    try :
+    async def launchTournament(request):
+    try:
         body = json.loads(request.body)
         tkey = body["tKey"]
-        if tkey in trnmtDict :
-            trnmtDict[tkey].launchTournament()
-        else :
-            return JsonResponse({"Error" : "Tournament not found"}, status=404)
-        #Tournament logic in consumer
+        if tkey not in trnmtDict:
+            return JsonResponse({"Error": "Tournament not found"}, status=404)
+        trnmtDict[tkey].launchTournament()
+
+        message = json.dumps({
+            "event": "tournament_launched",
+            "match1" : f'{trnmtDict[tkey].tournamentPl[0][0]}:{trnmtDict[tkey].tournamentPl[0][1]}'
+            "match2" : f"{trnmtDict[tkey].tournamentPl[1][0]}:{trnmtDict[tkey].tournamentPl[1][1]}"
+        })
+        r.publish(f"tournament:{tkey}", message)
+
+        return JsonResponse({"Result": "Tournament launched"})
     except TournamentError as e:
-        return JsonResponse({"Error" : e}, status=401)
-    except Exception :
-        return JsonResponse({"error" : "Internal server error"}, status=500)
-
-
-async def  checkForUpdates(uriKey, key) :
-    try :
-        print("0", file=sys.stderr)
-        ssl_context = ssl.create_default_context()
-        ssl_context.load_verify_locations('/certs/fullchain.crt')
-        async with websockets.connect(uriKey, ssl=ssl_context) as ws:
-            print("1", file=sys.stderr)
-            while True:
-                print("2", file=sys.stderr)
-                message = await ws.recv()
-                print("3", file=sys.stderr)
-                yield f"data: {message}\n\n"
-    except Exception as e :
-        print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
-        yield f"data: WebSocket stop, error : {e}\n\n"
-
-
+        return JsonResponse({"Error": str(e)}, status=401)
+    except Exception:
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 @csrf_exempt
 async def joinTournament(request):
-    try :
+    try:
         body = json.loads(request.body)
-        jwt = await getJWT(request)
+        jwt_token = await getJWT(request)
+        encodedJwt = 
         username = body["username"]
         tKey = body["tKey"]
-        if tKey in trnmtDict :
-            trnmtDict[tKey].addPlayers(Player(jwt, username))
-        else :
-            return JsonResponse({"Error" : "Tournament not found"}, status=404)
-    except Exception as e :
-        return JsonResponse({"error" : "Internal server error"}, status=500)
+
+        if tKey not in trnmtDict:
+            return JsonResponse({"Error": "Tournament not found"}, status=404)
+
+        player = Player(jwt_token, username)
+        trnmtDict[tKey].addPlayers(player)
+
+        # Fonction qui va écouter Redis pubsub et envoyer les messages en streaming
+        async def event_stream():
+            pubsub = r.pubsub()
+            await pubsub.subscribe(f"tournament:{tKey}")
+
+            try:
+                while True:
+                    message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=10)
+                    if message:
+                        data = message['data']
+                        # data peut être bytes, on décode et renvoie JSON
+                        if isinstance(data, bytes):
+                            data = data.decode('utf-8')
+                        yield f"data: {data}\n\n"
+                    else:
+                        # keep connection alive
+                        yield ": keep-alive\n\n"
+                    await asyncio.sleep(0.1)
+            except asyncio.CancelledError:
+                await pubsub.unsubscribe(f"tournament:{tKey}")
+                raise
+            finally:
+                await pubsub.unsubscribe(f"tournament:{tKey}")
+
+        # StreamingHttpResponse en mode SSE (Server Sent Events)
+        response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+        response['Cache-Control'] = 'no-cache'
+        return response
+
+    except Exception as e:
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 
 @csrf_exempt
