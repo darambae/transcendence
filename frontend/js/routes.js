@@ -34,5 +34,8 @@ export const routes = {
 	},
 	signupSuccess: {
 		template: 'signupSuccess',
+	},
+	user: {
+		template: 'user',
 	}
 };

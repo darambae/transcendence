@@ -1,16 +1,17 @@
 <div id="login-form" class="login-form active">
 	<button id="close-login-form" type="button" class="btn-close" aria-label="Close"></button>
-	<form class="needs-validation">
+	<form class="needs-validation" id="log-form">
 	  <div class="mb-3">
 		<label for="mail" class="form-label">MAIL ADDRESS</label>
 		<input type="email" class="form-control" id="mail" name="mail" placeholder="mail address" required>
 	  </div>
-	  <div class="mb-3">
+	  <div id="login-password" class="mb-3">
 		<label for="password" class="form-label">PASSWORD</label>
 		<input type="password" class="form-control" id="password" name="password" placeholder="password" required>
 		<a href="#signup" class="form-text text-muted" style="display: block; margin-top: 3px;">Can't login ? Create an account</a>
 	  </div>
+	  <div class="error-msg"></div>
 	  <button type="submit" class="btn btn-primary">login</button>
-	  <span id="loading-message" style="display:none">connexion en cours...</span>
+	  <span class="loading-msg" id="loading-message" style="display:none">connecting...</span>
 	</form>
   </div>

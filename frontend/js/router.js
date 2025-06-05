@@ -30,18 +30,7 @@ export async function navigate() {
 		}
 	} catch (error) {
 		console.error('Error loading template ', error);
+		const content = document.getElementById("main-content");
 		content.innerHTML = '<h2> Unable to load the page </h2>';
 	}
 }
-
-// if (!hash || hash === 'home') {
-// 	routes.home();
-// 	return;
-// }
-
-// const page = routes[hash];
-// if (page) {
-// 	page(); // Appelle la fonction de la page
-// } else {
-// 	content.innerHTML = `<h2>404</h2><p>Page not Found</p>`
-// }

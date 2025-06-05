@@ -20,7 +20,7 @@ def login(request):
 			if check_password(data.get('password'), user.password):
 				user.two_factor_Auth = make_password(generate_otp_send_mail(user))
 				user.save()
-				return JsonResponse({'success': 'authentication code sent', 'user_id': user.id}, status=200)
+				return JsonResponse({'success': 'authentication code sent', 'user_id': user.id, 'user_mail': user.mail}, status=200)
 			else:
 				return JsonResponse({'error': 'Invalid password'}, status=401)
 		except USER.DoesNotExist:
@@ -28,7 +28,8 @@ def login(request):
 	else:
 		return JsonResponse({'error': 'Unauthorized'}, status=405)
 
-def token(request):
+def verify_2fa(request):
+
 	if (request.method == 'POST'):
 		try:
 			data = json.loads(request.body)
@@ -44,7 +45,7 @@ def token(request):
 
 				user.online = True
 				user.save()
-				return JsonResponse({'succes': 'Login successful',
+				return JsonResponse({'success': 'Login successful',
 									'user_id': user.id,
 									'access' : access_token,
 									'refresh' : str(refresh)

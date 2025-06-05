@@ -22,6 +22,6 @@ from rest_framework_simplejwt.views import (TokenRefreshView)
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('auth/login/', views.login, name='login'),
-	path('auth/token/', views.token, name='token'),
+	path('auth/verify-2fa/', views.verify_2fa, name='verify-2fa'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
