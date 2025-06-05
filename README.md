@@ -70,6 +70,10 @@
 | **Remarques**              |                                       |                                    |
 ### Server Pong
 
+This document describes the API endpoints for the `server_pong` Django application, which facilitates real-time multiplayer Pong game simulations. The API provides functionalities for managing game sessions, retrieving simulation states, and handling real-time communication.
+
+---
+
 ### AI Pong
 
 ### User Service
@@ -191,6 +195,13 @@ You can also run or start specific groups of containers:
 
     ```bash
     make destroy
+    ```
+
+3.  **Remove all unused docker data from the system**
+    This command will clean your docker environment completely.
+
+    ```bash
+    make prune
     ```
 
 ## Data structure

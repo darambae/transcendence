@@ -9,5 +9,5 @@ RUN pip install --upgrade pip
 COPY requirements.txt /app
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-EXPOSE 4020
-CMD ["sh", "-c", "daphne -e ssl:4020:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]
+EXPOSE 4010
+CMD ["sh", "-c", "daphne -e ssl:4010:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]

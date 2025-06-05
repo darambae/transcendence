@@ -16,17 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api import views
-from api.views import data_link
-from rest_framework_simplejwt.views import (TokenRefreshView)
+from api.views import confirm_singup
 
 urlpatterns = [
-   path('admin/', admin.site.urls),
-	path('auth/login/', views.login, name='login'),
-	path('auth/verify-2fa/', views.verify_2fa, name='verify-2fa'),
-   path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-	#path('auth/login/', views.login, name='login'),
-	path('auth/token/', views.token, name='token'),
-	path('auth/activate_account/<uidb64>/<token>/', views.activate_account, name='activate_account'),
-	path('auth_api/data_link/', data_link.as_view(), name='data_link')
+    path('admin/', admin.site.urls),
+	path('mail/confirm_singup/', confirm_singup.as_view(), name='confirm_singup')
 ]

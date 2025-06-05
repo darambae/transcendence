@@ -22,5 +22,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 	path('user-service/csrf/', views.get_csrf_token, name='csrf'),
 	path('user-service/signup/', views.signup, name='signup'),
-	path('user-service/activate_account/<uidb64>/<token>/', views.activate_account, name='activate_account'),
 ]

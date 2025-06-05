@@ -20,6 +20,8 @@ uri = "wss://server_pong:8030/ws/game/"
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
 
+# apiKey is a string that identifies the game room
+
 class   RequestParsed :
     def __init__(self, apiKey, action) :
         if apiKey in apiKeys or apiKey in apiKeysUnplayable :
@@ -53,7 +55,9 @@ def getSimulationState(request):
     else:
         return JsonResponse({'error': 'Simulation not found'}, status=404)
 
-
+# Asynchronous generator function('async' + 'yield') to handle WebSocket connections
+# -> When it runs, it produces a value (in this case, a formatted string) and pauses 
+# the function’s execution. The next time the generator is iterated, execution resumes right after the yield.
 async def  checkForUpdates(uriKey, key) :
     try :
         print("0", file=sys.stderr)
@@ -69,7 +73,6 @@ async def  checkForUpdates(uriKey, key) :
     except Exception as e :
         print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
         yield f"data: WebSocket stop, error : {e}\n\n"
-
 
 
 async def sse(request):
