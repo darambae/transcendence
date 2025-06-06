@@ -51,9 +51,10 @@ def signup(request):
         "mail":data['mail'],
         "password":make_password(data['password'])
     }
-    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'access-postgresql'})
-    response_mail = requests.post(url_mail, json=json_data, verify=False, headers={'Host': 'mail'})
+    creat_user_status = False
+    response_mail_status = False
 
+    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'access-postgresql'})
     try:
         data_response_create_user = response_creat_user.json()
     except ValueError:
@@ -62,16 +63,26 @@ def signup(request):
             'detail': response_creat_user.text
         }
 
-    try:
-        data_response_mail = response_mail.json()
-    except ValueError:
-        data_response_mail = {
-            'error': 'Invalid response from mail service',
-            'detail': response_mail.text
-        }
+    data_response_mail = None
+    if response_creat_user.status_code == 200:
+        creat_user_status = True
+        response_mail = requests.post(url_mail, json=json_data, verify=False, headers={'Host': 'mail'})
+
+        try:
+            data_response_mail = response_mail.json()
+        except ValueError:
+            data_response_mail = {
+                'error': 'Invalid response from mail service',
+                'detail': response_mail.text
+            }
+        response_mail_status = True
+
+    status_code = 200
+    if response_mail_status == False or creat_user_status == False:
+        status_code = 400
 
     return JsonResponse({
         'create_user': data_response_create_user,
         'send_mail': data_response_mail,
-    }, status=200)
+    }, status=status_code)
 

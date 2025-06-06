@@ -19,10 +19,12 @@ from django.urls import path
 from api import views
 from api.views import info_link
 from api.views import activate_account
+from api.views import check_password
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('api/signup/', views.api_signup, name='api_signup'),
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
+	path('api/check_password/', check_password.as_view(), name='check_password')
 ]
