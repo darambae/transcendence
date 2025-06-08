@@ -4,7 +4,11 @@ import sys
 import jwt
 import redis
 from .tournamentStatic import Tournament, Player, trnmtDict
-r = redis.Redis()
+from channels.layers import get_channel_layer
+
+channel_layer = get_channel_layer()
+
+consumerUri = "wss://tournament_manager:8050/ws/game/"
 
 ############ JWT ghost player #########
 '''
@@ -20,6 +24,23 @@ r = redis.Redis()
 class TournamentError(Exception) :
     pass
 
+async def  checkForUpdates(uriKey) :
+    try :
+        print("0", file=sys.stderr)
+        ssl_context = ssl.create_default_context()
+        ssl_context.load_verify_locations('/certs/fullchain.crt')
+        async with websockets.connect(uriKey, ssl=ssl_context) as ws:
+            print("1", file=sys.stderr)
+            while True:
+                print("2", file=sys.stderr)
+                message = await ws.recv()
+                print("3", file=sys.stderr)
+                yield f"data: {message}\n\n"
+    except Exception as e :
+        print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
+        yield f"data: WebSocket stop, error : {e}\n\n"
+
+
 async def getJWT(request) :
     auth_header = request.headers.get('Authorization', None)
     if not auth_header:
@@ -31,8 +52,7 @@ async def getJWT(request) :
     return token 
 
 @csrf_exempt
-async def launchTournament(request) :
-    async def launchTournament(request):
+async def launchFinals(request) :
     try:
         body = json.loads(request.body)
         tkey = body["tKey"]
@@ -40,14 +60,23 @@ async def launchTournament(request) :
             return JsonResponse({"Error": "Tournament not found"}, status=404)
         trnmtDict[tkey].launchTournament()
 
-        message = json.dumps({
-            "event": "tournament_launched",
-            "match1" : f'{trnmtDict[tkey].tournamentPl[0][0]}:{trnmtDict[tkey].tournamentPl[0][1]}'
-            "match2" : f"{trnmtDict[tkey].tournamentPl[1][0]}:{trnmtDict[tkey].tournamentPl[1][1]}"
-        })
-        r.publish(f"tournament:{tkey}", message)
+@csrf_exempt
+async def launchFirstRound(request) :
+    try:
+        body = json.loads(request.body)
+        tkey = body["tKey"]
+        if tkey not in trnmtDict:
+            return JsonResponse({"Error": "Tournament not found"}, status=404)
+        trnmtDict[tkey].launchTournament()
 
-        return JsonResponse({"Result": "Tournament launched"})
+        await channel_layer.group_send(
+            tkey,
+            {
+                "type": "tempReceived",
+                "text_data": "create-bracket"
+            }
+        )
+
     except TournamentError as e:
         return JsonResponse({"Error": str(e)}, status=401)
     except Exception:
@@ -68,32 +97,8 @@ async def joinTournament(request):
         player = Player(jwt_token, username)
         trnmtDict[tKey].addPlayers(player)
 
-        # Fonction qui va écouter Redis pubsub et envoyer les messages en streaming
-        async def event_stream():
-            pubsub = r.pubsub()
-            await pubsub.subscribe(f"tournament:{tKey}")
-
-            try:
-                while True:
-                    message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=10)
-                    if message:
-                        data = message['data']
-                        # data peut être bytes, on décode et renvoie JSON
-                        if isinstance(data, bytes):
-                            data = data.decode('utf-8')
-                        yield f"data: {data}\n\n"
-                    else:
-                        # keep connection alive
-                        yield ": keep-alive\n\n"
-                    await asyncio.sleep(0.1)
-            except asyncio.CancelledError:
-                await pubsub.unsubscribe(f"tournament:{tKey}")
-                raise
-            finally:
-                await pubsub.unsubscribe(f"tournament:{tKey}")
-
         # StreamingHttpResponse en mode SSE (Server Sent Events)
-        response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
+        response = StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt_token}'), content_type='text/event-stream')
         response['Cache-Control'] = 'no-cache'
         return response
 

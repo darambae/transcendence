@@ -74,9 +74,15 @@ def verify_2fa(request):
 
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
+			###### Begin of injection ######
+			relatedUsername = data.get('related-user', user.user_name)
+			###### ------------------ ######
 			if check_password(data.get('two'), user.two_factor_auth):
 
 				refresh = RefreshToken.for_user(user)
+				###### Begin of injection ######
+				refresh["related-username"] = relatedUsername
+				###### ------------------ ######
 				access_token = str(refresh.access_token)
 
 				user.online = True

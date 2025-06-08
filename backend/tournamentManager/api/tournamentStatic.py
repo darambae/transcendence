@@ -1,9 +1,45 @@
 import os
 import shortuuid
+import requests
+
+LOCAL = 1
+REMOTE = 2
 
 trnmtDict = {} # Usage : {str : Tournament}
 
 keygame = "https://server_pong:8030/"
+jwtUri = "https://auth:4020/"
+
+class Match() :
+    def __init__(self, p1, p2, matchBefore=None) :
+        self.key = getApiKeyTrnmt()
+        self.p1 = p1
+        self.p2 = p2
+        self.jwtP1 = None
+        self.jwtP2 = None
+        self.gameMode = REMOTE
+        self.launchable = True
+        self.mainAccount = -1
+
+        res = requests.get(f'{jwtUri}jwt-decoder?jwt={p1.jwt}')
+        if res.status_code == 200 :
+            self.jwtP1 = res.json()
+        
+        res = requests.get(f'{jwtUri}jwt-decoder?jwt={p2.jwt}')
+        if res.status_code == 200 :
+            self.jwtP2 = res.json()
+        
+        if self.jwtP1["related-username"] == self.jwtP2["related-username"] :
+            self.gameMode = LOCAL
+            if jwtP1["related-username"] == jwtP1["username"] :
+                self.mainAccount = p1.jwt
+            else:
+                self.mainAccount = p2.jwt
+        
+        if (matchBefore and (matchBefore.jwtP1["related-username"] == self.jwtP1["related-username"]) or (matchBefore.jwtP1["related-username"] == self.jwtP2["related-username"]) or (matchBefore.jwtP2["related-username"] == self.jwtP1["related-username"]) or (matchBefore.jwtP2["related-username"] == self.jwtP2["related-username"])) :
+            self.launchable = False
+        
+
 
 class Player() :
     def __init__(self, jwt, username):
@@ -27,10 +63,10 @@ class Tournament() :
         self.tournamentPl = []
         self.final = []
         self.nbPl = 0
-        self.match1 = getApiKeyTrnmt()
-        self.match2 = getApiKeyTrnmt()
-        self.matchWinnerBracket = getApiKeyTrnmt()
-        self.matchLoserBracket = getApiKeyTrnmt()
+        self.match1 = None
+        self.match2 = None
+        self.matchWinnerBracket = None
+        self.matchLoserBracket = None
     def addPlayers(self, playerClass) :
         if self.nbPl < 4 :
             self.players.append(playerClass)
@@ -51,6 +87,9 @@ class Tournament() :
         lstTemp.append(self.players.pop(random.randint(0, 2)))
         self.tournamentPl = [lstTemp, players]
         print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
+        self.match1 = Match(self.tournamentPl[0][0], self.tournamentPl[0][1])
+        self.match2 = Match(self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
+
     
     def listPlayers(self) :
         return [P.toTuple for P in self.players]
