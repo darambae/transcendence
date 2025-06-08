@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.utils.encoding import force_str
+from django.contrib.auth.hashers import make_password
+from .utils import generate_otp_send_mail
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
@@ -99,3 +101,21 @@ class activate_account(APIView):
 		else:
 			logger.warning("Activation link invalid or expired.")
 			return JsonResponse({'html': 'token_expired.html'}, status=200)
+
+class check_password(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+
+		data = request.data
+
+		try:
+			user = USER.objects.get(mail=data.get('mail'))
+			if check_password(data.get('password'), user.password):
+				user.two_factor_Auth = make_password(generate_otp_send_mail(user))
+				user.save()
+				return JsonResponse({'success': 'authentication code sent', 'user_id': user.id}, status=200)
+			else:
+				return JsonResponse({'error': 'Invalid password'}, status=401)
+		except USER.DoesNotExist:
+			return JsonResponse({'error': 'User not found'}, status=404)

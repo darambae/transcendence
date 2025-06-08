@@ -52,7 +52,8 @@ export async function handleSignupSubmit(event) {
 			}
 		} else {
 			console.log("signup form couldn't connect")
-			const errorMsg = responseData.error;
+			const errorMsg = responseData.create_user.error;
+			console.log('error: ', errorMsg)
 
 			const errorDiv = document.querySelector('.signup-form .error-msg');
 			if (errorMsg) {
