@@ -98,3 +98,23 @@ class confirm_singup(APIView):
 		except Exception as e:
 			logger.error(f"Error sending confirmation email to {user.get('mail')}: {str(e)}")
 			return Response({"error": "Failed to send email."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class send_tfa(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+
+		try:
+			data = request.data
+
+			subject = "PongPong two factor Authentication"
+			message = f"HELLO {data.get('user_name')},\n\nenter this code to connect to PongPong\n\n" + data.get('opt')
+			from_email = settings.DEFAULT_FROM_EMAIL
+			recipient_list = [data.get('mail')] 
+
+			send_mail(subject, message, from_email, recipient_list)
+		except BadHeaderError:
+			return Response({"error": "Failed to send email."}, status=500)
+	
+		return Response({"error": "Failed to send email."}, status=200)

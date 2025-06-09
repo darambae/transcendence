@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api.views import confirm_singup
+from api.views import send_tfa
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('mail/confirm_singup/', confirm_singup.as_view(), name='confirm_singup')
+	path('mail/confirm_singup/', confirm_singup.as_view(), name='confirm_singup'),
+	path('mail/send_tfa/', send_tfa.as_view(), name='send_tfa')
 ]
