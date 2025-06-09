@@ -12,3 +12,4 @@ redis
 dj-database-url
 aiosmtpd
 djangorestframework-simplejwt
+python-decouple

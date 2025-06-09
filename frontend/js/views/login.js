@@ -22,7 +22,7 @@ async function double_authenticate(data) {
 
 			const code = document.getElementById('auth-code').value;
 			console.log("mail + code: ", code, mail);
-			const response = await fetch("auth/verify-2fa/", {
+			const response = await fetch("auth/verifyTwofa/", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
