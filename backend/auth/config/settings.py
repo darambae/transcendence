@@ -12,11 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from datetime import timedelta
 #### REQUIRED ELK LIBRARY ####
 import dj_database_url
 from .jsonSocketHandler import JSONSocketHandler
-from decouple import config
 import logging
 from logstash_async.formatter import LogstashFormatter
 from logstash_async.handler import AsynchronousLogstashHandler
@@ -162,14 +160,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-}
-
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,
-	'SIGNING_KEY':config('DJANGO_SECRET_KEY'),
-	'AUTH_HEADER_TYPES':('Bearer')
 }
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'

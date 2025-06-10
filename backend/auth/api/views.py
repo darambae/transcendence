@@ -116,7 +116,9 @@ class verifyTwofa(APIView):
 
 			if response.status_code == 200:
 				data_response = {
-					'success':'authentication you are connect'
+					'success':'authentication you are connect',
+					'refresh':data_response.get('refresh'),
+					'access':data_response.get('access'),
 				}
 			else:
 				data_response = {
