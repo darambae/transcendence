@@ -46,6 +46,7 @@
 | **Remarques**              | Informations complémentaires, limitations, etc.                             |                                    |
 
   - **Copy this form to fill in**
+
 | Champ                      | Description                                                                 | Exemples de Valeurs                |
 | :------------------------- | :-------------------------------------------------------------------------- | :--------------------------------- |
 | **Nom de l'API** |                                                                             |                                    |
