@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import json
 import requests
+import os
 
 class data_link(APIView):
 	permission_classes = [AllowAny]
@@ -29,7 +30,7 @@ class data_link(APIView):
 			uid = json_response.get('uid')
 			token = json_response.get('token')
 			#host = request.get_host()
-			host = "transcendence.42.fr"
+			host = os.getenv("DOMAIN", "localhost")
 			activation_link = f"https://{host}:8443/auth/activate_account/{uid}/{token}/"
 		except ValueError:
 			json_response = {

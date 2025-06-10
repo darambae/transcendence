@@ -17,8 +17,14 @@ channel_layer = get_channel_layer()
 
 uri = "wss://server_pong:8030/ws/game/"
 
+uriJwt = "https://access-postgresql:4000/"
+
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
+
+class HttpResponse401(HttpResponse):
+    status_code = 401
+
 
 # apiKey is a string that identifies the game room
 
@@ -33,7 +39,14 @@ class   RequestParsed :
 # Create your views here.
 
 def decodeJWT(request) :
-    return ["temp", "temp"]
+    encodedJwt = request.headers.get("Bearer", None)
+    if not encodedJwt :
+        return [None]
+    
+    res = requests.get(f'{uriJwt}jwt-decoder', headers={"Bearer" : encodedJwt, 'Host': 'access-postgresql'}, verify=False)
+    if res.status_code != 200 :
+        return [None]
+    return [res.json()]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
@@ -80,23 +93,27 @@ async def  checkForUpdates(uriKey, key) :
 
 async def sse(request):
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = request.GET.get("idplayer")
+    username = JWT[0]["username"]
+    # if idplayer == 0 :
+        # username2 =
+        
     rq = RequestParsed(apikey, {})
     if (rq.apiKey) :
         print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI} JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
-        return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}", rq.apiKey), content_type="text/event-stream")
+        return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt
 def setApiKeySp(request):
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = json.loads(request.body).get('apiKey')
     dictApiSp[apikey] = 1
     apiKeys.append(apikey)
@@ -106,9 +123,9 @@ def setApiKeySp(request):
 @csrf_exempt
 def setApiKey(request):
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = json.loads(request.body).get('apiKey')
     if apikey not in apiKeysUnplayable:
         return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
@@ -129,9 +146,9 @@ def setApiKey(request):
 @csrf_exempt
 def isGamePlayable(request) :
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = json.loads(request.body).get('apiKey')
     if (dictApi[apikey] > 1) :
         apiKeys.append(apikey)
@@ -156,9 +173,9 @@ def get_api_key(request):
 @csrf_exempt
 async def sendNewJSON(request):
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     dictionnaryJson = json.loads(request.body)
     # #print(f"dictio : {dictionnaryJson}")
     rq = RequestParsed(dictionnaryJson.get("apiKey", None), dictionnaryJson.get("message", {}))
@@ -177,9 +194,9 @@ async def sendNewJSON(request):
 
 async def forfaitUser(request) :
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = request.GET.get("apikey")
     idplayer = request.GET.get("idplayer")
     rq = RequestParsed(apikey, {})
@@ -209,9 +226,9 @@ async def forfaitUser(request) :
 
 async def disconnectUsr(request) :
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
     if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
+        return HttpResponse401() # Set an error 
+    print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = request.GET.get("apikey")
     #print("disco usr", file=sys.stderr)
     await channel_layer.group_send(

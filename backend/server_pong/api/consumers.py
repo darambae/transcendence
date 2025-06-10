@@ -37,6 +37,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		# Extraire le paramètre 'room' de la chaîne de requête
 		self.room_group_name = params.get('room', [None])[0]
 		self.usrID = int(params.get('userid', [2])[0])
+		self.usernames = json.loads(params.get("name", "{}"))
+
 		self.AI = bool(int(params.get("AI", [False])[0]))
 		print(self.AI, file=sys.stderr)
 		print("AI sys.stderr connect", file=sys.stderr)
@@ -55,7 +57,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 		# self.scoring = False
 		self.map = Map() #None
 		self.matchReplay = []
-		dictInfoRackets[self.room_group_name] = {"scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
+		if not self.room_group_name in dictInfoRackets :
+			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None]"scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
+		
+		if self.usrID == 0 :
+			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = self.usernames["p1"]
+			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = self.usernames["p2"]
+		
+		elif self.usrID == 1 :
+			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = self.usernames["p1"]
+		else :
+			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = self.usernames["p2"]
+
 		# #print(dictInfoRackets, file=sys.stderr)
 
 		await self.channel_layer.group_add(
@@ -92,6 +105,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 			print(f"cache : {cache.get(f'simulation_state_{self.room_group_name}')}", file=sys.stderr)
 		elif action == "start":
 			mapString = data.get("map", "default.json")
+			await self.send(text_data=json.dumps({
+				"game_stats" : "playersInfo",
+				"p1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0],
+				"p2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1]
+			}))
 			if not self.game_running:
 				self.game_running = True
 				self.task = asyncio.create_task(self.send_game_updates())
