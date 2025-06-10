@@ -22,6 +22,7 @@ from api.views import info_link
 from api.views import activate_account
 from api.views import checkPassword
 from api.views import checkTfa
+from api.views import DecodeJwt
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
@@ -32,4 +33,5 @@ urlpatterns = [
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
 ]
