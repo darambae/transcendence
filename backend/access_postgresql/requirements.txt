@@ -12,3 +12,5 @@ dj-database-url
 aiosmtpd
 djangorestframework
 requests
+djangorestframework-simplejwt
+python-decouple

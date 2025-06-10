@@ -22,6 +22,7 @@ from api.views import info_link
 from api.views import activate_account
 from api.views import checkPassword
 from api.views import checkTfa
+from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +30,6 @@ urlpatterns = [
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
-	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa')
+	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
+	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
