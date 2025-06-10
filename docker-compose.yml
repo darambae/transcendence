@@ -142,6 +142,7 @@ services:
       - nginx_network
     restart: always
 
+
   ############### Game import ##################
   server_pong:
     build: 
@@ -189,6 +190,24 @@ services:
     image: "redis:latest"
     networks:
       - game_network
+
+  tournament:
+    build :
+      context : ./backend/tournamentManager
+      dockerfile : ./Dockerfile
+    container_name : tournament_manager
+    depends_on :
+      certs_generator:
+        condition: service_completed_successfully
+    volumes:
+      - certs:/certs
+      - ./backend/tournamentManager:/app
+    env_file: 
+      - .env
+    networks :
+      - game_network
+      - nginx_network
+      - elk_network
 
   ################# ELK Stack ##################
   logstash:
@@ -304,4 +323,7 @@ networks:
     driver: bridge
   game_network:
     name: game_network
+    driver: bridge
+  jwt_network:
+    name: jwt_network
     driver: bridge

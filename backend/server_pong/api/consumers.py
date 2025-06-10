@@ -89,6 +89,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			stats = cache.get(f'simulation_state_{self.room_group_name}')
 			stats[f"team{2 - (plId != 1)}Score"] = 5
 			cache.set(f'simulation_state_{self.room_group_name}', stats, timeout=None)
+			print(f"cache : {cache.get(f'simulation_state_{self.room_group_name}')}", file=sys.stderr)
 		elif action == "start":
 			mapString = data.get("map", "default.json")
 			if not self.game_running:
@@ -172,7 +173,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 							self.AI = False
 							print("Self.ai put to false", file=sys.stderr)
 						# #print(f"statissssss : {stats}", file=sys.stderr)
-						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID == 1:
+						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID <= 1:
 							#print("Yaaaaay stoping game", file=sys.stderr)
 							await self.channel_layer.group_send(
 								self.room_group_name,

@@ -1,0 +1,15 @@
+daphne
+channels
+channels-redis
+django
+djangorestframework
+numpy
+websockets==10.0
+requests
+django-cors-headers
+dj-database-url
+redis
+python-logstash-async
+python-json-logger
+psycopg2-binary
+shortuuid

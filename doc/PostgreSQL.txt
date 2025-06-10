@@ -1,2 +1,4 @@
 1. Connect to psql in your terminal: docker compose exec postgres psql -U admin -d transcendence_db
 2. In the container to check database/users(Role): \l or \du
+3. To see all available database tables: \dt
+4. To get all created users: SELECT * FROM api_user;
