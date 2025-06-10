@@ -125,7 +125,6 @@ def isGamePlayable(request) :
 
 def get_api_key(request):
     api_key = str(uuid.uuid4())
-
     apiKeysUnplayable.append(api_key)
 
     return JsonResponse({"api_key": api_key})
