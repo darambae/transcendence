@@ -67,7 +67,7 @@ async def launchFirstRound(request) :
         tkey = body["tKey"]
         if tkey not in trnmtDict:
             return JsonResponse({"Error": "Tournament not found"}, status=404)
-        trnmtDict[tkey].launchTournament()
+        await trnmtDict[tkey].launchTournament()
 
         await channel_layer.group_send(
             tkey,
@@ -76,11 +76,25 @@ async def launchFirstRound(request) :
                 "text_data": "create-bracket"
             }
         )
-
     except TournamentError as e:
         return JsonResponse({"Error": str(e)}, status=401)
     except Exception:
         return JsonResponse({"error": "Internal server error"}, status=500)
+
+@csrf_exempt
+async def launchFinals(request) :
+    try :
+        body = json.loads(request.body)
+        tkey = body["tKey"]
+        if tkey not in trnmtDict :
+            return JsonResponse({"Error": "Tournament not found"}, status=404)
+        await channel_layer.group_send(
+            tkey,
+            {
+                "type" : "tempReceived",
+                "text_data" : "final-matches"
+            }
+        )
 
 @csrf_exempt
 async def joinTournament(request):
@@ -97,7 +111,6 @@ async def joinTournament(request):
         player = Player(jwt_token, username)
         trnmtDict[tKey].addPlayers(player)
 
-        # StreamingHttpResponse en mode SSE (Server Sent Events)
         response = StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt_token}'), content_type='text/event-stream')
         response['Cache-Control'] = 'no-cache'
         return response

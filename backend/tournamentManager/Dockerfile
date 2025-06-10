@@ -23,5 +23,5 @@ EXPOSE 8050
 #ENTRYPOINT ["/entrypoint.sh"]
 
 
-CMD ["tail", "-f", "/dev/null"]
-# CMD ["sh", "-c", "daphne -e ssl:8050:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]
+# CMD ["tail", "-f", "/dev/null"]
+CMD ["sh", "-c", "daphne -e ssl:8050:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]

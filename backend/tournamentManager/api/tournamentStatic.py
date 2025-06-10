@@ -22,23 +22,24 @@ class Match() :
         self.launchable = True
         self.mainAccount = -1
 
+        self.first = None
+        self.second = None
+        self.third = None
+        self.fourth = None
+
     def initValues(self) :
-        res = requests.get(f'{jwtUri}jwt-decoder?jwt={p1.jwt}')
-        if res.status_code == 200 :
-            self.jwtP1 = res.json()
+        self.jwtP1 = requests.get(f"{jwtUri}jwt-decoder" headers={"jwt" : self.p1.jwt})
         
-        res = requests.get(f'{jwtUri}jwt-decoder?jwt={p2.jwt}')
-        if res.status_code == 200 :
-            self.jwtP2 = res.json()
+        self.jwtP2 = requests.get(f"{jwtUri}jwt-decoder" headers={"jwt" : self.p2.jwt})
         
-        if self.jwtP1["related-username"] == self.jwtP2["related-username"] :
+        if self.jwtP1 == self.jwtP2 :
             self.gameMode = LOCAL
-            if jwtP1["related-username"] == jwtP1["username"] :
-                self.mainAccount = p1.jwt
+            if self.jwtP1["username"] == self.p1.username:
+                self.mainAccount = p1
             else:
-                self.mainAccount = p2.jwt
+                self.mainAccount = p2
         
-        if (matchBefore and (matchBefore.jwtP1["related-username"] == self.jwtP1["related-username"]) or (matchBefore.jwtP1["related-username"] == self.jwtP2["related-username"]) or (matchBefore.jwtP2["related-username"] == self.jwtP1["related-username"]) or (matchBefore.jwtP2["related-username"] == self.jwtP2["related-username"])) :
+        if (matchBefore and (matchBefore.p1.username in self.jwtP1["invites"]) or (matchBefore.p1.username in self.jwtP2["invites"]) or (matchBefore.p2.username in self.jwtP1["invites"]) or (matchBefore.p2.username in self.jwtP2["invites"])) :
             self.launchable = False
         
 
@@ -69,6 +70,8 @@ class Tournament() :
         self.match2 = None
         self.matchWinnerBracket = None
         self.matchLoserBracket = None
+        self.finished = False
+
     def addPlayers(self, playerClass) :
         if self.nbPl < 4 :
             self.players.append(playerClass)
@@ -109,7 +112,7 @@ def getApiKeyTrnmt() :
 async def supervise_match(tkey) :
     infoResultsMatch = None
     while not infoResultsMatch :
-        res = requests.get(f"{dbUri}results?matchkey={tkey}")
+        res = requests.get(f"{dbUri}results?matchKey={tkey}")
         if res.status_code == 200 :
             infoResultsMatch = res.json()
         await asyncio.sleep(2)
