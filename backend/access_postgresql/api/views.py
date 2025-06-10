@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.encoding import force_str
 from .utils import generate_otp_send_mail
@@ -17,7 +18,8 @@ from django.contrib.auth import get_user_model
 import json
 import logging
 
-
+import jwt
+from django.conf import settings
 # Create your views here.
 
 @api_view(['POST'])
@@ -114,7 +116,7 @@ class checkPassword(APIView):
 			if user.actived:
 				if check_password(data.get('password'), user.password):
 					opt = generate_otp_send_mail(user)
-					user.two_factor_Auth = make_password(opt)
+					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',
 										'user_name': user.user_name,
@@ -140,12 +142,46 @@ class checkTfa(APIView):
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.actived and user.two_factor_auth != None:
 				if check_password(data.get('tfa'), user.two_factor_auth):
-					user.two_factor_Auth = None
+					user.two_factor_auth = False
 					user.save()
-					return JsonResponse({'success': 'authentication code send'}, status=200)
+
+					refresh = RefreshToken.for_user(user)
+					access = refresh.access_token 
+
+					access['id'] = user.id
+					access['username'] = user.user_name
+					access['invites'] = {}
+
+					return JsonResponse({'success': 'authentication code send',
+						  				 'refresh': str(refresh),
+										 'access': str(access)},
+										 status=200)
 				else:
 					return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
 			else:
 				return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
+
+
+class DecodeJwt(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request):
+		auth_header = request.headers.get('Authorization')
+		if not auth_header:
+			return Response({'error': 'Authorization header missing'}, status=400)
+
+		parts = auth_header.split()
+		if len(parts) != 2 or parts[0].lower() != 'bearer':
+			return Response({'error': 'Invalid Authorization header'}, status=400)
+
+		token = parts[1]
+
+		try:
+			data_jwt = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+			return Response({'payload': data_jwt}, status=200)
+		except jwt.ExpiredSignatureError:
+			return Response({'error': 'Token expired'}, status=401)
+		except jwt.InvalidTokenError:
+			return Response({'error': 'Invalid token'}, status=401)

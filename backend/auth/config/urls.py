@@ -20,7 +20,6 @@ from api import views
 from api.views import data_link
 from api.views import login
 from api.views import verifyTwofa
-from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +28,4 @@ urlpatterns = [
     path('auth/verifyTwofa/', verifyTwofa.as_view(), name='verifyTwofa'),
 	#path('auth/token/', views.token, name='token'),
 	path('auth/activate_account/<uidb64>/<token>/', views.activate_account, name='activate_account'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

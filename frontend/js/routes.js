@@ -7,6 +7,7 @@ import { signupController } from './views/signup.js';
 
 
 export const routes = {
+
 	home: {
 		template: 'home',
 		controller: homeController,
@@ -37,5 +38,8 @@ export const routes = {
 	},
 	user: {
 		template: 'user',
+	},
+	settings_profile: {
+		template: 'settings_profile',
 	}
 };
