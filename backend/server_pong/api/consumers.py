@@ -58,7 +58,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		self.map = Map() #None
 		self.matchReplay = []
 		if not self.room_group_name in dictInfoRackets :
-			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None]"scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
+			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
 		
 		if self.usrID == 0 :
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = self.usernames["p1"]

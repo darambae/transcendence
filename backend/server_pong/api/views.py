@@ -40,6 +40,9 @@ class   RequestParsed :
 
 def decodeJWT(request) :
     encodedJwt = request.headers.get("Bearer", None)
+    fil = open('test.txt', 'w+')
+    print(encodedJwt, file=fil)
+    fil.close()
     if not encodedJwt :
         return [None]
     
@@ -95,18 +98,46 @@ async def sse(request):
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+    fil = open('test.txt', 'w+')
+    print(f" Jwt : {JWT[0]}", file=fil)
+    fil.close()
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = request.GET.get("idplayer")
-    username = JWT[0]["username"]
-    # if idplayer == 0 :
-        # username2 =
+    if idplayer == 0 :
+        idp1 = int(request.GET.get("JWTidP1"))
+        idp2 = int(request.GET.get("JWTidP2"))
+        if idp1 < 0 :
+            username1 = JWT[0]["username"]
+        else :
+            username1 = JWT[0]["invites"][idp1]
+
+        if idp2 < 0 :
+            username2 = JWT[0]["username"]
+        else :
+            username2 = JWT[0]["invites"][idp2]
+
+    elif idplayer == 1 :
+        idp1 = int(requests.GET.get("JWTidP1"))
+        if idp1 < 0 :
+            username1 = JWT[0]["username"]
+        else :
+            username1 = JWT[0]["invites"][idp1]
         
+        username2 = "None"
+    else :
+        idp2 = int(requests.GET.get("JWTidP2"))
+        if idp2 < 0 :
+            username2 = JWT[0]["username"]
+        else :
+            username2 = JWT[0]["invites"][idp2]
+        username1 = "None"
+    
+    jsonUernames = {"p1" : username1, "p2" :username2}
     rq = RequestParsed(apikey, {})
     if (rq.apiKey) :
         print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI} JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
-        return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={}", rq.apiKey), content_type="text/event-stream")
+        return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={jsonUernames}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt
 def setApiKeySp(request):
@@ -125,7 +156,9 @@ def setApiKey(request):
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+    fil = open('test.txt', 'w+')
+    print(f" Jwt : {JWT[0]}", file=fil)
+    fil.close()
     apikey = json.loads(request.body).get('apiKey')
     if apikey not in apiKeysUnplayable:
         return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
@@ -161,7 +194,9 @@ def isGamePlayable(request) :
 
 def get_api_key(request):
     JWT = decodeJWT(request)
-    print(f" Jwt : {JWT[1]}", file=sys.stderr)
+    fil = open('test.txt', 'w+')
+    print(f" Jwt : {JWT[0]}", file=fil)
+    fil.close()
     if not JWT[0] :
         return HttpResponseNoContent() # Set an error 
     api_key = str(uuid.uuid4())
