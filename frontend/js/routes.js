@@ -37,5 +37,8 @@ export const routes = {
 	},
 	user: {
 		template: 'user',
+	},
+	settings_profile: {
+		template: 'settings_profile',
 	}
 };
