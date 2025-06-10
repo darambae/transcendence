@@ -47,27 +47,28 @@
 
   - **Copy this form to fill in**
 | Champ                      | Description                                                                 | Exemples de Valeurs                |
-|----------------------------|-----------------------------------------------------------------------------|------------------------------------|
-| **Nom de l'API**           |                                       |                                    |
-| **Endpoint**               |                                       |                                    |
-| **Méthode**                |                                       |                                    |
-| **Description**            |                                       |                                    |
-| **Authentification**       |                                       |                                    |
-| **Paramètres de Requête**  |                                       |                                    |
-| - Nom                      |                                       |                                    |
-| - Type                     |                                       |                                    |
-| - Obligatoire              |                                       |                                    |
-| - Description              |                                       |                                    |
-| - Exemple                  |                                       |                                    |
-| **Exemple de Requête**     |                                       |                                    |
-| **Réponse**                |                                       |                                    |
-| - Code de Statut           |                                       |                                    |
-| - Corps                    |                                       |                                    |
-| - Description des Champs   |                                       |                                    |
-| **Réponses d'Erreur**      |                                       |                                    |
-| - Code de Statut           |                                       |                                    |
-| - Corps                    |                                       |                                    |
-| **Remarques**              |                                       |                                    |
+| :------------------------- | :-------------------------------------------------------------------------- | :--------------------------------- |
+| **Nom de l'API** |                                                                             |                                    |
+| **Endpoint** |                                                                             |                                    |
+| **Méthode** |                                                                             |                                    |
+| **Description** |                                                                             |                                    |
+| **Authentification** |                                                                             |                                    |
+| **Paramètres de Requête** |                                                                             |                                    |
+| - Nom                      |                                                                             |                                    |
+| - Type                     |                                                                             |                                    |
+| - Obligatoire              |                                                                             |                                    |
+| - Description              |                                                                             |                                    |
+| - Exemple                  |                                                                             |                                    |
+| **Exemple de Requête** |                                                                             |                                    |
+| **Réponse** |                                                                             |                                    |
+| - Code de Statut           |                                                                             |                                    |
+| - Corps                    |                                                                             |                                    |
+| - Description des Champs   |                                                                             |                                    |
+| **Réponses d'Erreur** |                                                                             |                                    |
+| - Code de Statut           |                                                                             |                                    |
+| - Corps                    |                                                                             |                                    |
+| **Remarques** |                                                                             |                                    |
+
 ### Server Pong
 
 This document describes the API endpoints for the `server_pong` Django application, which facilitates real-time multiplayer Pong game simulations. The API provides functionalities for managing game sessions, retrieving simulation states, and handling real-time communication.
