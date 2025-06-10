@@ -9,9 +9,10 @@ trnmtDict = {} # Usage : {str : Tournament}
 
 keygame = "https://server_pong:8030/"
 jwtUri = "https://auth:4020/"
+dbUri = "https://access-postgresql:4000/"
 
 class Match() :
-    def __init__(self, p1, p2, matchBefore=None) :
+    def __init__(self, p1=None, p2=None, matchBefore=None) :
         self.key = getApiKeyTrnmt()
         self.p1 = p1
         self.p2 = p2
@@ -21,6 +22,7 @@ class Match() :
         self.launchable = True
         self.mainAccount = -1
 
+    def initValues(self) :
         res = requests.get(f'{jwtUri}jwt-decoder?jwt={p1.jwt}')
         if res.status_code == 200 :
             self.jwtP1 = res.json()
@@ -89,6 +91,10 @@ class Tournament() :
         print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
         self.match1 = Match(self.tournamentPl[0][0], self.tournamentPl[0][1])
         self.match2 = Match(self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
+        self.match1.initValues()
+        self.match2.initValues()
+        self.matchWinnerBracket = Match()
+        self.matchLoserBracket = Match()
 
     
     def listPlayers(self) :
@@ -99,3 +105,12 @@ def getApiKeyTrnmt() :
     res = requests.get(f"{keygame}server-pong/api-key")
     if (res.status_code == 200) :
         return res.json()["api_key"]
+
+async def supervise_match(tkey) :
+    infoResultsMatch = None
+    while not infoResultsMatch :
+        res = requests.get(f"{dbUri}results?matchkey={tkey}")
+        if res.status_code == 200 :
+            infoResultsMatch = res.json()
+        await asyncio.sleep(2)
+    return infoResultsMatch
