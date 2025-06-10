@@ -22,6 +22,7 @@
 
 ## API list
   - **Documentation format with examples**
+
 | Champ                      | Description                                                                 | Exemples de Valeurs                |
 |----------------------------|-----------------------------------------------------------------------------|------------------------------------|
 | **Nom de l'API**           | Nom de la fonctionnalité ou de l'action de l'API                            | Connexion utilisateur              |
