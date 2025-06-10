@@ -39,66 +39,92 @@ class data_link(APIView):
     	    }
 			return JsonResponse({'error': json_response}, status=500)
 
-
 		return JsonResponse({'link': activation_link}, status=200)
 
 
-# Create your views here.
-def login(request):
-	if (request.method == 'POST'):
-		try:
-			data = json.loads(request.body)
-		except KeyError as e:
-			return JsonResponse({'error': f'Missing field : {str(e)}'}, status=400)
+class login(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+		if (request.method == 'POST'):
+
+			user = request.data
+			
+			json_data = {
+				'mail':user.get('mail'),
+				'password':user.get('password')
+			}
+
+			response = requests.post("https://access-postgresql:4000/api/checkPassword/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})
+			
+			data_response = None
+			try:
+				data_response = response.json()
+			except ValueError:
+				data_response = {
+			    	'error': 'Invalid response from mail service',
+			    	'detail': response.text
+				}
+
+			if response.status_code == 200:
+					json_send_mail = {
+						'user_name': data_response.get('user_name'),
+						'mail': data_response.get('mail'),
+						'opt': data_response.get('opt')
+					}
+					mail_response = requests.post("https://mail:4010/mail/send_tfa/", json=json_send_mail, verify=False, headers={'Host': 'mail'})
+
+					data_response = {
+						'success':'authentication code send'
+					}
+			
+
+			return JsonResponse(data_response, status=response.status_code)
+
+
+class verifyTwofa(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+		if (request.method == 'POST'):
 		
-		try:
-			user = USER.objects.get(mail=data.get('mail'))
-			if check_password(data.get('password'), user.password):
-				user.two_factor_Auth = make_password(generate_otp_send_mail(user))
-				user.save()
-				return JsonResponse({'success': 'authentication code sent', 'user_id': user.id}, status=200)
+			user = request.data
+			
+			json_data = {
+				'mail':user.get('mail'),
+				'tfa':user.get('code')
+			}
+
+			if user.get('mail') == None:
+				return JsonResponse({'error':'mail is empty'}, status=400)
+
+			if user.get('code') == None:
+				return JsonResponse({'error':'code is empty'}, status=400)
+
+			if json_data.get('tfa').lenght != 19:
+				return JsonResponse({'error':'text size is different from 19 characters'}, status=400)
+
+			response = requests.post("https://access-postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})
+
+			data_response = None
+			try:
+				data_response = response.json()
+			except ValueError:
+				data_response = {
+			    	'error': 'Invalid response from mail service',
+			    	'detail': response.text
+				}
+
+			if response.status_code == 200:
+				data_response = {
+					'success':'authentication you are connect'
+				}
 			else:
-				return JsonResponse({'error': 'Invalid password'}, status=401)
-		except USER.DoesNotExist:
-			return JsonResponse({'error': 'User not found'}, status=404)
-	else:
-		return JsonResponse({'error': 'Unauthorized'}, status=405)
+				data_response = {
+					'error':response.text
+				}
 
-
-def verify_2fa(request):
-
-	if (request.method == 'POST'):
-		try:
-			data = json.loads(request.body)
-		except KeyError as e:
-			return JsonResponse({'error': f'Missing field : {str(e)}'}, status=400)
-
-		try:
-			user = USER.objects.get(mail=data.get('mail'))
-			###### Begin of injection ######
-			relatedUsername = data.get('related-user', user.user_name)
-			###### ------------------ ######
-			if check_password(data.get('two'), user.two_factor_auth):
-
-				refresh = RefreshToken.for_user(user)
-				###### Begin of injection ######
-				refresh["related-username"] = relatedUsername
-				###### ------------------ ######
-				access_token = str(refresh.access_token)
-
-				user.online = True
-				user.save()
-				return JsonResponse({'success': 'Login successful',
-									'user_id': user.id,
-									'access' : access_token,
-									'refresh' : str(refresh)
-									}, status=200)
-			else:
-				return JsonResponse({'error': 'Invalid two_factor_auth'}, status=401)
-		except USER.DoesNotExist:
-			return JsonResponse({'error': 'User not found'}, status=404)
-	else:
-		return JsonResponse({'error': 'Unauthorized'}, status=405)
+			return JsonResponse(data_response, status=response.status_code)
 
 
 def activate_account(request, uidb64, token):

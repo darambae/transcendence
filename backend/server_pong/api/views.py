@@ -165,7 +165,6 @@ def get_api_key(request):
     if not JWT[0] :
         return HttpResponseNoContent() # Set an error 
     api_key = str(uuid.uuid4())
-
     apiKeysUnplayable.append(api_key)
 
     return JsonResponse({"api_key": api_key})

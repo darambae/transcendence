@@ -75,7 +75,8 @@ def signup(request):
                 'error': 'Invalid response from mail service',
                 'detail': response_mail.text
             }
-        response_mail_status = True
+        if response_mail.status_code == 200:
+            response_mail_status = True
 
     status_code = 200
     if response_mail_status == False or creat_user_status == False:

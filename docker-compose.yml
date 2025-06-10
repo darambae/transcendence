@@ -9,7 +9,6 @@ services:
     env_file:
       - .env
   
-
   ################## Postgresql ##################
 
   postgres:
@@ -27,7 +26,7 @@ services:
     env_file:
       - .env
     networks:
-      - postgresql_django_access_network
+      - data_network
 
   ################## Nginx_modsecurity ##################
   nginx_modsecurity:
@@ -95,7 +94,7 @@ services:
       - mail_network
       - elk_network
       - nginx_network
-      - postgresql_django_access_network
+      - data_network
 
   ################## Access_posgresql ##################
 
@@ -116,7 +115,7 @@ services:
     networks:
       - elk_network
       - nginx_network
-      - postgresql_django_access_network
+      - data_network
 
   ################## mail ##################
 
@@ -135,8 +134,6 @@ services:
     restart: always
     networks:
       - mail_network
-
-
 
   redis:
     image: redis:latest
@@ -315,8 +312,8 @@ networks:
   mail_network:
     name: mail_network
     driver: bridge
-  postgresql_django_access_network:
-    name: postgresql_django_access_network
+  data_network:
+    name: data_network
     driver: bridge
   nginx_network:
     name: nginx_network
