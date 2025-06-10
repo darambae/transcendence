@@ -100,7 +100,7 @@ class verifyTwofa(APIView):
 			if user.get('code') == None:
 				return JsonResponse({'error':'code is empty'}, status=400)
 
-			if json_data.get('tfa').lenght != 19:
+			if len(json_data.get('tfa')) != 19:
 				return JsonResponse({'error':'text size is different from 19 characters'}, status=400)
 
 			response = requests.post("https://access-postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})

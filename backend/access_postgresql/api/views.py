@@ -114,7 +114,7 @@ class checkPassword(APIView):
 			if user.actived:
 				if check_password(data.get('password'), user.password):
 					opt = generate_otp_send_mail(user)
-					user.two_factor_Auth = make_password(opt)
+					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',
 										'user_name': user.user_name,
@@ -140,7 +140,7 @@ class checkTfa(APIView):
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.actived and user.two_factor_auth != None:
 				if check_password(data.get('tfa'), user.two_factor_auth):
-					user.two_factor_Auth = None
+					user.two_factor_auth = False
 					user.save()
 					return JsonResponse({'success': 'authentication code send'}, status=200)
 				else:
