@@ -4,15 +4,18 @@ import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../util
 async function double_authenticate(data) {
 	const html = await loadTemplate('double_auth');
 	const content = document.getElementById("login-form");
-
 	if (html) {
 		content.innerHTML = html;
 	}
-	const mail = data.user_mail;
+	const mail = data.mail;
+	if (!mail) {
+		throw new Error("No mail address provided for double authentication");
+	}
 	const mailDiv = document.querySelector('.login-form .double-auth .user-mail');
 	if (mailDiv) {
 		mailDiv.textContent = mail;
 	}
+	
 	return new Promise((resolve, reject) => {
 		const form = document.getElementById('double-auth-form');
 		const csrf = getCookie('csrftoken');
@@ -28,7 +31,7 @@ async function double_authenticate(data) {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
 				},
-				body: JSON.stringify({ mail, two: code })
+				body: JSON.stringify({ mail, code })
 			});
 
 			const responseData = await response.json();
@@ -76,10 +79,10 @@ export async function handleLoginSubmit(event) {
 		});
 
 		const data = await response.json();
-		
+		console.log("response data: ", data);
 		if (response.ok) {
 			try {
-				await double_authenticate(data)
+				await double_authenticate(dataForm)
 				//tokens returned in the JWT to communicate with protected roads
 				let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
 				let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
