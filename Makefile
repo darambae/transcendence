@@ -4,14 +4,14 @@ ELK=elk
 
 DOCKER_FILE=docker-compose.yml
 
-MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access-postgresql
+MAIN_CONTAINERS=user_service ai_pong server-pong nginx_modsecurity postgres redis game_redis auth mail access-postgresql
 ELK_CONTAINERS=elasticsearch kibana logstash
 
 # POUR GAUTIER & OMAR
 USER_CONTAINER=nginx_modsecurity postgres access-postgresql auth user_service mail
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access-postgresql auth mail	 # tournament
+GAME_CONTAINER=ai_pong server-pong game_redis nginx_modsecurity postgres user_service access-postgresql auth mail	 # tournament
 
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=chat nginx_modsecurity postgres redis

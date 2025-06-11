@@ -16,7 +16,7 @@ from http import HTTPStatus
 
 channel_layer = get_channel_layer()
 
-uri = "wss://server_pong:8030/ws/game/"
+uri = "wss://server-pong:8030/ws/game/"
 
 uriJwt = "https://access-postgresql:4000/"
 
@@ -39,16 +39,17 @@ class   RequestParsed :
 
 # Create your views here.
 
-def decodeJWT(request) :
-    print(f"headers : {request.headers}", file=sys.stderr)
-    encodedJwt = request.headers.get("Authorization", None)
-    print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
+def decodeJWT(request, encodedJwt=None) :
+    if not encodedJwt :
+        print(f"headers : {request.headers}", file=sys.stderr)
+        encodedJwt = request.headers.get("Authorization", None)
+        print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
     if not encodedJwt :
         return [None]
     
-    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
     if res.status_code != 200 :
-        print(f"Not recognized, code = {res.status_code}", file=sys.stderr)
+        print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]
     return [res.json()]
 
@@ -96,49 +97,54 @@ async def  checkForUpdates(uriKey, key) :
 
 
 async def sse(request):
-    JWT = decodeJWT(request)
+    encodedJwt = f'bearer {request.GET.get("jwt", None)}'
+    JWT = decodeJWT(request, encodedJwt)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    fil = open('test.txt', 'w+')
-    print(f" Jwt : {JWT[0]}", file=fil)
-    fil.close()
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = request.GET.get("idplayer")
+    rq = RequestParsed(apikey, {})
+
     if idplayer == 0 :
         idp1 = int(request.GET.get("JWTidP1"))
         idp2 = int(request.GET.get("JWTidP2"))
         if idp1 < 0 :
-            username1 = JWT[0]["username"]
+            username1 = JWT[0]["payload"]["username"]
         else :
-            username1 = JWT[0]["invites"][idp1]
+            username1 = JWT[0]["payload"]["invites"][idp1]
 
         if idp2 < 0 :
-            username2 = JWT[0]["username"]
+            username2 = JWT[0]["payload"]["username"]
         else :
-            username2 = JWT[0]["invites"][idp2]
+            username2 = JWT[0]["payload"]["invites"][idp2]
+        
+        if (rq.apiKey) :
+            print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
+            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}", rq.apiKey), content_type="text/event-stream")
 
     elif idplayer == 1 :
-        idp1 = int(requests.GET.get("JWTidP1"))
+        idp1 = int(request.GET.get("JWTid"))
         if idp1 < 0 :
-            username1 = JWT[0]["username"]
+            username1 = JWT[0]["payload"]["username"]
         else :
-            username1 = JWT[0]["invites"][idp1]
+            username1 = JWT[0]["payload"]["invites"][idp1]
+
+        if (rq.apiKey) :
+            print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
+            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
         
-        username2 = "None"
     else :
-        idp2 = int(requests.GET.get("JWTidP2"))
+        idp2 = int(request.GET.get("JWTid"))
         if idp2 < 0 :
-            username2 = JWT[0]["username"]
+            username2 = JWT[0]["payload"]["username"]
         else :
-            username2 = JWT[0]["invites"][idp2]
+            username2 = JWT[0]["payload"]["invites"][idp2]
         username1 = "None"
-    
-    jsonUernames = {"p1" : username1, "p2" :username2}
-    rq = RequestParsed(apikey, {})
-    if (rq.apiKey) :
-        print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI} JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
-        return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={jsonUernames}", rq.apiKey), content_type="text/event-stream")
+
+        if (rq.apiKey) :
+            print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
+            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt
 def setApiKeySp(request):

@@ -19,7 +19,7 @@ from logstash_async.formatter import LogstashFormatter
 from logstash_async.handler import AsynchronousLogstashHandler
 from .jsonSocketHandler import JSONSocketHandler
 
-APP_NAME = 'server_pong'
+APP_NAME = 'server-pong'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -70,6 +70,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://localhost:8443",
     "http://127.0.0.1:3000",
+    "https://server-pong:8030",
 ]
 
 TEMPLATES = [

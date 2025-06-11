@@ -17,7 +17,7 @@ export async function sendGameJoining() {
         console.log(`api key : ${txtApiKey}`)
         console.log(`state : ${isGamePlayable}`)
         if (isGamePlayable == "Game can start") {
-            return handleGame2Players(txtApiKey, 2, 0);
+            return handleGame2Players(txtApiKey, 2, 0, -1);
         }
     });
 }

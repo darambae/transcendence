@@ -37,7 +37,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 		# Extraire le paramètre 'room' de la chaîne de requête
 		self.room_group_name = params.get('room', [None])[0]
 		self.usrID = int(params.get('userid', [2])[0])
-		self.usernames = json.loads(params.get("name", "{}"))
+		print(f"0 {self.usrID}", file=sys.stderr)
+		# self.usernames = json.loads(params.get("name", "{}"))
+		# print(f"1 {self.usernames}", file=sys.stderr)
 
 		self.AI = bool(int(params.get("AI", [False])[0]))
 		print(self.AI, file=sys.stderr)
@@ -61,13 +63,17 @@ class GameConsumer(AsyncWebsocketConsumer):
 			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
 		
 		if self.usrID == 0 :
-			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = self.usernames["p1"]
-			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = self.usernames["p2"]
+			u1 = json.loads(params.get("u1", "Default"))
+			u2 = json.loads(params.get("u2", "Default"))
+			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u1
+			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u2
 		
 		elif self.usrID == 1 :
-			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = self.usernames["p1"]
+			u = json.loads(params.get("name", "Default"))
+			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u
 		else :
-			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = self.usernames["p2"]
+			u = json.loads(params.get("name", "Default"))
+			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u
 
 		# #print(dictInfoRackets, file=sys.stderr)
 

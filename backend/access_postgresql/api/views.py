@@ -16,6 +16,7 @@ from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 import json
+import sys
 import logging
 
 import jwt
@@ -173,6 +174,8 @@ class DecodeJwt(APIView):
 			return Response({'error': 'Authorization header missing'}, status=400)
 
 		parts = auth_header.split()
+		print(f"parts: {parts}", file=sys.stderr)
+		print(f"len : {len(parts)} | p0 : {parts[0].lower()} | p1 : {parts[1]}", file=sys.stderr)
 		if len(parts) != 2 or parts[0].lower() != 'bearer':
 			return Response({'error': 'Invalid Authorization header'}, status=400)
 

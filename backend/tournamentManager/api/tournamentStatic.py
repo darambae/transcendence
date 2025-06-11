@@ -7,7 +7,7 @@ REMOTE = 2
 
 trnmtDict = {} # Usage : {str : Tournament}
 
-keygame = "https://server_pong:8030/"
+keygame = "https://server-pong:8030/"
 jwtUri = "https://auth:4020/"
 dbUri = "https://access-postgresql:4000/"
 

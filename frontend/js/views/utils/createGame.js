@@ -11,7 +11,7 @@ export async function sendGameCreation() {
     gameState = document.getElementById('gameid')
     await fetch(`https://${adress}:8443/server-pong/api-key`, {
       headers: {
-        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
       }
     })
       .then(response => {
@@ -37,7 +37,7 @@ export async function sendGameCreation() {
       // ctx.clearRect(150, 220 - 20, 650, 50);
       // ctx.fillText(`Game state : ${isGamePlayable}`, 150, 220);
       if (isGamePlayable == "Game can start") {
-        return handleGame2Players(apiKey, 1, 0);
+        return handleGame2Players(apiKey, 1, 0, -1);
       }
       await sleep(500);
     }

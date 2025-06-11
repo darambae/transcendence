@@ -68,9 +68,9 @@ export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function handleGame2Players(key, playerID, isAiGame) {
+export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   console.log(adress);
-  let url_sse = `https://${adress}:8443/server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}`;
+  let url_sse = `https://${adress}:8443/server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&jwt=${sessionStorage.getItem("accessToken")}`;
   let url_post = `https://${adress}:8443/server-pong/send-message`;
   let started = false;
   let game_stats;
@@ -87,6 +87,9 @@ export async function handleGame2Players(key, playerID, isAiGame) {
         console.log(data);
         game_stats = data["game_stats"]
         if (game_stats["State"] != "Waiting for start" ) {  
+          if (started == false) {
+            started = true;
+          }
           drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
         }
       } catch (error) {
@@ -97,10 +100,8 @@ export async function handleGame2Players(key, playerID, isAiGame) {
   window.onbeforeunload = function(event) {
     console.log("Détection du rechargement ou fermeture de la page");
     if (SSEStream.readyState !== EventSource.CLOSED) {
-        // Si la connexion SSE est toujours ouverte, on peut loguer une erreur
         console.log("La connexion SSE va être fermée lors du rechargement.");
         logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
-        // Tu peux aussi essayer de fermer proprement la connexion ici si tu veux
         SSEStream.close();
     }
     else {
@@ -117,7 +118,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                       },
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "start"}'})
                     });
@@ -128,7 +129,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
               if (started == true) {
                 fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
                   headers: {
-                    "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                    "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                   }
                 });
               }
@@ -139,7 +140,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                    "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                   },
                   body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "up"}'})
                 });
@@ -149,7 +150,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                       },
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}'})
                     });
@@ -161,7 +162,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                    "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                   },
                   body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "down"}'})
                 });
@@ -171,7 +172,7 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                       },
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}'})
                     });
@@ -189,7 +190,7 @@ export async function loadGamePlayable(apikey) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+          "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
         },
         body: JSON.stringify({"apiKey": apikey})
       })
@@ -214,7 +215,7 @@ export async function setApiKeyWeb(apikey) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+      "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
     },
     body: JSON.stringify({ "apiKey": apikey })
   })
@@ -238,7 +239,7 @@ export async function setApiKeyWebSP(apikey) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+      "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
     },
     body: JSON.stringify({ "apiKey": apikey })
   })
