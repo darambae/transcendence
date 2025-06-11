@@ -136,4 +136,4 @@ prune:
 	@echo "Pruning unused Docker resources..."
 	@docker system prune --all --force
 
-.PHONY: no-cache up-elk up-main up down-elk down-main down destroy
+.PHONY: no-cache up-elk up-main up down-elk down-main down destroy prune certs_generator build-user build-game build-elk build-main build add-ca start-user start-game start-elk start-main start
