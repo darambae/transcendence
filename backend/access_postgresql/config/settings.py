@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+from datetime import timedelta
+from decouple import config
 from .jsonSocketHandler import JSONSocketHandler
 import logging
 from logstash_async.formatter import LogstashFormatter
@@ -137,6 +139,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # For my user 
 AUTH_USER_MODEL = 'api.USER'
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+	'SIGNING_KEY':config('DJANGO_SECRET_KEY'),
+	'AUTH_HEADER_TYPES':('Bearer'),
+	"ALGORITHM": "HS256"
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 class AddAppNameFilter(logging.Filter):

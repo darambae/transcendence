@@ -38,6 +38,16 @@ async function double_authenticate(data) {
 
 			if (response.ok) {
 				resolve(true);
+				let	accessToken = responseData.access; //Token to put in the authorization header of request trying to access protected roads
+				let	refreshToken = responseData.refresh; // Token to get a new acccess token if needed without having to reconnect		
+
+
+				console.log(accessToken)
+				console.log(refreshToken)
+
+
+				localStorage.setItem('accessToken', responseData.access);
+				localStorage.setItem('refreshToken', responseData.refresh);
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
@@ -84,11 +94,11 @@ export async function handleLoginSubmit(event) {
 			try {
 				await double_authenticate(dataForm)
 				//tokens returned in the JWT to communicate with protected roads
-				let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
-				let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
+				//let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
+				//let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
 
-				localStorage.setItem('accessToken', accessToken);
-				localStorage.setItem('refreshToken', refreshToken);
+				//localStorage.setItem('accessToken', accessToken);
+				//localStorage.setItem('refreshToken', refreshToken);
 
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
