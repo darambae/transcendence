@@ -11,6 +11,7 @@ import websockets
 import json
 from channels.layers import get_channel_layer
 from datetime import datetime
+import requests
 from http import HTTPStatus
 
 channel_layer = get_channel_layer()
@@ -39,15 +40,15 @@ class   RequestParsed :
 # Create your views here.
 
 def decodeJWT(request) :
-    encodedJwt = request.headers.get("Bearer", None)
-    fil = open('test.txt', 'w+')
-    print(encodedJwt, file=fil)
-    fil.close()
+    print(f"headers : {request.headers}", file=sys.stderr)
+    encodedJwt = request.headers.get("Authorization", None)
+    print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
     if not encodedJwt :
         return [None]
     
-    res = requests.get(f'{uriJwt}jwt-decoder', headers={"Bearer" : encodedJwt, 'Host': 'access-postgresql'}, verify=False)
+    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
     if res.status_code != 200 :
+        print(f"Not recognized, code = {res.status_code}", file=sys.stderr)
         return [None]
     return [res.json()]
 

@@ -9,7 +9,11 @@ export async function sendGameCreation() {
     let gameState  = document.getElementById("replace-state");
     gameState.innerHTML = mulTxt;
     gameState = document.getElementById('gameid')
-    await fetch(`https://${adress}:8443/server-pong/api-key`)
+    await fetch(`https://${adress}:8443/server-pong/api-key`, {
+      headers: {
+        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+      }
+    })
       .then(response => {
         if (!response.ok) throw new Error("https Error: " + response.status);
         return response.json();

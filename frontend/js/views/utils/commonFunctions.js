@@ -116,7 +116,8 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   fetch(url_post, {
                       method: 'POST',
                       headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
                       },
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "start"}'})
                     });
@@ -125,7 +126,11 @@ export async function handleGame2Players(key, playerID, isAiGame) {
           case "q" :
               console.log("Started : ", started);
               if (started == true) {
-                fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`);
+                fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
+                  headers: {
+                    "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
+                  }
+                });
               }
               break;
           case "ArrowUp" : 
@@ -133,7 +138,8 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   fetch(url_post, {
                   method: 'POST',
                   headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
                   },
                   body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "up"}'})
                 });
@@ -142,7 +148,8 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   fetch(url_post, {
                       method: 'POST',
                       headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
                       },
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}'})
                     });
@@ -153,7 +160,8 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   fetch(url_post, {
                   method: 'POST',
                   headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
                   },
                   body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "down"}'})
                 });
@@ -162,7 +170,8 @@ export async function handleGame2Players(key, playerID, isAiGame) {
                   fetch(url_post, {
                       method: 'POST',
                       headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
                       },
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}'})
                     });
@@ -179,7 +188,8 @@ export async function loadGamePlayable(apikey) {
     await fetch(`https://${adress}:8443/server-pong/game-status?apikey=${apikey}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
         },
         body: JSON.stringify({"apiKey": apikey})
       })
@@ -203,7 +213,8 @@ export async function setApiKeyWeb(apikey) {
   return fetch(`https://${adress}:8443/server-pong/api-key`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
     },
     body: JSON.stringify({ "apiKey": apikey })
   })
@@ -226,7 +237,8 @@ export async function setApiKeyWebSP(apikey) {
   return fetch(`https://${adress}:8443/server-pong/api-key-alone`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      "Authorization" : `bearer ${localStorage.getItem("accessToken")}`
     },
     body: JSON.stringify({ "apiKey": apikey })
   })
