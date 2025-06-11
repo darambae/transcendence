@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
   
-  ################## Postgresql ##################
+  ################## PostgreSQL ##################
 
   postgres:
     image: postgres:latest
@@ -38,7 +38,6 @@ services:
       - ./frontend:/usr/share/nginx/html
       - certs:/etc/nginx/certs
       - ./nginx_modsecurity/log:/var/log/modsecurity:rw
-    # Add all django services as dependencies
     depends_on:
       - user_service
       - ai_pong
@@ -71,6 +70,13 @@ services:
       - mail_network
       - elk_network
       - nginx_network
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - nginx_network
+    restart: always
+
 
   ################## Auth ##################
 
@@ -87,8 +93,10 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
-    environment:
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    # environment:
+    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    env_file:
+      - .env
     restart: always
     networks:
       - mail_network
@@ -106,9 +114,11 @@ services:
     volumes:
       - ./backend/access_postgresql:/app
       - certs:/certs
-    environment:
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    # environment:
+    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    #   - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    env_file:
+      - .env
     depends_on:
       - postgres
     restart: always
@@ -127,21 +137,16 @@ services:
     volumes:
       - ./backend/mail:/app
       - certs:/certs
-    environment:
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+    # environment:
+    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    #   - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+    #   - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+    env_file:
+      - .env
     restart: always
     networks:
       - mail_network
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    networks:
-      - nginx_network
-    restart: always
-
+      - elk_network
 
   ############### Game import ##################
   server_pong:
@@ -249,8 +254,8 @@ services:
       certs_generator:
         condition: service_completed_successfully
     environment:
-      - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      # - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+      # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - NODE_OPTIONS=--openssl-legacy-provider
       - ES_JAVA_OPTS=-Xms2g -Xmx2g
     volumes:

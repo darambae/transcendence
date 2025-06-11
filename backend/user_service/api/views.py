@@ -14,7 +14,6 @@ import requests
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
 
-@ensure_csrf_cookie
 def signup(request):
     url_access_postgresql = "https://access-postgresql:4000/api/signup/"
     url_mail = "https://mail:4010/mail/confirm_singup/"

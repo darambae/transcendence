@@ -1,7 +1,7 @@
 api.http.host: "0.0.0.0"
 
 # xpack.monitoring.enabled: false
-log.level: info
+log.level: "debug"
 xpack.monitoring.elasticsearch.hosts: ["https://elasticsearch:9200"]
 xpack.monitoring.enabled: true
 xpack.monitoring.elasticsearch.ssl.certificate_authority: "/usr/share/logstash/config/certs/ca/ca.crt"
