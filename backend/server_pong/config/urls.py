@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django.urls import path, include
 from api.views import getSimulationState, sse, setApiKeySp, get_api_key, sendNewJSON, setApiKey, forfaitUser, disconnectUsr, isGamePlayable, apiKeyManager
 

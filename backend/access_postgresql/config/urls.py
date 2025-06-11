@@ -26,7 +26,7 @@ from api.views import DecodeJwt
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
 	path('api/signup/', views.api_signup, name='api_signup'),
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),

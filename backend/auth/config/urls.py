@@ -22,7 +22,7 @@ from api.views import login
 from api.views import verifyTwofa
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
 	path('auth_api/data_link/', data_link.as_view(), name='data_link'),
     path('auth/login/', login.as_view(), name='login'),
     path('auth/verifyTwofa/', verifyTwofa.as_view(), name='verifyTwofa'),
