@@ -200,7 +200,7 @@ LOGGING = {
         'django.request': {
             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
             'level': 'DEBUG',
-            'propagate': False, # Prevent duplicate logging via root logger
+            'propagate': True, # Prevent duplicate logging via root logger
         },
         'api': {
             'handlers': ['console' ,'logstash'],
