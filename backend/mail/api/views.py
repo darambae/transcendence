@@ -118,3 +118,95 @@ class send_tfa(APIView):
 			return Response({"error": "Failed to send email."}, status=500)
 	
 		return Response({"error": "Failed to send email."}, status=200)
+
+###################### Suggestion to fix because of possible bugs #################
+# import json
+# import logging
+# import random
+# import string
+# import requests
+# from django.conf import settings
+# from django.core.mail import send_mail, BadHeaderError
+# from rest_framework import status
+# from rest_framework.permissions import AllowAny
+# from rest_framework.response import Response
+# from rest_framework.views import APIView
+
+# logger = logging.getLogger(__name__)
+
+# class confirm_singup(APIView):
+#     permission_classes = [AllowAny]
+
+#     def post(self, request):
+#         logger.info(f"Headers: {request.headers}")
+#         user_data = request.data # Renamed 'user' to 'user_data' to avoid confusion with internal 'user' objects
+
+#         json_data = {
+#             'mail': user_data.get('mail')
+#         }
+        
+#         # --- CRUCIAL FIX HERE: Check response.ok before proceeding ---
+#         try:
+#             response = requests.post("https://auth:4020/auth_api/data_link/", json=json_data, verify=False, headers={'Host': 'auth'})
+
+#             if not response.ok: # Check if the internal request was successful (2xx status)
+#                 logger.error(f"Auth service call failed with status {response.status_code}: {response.text}")
+#                 # Return an appropriate error response if auth service call fails
+#                 return Response(
+#                     {"error": f"Failed to get activation link from auth service. Status: {response.status_code}"},
+#                     status=status.HTTP_500_INTERNAL_SERVER_ERROR # Or HTTP_400_BAD_REQUEST if it's a client error
+#                 )
+
+#             json_response = response.json() # Now safe to parse JSON
+
+#             subject = "Confirmation of your PongPong registration"
+#             message = (
+#                 f"Hello {user_data.get('user_name')},\n\n"
+#                 f"Thank you for registering on PongPong!\n\n"
+#                 f"Please click the following link to activate your account:\n{json_response.get('link')}\n\n"
+#             )
+
+#             from_email = settings.DEFAULT_FROM_EMAIL
+#             recipient_list = [user_data.get('mail')]
+
+#             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
+#             return Response({"detail": "Email sent successfully."}, status=status.HTTP_200_OK)
+
+#         except BadHeaderError:
+#             logger.error(f"Invalid header found when sending email to {user_data.get('mail')}")
+#             return Response({"error": "Invalid header found."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         except requests.exceptions.RequestException as e: # Catch network errors from requests library
+#             logger.error(f"Network error during auth service call for {user_data.get('mail')}: {str(e)}")
+#             return Response({"error": "Failed to connect to authentication service."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#         except Exception as e:
+#             logger.error(f"Unexpected error sending confirmation email to {user_data.get('mail')}: {str(e)}")
+#             return Response({"error": "Failed to send email due to unexpected error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# class send_tfa(APIView):
+#     permission_classes = [AllowAny]
+
+#     def post(self, request):
+#         try:
+#             data = request.data
+
+#             subject = "PongPong two factor Authentication"
+#             message = f"HELLO {data.get('user_name')},\n\nenter this code to connect to PongPong\n\n" + data.get('opt')
+#             from_email = settings.DEFAULT_FROM_EMAIL
+#             recipient_list = [data.get('mail')]
+
+#             send_mail(subject, message, from_email, recipient_list)
+
+#             # --- CRUCIAL FIX HERE: Return success on success ---
+#             return Response({"detail": "TFA email sent successfully."}, status=status.HTTP_200_OK)
+
+#         except BadHeaderError:
+#             logger.error(f"Invalid header found when sending TFA email to {data.get('mail')}")
+#             return Response({"error": "Failed to send email due to invalid header."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         except Exception as e:
+#             logger.error(f"Error sending TFA email to {data.get('mail')}: {str(e)}")
+#             return Response({"error": "Failed to send email due to unexpected error."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

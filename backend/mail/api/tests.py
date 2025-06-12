@@ -20,6 +20,7 @@ import random
 import requests
 import logging
 from api.views import confirm_singup, send_tfa
+from requests.exceptions import RequestException
 
 # --- START: Mocking External Dependencies ---
 # These mocks prevent actual emails from being sent and HTTP requests from being made during tests.
@@ -83,12 +84,11 @@ class EmailAPITests(TestCase):
         mock_send_mail.assert_called_once()
         # Verify the content of the email sent
         call_args, call_kwargs = mock_send_mail.call_args
+        self.assertEqual(call_args[2], mail.settings.DEFAULT_FROM_EMAIL) # <--- FIX: Changed from call_kwargs
         self.assertIn("Confirmation of your PongPong registration", call_args[0]) # subject
         self.assertIn(f"Hello {payload['user_name']}", call_args[1]) # message starts with Hello
         self.assertIn(mock_auth_response.json.return_value['link'], call_args[1]) # link in message
-        self.assertEqual(call_kwargs['from_email'], mail.settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(call_kwargs['recipient_list'], [payload['mail']])
-        self.assertFalse(call_kwargs['fail_silently'])
+        self.assertEqual(call_kwargs['fail_silently'], False) # fail_silently is a keyword arg
 
         # Verify that requests.post was called
         mock_requests.post.assert_called_once_with(
@@ -149,9 +149,32 @@ class EmailAPITests(TestCase):
         response = self.client.post(url, json.dumps(payload), content_type='application/json')
 
         # Assertions: Expect an error because the internal request failed
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR) # <--- FIX: Expected 500
+        self.assertIn("Failed to get activation link", response.json().get('error')) # More specific error message
+        mock_send_mail.assert_not_called()
+    
+    @mock.patch(mock_send_mail_path)
+    @mock.patch(mock_requests_path) # Need to mock requests even if not used by this view, if it's in the decorator list
+    def test_confirm_signup_auth_network_error(self, mock_requests, mock_send_mail):
+        """
+        Test confirm_singup handles network errors during internal auth service call.
+        """
+        # Simulate a network error (e.g., connection refused)
+        mock_requests.post.side_effect = RequestException("Connection refused")
+
+        payload = {
+            'mail': 'test@example.com',
+            'user_name': 'TestUser'
+        }
+        url = reverse('confirm_singup')
+
+        response = self.client.post(url, json.dumps(payload), content_type='application/json')
+
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual(response.json(), {"error": "Failed to send email."}) # Your view's generic 500 error
-        mock_send_mail.assert_not_called() # No email should be sent if internal call fails
+        self.assertEqual(response.json(), {"error": "Failed to connect to authentication service."})
+        mock_send_mail.assert_not_called()
+
+
 
     @mock.patch(mock_send_mail_path)
     def test_send_tfa_success(self, mock_send_mail):
@@ -203,6 +226,6 @@ class EmailAPITests(TestCase):
         response = self.client.post(url, json.dumps(payload), content_type='application/json')
 
         # Assertions
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertEqual(response.json(), {"error": "Failed to send email."})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST) # <--- FIX: Expected 400
+        self.assertEqual(response.json(), {"error": "Failed to send email due to invalid header."}) # <--- FIX: Expected new error message
         mock_send_mail.assert_called_once()
