@@ -17,6 +17,7 @@ from serverPong.ball import Movement, BallData, calcIntersections
 urlAI = "https://ai_pong:8020/"
 
 def calcAllIntersections(walls, ptRacket1, ptRacket2) :
+	print("Walls : ", len(walls), file=sys.stderr)
 	for w in walls:
 		if (calcIntersections(w[0], w[1], ptRacket1, ptRacket2) != (None, None)) :
 			return True
@@ -159,7 +160,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 	async def game_update(self, event):
 		game_stats = event.get('game_stats', {})
 		# print("game_stats type: ", type(game_stats).__name__, file=sys.stderr)
-		self.matchReplay.append(game_stats)
+		# self.matchReplay.append(game_stats)
 
 		await self.send(text_data=json.dumps({
 			'game_stats': game_stats

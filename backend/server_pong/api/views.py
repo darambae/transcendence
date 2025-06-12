@@ -13,6 +13,7 @@ from channels.layers import get_channel_layer
 from datetime import datetime
 import requests
 from http import HTTPStatus
+from serverPong.Racket import dictInfoRackets
 
 channel_layer = get_channel_layer()
 
@@ -206,18 +207,26 @@ def get_api_key(request):
 
     return JsonResponse({"api_key": api_key})
 
+locks = {}
+
 @csrf_exempt
 async def sendNewJSON(request):
-    # JWT = decodeJWT(request)
-    # if not JWT[0] :
-    #     return HttpResponse401() # Set an error 
-    #print(f" Jwt : {JWT[0]}", file=sys.stderr)
     dictionnaryJson = json.loads(request.body)
-    # #print(f"dictio : {dictionnaryJson}")
-    rq = RequestParsed(dictionnaryJson.get("apiKey", None), dictionnaryJson.get("message", {}))
-    # #print(rq.apiKey, file=sys.stderr)
-    if (rq.apiKey) :
-        # #print(f"Heyo : {type(rq.action).__name__} | {rq.action}", file=sys.stderr)
+    api_key = dictionnaryJson.get("apiKey", None)
+    message = dictionnaryJson.get("message", {})
+
+    if not api_key:
+        return HttpResponse(status=400)  # apiKey manquant
+
+    # Obtenir ou créer un lock pour cette apiKey
+    lock = locks.setdefault(api_key, asyncio.Lock())
+
+    if lock.locked():
+        # Un message est déjà en cours de traitement pour ce joueur
+        return HttpResponse(status=429)  # Trop de requêtes (Too Many Requests)
+
+    async with lock:
+        rq = RequestParsed(api_key, message)
         await channel_layer.group_send(
             rq.apiKey,
             {
@@ -225,8 +234,8 @@ async def sendNewJSON(request):
                 "text_data": rq.action
             }
         )
+
     return HttpResponse(status=204)
-    # #print(f"Reiceived Json : {dictionnaryJson}", file=sys.stderr)
 
 async def forfaitUser(request) :
     JWT = decodeJWT(request)
