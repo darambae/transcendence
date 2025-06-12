@@ -37,7 +37,7 @@ DEBUG = True
 
 APP_NAME = 'auth'
 
-ALLOWED_HOSTS = ['transcendence.42.fr', 'auth', 'localhost']
+ALLOWED_HOSTS = ["*"] # ['transcendence.42.fr', 'auth', 'localhost']
 
 # HTTP settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -148,6 +148,7 @@ APPEND_SLASH = True
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
     "https://localhost:8443",
+    "https://10.18.161.147:8443",
 ]
 
 # MEDIA FOR IMG

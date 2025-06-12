@@ -18,9 +18,9 @@ export async function localGameController() {
     const SSEStream = new EventSource(url_sse);
     SSEStream.onmessage = function(event) {
         try {
-            console.log("Heyyo");
+            // console.log("Heyyo");
             const data = JSON.parse(event.data);
-            console.log(data);
+            // console.log(data);
             game_stats = data["game_stats"]
             if (game_stats["State"] != "Waiting for start" ) {  
                 drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
@@ -28,20 +28,20 @@ export async function localGameController() {
                 score2.innerHTML = game_stats["team2Score"]
             }
         } catch (error) {
-            console.log("ParsingError: ", error)
+            // console.log("ParsingError: ", error)
         }
     }
 
     window.onbeforeunload = function(event) {
-        console.log("Détection du rechargement ou fermeture de la page");
+        // console.log("Détection du rechargement ou fermeture de la page");
         if (SSEStream.readyState !== EventSource.CLOSED) {
-            console.log("La connexion SSE va être fermée lors du rechargement.");
+            // console.log("La connexion SSE va être fermée lors du rechargement.");
             logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
             // Tu peux aussi essayer de fermer proprement la connexion ici si tu veux
             SSEStream.close();
         }
         else {
-          console.log("Yes");
+          // console.log("Yes");
         }
       };
 
@@ -60,13 +60,13 @@ export async function localGameController() {
                     };
                     break;
                 case "q" :
-                    console.log("Started : ", started);
+                    // console.log("Started : ", started);
                     if (started == true) {
                       fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${2}`)
                     }
                     break;
                 case "l" :
-                    console.log("Started : ", started);
+                    // console.log("Started : ", started);
                     if (started == true) {
                       await fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${1}`);
                     }

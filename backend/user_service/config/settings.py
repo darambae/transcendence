@@ -22,7 +22,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 
-ALLOWED_HOSTS = ['localhost', 'transcendence.42.fr', 'access_postgresql']
+ALLOWED_HOSTS = ["*"] # ['localhost', 'transcendence.42.fr', 'access_postgresql']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,6 +142,7 @@ APPEND_SLASH = True
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
     "https://localhost:8443",
+    "https://10.18.161.147:8443",
 ]
 
 # MEDIA FOR IMG

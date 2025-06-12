@@ -14,9 +14,9 @@ urlpatterns = [
     path('server-pong/events', sse, name="sse")
 ]
 
-from django.urls import get_resolver
-import sys
+# from django.urls import get_resolver
+# import sys
 
-resolver = get_resolver()
-for pattern in resolver.url_patterns:
-    print(pattern, file=sys.stderr)
+# resolver = get_resolver()
+# for pattern in resolver.url_patterns:
+#     print(pattern, file=sys.stderr)

@@ -1,8 +1,9 @@
 import { versusController } from "../versusGame.js";
 import { homeController } from "../home.js";
 import { localGameController } from "../localGame.js";
+import { actualizeIndexPage } from "../../utils.js";
 
-export let adress = "localhost"
+export let adress = "10.18.161"
 let canvas;
 let ctx;
 
@@ -19,6 +20,9 @@ export const routesSp = {
     template: 'localGame',
     controller: localGameController,
   },
+  multiplayerGame : {
+    template: 'localGame',
+  }
   };
 
 let p1Name;
@@ -69,43 +73,66 @@ export function sleep(ms) {
 }
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
-  console.log(adress);
-  let url_sse = `https://${adress}:8443/server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&jwt=${sessionStorage.getItem("accessToken")}`;
-  let url_post = `https://${adress}:8443/server-pong/send-message`;
+  // console.log(adress);
+  let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&jwt=${sessionStorage.getItem("accessToken")}`;
+  let url_post = `server-pong/send-message`;
   let started = false;
   let game_stats;
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+  let mul = await fetch('./templates/localGame.html')
+  let mulTxt = await mul.text()
+
+  let gameState  = document.getElementById("replace-state");
+  gameState.innerHTML = mulTxt;
     
   const SSEStream = new EventSource(url_sse);
   SSEStream.onmessage = function(event) {
       try {
         // const data = JSON.parse(event.data);
-        // console.log("Received data: ", data);
-        console.log("Heyyo");
+        // // console.log("Received data: ", data);
+        // console.log("Heyyo");
         const data = JSON.parse(event.data);
-        console.log(data);
+
+        let sc1 = document.getElementById("player1score");
+        let sc2 = document.getElementById("player1score");
+
+        // console.log(data);
         game_stats = data["game_stats"]
         if (game_stats["State"] != "Waiting for start" ) {  
           if (started == false) {
             started = true;
           }
-          drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
+          if (game_stats["State"] != "playersInfo") {
+            // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
+            sc1.innerHTML = game_stats["team1Score"];
+            sc2.innerHTML = game_stats["team2Score"];
+          }
+          else {
+            // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+            let p1 = document.getElementById("player1Username");
+            let p2 = document.getElementById("player2Username");
+
+            p1.innerHTML = game_stats["p1"][0]
+            p2.innerHTML = game_stats["p2"][0]
+
+          }
         }
       } catch (error) {
-        console.log("ParsingError: ", error)
+        // console.log("ParsingError: ", error)
       }
   }
 
   window.onbeforeunload = function(event) {
-    console.log("Détection du rechargement ou fermeture de la page");
+    // console.log("Détection du rechargement ou fermeture de la page");
     if (SSEStream.readyState !== EventSource.CLOSED) {
-        console.log("La connexion SSE va être fermée lors du rechargement.");
+        // console.log("La connexion SSE va être fermée lors du rechargement.");
         logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
         SSEStream.close();
     }
     else {
-      console.log("Yes");
+      // console.log("Yes");
     }
   };
 
@@ -125,9 +152,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
               };
               break;
           case "q" :
-              console.log("Started : ", started);
+              // console.log("Started : ", started);
               if (started == true) {
-                fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
+                fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
                   headers: {
                     "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                   }
@@ -186,7 +213,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 export async function loadGamePlayable(apikey) {
   let isPlayable;
 
-    await fetch(`https://${adress}:8443/server-pong/game-status?apikey=${apikey}`, {
+    await fetch(`server-pong/game-status?apikey=${apikey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -199,19 +226,19 @@ export async function loadGamePlayable(apikey) {
           return response.json();
         })
         .then(data => {
-          console.log("Données reçues loadPlayable:", data["playable"]);
+          // console.log("Données reçues loadPlayable:", data["playable"]);
           isPlayable =  data["playable"]
         })
         .catch(error => {
           console.error("Erreur de requête :", error);
         })
-    console.log("isPlayable :", isPlayable);
+    // console.log("isPlayable :", isPlayable);
     return isPlayable;
 }
 
 export async function setApiKeyWeb(apikey) {
-  console.log("apikey Set : ", apikey);
-  return fetch(`https://${adress}:8443/server-pong/api-key`, {
+  // console.log("apikey Set : ", apikey);
+  return fetch(`server-pong/api-key`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -224,7 +251,7 @@ export async function setApiKeyWeb(apikey) {
     return response.json();
   })
   .then(data => {
-    console.log("Données reçues SetKey:", data["playable"]);
+    // console.log("Données reçues SetKey:", data["playable"]);
     return data["playable"];
   })
   .catch(error => {
@@ -234,8 +261,8 @@ export async function setApiKeyWeb(apikey) {
 }
 
 export async function setApiKeyWebSP(apikey) {
-  console.log("apikey Set : ", apikey);
-  return fetch(`https://${adress}:8443/server-pong/api-key-alone`, {
+  // console.log("apikey Set : ", apikey);
+  return fetch(`server-pong/api-key-alone`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -248,7 +275,7 @@ export async function setApiKeyWebSP(apikey) {
     return response.json();
   })
   .then(data => {
-    console.log("Données reçues SetKey:", data["playable"]);
+    // console.log("Données reçues SetKey:", data["playable"]);
     return data["playable"];
   })
   .catch(error => {

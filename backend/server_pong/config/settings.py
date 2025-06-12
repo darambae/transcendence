@@ -71,6 +71,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://localhost:8443",
     "http://127.0.0.1:3000",
     "https://server-pong:8030",
+    "https://10.18.161.147:8443",
 ]
 
 TEMPLATES = [

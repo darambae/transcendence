@@ -41,9 +41,9 @@ class   RequestParsed :
 
 def decodeJWT(request, encodedJwt=None) :
     if not encodedJwt :
-        print(f"headers : {request.headers}", file=sys.stderr)
+        #print(f"headers : {request.headers}", file=sys.stderr)
         encodedJwt = request.headers.get("Authorization", None)
-        print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
+        #print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
     if not encodedJwt :
         return [None]
     
@@ -81,18 +81,13 @@ def getSimulationState(request):
 # the function’s execution. The next time the generator is iterated, execution resumes right after the yield.
 async def  checkForUpdates(uriKey, key) :
     try :
-        print("0", file=sys.stderr)
         ssl_context = ssl.create_default_context()
         ssl_context.load_verify_locations('/certs/fullchain.crt')
         async with websockets.connect(uriKey, ssl=ssl_context) as ws:
-            print("1", file=sys.stderr)
             while True:
-                print("2", file=sys.stderr)
                 message = await ws.recv()
-                print("3", file=sys.stderr)
                 yield f"data: {message}\n\n"
     except Exception as e :
-        print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
         yield f"data: WebSocket stop, error : {e}\n\n"
 
 
@@ -120,7 +115,7 @@ async def sse(request):
             username2 = JWT[0]["payload"]["invites"][idp2]
         
         if (rq.apiKey) :
-            print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
+            #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}", rq.apiKey), content_type="text/event-stream")
 
     elif idplayer == 1 :
@@ -131,7 +126,7 @@ async def sse(request):
             username1 = JWT[0]["payload"]["invites"][idp1]
 
         if (rq.apiKey) :
-            print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
+            #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
         
     else :
@@ -143,7 +138,7 @@ async def sse(request):
         username1 = "None"
 
         if (rq.apiKey) :
-            print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
+            #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt
@@ -151,7 +146,7 @@ def setApiKeySp(request):
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = json.loads(request.body).get('apiKey')
     dictApiSp[apikey] = 1
     apiKeys.append(apikey)
@@ -164,7 +159,7 @@ def setApiKey(request):
     if not JWT[0] :
         return HttpResponse401() # Set an error 
     fil = open('test.txt', 'w+')
-    print(f" Jwt : {JWT[0]}", file=fil)
+    #print(f" Jwt : {JWT[0]}", file=fil)
     fil.close()
     apikey = json.loads(request.body).get('apiKey')
     if apikey not in apiKeysUnplayable:
@@ -188,7 +183,7 @@ def isGamePlayable(request) :
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+    #print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = json.loads(request.body).get('apiKey')
     if (dictApi[apikey] > 1) :
         apiKeys.append(apikey)
@@ -213,10 +208,10 @@ def get_api_key(request):
 
 @csrf_exempt
 async def sendNewJSON(request):
-    JWT = decodeJWT(request)
-    if not JWT[0] :
-        return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+    # JWT = decodeJWT(request)
+    # if not JWT[0] :
+    #     return HttpResponse401() # Set an error 
+    #print(f" Jwt : {JWT[0]}", file=sys.stderr)
     dictionnaryJson = json.loads(request.body)
     # #print(f"dictio : {dictionnaryJson}")
     rq = RequestParsed(dictionnaryJson.get("apiKey", None), dictionnaryJson.get("message", {}))
@@ -237,13 +232,13 @@ async def forfaitUser(request) :
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = request.GET.get("apikey")
     idplayer = request.GET.get("idplayer")
     rq = RequestParsed(apikey, {})
     #print("---------------------6>   ->  -> Trying to disconnect ", file=sys.stderr)
     if (rq.apiKey) :
-        print("Yay", file=sys.stderr)
+       # print("Yay", file=sys.stderr)
         await channel_layer.group_send(
             rq.apiKey,
             {
@@ -269,7 +264,7 @@ async def disconnectUsr(request) :
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    print(f" Jwt : {JWT[0]}", file=sys.stderr)
+   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = request.GET.get("apikey")
     #print("disco usr", file=sys.stderr)
     await channel_layer.group_send(

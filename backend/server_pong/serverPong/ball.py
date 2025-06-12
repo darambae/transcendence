@@ -64,8 +64,6 @@ def calcIntersections(A1 : Point, A2 : Point, B1 : Point, B2 : Point):
 
 def	normalizeNormalVector(vector:Vector) :
 	norm = math.sqrt(vector.x**2 + vector.y**2)
-	if(norm == 0) :
-		print("vec : ", vector, file=sys.stderr)
 	return Vector(-(round(vector.y / norm, 2)), round(vector.x / norm, 2))
 
 def calcDotProduct(vec1:Vector, vec2:Vector) :
