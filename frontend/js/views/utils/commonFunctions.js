@@ -2,6 +2,7 @@ import { versusController } from "../versusGame.js";
 import { homeController } from "../home.js";
 import { localGameController } from "../localGame.js";
 import { actualizeIndexPage } from "../../utils.js";
+import { invitController } from "../invits.js";
 
 export let adress = "10.18.161"
 let canvas;
@@ -22,6 +23,10 @@ export const routesSp = {
   },
   multiplayerGame : {
     template: 'localGame',
+  },
+  invit : {
+    template : 'login',
+    controller: invitController,
   }
   };
 
