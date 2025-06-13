@@ -13,7 +13,9 @@ from channels.layers import get_channel_layer
 from datetime import datetime
 import requests
 from http import HTTPStatus
-from serverPong.Racket import dictInfoRackets
+import asyncio
+from serverPong.Racket import dictInfoRackets, wall1, wall2
+from serverPong.ball import calcIntersections
 
 channel_layer = get_channel_layer()
 
@@ -218,14 +220,30 @@ async def sendNewJSON(request):
     if not api_key:
         return HttpResponse(status=400)  # apiKey manquant
 
+    m2 = json.loads(message)
     # Obtenir ou créer un lock pour cette apiKey
-    lock = locks.setdefault(api_key, asyncio.Lock())
 
-    if lock.locked():
-        # Un message est déjà en cours de traitement pour ce joueur
-        return HttpResponse(status=429)  # Trop de requêtes (Too Many Requests)
+    # print(f"message : {message}", file=sys.stderr)
+    if m2["action"] == 'move' :
+        try :
+            if m2["player1"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] - 5] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] - 5], wall1[0], wall1[1]) == (None, None): 
+                dictInfoRackets[api_key]["racket1"][0][1] -= 5
+                dictInfoRackets[api_key]["racket1"][1][1] -= 5
+            elif m2["player1"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] + 5] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] + 5], wall2[0], wall2[1]) == (None, None): 
+                dictInfoRackets[api_key]["racket1"][0][1] += 5
+                dictInfoRackets[api_key]["racket1"][1][1] += 5
+        except KeyError :
+            try :
+                if m2["player2"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] - 5] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] - 5], wall1[0], wall1[1]) == (None, None): 
+                    dictInfoRackets[api_key]["racket2"][0][1] -= 5
+                    dictInfoRackets[api_key]["racket2"][1][1] -= 5
+                elif m2["player2"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] + 5] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] + 5], wall2[0], wall2[1]) == (None, None): 
+                    dictInfoRackets[api_key]["racket2"][0][1] += 5
+                    dictInfoRackets[api_key]["racket2"][1][1] += 5
+            except Exception :
+                return HttpResponse(status=500)
 
-    async with lock:
+    else :
         rq = RequestParsed(api_key, message)
         await channel_layer.group_send(
             rq.apiKey,

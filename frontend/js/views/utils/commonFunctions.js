@@ -169,7 +169,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                     'Content-Type': 'application/json',
                     "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                   },
-                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "up"}'})
+                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "up"}', "player" : "1"})
                 });
               }
               else {
@@ -179,7 +179,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                         'Content-Type': 'application/json',
                         "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                       },
-                      body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}'})
+                      body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}', "player" : "2"})
                     });
               } ;
               break;
@@ -191,7 +191,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                     'Content-Type': 'application/json',
                     "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                   },
-                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "down"}'})
+                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "down"}', "player" : "1"})
                 });
               }
               else {
@@ -201,7 +201,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                         'Content-Type': 'application/json',
                         "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                       },
-                      body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}'})
+                      body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}', "player" : "2"})
                     });
               } ;
               break;
