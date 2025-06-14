@@ -45,12 +45,12 @@ class   RequestParsed :
 def decodeJWT(request, encodedJwt=None) :
     if not encodedJwt :
         #print(f"headers : {request.headers}", file=sys.stderr)
-        encodedJwt = request.headers.get("Authorization", None)
+        encodedJwt = request.COOKIES.get("access", None)
         #print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
     if not encodedJwt :
         return [None]
     
-    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
     if res.status_code != 200 :
         print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]
@@ -149,11 +149,12 @@ def setApiKeySp(request):
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
-    apikey = json.loads(request.body).get('apiKey')
+    # print(f" Jwt : {JWT[0]}", file=sys.stderr)
+    body = json.loads(request.body)
+    apikey = body.get('apiKey')
     dictApiSp[apikey] = 1
     apiKeys.append(apikey)
-    return JsonResponse({"playable": "Game can start"})
+    return JsonResponse({"playable": "Game can start", "p1" : })
 
 
 @csrf_exempt
@@ -161,9 +162,9 @@ def setApiKey(request):
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    fil = open('test.txt', 'w+')
-    #print(f" Jwt : {JWT[0]}", file=fil)
-    fil.close()
+    # fil = open('test.txt', 'w+')
+    # #print(f" Jwt : {JWT[0]}", file=fil)
+    # fil.close()
     apikey = json.loads(request.body).get('apiKey')
     if apikey not in apiKeysUnplayable:
         return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
@@ -256,6 +257,7 @@ async def sendNewJSON(request):
     return HttpResponse(status=204)
 
 async def forfaitUser(request) :
+    
     JWT = decodeJWT(request)
     if not JWT[0] :
         return HttpResponse401() # Set an error 

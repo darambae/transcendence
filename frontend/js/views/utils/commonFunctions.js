@@ -30,17 +30,13 @@ export const routesSp = {
   }
   };
 
-let p1Name;
-let p2Name;
 let keySp;
-export function setPlayersLocalName(p1, p2, apikey) {
-  p1Name = p1;
-  p2Name = p2;
+export function setPlayersLocalName(apikey) {
   keySp = apikey;
 };
 
 export function getPlayersLocalName() {
-  return ([p1Name, p2Name, keySp])
+  return (keySp)
 }
 
 export function setCanvasAndContext() {

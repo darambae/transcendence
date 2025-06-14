@@ -4,13 +4,12 @@ import { setPlayersLocalName } from "./utils/commonFunctions.js";
 import { actualizeIndexPage } from "../utils.js";
 
 export async function versusController() {
-    let p1 = "Default";
-    let p2 = "Default";
+    
     let startButton = document.getElementById("getTextBtn");
     let apiKey;
 
     startButton.addEventListener("click", async (event) => {
-        await fetch(`https://${adress}:8443/server-pong/api-key`)
+        await fetch(`server-pong/api-key`)
               .then(response => {
                 if (!response.ok) throw new Error("https Error: " + response.status);
                 return response.json();

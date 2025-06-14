@@ -41,48 +41,6 @@ class data_link(APIView):
 
 		return JsonResponse({'link': activation_link}, status=200)
 
-######################################### TEMP #####################################
-class login(APIView):
-	permission_classes = [AllowAny]
-
-	def post(self, request):
-		if (request.method == 'POST'):
-
-			user = request.data
-			
-			json_data = {
-				'mail':user.get('mail'),
-				'password':user.get('password')
-			}
-
-			response = requests.post("https://access-postgresql:4000/api/checkPassword/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})
-			
-			data_response = None
-			try:
-				data_response = response.json()
-			except ValueError:
-				data_response = {
-			    	'error': 'Invalid response from mail service',
-			    	'detail': response.text
-				}
-
-			if response.status_code == 200:
-					json_send_mail = {
-						'user_name': data_response.get('user_name'),
-						'mail': data_response.get('mail'),
-						'opt': data_response.get('opt')
-					}
-					mail_response = requests.post("https://mail:4010/mail/send_tfa/", json=json_send_mail, verify=False, headers={'Host': 'mail'})
-
-					data_response = {
-						'success':'authentication code send'
-					}
-			
-
-			return JsonResponse(data_response, status=response.status_code)
-
-######################################### TEMP #####################################
-
 
 class login(APIView):
 	permission_classes = [AllowAny]
