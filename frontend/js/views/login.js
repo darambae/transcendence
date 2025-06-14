@@ -46,8 +46,8 @@ async function double_authenticate(data) {
 				console.log(refreshToken)
 
 
-				localStorage.setItem('accessToken', responseData.access);
-				localStorage.setItem('refreshToken', responseData.refresh);
+				sessionStorage.setItem('accessToken', responseData.access);
+				sessionStorage.setItem('refreshToken', responseData.refresh);
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
@@ -127,7 +127,6 @@ export async function handleLoginSubmit(event) {
 			loadingMessage.style.display = "none";
 	}
 }
-
 
 
 export function loginController() {

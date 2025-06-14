@@ -1,3 +1,6 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from django.http import JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -9,7 +12,6 @@ from django.shortcuts import render
 import json
 import requests
 # Create your views here.
-
 @ensure_csrf_cookie
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
@@ -20,24 +22,24 @@ def signup(request):
     url_mail = "https://mail:4010/mail/confirm_singup/"
 
     if request.method != 'POST':
-        return JsonResponse({'error': 'Unauthorized method'}, status=405)
+        return JsonResponse({'create_user': {'error': 'Unauthorized method'}}, status=405)
 
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        return JsonResponse({'create_user': {'error': 'Invalid JSON'}}, status=400)
 
     len_for_fields = {'username':15, 'firstName':15, 'lastName':15, 'mail':50, 'password':255}
     required_fields = ['username', 'firstName', 'lastName', 'mail', 'password']
     for field in required_fields:
         if field not in data:
-            return JsonResponse({'error': f'Missing field: {field}'}, status=400)
+            return JsonResponse({'create_user': {'error': f'Missing field: {field}'}}, status=400)
         if not data[field]:
-            return JsonResponse({'error': f'Field {field} cannot be empty'}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field {field} cannot be empty'}}, status=400)
         if len(data[field]) > len_for_fields[field]:
-            return JsonResponse({'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
-            return JsonResponse({'error': f'Field password is too short minimum body is 8 caracter'}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
 
     try:
         validate_email(data['mail'])
@@ -86,4 +88,28 @@ def signup(request):
         'create_user': data_response_create_user,
         'send_mail': data_response_mail,
     }, status=status_code)
+
+
+class InfoUser(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        url_avatar = "https://user_service:8443/media/"
+        token = request.headers.get('Authorization')
+        
+        try:
+            response = requests.get(
+                'https://access-postgresql:4000/api/InfoUser/',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql'
+                }
+            )
+            data_json = response.json()
+            data_json['avatar'] = url_avatar + data_json['avatar']
+            return Response(data_json, status=response.status_code)
+
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
 

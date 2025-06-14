@@ -1,5 +1,5 @@
 
-from django.core.mail import send_mail
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 import random
 import string
@@ -13,3 +13,17 @@ def generate_otp_send_mail(user):
 	opt = "-".join(tab)
 
 	return opt
+
+def generateJwt(user):
+
+	refresh = RefreshToken.for_user(user)
+	access = refresh.access_token
+
+	access['user_id'] = user.id
+	access['username'] = user.user_name
+	access['invites'] = {}
+
+	return {
+		'refresh': str(refresh),
+		'access': str(access)
+	}

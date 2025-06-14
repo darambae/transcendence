@@ -14,10 +14,22 @@ class USER(AbstractBaseUser, PermissionsMixin):
 	actived = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	last_login = models.DateTimeField(null=True, blank=True)
-	avatar = models.ImageField(upload_to='imgs/', default='imgs/default.png')
+	avatar = models.CharField(max_length=255, default='default.png')
+
 
 	USERNAME_FIELD = 'mail'
 	REQUIRED_FIELDS = ['user_name', 'first_name', 'last_name']
 
 	def __str__(self):
 		return self.user_name
+
+class MATCHTABLE(models.Model):
+    matchKey = models.CharField(unique=True, max_length=100)
+    username1 = models.CharField(max_length=15)
+    score1 = models.IntegerField()
+    score2 = models.IntegerField()
+    username2 = models.CharField(max_length=15)
+
+    def __str__(self):
+        return f"{self.username1} {self.score1} - {self.score2} {self.username2}"
+    

@@ -3,6 +3,9 @@
 @import url('./signupSuccess.css');
 @import url('./double_auth.css');
 @import url('./user.css');
+@import url('./card_profile.css');
+@import url('./settings_profile.css');
+@import url('./settings_password.css');
 
 h1 {
 	display: flex;
