@@ -9,7 +9,11 @@ export async function versusController() {
     let apiKey;
 
     startButton.addEventListener("click", async (event) => {
-        await fetch(`server-pong/api-key`)
+        await fetch(`server-pong/api-key`, {
+          headers: {
+            "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+          }
+        })
               .then(response => {
                 if (!response.ok) throw new Error("https Error: " + response.status);
                 return response.json();
@@ -21,9 +25,7 @@ export async function versusController() {
                 console.error("Erreur de requête :", error);
               });
         await setApiKeyWebSP(apiKey);
-        p1 = document.getElementById("player1").value;
-        p2 = document.getElementById("player2").value;
-        setPlayersLocalName(p1, p2, apiKey);
+        setPlayersLocalName(apiKey);
         actualizeIndexPage("replace-state", routesSp["game"])
     });
 }

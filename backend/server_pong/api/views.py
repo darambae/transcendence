@@ -45,12 +45,14 @@ class   RequestParsed :
 def decodeJWT(request, encodedJwt=None) :
     if not encodedJwt :
         #print(f"headers : {request.headers}", file=sys.stderr)
-        encodedJwt = request.COOKIES.get("access", None)
+        # encodedJwt = request.COOKIES.get("access", None)
+        encodedJwt = request.headers.get("Authorization", None)
         #print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
     if not encodedJwt :
         return [None]
     
-    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+    # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
     if res.status_code != 200 :
         print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]
@@ -101,7 +103,7 @@ async def sse(request):
         return HttpResponse401() # Set an error 
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
-    idplayer = request.GET.get("idplayer")
+    idplayer = int(request.GET.get("idplayer"))
     rq = RequestParsed(apikey, {})
 
     if idplayer == 0 :
@@ -154,7 +156,7 @@ def setApiKeySp(request):
     apikey = body.get('apiKey')
     dictApiSp[apikey] = 1
     apiKeys.append(apikey)
-    return JsonResponse({"playable": "Game can start", "p1" : })
+    return JsonResponse({"playable": "Game can start"})
 
 
 @csrf_exempt

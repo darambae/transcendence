@@ -120,28 +120,28 @@ class GameConsumer(AsyncWebsocketConsumer):
 			self.game_running = False
 			if self.task:
 				self.task.cancel()
-		elif action == "move" and not dictInfoRackets[self.room_group_name]["scoring"]:
-			try :
-				player1Move:str = data.get("player1", "None")
-				player2Move:str = data.get("player2", "None")
-				if (player1Move == "down") :
-					if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket1"][0][0], dictInfoRackets[self.room_group_name]["racket1"][0][1] + 5), Point(dictInfoRackets[self.room_group_name]["racket1"][1][0], dictInfoRackets[self.room_group_name]["racket1"][1][1] + 5)) == False) : # Need to check if it hits a wall
-						dictInfoRackets[self.room_group_name]["racket1"][0][1] += 5
-						dictInfoRackets[self.room_group_name]["racket1"][1][1] += 5
-				elif (player1Move == "up") :
-					if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket1"][0][0], dictInfoRackets[self.room_group_name]["racket1"][0][1] - 5), Point(dictInfoRackets[self.room_group_name]["racket1"][1][0], dictInfoRackets[self.room_group_name]["racket1"][1][1] - 5)) == False) : # Need to check if it hits a wall
-						dictInfoRackets[self.room_group_name]["racket1"][0][1] -= 5
-						dictInfoRackets[self.room_group_name]["racket1"][1][1] -= 5
-				if (player2Move == "down") :
-					if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket2"][0][0], dictInfoRackets[self.room_group_name]["racket2"][0][1] + 5), Point(dictInfoRackets[self.room_group_name]["racket2"][1][0], dictInfoRackets[self.room_group_name]["racket2"][1][1] + 5)) == False) : # Need to check if it hits a wall
-						dictInfoRackets[self.room_group_name]["racket2"][0][1] += 5
-						dictInfoRackets[self.room_group_name]["racket2"][1][1] += 5
-				elif (player2Move == "up") :
-					if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket2"][0][0], dictInfoRackets[self.room_group_name]["racket2"][0][1] - 5), Point(dictInfoRackets[self.room_group_name]["racket2"][1][0], dictInfoRackets[self.room_group_name]["racket2"][1][1] - 5)) == False) : # Need to check if it hits a wall
-						dictInfoRackets[self.room_group_name]["racket2"][0][1] -= 5
-						dictInfoRackets[self.room_group_name]["racket2"][1][1] -= 5
-			except Exception as e :
-				print(f"ERROR : {e}")
+		# elif action == "move" and not dictInfoRackets[self.room_group_name]["scoring"]:
+		# 	try :
+		# 		player1Move:str = data.get("player1", "None")
+		# 		player2Move:str = data.get("player2", "None")
+		# 		if (player1Move == "down") :
+		# 			if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket1"][0][0], dictInfoRackets[self.room_group_name]["racket1"][0][1] + 5), Point(dictInfoRackets[self.room_group_name]["racket1"][1][0], dictInfoRackets[self.room_group_name]["racket1"][1][1] + 5)) == False) : # Need to check if it hits a wall
+		# 				dictInfoRackets[self.room_group_name]["racket1"][0][1] += 5
+		# 				dictInfoRackets[self.room_group_name]["racket1"][1][1] += 5
+		# 		elif (player1Move == "up") :
+		# 			if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket1"][0][0], dictInfoRackets[self.room_group_name]["racket1"][0][1] - 5), Point(dictInfoRackets[self.room_group_name]["racket1"][1][0], dictInfoRackets[self.room_group_name]["racket1"][1][1] - 5)) == False) : # Need to check if it hits a wall
+		# 				dictInfoRackets[self.room_group_name]["racket1"][0][1] -= 5
+		# 				dictInfoRackets[self.room_group_name]["racket1"][1][1] -= 5
+		# 		if (player2Move == "down") :
+		# 			if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket2"][0][0], dictInfoRackets[self.room_group_name]["racket2"][0][1] + 5), Point(dictInfoRackets[self.room_group_name]["racket2"][1][0], dictInfoRackets[self.room_group_name]["racket2"][1][1] + 5)) == False) : # Need to check if it hits a wall
+		# 				dictInfoRackets[self.room_group_name]["racket2"][0][1] += 5
+		# 				dictInfoRackets[self.room_group_name]["racket2"][1][1] += 5
+		# 		elif (player2Move == "up") :
+		# 			if (calcAllIntersections(self.map.walls, Point(dictInfoRackets[self.room_group_name]["racket2"][0][0], dictInfoRackets[self.room_group_name]["racket2"][0][1] - 5), Point(dictInfoRackets[self.room_group_name]["racket2"][1][0], dictInfoRackets[self.room_group_name]["racket2"][1][1] - 5)) == False) : # Need to check if it hits a wall
+		# 				dictInfoRackets[self.room_group_name]["racket2"][0][1] -= 5
+		# 				dictInfoRackets[self.room_group_name]["racket2"][1][1] -= 5
+			# except Exception as e :
+			# 	print(f"ERROR : {e}")
 
 	async def tempReceived(self, event) :
 		await self.receive(event["text_data"])

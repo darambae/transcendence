@@ -5,7 +5,7 @@ import { drawMap } from "./utils/commonFunctions.js";
 export async function localGameController() {
     let key = getPlayersLocalName();
 
-    let url_sse = `server-pong/events?apikey=${key}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0`;
+    let url_sse = `server-pong/events?apikey=${key}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&jwt=${sessionStorage.getItem("accessToken")}`;
     let url_post = `server-pong/send-message`;
     let started = false;
     let game_stats;
@@ -81,13 +81,21 @@ export async function localGameController() {
                 case "q" :
                     // console.log("Started : ", started);
                     if (started == true) {
-                      fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${2}`)
+                      fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${2}`, {
+                        headers: {
+                          "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                        }
+                      });
                     }
                     break;
                 case "l" :
                     // console.log("Started : ", started);
                     if (started == true) {
-                      await fetch(`https://${adress}:8443/server-pong/forfait-game?apikey=${key}&idplayer=${1}`);
+                      await fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${1}`, {
+                        headers: {
+                          "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                        }
+                      });
                     }
                     break;
                 case "ArrowUp" : 
@@ -98,6 +106,7 @@ export async function localGameController() {
                     },
                     body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}'})
                     });
+                    break;
                 case "w" :
                     fetch(url_post, {
                         method: 'POST',
@@ -115,6 +124,7 @@ export async function localGameController() {
                     },
                     body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}'})
                   });
+                  break;
                 case "s" :
                     fetch(url_post, {
                         method: 'POST',
