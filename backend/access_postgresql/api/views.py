@@ -11,7 +11,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.shortcuts import render
-from .models import USER
+from .models import USER, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
@@ -186,3 +186,31 @@ class DecodeJwt(APIView):
 			return Response({'error': 'Token expired'}, status=401)
 		except jwt.InvalidTokenError:
 			return Response({'error': 'Invalid token'}, status=401)
+
+
+
+class addResultGames(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+
+		data = request.data
+
+		try:
+			with transaction.atomic():
+				tab = MATCHTABLE.objects.create (
+					matchKey = data['matchKey'],
+					username1 = data['username1'],
+					score1 = data['score1'],
+					score2 = data['score2'],
+					username2 = data['username2']
+				)
+		except IntegrityError as e:
+			err_msg = str(e)
+			if 'matchKey' in err_msg:
+				return JsonResponse({'error': 'matchKey already exists'}, status=400)
+			else:
+				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
+
+		return JsonResponse({'success': 'Result Match creat', 'matchKey': data['matchKey']}, status=200)
+

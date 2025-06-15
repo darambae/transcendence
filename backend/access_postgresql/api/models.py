@@ -21,3 +21,14 @@ class USER(AbstractBaseUser, PermissionsMixin):
 
 	def __str__(self):
 		return self.user_name
+
+class MATCHTABLE(models.Model):
+    matchKey = models.CharField(unique=True, max_length=100)
+    dateMatch = models.DateTimeField(auto_now_add=True)
+    username1 = models.CharField(max_length=15)
+    score1 = models.IntegerField()
+    score2 = models.IntegerField()
+    username2 = models.CharField(max_length=15)
+
+    def __str__(self):
+        return f"{self.username1} {self.score1} - {self.score2} {self.username2}"
