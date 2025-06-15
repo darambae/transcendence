@@ -214,3 +214,24 @@ class addResultGames(APIView):
 
 		return JsonResponse({'success': 'Result Match creat', 'matchKey': data['matchKey']}, status=200)
 
+
+class keyGame(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request, key):
+
+		try:
+			game = MATCHTABLE.objects.get(matchKey=key)
+
+			return JsonResponse({'succes': 'keu math found',
+								 'matchKey': game.matchKey,
+								 'dateMatch': game.dateMatch,
+								 'username1': game.username1,
+								 'score1': game.score1,
+								 'score2': game.score2,
+								 'username2': game.username2,
+								},
+					   			status=200)
+		except MATCHTABLE.DoesNotExist:
+			return JsonResponse({'error': 'Key Math not found'}, status=404)
+			

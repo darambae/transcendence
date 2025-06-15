@@ -22,7 +22,7 @@ from api.views import info_link
 from api.views import activate_account
 from api.views import checkPassword
 from api.views import checkTfa
-from api.views import DecodeJwt, addResultGames
+from api.views import DecodeJwt, addResultGames, keyGame
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
@@ -35,4 +35,5 @@ urlpatterns = [
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
     path('api/addResultGames/', addResultGames.as_view(), name='addResultGames'),
+    path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
 ]
