@@ -18,10 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api import views
-from api.views import info_link
-from api.views import activate_account
-from api.views import checkPassword
-from api.views import checkTfa
+from api.views import info_link, activate_account, checkPassword, checkTfa, addResultGames
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,5 +26,6 @@ urlpatterns = [
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
-	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa')
+	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
+	path('api/addResultGames/', addResultGames.as_view(), name='addResultGames')
 ]
