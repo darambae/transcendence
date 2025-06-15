@@ -202,6 +202,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 									"game_stats" : stats
 								}
 							)
+							json_data = {
+								"matchKey" : self.room_group_name,
+								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0],
+								"score1" : stats['team1Score'],
+								"score2" : stats['team2Score'],
+								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1]
+							}
+							requests.post("https://access-postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'access-postgresql'})
 ######################################### Writing into a file, waiting for Db #########################################
 							# outfile = open(f"replay_{self.room_group_name}.json", 'w')
 							# json.dump(self.matchReplay, outfile)
