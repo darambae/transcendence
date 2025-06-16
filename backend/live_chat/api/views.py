@@ -1,10 +1,10 @@
-# live_chat_sse/chatMessage/views.py
+#api/views.py
 
 import json
 from django.shortcuts import render
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.http import require_POST, require_GET # NOUVEAU: require_GET pour l'historique
-from django.contrib.auth.models import User
+from .models import Message, ChatGroup, USER
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import datetime
 
@@ -14,6 +14,8 @@ import asyncio
 
 from .models import Message, ChatGroup
 from django.core.serializers.json import DjangoJSONEncoder # NOUVEAU: Pour sérialiser les objets Django
+
+ACCESS_PG_URL = "http://access-postgresql:4000/api"
 
 # Définition d'un encodeur JSON personnalisé pour les dates
 class CustomDjangoJSONEncoder(DjangoJSONEncoder):
@@ -38,7 +40,7 @@ async def send_message(request):
             return JsonResponse({'status': 'error', 'message': 'Nom d\'utilisateur, contenu et nom de groupe requis.'}, status=400)
 
         # Utiliser sync_to_async pour les opérations ORM
-        user, created = await sync_to_async(User.objects.get_or_create)(username=username)
+        user, created = await sync_to_async(USER.objects.get_or_create)(user_name=username)
         chat_group, created_group = await sync_to_async(ChatGroup.objects.get_or_create)(name=group_name_str)
 
         message = await sync_to_async(Message.objects.create)(
@@ -89,8 +91,8 @@ async def create_or_get_private_group(request):
         return JsonResponse({'error': 'Noms d\'utilisateur requis.'}, status=400)
 
     try:
-        user1, _ = await sync_to_async(User.objects.get_or_create)(username=current_username)
-        user2, _ = await sync_to_async(User.objects.get_or_create)(username=target_username)
+        user1, _ = await sync_to_async(USER.objects.get_or_create)(user_name=current_username)
+        user2, _ = await sync_to_async(USER.objects.get_or_create)(user_name=target_username)
 
         # Assurez-vous que les deux utilisateurs sont ajoutés au groupe privé
         # et que le nom du groupe est toujours cohérent (tri des IDs)

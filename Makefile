@@ -4,7 +4,7 @@ ELK=elk
 
 DOCKER_FILE=docker-compose.yml
 
-MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access-postgresql tournament
+MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access-postgresql tournament live_chat
 ELK_CONTAINERS=elasticsearch kibana logstash
 
 # POUR GAUTIER & OMAR
@@ -14,7 +14,7 @@ USER_CONTAINER=nginx_modsecurity postgres access-postgresql auth user_service ma
 GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service tournament access-postgresql
 
 # POUR KELLY PLUS TARD
-CHAT_CONTAINER=chat nginx_modsecurity postgres redis access-postgresql
+CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access-postgresql
 
 COMPOSE=docker compose -f ${DOCKER_FILE}
 
@@ -51,6 +51,10 @@ build-user: certs_generator
 	@echo "Building user service..."
 	@${COMPOSE} build ${USER_CONTAINER}
 
+build-chat: certs_generator
+	@echo "Building live chat service..."
+	@${COMPOSE} build ${CHAT_CONTAINER}
+
 build-game: certs_generator
 	@echo "Building game service..."
 	@${COMPOSE} build ${GAME_CONTAINER}
@@ -78,6 +82,10 @@ up-user:
 	@echo "Building & starting user service..."
 	@${COMPOSE} up ${USER_CONTAINER}
 
+up-chat:
+	@echo "Building & starting live chat service..."
+	@${COMPOSE} up ${CHAT_CONTAINER}
+
 up-game:
 	@echo "Building & starting game service..."
 	@${COMPOSE} up ${GAME_CONTAINER}
@@ -97,6 +105,9 @@ up:
 start-user:
 	@echo "Starting user service..."
 	@${COMPOSE} start ${USER_CONTAINER}
+start-chat:
+	@echo "Starting live chat service..."
+	@${COMPOSE} start ${CHAT_CONTAINER}
 
 start-game:
 	@echo "Starting game service..."
@@ -136,4 +147,28 @@ prune:
 	@echo "Pruning unused Docker resources..."
 	@docker system prune --all --force
 
-.PHONY: no-cache up-elk up-main up down-elk down-main down destroy prune certs_generator build-user build-game build-elk build-main build add-ca start-user start-game start-elk start-main start
+.PHONY: \
+	add-ca \
+	certs_generator \
+	build-user \
+	build-chat \
+	build-game \
+	build-elk \
+	build-main \
+	build \
+	no-cache \
+	up-user \
+	up-chat \
+	up-game \
+	up-elk \
+	up-main \
+	up \
+	start-user \
+	start-chat \
+	start-game \
+	start-elk \
+	start-main \
+	start \
+	down \
+	destroy \
+	prune

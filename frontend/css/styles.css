@@ -3,6 +3,7 @@
 @import url('./signupSuccess.css');
 @import url('./double_auth.css');
 @import url('./user.css');
+@import url('./chat.css');
 
 h1 {
 	display: flex;

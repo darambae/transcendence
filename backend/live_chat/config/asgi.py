@@ -5,7 +5,7 @@ from channels.routing import ProtocolTypeRouter # Plus besoin de URLRouter, Auth
 from django.core.asgi import get_asgi_application
 
 # Définir la variable d'environnement du module de paramètres Django EN PREMIER
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'live_chat_sse.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 # Initialiser l'application ASGI de Django tôt pour s'assurer que l'AppRegistry
 # est peuplé avant d'importer du code qui pourrait importer des modèles ORM.

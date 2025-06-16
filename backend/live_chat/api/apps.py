@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_migrate
+# from django.db.models.signals import post_migrate
 
 #pour créer un groupe de chat général s'il n'existe pas
 def create_general_group(sender, **kwargs):
@@ -8,7 +8,7 @@ def create_general_group(sender, **kwargs):
 
 class ChatmessageConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'chatMessage'
+    name = 'api'
 
-    def ready(self):
-        post_migrate.connect(create_general_group, sender=self)
+    # def ready(self):
+    #     post_migrate.connect(create_general_group, sender=self)

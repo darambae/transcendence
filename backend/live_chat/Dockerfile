@@ -10,9 +10,9 @@ COPY entrypoint.sh /entrypoint.sh
 COPY requirements.txt /app
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-EXPOSE 4010
+EXPOSE 8040
 
 # Remove the comment below so that you can run without elk
 #ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["sh", "-c", "daphne -e ssl:4010:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]
+CMD ["sh", "-c", "daphne -e ssl:8040:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]
