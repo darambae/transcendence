@@ -105,14 +105,6 @@ export function signupController() {
 	const passwordConfirmationInput = document.getElementById("password-confirmation");
 	const passwordConfirmationCheck = document.getElementById("passwordConfirmationCheck");
 
-	passwordConfirmationInput.addEventListener('input', () => {
-		if (passwordConfirmationInput.value !== passwordInput.value) {
-			passwordConfirmationCheck.style.display = "block";
-		} else {
-			passwordConfirmationCheck.style.display = "none";
-		}
-	});
-
 	passwordInput.addEventListener('input', () => {
 		if (passwordConfirmationInput.value !== passwordInput.value) {
 			passwordConfirmationCheck.style.display = "block";
@@ -120,21 +112,50 @@ export function signupController() {
 			passwordConfirmationCheck.style.display = "none";
 		}
 	});
+	passwordConfirmationInput.addEventListener('input', () => {
+		if (passwordConfirmationInput.value !== passwordInput.value) {
+			passwordConfirmationCheck.style.display = 'block';
+		} else {
+			passwordConfirmationCheck.style.display = 'none';
+		}
+	});
 
 
 	const form = document.querySelector("#signup-form form");
 	if (form) {
 		form.addEventListener("submit", (event) => {
-			if (passwordConfirmationInput.value !== passwordInput.value) {
-				event.preventDefault();
-				passwordConfirmationCheck.style.display = "block";
-				//shaking animation
-				passwordConfirmationCheck.classList.remove("shake");
-        		void passwordConfirmationCheck.offsetWidth;
-        		passwordConfirmationCheck.classList.add("shake");
-            	return;
+			event.preventDefault();
+			const invalidSpan = document.getElementById('invalid');
+			let inputErr = false;
+			let errMsg = [];
+			if (invalidSpan) {
+				const value = passwordInput.value;
+				const hasUppercase = /[A-Z]/.test(value);
+				const hasNumber = /\d/.test(value);
+				const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+				if (!hasUppercase || !hasNumber || !hasSpecialChar) {
+					errMsg.push(
+						'Password must contain at least one uppercase letter, one number, and one special character.'
+					);
+					inputErr = true;
+				}
+				if (passwordConfirmationInput.value !== passwordInput.value) {
+					errMsg.push('Passwords do not match.');
+					inputErr = true;
+				}
+				if (inputErr) {
+					invalidSpan.textContent = errMsg.join('\n');
+					invalidSpan.style.display = 'block';
+					invalidSpan.classList.remove('shake');
+					void invalidSpan.offsetWidth;
+					invalidSpan.classList.add('shake');
+					return;
+				} else {
+					invalidSpan.style.display = 'none';
+				}
 			}
-		handleSignupSubmit(event);
-	});
+			handleSignupSubmit(event);
+		})
 	}
 }

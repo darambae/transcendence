@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 import json
 import requests
 
+
 class data_link(APIView):
 	permission_classes = [AllowAny]
 
@@ -24,6 +25,9 @@ class data_link(APIView):
 		response = requests.post("https://access-postgresql:4000/api/info_link/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})
 
 		try:
+			if not response.ok:
+				error_detail = response.json() if response.content else response.text
+				return JsonResponse({'error': error_detail}, status=response.status_code)
 			json_response = response.json()
 
 			uid = json_response.get('uid')
@@ -36,7 +40,7 @@ class data_link(APIView):
             	'error': 'Invalid response from mail service',
             	'detail': response.text
     	    }
-			return JsonResponse({'error': json_response}, status=500)
+			return JsonResponse({'error': json_response.get('error')}, status=500)
 
 		return JsonResponse({'link': activation_link}, status=200)
 
@@ -72,12 +76,16 @@ class login(APIView):
 						'opt': data_response.get('opt')
 					}
 					mail_response = requests.post("https://mail:4010/mail/send_tfa/", json=json_send_mail, verify=False, headers={'Host': 'mail'})
-
+					if not mail_response.ok:
+						mail_error_detail = mail_response.json() if mail_response.content else mail_response.text
+						data_response = {
+							'error': f"Failed to send 2FA email. Status: {mail_response.status_code}",
+							'detail': mail_error_detail
+						}
+						return JsonResponse(data_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 					data_response = {
 						'success':'authentication code send'
 					}
-			
-
 			return JsonResponse(data_response, status=response.status_code)
 
 
@@ -107,7 +115,10 @@ class verifyTwofa(APIView):
 
 			data_response = None
 			try:
-				data_response = response.json()
+				if not response.ok:
+					error_detail = response.json() if response.content else response.text
+					if response.status_code in [400, 401, 403, 404]:
+						return JsonResponse({'error': error_detail}, status=400)
 			except ValueError:
 				data_response = {
 			    	'error': 'Invalid response from mail service',
@@ -115,15 +126,14 @@ class verifyTwofa(APIView):
 				}
 
 			if response.status_code == 200:
-				data_response = {
-					'success':'authentication you are connect',
-					'refresh':data_response.get('refresh'),
-					'access':data_response.get('access'),
-				}
+				data_response = response.json()
+				return JsonResponse({
+					'success': 'authentication code send',
+					'refresh': data_response.get('refresh'),
+					'access': data_response.get('access'),
+				}, status=200)
 			else:
-				data_response = {
-					'error':response.text
-				}
+				return JsonResponse({'error': response.text}, status=response.status_code)
 
 			return JsonResponse(data_response, status=response.status_code)
 
@@ -139,5 +149,7 @@ def activate_account(request, uidb64, token):
 
 	json_response = response.json()
 	template_html = json_response.get('html')
-
+	if not template_html:
+		error_message = "Missing template path from activation service."
+		return render(request, '404.html', {'error_message': error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 	return render(request, template_html)

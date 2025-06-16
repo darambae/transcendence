@@ -207,7 +207,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'], # Only send Django logs to console by default
+            'handlers': ['console', 'logstash'], # Only send Django logs to console by default
             'level': 'DEBUG',
             'propagate': False, # Prevent duplicate logging via root logger
         },

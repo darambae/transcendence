@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from django.core import mail # To assert if emails were sent
-from django.core.mail import send_mail, BadHeaderError
+#from django.core.mail import send_mail, BadHeaderError
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.shortcuts import render
