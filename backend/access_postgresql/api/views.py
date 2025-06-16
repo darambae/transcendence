@@ -3,52 +3,53 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.encoding import force_str
-from .utils import generate_otp_send_mail
+from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.shortcuts import render
-from .models import USER, MATCHTABLE
+from .models import USER
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 import json
-import sys
 import logging
+from datetime import datetime
 
 import jwt
 from django.conf import settings
 # Create your views here.
 
-@api_view(['POST'])
-def api_signup(request):
-	print("HTTP_HOST:", request.META.get("HTTP_HOST"))
-	print("Host (get_host()):", request.get_host())
+class api_signup(APIView):
+	permission_classes = [AllowAny]
 
-	data = request.data
+	def post(self, request):
 
-	try:
-		with transaction.atomic():
-			user = USER.objects.create(
-			user_name=data['user_name'],
-			first_name=data['first_name'],
-			last_name=data['last_name'],
-			mail=data['mail'],
-			password=data['password']
+		data = request.data
+
+		try:
+			with transaction.atomic():
+				user = USER.objects.create(
+				user_name=data['user_name'],
+				first_name=data['first_name'],
+				last_name=data['last_name'],
+				mail=data['mail'],
+				password=data['password']
             )
-	except IntegrityError as e:
-		err_msg = str(e)
-		if 'mail' in err_msg:
-			return JsonResponse({'error': 'User with this email already exists'}, status=400)
-		elif 'user_name' in err_msg:
-			return JsonResponse({'error': 'Username already taken'}, status=400)
-		else:
-			return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
+		except IntegrityError as e:
+			err_msg = str(e)
+			if 'mail' in err_msg:
+				return JsonResponse({'error': 'User with this email already exists'}, status=400)
+			elif 'user_name' in err_msg:
+				return JsonResponse({'error': 'Username already taken'}, status=400)
+			else:
+				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
 
-	return JsonResponse({'success': 'User successfully created', 'user_id': user.id}, status=200)
+		return JsonResponse({'success': 'User successfully created', 'user_id': user.id}, status=200)
+
+
 
 class info_link(APIView):
 	permission_classes = [AllowAny]
@@ -144,18 +145,15 @@ class checkTfa(APIView):
 			if user.actived and user.two_factor_auth != None:
 				if check_password(data.get('tfa'), user.two_factor_auth):
 					user.two_factor_auth = False
+					user.online = True
+					user.last_login = datetime.now()
 					user.save()
 
-					refresh = RefreshToken.for_user(user)
-					access = refresh.access_token 
-
-					access['id'] = user.id
-					access['username'] = user.user_name
-					access['invites'] = ["bob-Default"]
+					data_generate_jwt = generateJwt(user)
 
 					return JsonResponse({'success': 'authentication code send',
-						  				 'refresh': str(refresh),
-										 'access': str(access)},
+						  				 'refresh': str(data_generate_jwt['refresh']),
+										 'access': str(data_generate_jwt['access'])},
 										 status=200)
 				else:
 					return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
@@ -187,6 +185,22 @@ class DecodeJwt(APIView):
 		except jwt.InvalidTokenError:
 			return Response({'error': 'Invalid token'}, status=401)
 
+class InfoUser(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "id": user.id,
+            "user_name": user.user_name,
+			"first_name": user.first_name,
+			"last_name": user.last_name,
+            "mail": user.mail,
+			"online": user.online,
+			"created_at": user.created_at,
+			"last_login": user.last_login,
+			"avatar": user.avatar
+        })
 
 
 class addResultGames(APIView):
@@ -234,4 +248,5 @@ class keyGame(APIView):
 					   			status=200)
 		except MATCHTABLE.DoesNotExist:
 			return JsonResponse({'error': 'Key Math not found'}, status=404)
+
 			

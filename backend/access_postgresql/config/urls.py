@@ -2,17 +2,17 @@
 URL configuration for config project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
+	https://docs.djangoproject.com/en/4.2/topics/http/urls/
 Examples:
 Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+	1. Add an import:  from my_app import views
+	2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+	1. Add an import:  from other_app.views import Home
+	2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+	1. Import the include() function: from django.urls import include, path
+	2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
 from django.contrib import admin
@@ -26,7 +26,7 @@ from api.views import DecodeJwt, addResultGames, keyGame
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+	path('admin/', admin.site.urls),
 	path('api/signup/', views.api_signup, name='api_signup'),
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
@@ -34,6 +34,6 @@ urlpatterns = [
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
-    path('api/addResultGames/', addResultGames.as_view(), name='addResultGames'),
-    path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
+	path('api/addResultGames/', addResultGames.as_view(), name='addResultGames'),
+	path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
 ]
