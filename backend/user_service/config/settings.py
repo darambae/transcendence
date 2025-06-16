@@ -73,7 +73,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            FRONTEND_DIR,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -96,6 +98,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 #         'ENGINE': 'django.db.backends.dummy'
 #     }
 # }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -142,12 +146,14 @@ APPEND_SLASH = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
+    "https://localhost:8443",
 ]
 
 # MEDIA FOR IMG
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):

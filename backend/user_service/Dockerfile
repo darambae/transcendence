@@ -12,5 +12,5 @@ COPY requirements.txt /app
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 EXPOSE 8010
-#ENTRYPOINT ["/entrypoint.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]
 CMD ["sh", "-c", "daphne -e ssl:8010:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]

@@ -4,6 +4,9 @@
 @import url('./double_auth.css');
 @import url('./user.css');
 @import url('./chat.css');
+@import url('./card_profile.css');
+@import url('./settings_profile.css');
+
 
 h1 {
 	display: flex;
@@ -57,14 +60,17 @@ main {
 	text-decoration: underline;
 }
 
-.connexion a {
+.login {
 	position: absolute;
 	font-family: 'Sankyu', sans-serif;
-	text-decoration: none;
 	text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255);
-	color: black;
 	margin-top: 20px;
 	right: 20px;
+}
+
+.login-link {
+	text-decoration: none !important;
+	color: black !important;
 }
 
 .header-image {

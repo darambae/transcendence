@@ -16,15 +16,15 @@ import dj_database_url
 from datetime import timedelta
 from decouple import config
 from .jsonSocketHandler import JSONSocketHandler
-import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'access-postgresql'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+BACKEND_DIR = BASE_DIR.parent
+PROJECT_DIR = BACKEND_DIR.parent
+FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
+DOMAIN = os.getenv('DOMAIN', 'localhost')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -71,7 +71,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            FRONTEND_DIR,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,7 +132,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = FRONTEND_DIR
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -140,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.USER'
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
 	'SIGNING_KEY':config('DJANGO_SECRET_KEY'),
@@ -148,12 +150,16 @@ SIMPLE_JWT = {
 	"ALGORITHM": "HS256"
 }
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CustomJWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
+
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):

@@ -137,9 +137,9 @@ services:
     volumes:
       - ./backend/access_postgresql:/app
       - certs:/certs
-    # environment:
-    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-    #   - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    environment:
+       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     env_file:
       - .env
     depends_on:
