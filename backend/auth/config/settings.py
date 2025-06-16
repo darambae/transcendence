@@ -58,7 +58,6 @@ INSTALLED_APPS = [
 	'rest_framework',
 	'api'
 ]
-AUTH_USER_MODEL = 'api.USER'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,7 +75,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            FRONTEND_DIR,
+            FRONTEND_DIR, "templates"
         ],
         'APP_DIRS': True,
         'OPTIONS': {

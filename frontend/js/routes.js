@@ -4,7 +4,8 @@ import { multiplayerController } from './views/multiplayer.js';
 import { duelController } from './views/duel.js';
 import { loginController } from './views/login.js';
 import { signupController } from './views/signup.js';
-
+import { userController } from './views/user.js';
+import { settingsProfileController } from './views/settings_profile.js';
 
 export const routes = {
 
@@ -38,8 +39,13 @@ export const routes = {
 	},
 	user: {
 		template: 'user',
+		controller: userController,
+	},
+	card_profile: {
+		template: 'card_profile',
 	},
 	settings_profile: {
 		template: 'settings_profile',
-	}
+		controller: settingsProfileController,
+	},
 };

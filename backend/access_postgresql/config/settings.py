@@ -16,9 +16,6 @@ import dj_database_url
 from datetime import timedelta
 from decouple import config
 from .jsonSocketHandler import JSONSocketHandler
-import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'access-postgresql'
 
@@ -43,6 +40,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 APPEND_SLASH = True
+# Application definition
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -140,7 +139,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.USER'
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
 	'SIGNING_KEY':config('DJANGO_SECRET_KEY'),
@@ -148,12 +147,16 @@ SIMPLE_JWT = {
 	"ALGORITHM": "HS256"
 }
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'api.authentication.CustomJWTAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
+
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 class AddAppNameFilter(logging.Filter):
