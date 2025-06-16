@@ -11,7 +11,7 @@ class USER(AbstractBaseUser, PermissionsMixin):
 	password = models.CharField(max_length=255)
 	two_factor_auth = models.CharField(default=False)
 	online = models.BooleanField(default=False)
-	actived = models.BooleanField(default=False)
+	activated = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	last_login = models.DateTimeField(null=True, blank=True)
 	avatar = models.CharField(max_length=255, default='default.png')

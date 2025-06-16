@@ -94,14 +94,14 @@ class activate_account(APIView):
 			user = None
 
 		if user is not None and default_token_generator.check_token(user, token):
-			if not user.actived:
-				user.actived = True
+			if not user.activated:
+				user.activated = True
 				user.save()
 				logger.info(f"User {user.mail} activated successfully.")
 
-				return JsonResponse({'html': 'account_actived.html'}, status=200)
+				return JsonResponse({'html': 'account_activated.html'}, status=200)
 			else:
-				return JsonResponse({'html': 'account_already_actived.html'}, status=200)
+				return JsonResponse({'html': 'account_already_activated.html'}, status=200)
 		else:
 			logger.warning("Activation link invalid or expired.")
 			return JsonResponse({'html': 'token_expired.html'}, status=200)
@@ -115,7 +115,7 @@ class checkPassword(APIView):
 
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
-			if user.actived:
+			if user.activated:
 				if check_password(data.get('password'), user.password):
 					opt = generate_otp_send_mail(user)
 					user.two_factor_auth = make_password(opt)
@@ -142,7 +142,7 @@ class checkTfa(APIView):
 
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
-			if user.actived and user.two_factor_auth != None:
+			if user.activated and user.two_factor_auth != None:
 				if check_password(data.get('tfa'), user.two_factor_auth):
 					user.two_factor_auth = False
 					user.online = True
