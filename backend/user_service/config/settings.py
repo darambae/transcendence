@@ -22,8 +22,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 
-#ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql']
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql', 'localhost']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,11 +90,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.dummy'
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.dummy'
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -142,12 +141,14 @@ APPEND_SLASH = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
+    "https://localhost:8443",
 ]
 
 # MEDIA FOR IMG
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):
@@ -164,12 +165,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 #         },
 #     },
 #     'formatters': {
+#         'json': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+#         },
 #         'text': {
 #             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
 #             'class': 'logging.Formatter',
 #         },
 #         'logstash': {
 #             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+#             # You might want to explore additional options in DjangoLogstashFormatter
+#             # For example, 'extra_fields': {'environment': 'production'}
 #         },
 #     },
 #     'handlers': {
@@ -195,14 +202,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 #         'django': {
 #             'handlers': ['console'], # Only send Django logs to console by default
 #             'level': 'DEBUG',
-#             'propagate': False, # Prevent duplicate logging via root logger
+#             'propagate': True, # Prevent duplicate logging via root logger
 #         },
 #         'django.request': {
 #             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger
 #         },
-#         'api': {
+#         'user_service': {
 #             'handlers': ['console' ,'logstash'],
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger if needed

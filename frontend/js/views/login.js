@@ -120,7 +120,6 @@ export async function handleLoginSubmit(event) {
 }
 
 
-
 export function loginController() {
 	const modalContainer = document.getElementById("modal-container");
 	const closeBtn = document.getElementById("close-login-form");

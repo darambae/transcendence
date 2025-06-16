@@ -58,7 +58,6 @@ INSTALLED_APPS = [
 	'rest_framework',
 	'api'
 ]
-AUTH_USER_MODEL = 'api.USER'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -76,7 +75,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            FRONTEND_DIR,
+            FRONTEND_DIR, "templates"
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -164,11 +163,11 @@ REST_FRAMEWORK = {
 }
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
-class AddAppNameFilter(logging.Filter):
-    def filter(self, record):
-        if not hasattr(record, 'app_name'):
-            record.app_name = APP_NAME
-        return True
+# class AddAppNameFilter(logging.Filter):
+#     def filter(self, record):
+#         if not hasattr(record, 'app_name'):
+#             record.app_name = APP_NAME
+#         return True
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
@@ -178,12 +177,18 @@ class AddAppNameFilter(logging.Filter):
 #         },
 #     },
 #     'formatters': {
+#         'json': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+#         },
 #         'text': {
 #             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
 #             'class': 'logging.Formatter',
 #         },
 #         'logstash': {
 #             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+#             # You might want to explore additional options in DjangoLogstashFormatter
+#             # For example, 'extra_fields': {'environment': 'production'}
 #         },
 #     },
 #     'handlers': {
@@ -209,14 +214,14 @@ class AddAppNameFilter(logging.Filter):
 #         'django': {
 #             'handlers': ['console'], # Only send Django logs to console by default
 #             'level': 'DEBUG',
-#             'propagate': False, # Prevent duplicate logging via root logger
+#             'propagate': True, # Prevent duplicate logging via root logger
 #         },
 #         'django.request': {
 #             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger
 #         },
-#         'api': {
+#         'user_service': {
 #             'handlers': ['console' ,'logstash'],
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger if needed

@@ -19,16 +19,4 @@ python manage.py makemigrations --noinput
 #python manage.py showmigrations
 python manage.py migrate --noinput
 
-# if ! python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(is_superuser=True).exists())" | grep "True"; then
-#   echo "Creating superuser 'admin'..."
-#   python manage.py createsuperuser \
-#     --user_name "${DJANGO_SUPERUSER}" \
-#     --mail "${DJANGO_SUPERUSER_EMAIL}" \
-#     --first_name "transcendence" \
-#     --last_name "ecole 42" \
-#     --noinput
-# else
-#   echo "A superuser already exists."
-# fi
-
 exec "$@"
