@@ -11,6 +11,25 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import json
 import requests
+import sys
+import os
+
+def decodeJWT(request, encodedJwt=None) :
+	if not encodedJwt :
+		#print(f"headers : {request.headers}", file=sys.stderr)
+		# encodedJwt = request.COOKIES.get("access", None)
+		encodedJwt = request.headers.get("Authorization", None)
+		#print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
+	if not encodedJwt :
+		return [None]
+	
+	# res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+	print(f"encoded: {encodedJwt}", file=sys.stderr)
+	res = requests.get(f'https://access-postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+	if res.status_code != 200 :
+		print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
+		return [None]
+	return [res.json()]
 
 class data_link(APIView):
 	permission_classes = [AllowAny]
@@ -29,13 +48,13 @@ class data_link(APIView):
 			uid = json_response.get('uid')
 			token = json_response.get('token')
 			#host = request.get_host()
-			host = "transcendence.42.fr"
+			host = os.getenv("DOMAIN", "localhost")
 			activation_link = f"https://{host}:8443/auth/activate_account/{uid}/{token}/"
 		except ValueError:
 			json_response = {
-            	'error': 'Invalid response from mail service',
-            	'detail': response.text
-    	    }
+				'error': 'Invalid response from mail service',
+				'detail': response.text
+			}
 			return JsonResponse({'error': json_response}, status=500)
 
 		return JsonResponse({'link': activation_link}, status=200)
@@ -61,8 +80,8 @@ class login(APIView):
 				data_response = response.json()
 			except ValueError:
 				data_response = {
-			    	'error': 'Invalid response from mail service',
-			    	'detail': response.text
+					'error': 'Invalid response from mail service',
+					'detail': response.text
 				}
 
 			if response.status_code == 200:
@@ -88,11 +107,18 @@ class verifyTwofa(APIView):
 		if (request.method == 'POST'):
 		
 			user = request.data
-			
+
 			json_data = {
 				'mail':user.get('mail'),
-				'tfa':user.get('code')
+				'tfa':user.get('code'),
 			}
+
+			main_account = (decodeJWT(request))[0]
+
+			print(f"main : {main_account}", file=sys.stderr)
+
+			if main_account:
+				json_data["jwt"] = main_account["payload"]
 
 			if user.get('mail') == None:
 				return JsonResponse({'error':'mail is empty'}, status=400)
@@ -103,6 +129,7 @@ class verifyTwofa(APIView):
 			if len(json_data.get('tfa')) != 19:
 				return JsonResponse({'error':'text size is different from 19 characters'}, status=400)
 
+
 			response = requests.post("https://access-postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})
 
 			data_response = None
@@ -110,8 +137,8 @@ class verifyTwofa(APIView):
 				data_response = response.json()
 			except ValueError:
 				data_response = {
-			    	'error': 'Invalid response from mail service',
-			    	'detail': response.text
+					'error': 'Invalid response from mail service',
+					'detail': response.text
 				}
 
 			if response.status_code == 200:

@@ -2,7 +2,7 @@ import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 
 async function double_authenticate(data) {
-	const html = await loadTemplate('doubleAuth');
+	const html = await loadTemplate('double_auth');
 	const content = document.getElementById("login-form");
 	if (html) {
 		content.innerHTML = html;
@@ -25,12 +25,11 @@ async function double_authenticate(data) {
 
 			const code = document.getElementById('auth-code').value;
 			console.log("mail + code: ", code, mail);
-			const response = await fetch("auth/verifyTwofa/", {
+			const response = await fetch("auth/invits/verifyTwofa/", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
-					"Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
 				},
 				body: JSON.stringify({ mail, code })
 			});
@@ -42,8 +41,10 @@ async function double_authenticate(data) {
 				let	accessToken = responseData.access; //Token to put in the authorization header of request trying to access protected roads
 				let	refreshToken = responseData.refresh; // Token to get a new acccess token if needed without having to reconnect		
 
+
 				console.log(accessToken)
 				console.log(refreshToken)
+
 
 				sessionStorage.setItem('accessToken', responseData.access);
 				sessionStorage.setItem('refreshToken', responseData.refresh);
@@ -78,7 +79,7 @@ export async function handleLoginSubmit(event) {
 		
 		const csrf = getCookie('csrftoken');
 		console.log("csrf: ", csrf);
-		const response = await fetch("/auth/login/", {
+		const response = await fetch("/auth/invits/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -92,6 +93,13 @@ export async function handleLoginSubmit(event) {
 		if (response.ok) {
 			try {
 				await double_authenticate(dataForm)
+				//tokens returned in the JWT to communicate with protected roads
+				//let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
+				//let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
+
+				//localStorage.setItem('accessToken', accessToken);
+				//localStorage.setItem('refreshToken', refreshToken);
+
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
 				console.log("User successfully connected");
@@ -121,7 +129,8 @@ export async function handleLoginSubmit(event) {
 }
 
 
-export function loginController() {
+
+export function invitController() {
 	const modalContainer = document.getElementById("modal-container");
 	const closeBtn = document.getElementById("close-login-form");
 

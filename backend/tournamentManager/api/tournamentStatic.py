@@ -7,7 +7,7 @@ REMOTE = 2
 
 trnmtDict = {} # Usage : {str : Tournament}
 
-keygame = "https://server_pong:8030/"
+keygame = "https://server-pong:8030/"
 jwtUri = "https://auth:4020/"
 dbUri = "https://access-postgresql:4000/"
 
@@ -28,9 +28,9 @@ class Match() :
         self.fourth = None
 
     def initValues(self) :
-        self.jwtP1 = requests.get(f"{jwtUri}jwt-decoder" headers={"jwt" : self.p1.jwt})
+        self.jwtP1 = requests.get(f"{jwtUri}api/DecodeJwt" headers={"Authorization" : f"bearer {self.p1.jwt}"})
         
-        self.jwtP2 = requests.get(f"{jwtUri}jwt-decoder" headers={"jwt" : self.p2.jwt})
+        self.jwtP2 = requests.get(f"{jwtUri}api/DecodeJwt" headers={"Authorization" : f"bearer {self.p2.jwt}"})
         
         if self.jwtP1 == self.jwtP2 :
             self.gameMode = LOCAL
