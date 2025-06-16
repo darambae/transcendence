@@ -117,8 +117,8 @@ class checkPassword(APIView):
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.actived:
 				if check_password(data.get('password'), user.password):
-					# opt = generate_otp_send_mail(user)
-					opt = "NZHK-GO7Q-9JSD-X9QI"
+					opt = generate_otp_send_mail(user)
+					# opt = "NZHK-GO7Q-9JSD-X9QI"
 					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',
