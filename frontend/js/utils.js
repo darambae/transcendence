@@ -29,6 +29,7 @@ export async function closeModal() {
 	window.location = "#home";
 }
 
+
 //csrf token getter
 export function getCookie(name) {
 	let cookieValue = null;

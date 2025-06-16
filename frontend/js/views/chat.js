@@ -431,7 +431,7 @@ async function promptPrivateChat(targetUsername, targetUserId) {
 
 	if (confirm(`Voulez-vous démarrer un chat privé avec ${targetUsername}?`)) {
 		try {
-			const response = await fetch('/chat/create_private_group/', {
+			const response = await fetch('/chat/group/create/private', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded',
@@ -508,17 +508,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 export function chatController() {
-	// Initialiser les bulles de chat pour les groupes privés déjà existants
-	const existingGroups = document.querySelectorAll('.chat-bubble');
-	existingGroups.forEach((bubble) => {
-		const groupName = bubble.id.replace('chatBubble-', '');
-		if (groupName.startsWith('private_')) {
-			createChatBubble(groupName, true);
-		} else {
-			createChatBubble(groupName, false);
-		}
-	});
-
-	// Initialiser le bouton de chat général
-	createChatToggleButton('general', false);
+	
 }
