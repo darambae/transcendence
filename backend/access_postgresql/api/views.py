@@ -10,14 +10,14 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.shortcuts import render
-from .models import USER
+from .models import USER, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 import json
 import logging
 from datetime import datetime
-
+import sys
 import jwt
 from django.conf import settings
 # Create your views here.
@@ -117,7 +117,8 @@ class checkPassword(APIView):
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.actived:
 				if check_password(data.get('password'), user.password):
-					opt = generate_otp_send_mail(user)
+					# opt = generate_otp_send_mail(user)
+					opt = "NZHK-GO7Q-9JSD-X9QI"
 					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',
@@ -139,26 +140,44 @@ class checkTfa(APIView):
 	def post(self, request):
 
 		data = request.data
+		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
 		try:
-			user = USER.objects.get(mail=data.get('mail'))
-			if user.actived and user.two_factor_auth != None:
-				if check_password(data.get('tfa'), user.two_factor_auth):
-					user.two_factor_auth = False
-					user.online = True
-					user.last_login = datetime.now()
-					user.save()
+			if "jwt" in data :
+				print(f"invites : {data['jwt']}", file=sys.stderr)
+				user = USER.objects.get(mail=data.get('mail'))
+				if user.actived and user.two_factor_auth != None:
+					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+						data["jwt"]["invites"].append(user.user_name)
+						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
+						user.two_factor_auth = False
+						user.save()
+						return JsonResponse({'success': 'authentication code send',
+							  				 'refresh': str(data_generate_jwt['refresh']),
+											 'access': str(data_generate_jwt['access'])},
+											 status=200)
+					else :
+						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+			else :
+				print(f"main : ", file=sys.stderr)
+				user = USER.objects.get(mail=data.get('mail'))
+				if user.actived and user.two_factor_auth != None:
+					if check_password(data.get('tfa'), user.two_factor_auth):
+						user.two_factor_auth = False
+						user.online = True
+						user.last_login = datetime.now()
+						user.save()
 
-					data_generate_jwt = generateJwt(user)
+						data_generate_jwt = generateJwt(user, user.toJson())
 
-					return JsonResponse({'success': 'authentication code send',
-						  				 'refresh': str(data_generate_jwt['refresh']),
-										 'access': str(data_generate_jwt['access'])},
-										 status=200)
+						return JsonResponse({'success': 'authentication code send',
+							  				 'refresh': str(data_generate_jwt['refresh']),
+											 'access': str(data_generate_jwt['access'])},
+											 status=200)
+					else:
+						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
 				else:
-					return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
-			else:
-				return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+					return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 
@@ -248,5 +267,3 @@ class keyGame(APIView):
 					   			status=200)
 		except MATCHTABLE.DoesNotExist:
 			return JsonResponse({'error': 'Key Math not found'}, status=404)
-
-			

@@ -14,13 +14,16 @@ class USER(AbstractBaseUser, PermissionsMixin):
 	actived = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	last_login = models.DateTimeField(null=True, blank=True)
-	avatar = models.ImageField(upload_to='imgs/', default='imgs/default.png')
+	avatar = models.CharField(max_length=255, default='default.png')
 
 	USERNAME_FIELD = 'mail'
 	REQUIRED_FIELDS = ['user_name', 'first_name', 'last_name']
 
 	def __str__(self):
 		return self.user_name
+	
+	def toJson(self):
+		return {"user_id" : self.id, "username" : self.user_name, "avatar" : self.avatar, "invites" : []}
 
 class MATCHTABLE(models.Model):
     matchKey = models.CharField(unique=True, max_length=100)

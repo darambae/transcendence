@@ -30,6 +30,7 @@ async function double_authenticate(data) {
 				headers: {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
+					"Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
 				},
 				body: JSON.stringify({ mail, code })
 			});

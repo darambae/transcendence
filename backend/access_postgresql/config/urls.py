@@ -22,12 +22,12 @@ from api.views import info_link
 from api.views import activate_account
 from api.views import checkPassword
 from api.views import checkTfa
-from api.views import DecodeJwt, addResultGames, keyGame
+from api.views import DecodeJwt, addResultGames, keyGame, api_signup
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
-	path('api/signup/', views.api_signup, name='api_signup'),
+	path('api/signup/', api_signup.as_view(), name='api_signup'),
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),

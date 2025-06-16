@@ -81,7 +81,7 @@ export async function localGameController() {
                 case "q" :
                     // console.log("Started : ", started);
                     if (started == true) {
-                      fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${2}`, {
+                      await fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${2}`, {
                         headers: {
                           "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
                         }

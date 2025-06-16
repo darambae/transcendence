@@ -4,6 +4,7 @@ import { multiplayerController } from './views/multiplayer.js';
 import { duelController } from './views/duel.js';
 import { loginController } from './views/login.js';
 import { signupController } from './views/signup.js';
+import { tournamentController } from './views/tournament.js';
 
 
 export const routes = {
@@ -20,9 +21,9 @@ export const routes = {
 		template: 'multiplayer',
 		controller: multiplayerController,
 	},
-	duel: {
-		template: 'duel',
-		controller: duelController,
+	tournament: {
+		template: 'tournament',
+		controller: tournamentController,
 	},
 	login: {
 		template: 'login',
