@@ -1,3 +1,7 @@
+#avatarDropdownBtn {
+    padding: 0 !important;
+}
+
 .user-dropdown-menu {
 	position: fixed;
 	top: 20px;
@@ -27,9 +31,9 @@
 }
 
 .user-avatar {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
+	width: 100px;
+	height: 100px;
+	border-radius: 80%;
 	object-fit: cover;
 }
 
