@@ -94,7 +94,6 @@ class InfoUser(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        url_avatar = "https://user_service:8443/media/"
         token = request.headers.get('Authorization')
         
         try:
@@ -106,10 +105,13 @@ class InfoUser(APIView):
                     'Host': 'access-postgresql'
                 }
             )
-            data_json = response.json()
-            data_json['avatar'] = url_avatar + data_json['avatar']
-            return Response(data_json, status=response.status_code)
+            return Response(response.json(), status=response.status_code)
 
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres failed'}, status=500)
 
+
+#class avatarMedia(APIView):
+#    permission_classes = [AllowAny]
+
+#    def get(self, request):

@@ -21,6 +21,7 @@ def generateJwt(user):
 
 	access['user_id'] = user.id
 	access['username'] = user.user_name
+	access['avatar'] = user.avatar
 	access['invites'] = {}
 
 	return {
