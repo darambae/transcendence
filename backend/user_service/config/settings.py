@@ -146,8 +146,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 # MEDIA FOR IMG
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'

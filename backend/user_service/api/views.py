@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
@@ -9,8 +9,13 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render
+from .utils import decodeJWT
+import sys
+from django.conf import settings
+import os
 import json
 import requests
+
 # Create your views here.
 @ensure_csrf_cookie
 def get_csrf_token(request):
@@ -90,7 +95,7 @@ def signup(request):
     }, status=status_code)
 
 
-class InfoUser(APIView):
+class infoUser(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
@@ -109,9 +114,16 @@ class InfoUser(APIView):
 
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres failed'}, status=500)
+        
 
+class avatar(APIView):
+    permission_classes = [AllowAny]
 
-#class avatarMedia(APIView):
-#    permission_classes = [AllowAny]
-
-#    def get(self, request):
+    def get(self, request):
+        path = decodeJWT(request)[0]['payload']['avatar']
+        if path:
+            full_path = "/app/api/media/imgs/" + path
+            print(full_path, file=sys.stderr)
+            return FileResponse(open(full_path, 'rb'), content_type='image/png')
+        else:
+            return JsonResponse({'error': 'not authorized'}, status=401)

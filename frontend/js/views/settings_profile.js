@@ -4,7 +4,7 @@ export function settingsProfileController() {
 
 	const token = sessionStorage.getItem("accessToken");
 
-	fetch("https://localhost:8443/user-service/InfoUser/", {
+	fetch("https://localhost:8443/user-service/infoUser/", {
 	  method: "GET",
 	  headers: {
 		"Authorization": `Bearer ${token}`,
@@ -24,7 +24,7 @@ export function settingsProfileController() {
 		document.getElementById('firstNameLabel').textContent = data.first_name;
 		document.getElementById('lastNameLabel').textContent = data.last_name;
 
-		/*fetch(data.avatar, {
+		fetch("https://localhost:8443/user-service/avatar/", {
 			method: "GET",
 			headers: {
 			  "Authorization": `Bearer ${token}`,
@@ -40,7 +40,7 @@ export function settingsProfileController() {
 		  })
 		  .catch(err => {
 			console.error("Erreur:", err);
-		  });*/
+		  });
 	})
 
 	.catch(error => {

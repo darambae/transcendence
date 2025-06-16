@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api import views
-from api.views import InfoUser
+from api.views import infoUser, avatar
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('user-service/csrf/', views.get_csrf_token, name='csrf'),
 	path('user-service/signup/', views.signup, name='signup'),
-	path('user-service/InfoUser/', InfoUser.as_view(), name='InfoUser')
+	path('user-service/infoUser/', infoUser.as_view(), name='infoUser'),
+	path('user-service/avatar/', avatar.as_view(), name='avatar')
 ]
