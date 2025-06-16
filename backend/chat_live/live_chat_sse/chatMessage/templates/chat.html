@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Dynamique</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-end; /* Pour aligner le bouton à droite */
+            align-items: flex-end; /* Pour aligner le bouton en bas */
+            min-height: 100vh; /* Prend toute la hauteur de la fenêtre */
+            background-color: #f0f2f5;
+        }
+
+        /* Bouton pour ouvrir le chat */
+        .open-chat-button {
+            position: fixed; /* Fixé par rapport à la fenêtre */
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Assure qu'il est au-dessus des autres éléments */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Styles de la bulle de chat */
+        .chat-bubble {
+            width: 350px;
+            height: 450px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: none; /* Caché par défaut, sera contrôlé par JS */
+            flex-direction: column;
+            position: fixed; /* Fixé par rapport à la fenêtre */
+            bottom: 90px; /* Au-dessus du bouton d'ouverture */
+            right: 20px;
+            z-index: 999;
+            overflow: hidden; /* Pour que les bords arrondis s'appliquent au contenu */
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer; /* Pour indiquer qu'on peut cliquer pour basculer */
+            text-align: center;
+        }
+
+        .chat-body {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto; /* Permet le défilement des messages */
+            border-bottom: 1px solid #eee;
+            background-color: #f9f9f9;
+            display: flex; /* Utilise flexbox pour empiler les messages */
+            flex-direction: column;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word; /* Casse les mots longs */
+            line-height: 1.4;
+            /* Ajout pour un positionnement correct dans flex-direction: column */
+            align-self: flex-start;
+        }
+
+        .chat-message.self {
+            background-color: #dcf8c6; /* Vert clair pour ses propres messages */
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .chat-message.other {
+            background-color: #e2e2e2; /* Gris clair pour les messages des autres */
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 3px;
+            display: block; /* Pour que le nom soit sur sa propre ligne */
+        }
+
+        .message-timestamp {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 3px;
+            display: block; /* Pour que le timestamp soit sur sa propre ligne */
+            text-align: right;
+        }
+
+        .chat-input {
+            padding: 10px 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            flex-direction: column; /* Inputs empilés */
+            gap: 5px; /* Espace entre les inputs */
+        }
+
+        .chat-input input[type="text"],
+        .chat-input button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .chat-input input[type="text"] {
+            width: calc(100% - 22px); /* Moins le padding et bordures */
+        }
+
+        .chat-input button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+            width: 100%;
+            box-sizing: border-box; /* Inclut padding et border dans la largeur */
+        }
+
+        .chat-input button:hover {
+            background-color: #218838;
+        }
+        /* Nouveau conteneur pour les boutons de chat */
+        .chat-buttons-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex; /* Utilise flexbox */
+            flex-direction: row-reverse; /* Arrange les éléments de droite à gauche */
+            gap: 10px; /* Espace entre les boutons */
+            z-index: 1000;
+        }
+
+        /* Styles génériques des boutons de chat (peut remplacer .open-chat-button) */
+        .chat-toggle-button {
+            background-color: #007bff; /* Couleur par défaut */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Animation simple pour le hover */
+            transition: background-color 0.2s ease;
+        }
+
+        .chat-toggle-button:hover {
+            opacity: 0.9;
+        }
+
+        /* Styles spécifiques pour les boutons de chats privés (ajustez les couleurs) */
+        .chat-toggle-button.private {
+            background-color: #6c757d; /* Gris pour les chats privés */
+        }
+        .chat-toggle-button.private.color1 { background-color: #28a745; } /* Vert */
+        .chat-toggle-button.private.color2 { background-color: #ffc107; } /* Jaune */
+        .chat-toggle-button.private.color3 { background-color: #dc3545; } /* Rouge */
+        .chat-toggle-button.private.color4 { background-color: #17a2b8; } /* Cyan */
+        .chat-toggle-button.private.color5 { background-color: #6610f2; } /* Violet */
+
+
+        /* Ajuster la position de la bulle de chat pour ne pas chevaucher le conteneur de boutons */
+        .chat-bubble {
+            bottom: 90px; /* Laisse de la place pour le conteneur de boutons */
+            /* ... le reste de vos styles .chat-bubble ... */
+        }
+        /* Styles spécifiques pour les chats privés */
+        .private-chat {
+            right: 390px; /* Décale les chats privés à gauche pour ne pas chevaucher le chat général */
+            width: 350px;
+            height: 450px;
+        }
+
+        .private-chat .chat-header {
+            background-color: #6c757d; /* Couleur différente pour le header des privés */
+        }
+
+        .private-chat .chat-input button {
+            background-color: #17a2b8; /* Couleur différente pour le bouton des privés */
+        }
+
+        .private-chat .chat-input button:hover {
+            background-color: #138496;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="chatButtonsContainer" class="chat-buttons-container">
+        </div>
+    <script>
+        const chatBubbles = {}; // Stocke les références aux éléments de bulle par groupName
+        const eventSources = {}; // Stocke les objets EventSource par groupName
+        const messageOffsets = {}; // NOUVEAU: Stocke l'offset pour l'historique de chaque groupe
+
+        // Helper pour créer un élément message HTML
+        function createMessageElement(messageData, groupName) {
+			const msg = document.createElement('div');
+			msg.classList.add('chat-message');
+
+			const usernameInput = document.getElementById(`usernameInput-${groupName}`);
+			const currentUsername = usernameInput ? usernameInput.value : '';
+
+			// Détermine si c'est son propre message
+    	if (messageData.sender === currentUsername || messageData.sender__username === currentUsername) { // Ajout de sender__username pour la compatibilité historique
+        	msg.classList.add('self');
+    	} else {
+    	    msg.classList.add('other');
+    	}
+
+    	const senderSpan = document.createElement('span');
+    	senderSpan.classList.add('message-sender');
+    	// UTILISE 'messageData.sender__username' QUI VIENT DE L'HISTORIQUE OU 'messageData.sender' DES NOUVEAUX MESSAGES
+    	senderSpan.textContent = messageData.sender__username || messageData.sender;
+    	// ... (Reste du code pour le nom d'utilisateur cliquable) ...
+    	// Rendre le nom cliquable pour initier un chat privé (sauf avec soi-même)
+    	const displayedSender = messageData.sender__username || messageData.sender;
+    	if (displayedSender && displayedSender !== currentUsername) {
+    	    senderSpan.style.cursor = 'pointer';
+    	    senderSpan.style.textDecoration = 'underline';
+    	    senderSpan.onclick = () => promptPrivateChat(displayedSender, messageData.sender_id || null);
+    	}
+    	msg.appendChild(senderSpan);
+
+    	const contentText = document.createTextNode(messageData.content);
+    	msg.appendChild(contentText);
+
+    	const timestampSpan = document.createElement('span');
+    	timestampSpan.classList.add('message-timestamp');
+    	timestampSpan.textContent = messageData.timestamp;
+    	msg.appendChild(timestampSpan);
+
+    	return msg;
+	}
+
+        // NOUVELLE FONCTION: Charger l'historique des messages
+        async function loadMessageHistory(groupName, prepend = false) {
+            const chatLog = document.getElementById(`chatLog-${groupName}`);
+            if (!chatLog) {
+                console.error(`chatLog-${groupName} introuvable pour charger l'historique.`);
+                return;
+            }
+
+            const offset = messageOffsets[groupName] || 0;
+            const limit = 20; // Nombre de messages à charger à chaque fois
+
+            try {
+                const response = await fetch(`/chat/history/${groupName}/?offset=${offset}&limit=${limit}`);
+                const data = await response.json();
+
+                if (response.ok && data.status === "success") {
+                    if (data.messages.length > 0) {
+                        const fragment = document.createDocumentFragment();
+                        data.messages.forEach(msgData => {
+                            const msgElement = createMessageElement(msgData, groupName);
+                            if (prepend) {
+                                fragment.appendChild(msgElement);
+                            } else {
+                                chatLog.appendChild(msgElement);
+                            }
+                        });
+
+                        if (prepend) {
+                            // Si on ajoute en haut, il faut insérer au début et ajuster le scroll
+                            const oldScrollHeight = chatLog.scrollHeight;
+                            chatLog.insertBefore(fragment, chatLog.firstChild);
+                            const newScrollHeight = chatLog.scrollHeight;
+                            // Maintenir la position de défilement relative
+                            chatLog.scrollTop = newScrollHeight - oldScrollHeight;
+                        } else {
+                            chatLog.appendChild(fragment);
+                            chatLog.scrollTop = chatLog.scrollHeight; // Défiler vers le bas après chargement initial
+                        }
+                        messageOffsets[groupName] = offset + data.messages.length;
+                    } else if (!prepend) {
+                        // Si aucun message n'est chargé au début, c'est peut-être la première fois
+                        console.log(`Pas d'historique pour ${groupName} ou fin de l'historique.`);
+                    }
+                } else {
+                    console.error("Erreur de chargement historique:", data.message || "Unknown error");
+                }
+            } catch (error) {
+                console.error("Erreur réseau lors du chargement de l'historique:", error);
+            }
+        }
+// NOUVELLE variable pour les couleurs des boutons privés
+const privateChatButtonColors = [
+    'color1', 'color2', 'color3', 'color4', 'color5' // Ajoutez plus si vous prévoyez beaucoup de chats privés
+];
+const assignedPrivateChatColors = {}; // Pour suivre les couleurs déjà attribuées
+
+// --- Nouvelle fonction pour créer et gérer les boutons de chat ---
+function createChatToggleButton(groupName, isPrivate = false) {
+    const buttonsContainer = document.getElementById('chatButtonsContainer');
+    let button = document.getElementById(`chatToggleButton-${groupName}`);
+
+    // Si le bouton existe déjà, ne rien faire (il est déjà là)
+    if (button) {
+        return button;
+    }
+
+    button = document.createElement('button');
+    button.classList.add('chat-toggle-button');
+    button.id = `chatToggleButton-${groupName}`;
+    button.textContent = '💬'; // Icône par défaut
+
+    if (isPrivate) {
+        button.classList.add('private');
+        // Trouver une couleur disponible ou en réutiliser une si le chat a déjà été ouvert
+        let colorClass = assignedPrivateChatColors[groupName];
+        if (!colorClass) {
+            // Simple assignation de couleur cyclique
+            const colorIndex = Object.keys(assignedPrivateChatColors).length % privateChatButtonColors.length;
+            colorClass = privateChatButtonColors[colorIndex];
+            assignedPrivateChatColors[groupName] = colorClass;
+        }
+        button.classList.add(colorClass);
+
+        // Mettre les initiales de l'interlocuteur dans l'icône du bouton
+        const participants = groupName.split('_').slice(1); // Ex: 'private_Alice_Bob' -> ['Alice', 'Bob']
+        if (participants.length >= 2) {
+            const otherUser = participants[0]; // Ou mettez une logique pour identifier l'autre utilisateur
+            button.textContent = otherUser.charAt(0).toUpperCase(); // Première lettre de l'autre utilisateur
+        } else {
+             button.textContent = '🔒'; // Icône générique pour chat privé si noms non disponibles
+        }
+
+    } else {
+        // Chat général, pas de changement pour l'icône par défaut
+    }
+
+    // Gérer l'action de clic
+    button.onclick = () => {
+        toggleChat(groupName);
+    };
+
+    // Ajouter le bouton au conteneur (il sera ajouté au début grâce à flex-direction: row-reverse)
+    buttonsContainer.prepend(button); // Ajoute au début du conteneur pour alignement de droite à gauche
+
+    return button;
+}
+        // Fonction pour créer une bulle de chat dynamique
+// --- Mise à jour de la fonction createChatBubble ---
+async function createChatBubble(groupName, isPrivate = false) {
+    // Si la bulle existe déjà, l'afficher et ne pas la recréer
+    if (chatBubbles[groupName]) {
+        toggleChat(groupName, true); // Force l'affichage
+        // S'assurer que le nom d'utilisateur est copié si c'est un nouveau chat privé
+        const usernameInputGeneral = document.getElementById('usernameInput-general');
+        const usernameInputCurrent = document.getElementById(`usernameInput-${groupName}`);
+        if (usernameInputGeneral && usernameInputCurrent && !usernameInputCurrent.value) {
+            usernameInputCurrent.value = usernameInputGeneral.value;
+        }
+        const chatLog = document.getElementById(`chatLog-${groupName}`);
+        if (chatLog) {
+            chatLog.scrollTop = chatLog.scrollHeight; // Scroll vers le bas
+        }
+        // Assurez-vous que le bouton est créé/visible si la bulle existe déjà
+        createChatToggleButton(groupName, isPrivate);
+        return;
+    }
+
+    const chatContainer = document.createElement('div');
+    chatContainer.classList.add('chat-bubble');
+    chatContainer.id = `chatBubble-${groupName}`;
+
+    if (isPrivate) {
+        chatContainer.classList.add('private-chat');
+        // Calculer la position 'right' pour que les bulles privées s'empilent à gauche
+        // Chaque bulle privée aura un 'right' décalé par rapport à la précédente
+        const existingBubbles = document.querySelectorAll('.chat-bubble[style*="display: flex"]');
+        const offset = existingBubbles.length * 370; // 350px (largeur) + 20px (marge) ou plus
+        chatContainer.style.right = `${20 + offset}px`; // 20px de base + offset
+    }
+
+
+    // Générer le contenu HTML de la bulle en utilisant les IDs dynamiques
+    chatContainer.innerHTML = `
+        <div class="chat-header" onclick="toggleChat('${groupName}')">
+            ${isPrivate ? `Chat Privé (${groupName.split('_').slice(1).join(' - ')})` : 'Chat Général'}
+        </div>
+        <div class="chat-body" id="chatLog-${groupName}">
+        </div>
+        <div class="chat-input">
+            <input type="text" id="usernameInput-${groupName}" placeholder="Votre nom">
+            <input type="hidden" id="groupNameInput-${groupName}" value="${groupName}">
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput-${groupName}" placeholder="Écris un message">
+            <button onclick="sendMessage('${groupName}')">Envoyer</button>
+        </div>
+    `;
+
+    document.body.appendChild(chatContainer); // Ajouter la bulle au corps du document
+    chatBubbles[groupName] = chatContainer; // Stocker la référence
+
+    // Important: Créez le bouton correspondant à la bulle ici
+    createChatToggleButton(groupName, isPrivate);
+
+    toggleChat(groupName, true); // Force l'affichage de la nouvelle bulle
+
+    // Copier le nom d'utilisateur si déjà renseigné dans le chat général
+    const usernameInputGeneral = document.getElementById('usernameInput-general');
+    const usernameInputCurrent = document.getElementById(`usernameInput-${groupName}`);
+    if (usernameInputGeneral && usernameInputCurrent) {
+        usernameInputCurrent.value = usernameInputGeneral.value;
+    }
+
+    await loadMessageHistory(groupName); // Charger l'historique des messages pour cette bulle
+
+    initEventSource(groupName); // Initialiser la connexion SSE pour ce nouveau groupe
+
+    // Ajouter l'écouteur de scroll pour charger plus d'historique
+    const chatLog = document.getElementById(`chatLog-${groupName}`);
+    if (chatLog) {
+        chatLog.addEventListener('scroll', function() {
+            if (chatLog.scrollTop === 0) {
+                loadMessageHistory(groupName, true);
+            }
+        });
+    }
+}
+
+        // Fonction pour afficher/masquer une bulle de chat
+// --- Mise à jour de la fonction toggleChat ---
+	function toggleChat(groupName, forceDisplay = false) {
+	    const bubble = document.getElementById(`chatBubble-${groupName}`);
+	    if (bubble) {
+	        if (forceDisplay) {
+	            bubble.style.display = 'flex';
+	        } else {
+	            bubble.style.display = (bubble.style.display === 'none' || bubble.style.display === '') ? 'flex' : 'none';
+	        }
+
+        	// Si affiché, faire défiler vers le bas
+	        if (bubble.style.display === 'flex') {
+	            const chatLog = document.getElementById(`chatLog-${groupName}`);
+	            if (chatLog) {
+	                chatLog.scrollTop = chatLog.scrollHeight;
+	            }
+	            // Mettre à jour la position des autres bulles si celle-ci s'affiche/se masque
+	            updateChatBubblePositions();
+	        } else {
+	             // Si la bulle est masquée, ajuster la position des autres
+	             updateChatBubblePositions();
+	        }
+	    }
+	}
+
+        // Fonction pour envoyer un message
+        async function sendMessage(groupName) {
+            const usernameInput = document.getElementById(`usernameInput-${groupName}`);
+            const messageInput = document.getElementById(`messageInput-${groupName}`);
+            const groupNameInput = document.getElementById(`groupNameInput-${groupName}`);
+
+            const username = usernameInput.value.trim();
+            const content = messageInput.value.trim();
+            const currentGroupName = groupNameInput.value;
+
+            if (!username || !content) {
+                alert("Veuillez entrer votre nom et un message.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/chat/send/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        content: content,
+                        group_name: currentGroupName
+                    }),
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    if (data.status === "success") {
+                        messageInput.value = "";
+                    } else {
+                        console.error("Erreur serveur lors de l'envoi:", data.message);
+                        alert("Erreur lors de l'envoi du message: " + data.message);
+                    }
+                } else {
+                    console.error("Erreur HTTP lors de l'envoi:", response.status, data.message || response.statusText);
+                    alert("Erreur HTTP: " + (data.message || response.statusText));
+                }
+            } catch (error) {
+                console.error("Erreur réseau ou JSON:", error);
+                alert("Impossible de se connecter au serveur pour envoyer le message.");
+            }
+        }
+
+        // Fonction pour initialiser l'EventSource (SSE) pour un groupe
+        function initEventSource(groupName) {
+            if (eventSources[groupName] && eventSources[groupName].readyState === EventSource.OPEN) {
+                return;
+            }
+
+            const chatLog = document.getElementById(`chatLog-${groupName}`);
+            if (!chatLog) {
+                console.error(`chatLog-${groupName} introuvable pour initEventSource.`);
+                return;
+            }
+
+            const source = new EventSource(`/chat/stream/${groupName}/`);
+            eventSources[groupName] = source;
+
+            source.onmessage = function(e) {
+                try {
+                    // Les messages SSE sont envoyés directement par le backend en JSON pour le stream
+                    const messageData = JSON.parse(e.data);
+                    const msgElement = createMessageElement(messageData, groupName);
+                    chatLog.appendChild(msgElement);
+                    chatLog.scrollTop = chatLog.scrollHeight; // Défiler vers le bas
+                    // NOUVEAU: Ajouter le point rouge si la bulle n'est pas visible (futur)
+                    // addNotificationDot(groupName);
+                } catch (error) {
+                    console.error("Erreur de parsing JSON ou de traitement du message SSE:", error, e.data);
+                }
+            };
+
+            source.onerror = function(err) {
+                console.error("EventSource failed:", err);
+                // Gérer les erreurs de connexion SSE (reconnexion, affichage message utilisateur, etc.)
+                // source.close(); // Peut-être fermer et tenter de reconnecter après un délai
+            };
+        }
+
+        // Fonction pour obtenir le token CSRF (inchangée)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Fonction pour demander la création/récupération d'un groupe privé (inchangée)
+        async function promptPrivateChat(targetUsername, targetUserId) {
+            const currentUsernameInput = document.getElementById('usernameInput-general') || document.querySelector('.chat-bubble input[id^="usernameInput-"]');
+            if (!currentUsernameInput || !currentUsernameInput.value) {
+                alert("Veuillez d'abord entrer votre nom d'utilisateur dans le chat général.");
+                return;
+            }
+            const currentUsername = currentUsernameInput.value.trim();
+
+            if (currentUsername === targetUsername) {
+                alert("Vous ne pouvez pas démarrer un chat privé avec vous-même.");
+                return;
+            }
+
+            if (confirm(`Voulez-vous démarrer un chat privé avec ${targetUsername}?`)) {
+                try {
+                    const response = await fetch("/chat/create_private_group/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-CSRFToken": getCookie('csrftoken')
+                        },
+                        body: new URLSearchParams({
+                            current_username: currentUsername,
+                            target_username: targetUsername
+                            // target_user_id: targetUserId // Si vous avez l'ID et que le backend l'utilise
+                        }).toString(),
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (data.status === "success" && data.group_name) {
+                            createChatBubble(data.group_name, true); // Créer la bulle du chat privé
+                        } else {
+                            console.error("Erreur serveur lors de la création du groupe privé:", data.message);
+                            alert("Erreur lors de la création du groupe privé: " + data.message);
+                        }
+                    } else {
+                        console.error("Erreur HTTP lors de la création du groupe privé:", response.status, data.error || response.statusText);
+                        alert("Erreur HTTP: " + (data.error || response.statusText));
+                    }
+                } catch (error) {
+                    console.error("Erreur réseau lors de la création du groupe privé:", error);
+                    alert("Impossible de se connecter au serveur pour créer le groupe privé.");
+                }
+            }
+        }
+// NOUVELLE FONCTION: Mettre à jour la position des bulles de chat privées
+	function updateChatBubblePositions() {
+	    const activeBubbles = document.querySelectorAll('.chat-bubble[style*="display: flex"]');
+	    let currentOffset = 0;
+	    activeBubbles.forEach(bubble => {
+	        // Ne déplace que les bulles privées
+	        if (bubble.classList.contains('private-chat')) {
+	            bubble.style.right = `${20 + currentOffset}px`;
+	            currentOffset += bubble.offsetWidth + 20; // Largeur de la bulle + gap
+	        }
+	    });
+	}
+
+        // Exécute ce code lorsque le DOM est entièrement chargé
+        document.addEventListener("DOMContentLoaded", () => {
+            // Créer la bulle de chat générale au chargement de la page
+            createChatBubble('general', false);
+
+            // Attacher l'écouteur d'événements pour la touche 'Entrée'
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    const activeElement = document.activeElement;
+                    if (activeElement && activeElement.id.startsWith('messageInput-')) {
+                        const groupName = activeElement.id.split('-')[1];
+                        sendMessage(groupName);
+                        event.preventDefault();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
