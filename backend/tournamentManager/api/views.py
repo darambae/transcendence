@@ -1,10 +1,11 @@
 from django.shortcuts import render
 import random
 import sys
-import jwt
 import redis
 from .tournamentStatic import Tournament, Player, trnmtDict
 from channels.layers import get_channel_layer
+from django.http import JsonResponse, StreamingHttpResponse
+import json
 
 channel_layer = get_channel_layer()
 
@@ -51,7 +52,7 @@ async def getJWT(request) :
 
     return token 
 
-@csrf_exempt
+# # @csrf_exempt
 async def launchFinals(request) :
     try:
         body = json.loads(request.body)
@@ -62,7 +63,7 @@ async def launchFinals(request) :
     except Exception :
         return JsonResponse({"error": "Internal server error"}, status=500)
 
-@csrf_exempt
+# # @csrf_exempt
 async def launchFirstRound(request) :
     try:
         body = json.loads(request.body)
@@ -83,7 +84,7 @@ async def launchFirstRound(request) :
     except Exception:
         return JsonResponse({"error": "Internal server error"}, status=500)
 
-@csrf_exempt
+# @csrf_exempt
 async def launchFinals(request) :
     try :
         body = json.loads(request.body)
@@ -97,13 +98,17 @@ async def launchFinals(request) :
                 "text_data" : "final-matches"
             }
         )
+    
+    except Exception as e:
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
-@csrf_exempt
+
+# @csrf_exempt
 async def joinTournament(request):
     try:
         body = json.loads(request.body)
         jwt_token = await getJWT(request)
-        encodedJwt = 
+        # encodedJwt = 
         username = body["username"]
         tKey = body["tKey"]
 
@@ -121,7 +126,7 @@ async def joinTournament(request):
         return JsonResponse({"error": "Internal server error"}, status=500)
 
 
-@csrf_exempt
+# @csrf_exempt
 async def leaveTournament(request):
     try :
         body = json.loads(request.body)
@@ -145,13 +150,13 @@ async def createTournament(request) :
         trnmtDict[tr.tKey] = tr
         return JsonResponse({"Result" : "Tournament succefully created"})
     except Exception :
-        return JsonResponse({"error" : "Internal server error"}, status=500)
+        return JsonResponse({"error" : "Internal server eeeeeeeerror"}, status=500)
 
 async def listTournament(request) :
     try :
         trnmtList = {}
         for elem in trnmtDict :
-            trnmtDict[elem] = f"{trnmtDict[elem].nbPl} / 4"
+            trnmtList[elem] = f"{trnmtDict[elem].nbPl} / 4"
 
         return JsonResponse({"list" : trnmtList})
     except Exception as e :
@@ -160,10 +165,16 @@ async def listTournament(request) :
 
 async def tournamentManager(request) :
     try :
+        print(f"action : {request.method}", file=sys.stderr)
         if request.method == "GET" :
-            return listTournament(request)
+            return await listTournament(request)
         elif request.method == "POST" :
-            if request.data["action"] == "create" :
-                return createTournament(request)
+            data = json.loads(request.body.decode('utf-8'))
+            print(f"action posted", file=sys.stderr)
+            print(f"action : {data['action']}", file=sys.stderr)
+            if data["action"] == "create" :
+                return await createTournament(request)
             else :
                 return joinTournament(request)
+    except Exception as e :
+        return JsonResponse({"error" : "Internal server error"}, status=500)

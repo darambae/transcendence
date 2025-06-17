@@ -19,5 +19,5 @@ from api.views import tournamentManager
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path("/tournament/", tournamentManager, name="tournamentManager")
+    path("tournament/tournament", tournamentManager, name="tournamentManager")
 ]

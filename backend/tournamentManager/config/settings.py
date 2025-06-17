@@ -53,6 +53,12 @@ INSTALLED_APPS = [
     'api',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:8443",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
