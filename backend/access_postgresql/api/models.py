@@ -15,7 +15,7 @@ class USER(AbstractBaseUser, PermissionsMixin):
 	created_at = models.DateTimeField(auto_now_add=True)
 	last_login = models.DateTimeField(null=True, blank=True)
 	avatar = models.CharField(max_length=255, default='default.png')
-
+	blocked_user=models.ManyToManyField(self, blank=True)
 
 	USERNAME_FIELD = 'mail'
 	REQUIRED_FIELDS = ['user_name', 'first_name', 'last_name']

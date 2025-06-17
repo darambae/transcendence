@@ -1,0 +1,5 @@
+1. CHAT
+ 1> connect with the authentication module
+ 2> block another user 
+ 3> connect the user in the chat with the profil, invitation to play, private chat 
+ 4> creating a tournment has to create a chat group and send notification to users

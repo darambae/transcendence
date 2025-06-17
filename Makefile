@@ -14,7 +14,7 @@ USER_CONTAINER=nginx_modsecurity postgres access-postgresql auth user_service ma
 GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service tournament access-postgresql
 
 # POUR KELLY PLUS TARD
-CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access-postgresql
+CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access-postgresql server_pong ai_pong user_service tournament
 
 COMPOSE=docker compose -f ${DOCKER_FILE}
 
