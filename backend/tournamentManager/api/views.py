@@ -59,6 +59,8 @@ async def launchFinals(request) :
         if tkey not in trnmtDict:
             return JsonResponse({"Error": "Tournament not found"}, status=404)
         trnmtDict[tkey].launchTournament()
+    except Exception :
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 @csrf_exempt
 async def launchFirstRound(request) :

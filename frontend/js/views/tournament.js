@@ -7,7 +7,7 @@ export async function tournamentController() {
     console.log("HEY 1")
     refreshButton.addEventListener("click", async (event) => {
         console.log("HEY 2")
-        await fetch('tournament-manager/tournament')
+        await fetch('tournament/tournament')
         .then(response => {
             if (!response.ok) throw new Error("https Error: " + response.status);
             return response.json();

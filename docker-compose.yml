@@ -200,7 +200,7 @@ services:
     build :
       context : ./backend/tournamentManager
       dockerfile : ./Dockerfile
-    container_name : tournament_manager
+    container_name : tournament
     depends_on :
       certs_generator:
         condition: service_completed_successfully
