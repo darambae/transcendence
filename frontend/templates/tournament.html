@@ -2,22 +2,59 @@
     <div class="row">
         <div class="col">
             <h2>TOURNAMENT LIST</h2>
+            <div class="row">
+                <div class="col">
+                    <button id="refresh-trnmt" type="button" class="btn btn-outline-secondary" aria-label="Close">Refresh</button>
+                </div>
+                <div class="col">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="trnmt-list" data-bs-toggle="dropdown" aria-expanded="false">
+                            Action
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="trnmt-list" id="trnmt-list-ul">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col" id="list">
+                <ul id="list-tr">
+                    <li id="first">First</li>
+                    <li id="second">Second</li>
+                    <li id="Third">Third</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <h2>ACTUAL INFORMATIONS</h2>
+            <div class="col" id="Tournament informations">
+                <h4>No tournament joined</h4>
+            </div>
+        </div>
+        <div class="col">
+            <h2>GUEST</h2>
+            <h4>Waiting for tournament</h4>
         </div>
     </div>
-    <div class="row" id="replace-state">
-        <div class="col">
-            <h2>Create game</h2>
-            <div id="invit"><a href="#login">Create game</a></div>  
-        </div>
-        <div class="col">
-            <h2>Informations</h2>
-            <p id="Game instructions">Waiting for a game</p>
-        </div>
-        <div class="col">
-            <h2>Join game</h2>
-            <button id="join-game" type="button" class="btn btn-outline-secondary" aria-label="Close">Join Game</button>
-        </div>
+    <!-- <div class="container"> -->
+    <div class="row" id="Information">
     </div>
-    <div class="row" id="replace-state2">
+    <!-- </div> -->
+</div>
+
+<!-- <div class="row" id="replace-state">
+    <div class="col">
+        <h3>Refresh</h3>
+        <div id="invit"><a href="#login">Create game</a></div>  
+    </div>
+    <div class="col">
+        <h2>Informations</h2>
+        <p id="Game instructions">Waiting for a game</p>
+    </div>
+    <div class="col">
+        <h2>Join game</h2>
+        <button id="join-game" type="button" class="btn btn-outline-secondary" aria-label="Close">Join Game</button>
     </div>
 </div>
+<div class="row" id="replace-state2">
+</div> -->

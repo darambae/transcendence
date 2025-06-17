@@ -2,11 +2,23 @@ import { actualizeIndexPage } from "../utils.js"
 import { routesSp } from "./utils/commonFunctions.js"
 
 export async function tournamentController() {
-    const createButton = document.getElementById("create-game")
+    const refreshButton = document.getElementById("refresh-trnmt")
 
     console.log("HEY 1")
-    createButton.addEventListener("click", (event) => {
+    refreshButton.addEventListener("click", async (event) => {
         console.log("HEY 2")
-        actualizeIndexPage("modal-container", routesSp["invit"])
+        await fetch('tournament-manager/tournament')
+        .then(response => {
+            if (!response.ok) throw new Error("https Error: " + response.status);
+            return response.json();
+          })
+          .then(data => {
+            console.log("Données reçues SetKey:", data["list"]);
+            trnmt = data["list"];
+          })
+          .catch(error => {
+            console.error("Erreur de requête :", error);
+            throw error;
+          });
     })
 }

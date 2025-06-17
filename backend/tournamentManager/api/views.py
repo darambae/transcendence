@@ -151,7 +151,7 @@ async def listTournament(request) :
         for elem in trnmtDict :
             trnmtDict[elem] = f"{trnmtDict[elem].nbPl} / 4"
 
-        return JsonResponse(trnmtList)
+        return JsonResponse({"list" : trnmtList})
     except Exception as e :
         return JsonResponse({"error" : "Internal server error"}, status=500)
 
@@ -161,4 +161,7 @@ async def tournamentManager(request) :
         if request.method == "GET" :
             return listTournament(request)
         elif request.method == "POST" :
-            return 
+            if request.data["action"] == "create" :
+                return createTournament(request)
+            else :
+                return joinTournament(request)
