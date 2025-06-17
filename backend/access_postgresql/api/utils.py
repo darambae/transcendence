@@ -28,6 +28,3 @@ def generateJwt(user, jsonJwt:dict):
 		'refresh': str(refresh),
 		'access': str(access)
 	}
-
-
-# username

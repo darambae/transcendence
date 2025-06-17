@@ -1,0 +1,84 @@
+	body {
+        background-color: #000000;
+        font-family: 'Poppins', sans-serif;
+        color: #000000;
+    }
+
+	.player-card {
+		background: linear-gradient(135deg, #ff4e50, #f9d423);
+		border-radius: 1rem;
+		overflow: hidden;
+		border: 2px solid rgba(255, 255, 255, 0.2);
+		box-shadow:
+			0 4px 6px rgba(0, 0, 0, 0.3),
+			0 8px 16px rgba(0, 0, 0, 0.25),
+			inset 0 0 10px rgba(255, 255, 255, 0.05);
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		transform-style: preserve-3d;
+		perspective: 1000px;
+	}
+	
+	.player-card:hover {
+		transform: translateY(-6px) scale(1.02);
+		box-shadow:
+			0 10px 20px rgba(0, 0, 0, 0.35),
+			0 15px 40px rgba(0, 0, 0, 0.25),
+			inset 0 0 15px rgba(255, 255, 255, 0.1);
+	}
+    .player-card img {
+        border: 4px solid #4dabf7;
+    }
+
+    .badge-online {
+        background-color: #51cf66;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+
+    .name-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 1rem;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .card-footer {
+        background-color: #f1f3f5;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .btn-link {
+        color: #4dabf7;
+        font-weight: 600;
+        transition: 0.2s ease;
+    }
+
+    .btn-link:hover {
+        color: #1c7ed6;
+    }
+
+    .vr {
+        width: 2px;
+        background-color: #ced4da;
+        height: 100%;
+    }
+
+    h6 {
+        font-size: 0.9rem;
+        color: #5c7cfa;
+    }
+
+    strong {
+        font-size: 1.2rem;
+        color: #222;
+    }
+
+    .card-title {
+        font-weight: bold;
+        font-size: 1.4rem;
+        color: #364fc7;
+        text-align: center;
+    }

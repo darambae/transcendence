@@ -2,7 +2,7 @@ import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 
 async function double_authenticate(data) {
-	const html = await loadTemplate('double_auth');
+	const html = await loadTemplate('doubleAuth');
 	const content = document.getElementById("login-form");
 	if (html) {
 		content.innerHTML = html;
@@ -42,10 +42,8 @@ async function double_authenticate(data) {
 				let	accessToken = responseData.access; //Token to put in the authorization header of request trying to access protected roads
 				let	refreshToken = responseData.refresh; // Token to get a new acccess token if needed without having to reconnect		
 
-
 				console.log(accessToken)
 				console.log(refreshToken)
-
 
 				sessionStorage.setItem('accessToken', responseData.access);
 				sessionStorage.setItem('refreshToken', responseData.refresh);
@@ -94,13 +92,6 @@ export async function handleLoginSubmit(event) {
 		if (response.ok) {
 			try {
 				await double_authenticate(dataForm)
-				//tokens returned in the JWT to communicate with protected roads
-				//let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
-				//let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
-
-				//localStorage.setItem('accessToken', accessToken);
-				//localStorage.setItem('refreshToken', refreshToken);
-
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
 				console.log("User successfully connected");
@@ -128,7 +119,6 @@ export async function handleLoginSubmit(event) {
 			loadingMessage.style.display = "none";
 	}
 }
-
 
 
 export function loginController() {

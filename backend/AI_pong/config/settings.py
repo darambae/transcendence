@@ -130,11 +130,11 @@ STATIC_ROOT = FRONTEND_DIR
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Remove the comment below so that you can run without elk
-# class AddAppNameFilter(logging.Filter):
-#     def filter(self, record):
-#         if not hasattr(record, 'app_name'):
-#             record.app_name = APP_NAME
-#         return True
+class AddAppNameFilter(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, 'app_name'):
+            record.app_name = APP_NAME
+        return True
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
@@ -144,18 +144,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         },
 #     },
 #     'formatters': {
-#         'json': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-#         },
 #         'text': {
 #             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
 #             'class': 'logging.Formatter',
 #         },
 #         'logstash': {
 #             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-#             # You might want to explore additional options in DjangoLogstashFormatter
-#             # For example, 'extra_fields': {'environment': 'production'}
 #         },
 #     },
 #     'handlers': {
@@ -181,14 +175,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         'django': {
 #             'handlers': ['console'], # Only send Django logs to console by default
 #             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger
+#             'propagate': False, # Prevent duplicate logging via root logger
 #         },
 #         'django.request': {
 #             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger
 #         },
-#         'user_service': {
+#         'api': {
 #             'handlers': ['console' ,'logstash'],
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger if needed

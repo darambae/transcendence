@@ -1,12 +1,12 @@
-server.host: "0.0.0.0" # Or your specific IP
+server.host: "0.0.0.0"
 server.port: 5601
 server.ssl.enabled: true
 server.ssl.keystore.path: /usr/share/kibana/config/certs/kibana.p12
-# server.ssl.keystore.password: jJkJ_p7EwHa0k+EgBgNW
 
 elasticsearch.username: "kibana_system"
 elasticsearch.password: "${ELASTIC_PASSWORD}"
 elasticsearch.hosts: ["https://elasticsearch:9200"]
 elasticsearch.ssl.certificateAuthorities: ["/usr/share/kibana/config/certs/ca/ca.crt"]
 elasticsearch.ssl.verificationMode: certificate
-xpack.encryptedSavedObjects.encryptionKey: "foewhjoitgufopertjkfl;wejrfloweihrilotewjtfl;ewjflkewshnj" # Replace with a secure key
+# to replace encryptionkey with environment variable
+xpack.encryptedSavedObjects.encryptionKey: "foewhjoitgufopertjkfl;wejrfloweihrilotewjtfl;ewjflkewshnj"

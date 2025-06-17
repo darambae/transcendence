@@ -22,7 +22,7 @@ from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 
-ALLOWED_HOSTS = ["*"] # ['localhost', 'transcendence.42.fr', 'access_postgresql']
+ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql', 'localhost']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,13 +142,13 @@ APPEND_SLASH = True
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
     "https://localhost:8443",
-    "https://10.18.161.147:8443",
 ]
 
 # MEDIA FOR IMG
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):

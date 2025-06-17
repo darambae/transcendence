@@ -182,6 +182,22 @@ class checkTfa(APIView):
 			return JsonResponse({'error': 'User not found'}, status=404)
 
 
+#class GenerJwt(APIView):
+#	permission_classes = [AllowAny]
+
+#	def post(self, request):
+
+#		data = request.data
+
+#		try:
+#			user = USER.objects.get(mail=data.get('mail'))
+
+
+#		except USER.DoesNotExist:
+#			return JsonResponse({'error': 'User not found'}, status=404)
+
+
+
 class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 

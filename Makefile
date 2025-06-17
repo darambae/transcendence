@@ -118,9 +118,15 @@ down:
 	@${COMPOSE} down -v
 	@echo "Transcendence stopped."
 	@echo "Deleting migrations & creating new migrations directory..."
-	@rm -rf ./backend/user_service/migrations
-	@mkdir -p ./backend/user_service/migrations
-	@cat << EOF > ./backend/user_service/migrations/__init__.py
+	@rm -rf ./backend/access_postgresql/api/migrations ./backend/user_service/api/migrations
+	@mkdir -p ./backend/access_postgresql/api/migrations
+	@mkdir -p ./backend/user_service/api/migrations
+	@cat << EOF > ./backend/access_postgresql/api/migrations/__init__.py
+	@cat << EOF > ./backend/user_service/api/migrations/__init__.py
+	@echo "Migrations directories recreated."
+	@echo "Deleting pycache directories..."
+	@find ./backend -type d -name "__pycache__" -exec rm -rf {} +
+	@echo "Pycache directories deleted."
 
 destroy:
 	@echo "Destroying Transcendence..."
@@ -130,4 +136,4 @@ prune:
 	@echo "Pruning unused Docker resources..."
 	@docker system prune --all --force
 
-.PHONY: no-cache up-elk up-main up down-elk down-main down destroy
+.PHONY: no-cache up-elk up-main up down-elk down-main down destroy prune certs_generator build-user build-game build-elk build-main build add-ca start-user start-game start-elk start-main start
