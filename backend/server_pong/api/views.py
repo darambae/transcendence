@@ -55,7 +55,7 @@ def decodeJWT(request, encodedJwt=None) :
 	print(f"encoded: {encodedJwt}", file=sys.stderr)
 	res = requests.get(f'https://access-postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
 	if res.status_code != 200 :
-		print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
+		print(f"Not recognized, code = {res.status_code} Body : ", file=sys.stderr)
 		return [None]
 	return [res.json()]
 

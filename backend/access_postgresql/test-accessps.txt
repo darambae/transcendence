@@ -1,0 +1,2 @@
+data : {'mail': 'rafaelmb.lycee@gmail.com', 'tfa': 'NZHK-GO7Q-9JSD-X9QI', 'jwt': {'token_type': 'access', 'exp': 1750277069, 'iat': 1750259069, 'jti': '9546b278ef7746799101beeb40d6ccc0', 'user_id': 1, 'username': 'rmichel-', 'avatar': 'default.png', 'invites': []}}, type name : dict
+invites : {'token_type': 'access', 'exp': 1750277069, 'iat': 1750259069, 'jti': '9546b278ef7746799101beeb40d6ccc0', 'user_id': 1, 'username': 'rmichel-', 'avatar': 'default.png', 'invites': []}

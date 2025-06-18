@@ -11,6 +11,7 @@ export async function versusController() {
     startButton.addEventListener("click", async (event) => {
         await fetch(`server-pong/api-key`, {
           headers: {
+            'Content-Type': 'application/json',
             "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
           }
         })
