@@ -22,10 +22,8 @@
         </div>
       </div>
     </div>
-
     <div class="col-md-7 col-xl-8 pb-3">
       <div class="tab-content" id="nav-tabContent">
-
         <div class="tab-pane fade show active" id="list-account" role="tabpanel" aria-labelledby="list-account-list">
           <div class="card">
             <div class="card-header">
@@ -40,36 +38,37 @@
               </div>
               <h5 class="card-title mb-0">Public info</h5>
             </div>
-            <div class="card-body">
-              <form>
-                <div class="row">
-                  <div class="col-md-8">
-                    <div class="mb-3">
-                      <label  id="usernameLabel" for="inputUsername" class="form-label">Username</label>
-                      <input type="text" class="form-control" id="inputUsername" placeholder="Username" />
-                    </div>
-                    <div class="mb-3">
-                      <label id="mailLabel" for="inputEmail4" class="form-label">Email</label>
-                      <input type="email" class="form-control" id="inputEmail4" placeholder="Email" />
-                    </div>
+            <div class="row mb-4">
+              <div class="col-md-8 ps-4 mt-4">
+                <form id="profileForm">
+                  <div class="mb-3">
+                    <label id="usernameLabel" for="inputUsername" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="inputUsername" placeholder="Username" />
                   </div>
-                  <div class="col-md-4 text-center">
-                    <img id="avatar" alt="Avatar User" src="" class="rounded-circle img-responsive mt-2" width="128" height="128" />
-                    <form enctype="multipart/form-data">
-                      <div class="mt-2">
-                        <label for="uploadImg" class="btn btn-primary">
-                          <i class="fa fa-upload"></i> Choose your image
-                        </label>
-                        <input type="file" id="uploadImg" name="image" style="display: none;" accept="image/*">
-                      </div>
-                    </form>
+                  <div class="mb-3">
+                    <label id="mailLabel" for="inputEmail4" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="inputEmail4" placeholder="Email" />
                   </div>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Save changes</button>
-              </form>
+                  <button type="submit" class="btn btn-primary mt-3">Save profile</button>
+                </form>
+              </div>
+              <div class="col-md-4 text-center ps-4">
+                <form id="uploadForm" enctype="multipart/form-data">
+                  <img id="avatar" alt="Avatar User" src="" class="rounded-circle img-responsive mt-2" width="128" height="128" />
+                  <div class="mt-2">
+                    <label for="uploadImg" class="btn btn-primary">
+                      <i class="fa fa-upload"></i> Choose your image
+                    </label>
+                    <input type="file" id="uploadImg" name="image" style="display: none;" accept="image/*" />
+                  </div>
+                  <div class="mt-3" id="saveImageContainer" style="display: none;">
+                    <button type="submit" class="btn btn-success">Save image</button>
+                  </div>
+                </form>
+                <div id="errorMessage" class="text-danger" style="display: none;"></div>
+              </div>
             </div>
           </div>
-
           <div class="card mt-3">
             <div class="card-header">
               <div class="card-actions float-end">
