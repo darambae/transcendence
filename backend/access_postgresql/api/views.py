@@ -140,11 +140,13 @@ class checkTfa(APIView):
 	def post(self, request):
 
 		data = request.data
-		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
+		with open("test-accessps.txt", "w+") as f :
+			print(f"data : {data}, type name : {type(data).__name__}", file=f)
 
 		try:
 			if "jwt" in data :
-				print(f"invites : {data['jwt']}", file=sys.stderr)
+				with open("test-accessps.txt", "a") as f :
+					print(f"invites : {data['jwt']}", file=f)
 				user = USER.objects.get(mail=data.get('mail'))
 				if user.actived and user.two_factor_auth != None:
 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
@@ -197,28 +199,44 @@ class checkTfa(APIView):
 #			return JsonResponse({'error': 'User not found'}, status=404)
 
 
-
 class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
 	def get(self, request):
-		auth_header = request.headers.get('Authorization')
-		if not auth_header:
-			return Response({'error': 'Authorization header missing'}, status=400)
+		with open("logs_access.txt", "a") as f :
+			print("--------------------------------", file=f)
+			print("111", file=f)
+			auth_header = request.headers.get('Authorization')
+			print("222", file=f)
+			if not auth_header:
+				print("3", file=f)
+				return Response({'error': 'Authorization header missing'}, status=400)
 
-		parts = auth_header.split()
-		if len(parts) != 2 or parts[0].lower() != 'bearer':
-			return Response({'error': 'Invalid Authorization header'}, status=400)
+			print("333", file=f)
+			parts = auth_header.split()
+			print("444", file=f)
+			if len(parts) != 2 or parts[0].lower() != 'bearer':
+				print("5", file=f)
+				return Response({'error': 'Invalid Authorization header'}, status=400)
 
-		token = parts[1]
+			print("666", file=f)
+			token = parts[1]
+			print("777", file=f)
 
-		try:
-			data_jwt = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-			return Response({'payload': data_jwt}, status=200)
-		except jwt.ExpiredSignatureError:
-			return Response({'error': 'Token expired'}, status=401)
-		except jwt.InvalidTokenError:
-			return Response({'error': 'Invalid token'}, status=401)
+			try:
+				print("888", file=f)
+				data_jwt = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+				print("999", file=f)
+				return Response({'payload': data_jwt}, status=200)
+			except jwt.ExpiredSignatureError:
+				print("10", file=f)
+				return Response({'error': 'Token expired'}, status=401)
+			except jwt.InvalidTokenError:
+				print("20", file=f)
+				return Response({'error': 'Invalid token'}, status=401)
+			except Exception as e :
+				print(f" Error : {e}", file=f)
+
 
 class InfoUser(APIView):
     permission_classes = [IsAuthenticated]
