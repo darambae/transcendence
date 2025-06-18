@@ -182,22 +182,6 @@ class checkTfa(APIView):
 			return JsonResponse({'error': 'User not found'}, status=404)
 
 
-#class GenerJwt(APIView):
-#	permission_classes = [AllowAny]
-
-#	def post(self, request):
-
-#		data = request.data
-
-#		try:
-#			user = USER.objects.get(mail=data.get('mail'))
-
-
-#		except USER.DoesNotExist:
-#			return JsonResponse({'error': 'User not found'}, status=404)
-
-
-
 class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
@@ -219,6 +203,7 @@ class DecodeJwt(APIView):
 			return Response({'error': 'Token expired'}, status=401)
 		except jwt.InvalidTokenError:
 			return Response({'error': 'Invalid token'}, status=401)
+
 
 class InfoUser(APIView):
     permission_classes = [IsAuthenticated]
@@ -283,3 +268,22 @@ class keyGame(APIView):
 					   			status=200)
 		except MATCHTABLE.DoesNotExist:
 			return JsonResponse({'error': 'Key Math not found'}, status=404)
+
+class uploadImgAvatar(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            user = request.user
+            data = request.data
+
+            new_avatar = data.get('new_path')
+            if not new_avatar:
+                return JsonResponse({'error': 'Missing new_path in request'}, status=400)
+
+            user.avatar = new_avatar
+            user.save()
+
+            return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
