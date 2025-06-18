@@ -134,7 +134,6 @@ class verifyTwofa(APIView):
 				}, status=200)
 			else:
 				return JsonResponse({'error': response.text}, status=response.status_code)
-
 			return JsonResponse(data_response, status=response.status_code)
 
 

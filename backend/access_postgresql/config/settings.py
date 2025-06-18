@@ -34,7 +34,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['access-postgresql']
+# ALLOWED_HOSTS = ['access-postgresql']
+ALLOWED_HOSTS = ['*']
 
 # HTTP settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

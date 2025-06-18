@@ -43,8 +43,6 @@ export async function navigate() {
 		return;
 	}
 
-
-
 	try {
 		if (view.isModal) {
 			actualizeIndexPage('modal-container', view);

@@ -1,141 +1,358 @@
-/* Minimized chat container (just the button) */
-#chat-container {
+/* --- Global Reset / Base Styles (unchanged) --- */
+/* (Keep any existing global styles from your styles.css here if they apply) */
+
+/* --- Main Chat Toggle Button (Fixed - generally fine as is) --- */
+#mainChatToggleButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 1000;
-    background: none;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    border-radius: 30px;
-    padding: 10px 20px;
-    color: #fff;
-    background-color: #007bff;
-    font-size: 1.2em;
-    transition: box-shadow 0.2s, background 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-#chat-container:hover {
+#mainChatToggleButton:hover {
     background-color: #0056b3;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    transform: scale(1.05);
 }
 
-/* Hide the chat bubble by default */
-.chat-bubble {
-    display: none;
+/* =============================================================== */
+/* --- DEFAULT CHAT WINDOW STYLES (for Smaller Screens/Mobile) --- */
+/* These styles apply by default, and will be overridden by media queries for larger screens */
+/* Think of this as your "mobile-first" approach for the chat modal */
+/* =============================================================== */
+
+#mainChatWindow .modal-dialog {
+    max-width: 95vw; /* Almost full width on smaller screens */
+    max-height: 95vh; /* Almost full height */
+    margin: 0.5rem auto; /* Smaller margin */
 }
 
-/* Maximized chat bubble */
-.chat-bubble {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 350px;
-    height: 450px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+#mainChatWindow .modal-content {
+    height: 90vh; /* Takes most of the viewport height */
+    min-height: 300px; /* Minimum height to prevent becoming too small */
     display: flex;
     flex-direction: column;
-    z-index: 1001;
+    border-radius: 0.5rem;
     overflow: hidden;
-    transition: box-shadow 0.2s, width 0.2s, height 0.2s;
 }
 
-/* Chat header */
-.chat-header {
+#mainChatWindow .modal-header {
     background-color: #007bff;
     color: white;
-    padding: 15px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    font-size: 1.1em;
-    font-weight: bold;
-    cursor: pointer;
-    text-align: center;
+    border-bottom: 1px solid #0056b3;
+    padding: 0.8rem 1rem; /* Slightly smaller padding */
+    flex-shrink: 0;
 }
 
-/* Chat body */
-.chat-body {
+#mainChatWindow .modal-title {
+    font-weight: bold;
+    font-size: 1.1rem; /* Slightly smaller title */
+}
+
+#mainChatWindow .modal-header .btn-close {
+    filter: invert(1) brightness(2);
+}
+
+#mainChatWindow .modal-body {
     flex-grow: 1;
-    padding: 15px;
+    display: flex;
+    flex-direction: column; /* Stacks columns vertically on small screens */
+    padding: 0;
+}
+
+/* Left Column: Chat Room List (for small screens) */
+.chat-rooms-list {
+    flex-shrink: 0;
+    width: 100%; /* Takes full width of the modal-body */
+    height: 120px; /* Fixed height for the list, can be adjusted */
+    background-color: #f8f9fa;
     overflow-y: auto;
-    background-color: #f9f9f9;
+    padding: 10px; /* Smaller padding */
+    border-bottom: 1px solid #dee2e6; /* Add separator when stacked */
+}
+
+.chat-rooms-list h6 {
+    color: #555;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 0.75rem; /* Smaller heading */
+    margin-bottom: 10px;
+}
+
+.chat-rooms-list .list-group-item {
+    cursor: pointer;
+    padding: 8px 10px; /* Smaller padding for list items */
+    font-size: 0.9rem; /* Smaller font size */
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 3px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.chat-rooms-list .list-group-item:hover {
+    background-color: #e9ecef;
+}
+
+.chat-rooms-list .list-group-item.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+/* Right Column: Active Chat Display (for small screens) */
+.chat-display {
+    flex-grow: 1; /* Takes remaining vertical space */
+    background-color: white;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
 }
 
-/* Chat message */
-.chat-message {
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    border-radius: 15px;
-    max-width: 80%;
+.chat-display-header {
+    flex-shrink: 0;
+    background-color: #f8f9fa;
+    padding: 10px; /* Smaller padding */
+    border-bottom: 1px solid #dee2e6;
+}
+
+.chat-display-header h5 {
+    font-size: 1rem; /* Smaller header */
+    font-weight: bold;
+    color: #333;
     word-wrap: break-word;
-    line-height: 1.4;
-    align-self: flex-start;
-    background-color: #e2e2e2;
-    color: #222;
-    text-align: left;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    white-space: normal;
+}
+
+.chat-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px; /* Smaller padding */
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Smaller gap between messages */
+}
+
+.chat-footer {
+    flex-shrink: 0;
+    padding: 10px; /* Smaller padding */
+    border-top: 1px solid #dee2e6;
+    background-color: #f1f1f1;
+}
+
+.chat-footer .input-group {
+    display: flex;
+    align-items: stretch;
+    gap: 8px; /* Smaller gap */
+    width: 100%;
+}
+
+.chat-footer .form-control {
+    flex-grow: 1;
+    min-width: 0;
+    padding: 0.5rem 0.75rem; /* Smaller padding for input */
+    font-size: 0.9rem; /* Smaller font size for input */
+}
+
+.chat-footer .btn-primary {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem; /* Smaller padding for button */
+    font-size: 0.9rem; /* Smaller font size for button */
+    white-space: nowrap;
+}
+
+/* Chat Message Styles (for small screens) */
+.chat-message {
+    max-width: 90%; /* Wider on small screens to use space */
+    padding: 7px 10px; /* Smaller padding */
+    border-radius: 16px;
+    word-wrap: break-word;
+    line-height: 1.3;
+    font-size: 0.9rem; /* Smaller font size */
+    position: relative;
+}
+
+.chat-message .message-sender {
+    font-weight: bold;
+    margin-right: 5px;
+    font-size: 0.8rem;
+    color: #555;
+    display: block;
+    margin-bottom: 2px;
 }
 
 .chat-message.self {
-    background-color: #dcf8c6;
     align-self: flex-end;
-    margin-left: auto;
+    background-color: #dcf8c6;
+    color: #333;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-message.other {
+    align-self: flex-start;
+    background-color: #e2e3e5;
+    color: #333;
+    border-bottom-left-radius: 2px;
+}
+
+.chat-message .message-timestamp {
+    display: block;
+    font-size: 0.65rem; /* Smaller timestamp */
+    color: #888;
+    text-align: right;
+    margin-top: 3px;
+}
+
+.chat-message.other .message-timestamp {
     text-align: left;
 }
 
-.message-sender {
-    font-weight: bold;
-    margin-bottom: 3px;
-    display: block;
-}
 
-.message-timestamp {
-    font-size: 0.75em;
-    color: #888;
-    margin-top: 3px;
-    display: block;
-    text-align: right;
-}
+/* =============================================================== */
+/* --- MEDIA QUERY FOR LARGER SCREENS (e.g., Desktops, Laptops) --- */
+/* These styles will override the default styles when the screen width is >= 992px */
+/* =============================================================== */
+@media (min-width: 992px) { /* Applies when viewport width is 992px or wider */
 
-.chat-input {
-    padding: 10px 15px;
-    border-top: 1px solid #eee;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    background: #fff;
-}
+    #mainChatWindow .modal-dialog {
+        max-width: 90vw;
+        max-height: 90vh;
+        margin: 1.75rem auto;
+    }
 
-.chat-input input[type="text"],
-.chat-input button {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.9em;
-}
+    #mainChatWindow .modal-content {
+        height: 80vh;
+        min-height: 450px;
+    }
 
-.chat-input input[type="text"] {
-    width: calc(100% - 22px);
-}
+    #mainChatWindow .modal-header {
+        padding: 1rem 1.5rem;
+    }
 
-.chat-input button {
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.2s;
-    width: 100%;
-    box-sizing: border-box;
-}
+    #mainChatWindow .modal-title {
+        font-size: 1.25rem;
+    }
 
-.chat-input button:hover {
-    background-color: #218838;
+    #mainChatWindow .modal-body {
+        flex-direction: row; /* Layout columns side-by-side on larger screens */
+        /* Ensure it occupies full available space horizontally */
+        width: 100%; 
+    }
+
+    /* Left Column: Chat Room List (for larger screens) */
+    .chat-rooms-list {
+        /* Instead of `width: 20%;` or `min-width`, let's try `flex-basis` */
+        flex-basis: 220px; /* Give it a fixed base width */
+        flex-shrink: 0; /* Prevent it from shrinking */
+        flex-grow: 0; /* Prevent it from growing */
+        
+        /* Remove redundant width properties that might conflict */
+        /* width: 20%; */
+        /* min-width: 180px; */
+        /* max-width: 250px; */
+
+        height: auto;
+        border-right: 1px solid #dee2e6;
+        border-bottom: none;
+        padding: 15px;
+    }
+
+    .chat-rooms-list h6 {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .chat-rooms-list .list-group-item {
+        padding: 10px 15px;
+        font-size: 0.95rem;
+        margin-bottom: 5px;
+    }
+
+    /* Right Column: Active Chat Display (for larger screens) */
+    .chat-display {
+        flex-grow: 1; /* This should make it take all remaining space */
+        flex-shrink: 1; /* Allow it to shrink if needed, but flex-grow will dominate */
+        flex-basis: auto; /* Default auto basis */
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        /* Ensure no extra padding/margin on this element pushing it inwards */
+        padding: 0; /* Make sure no unexpected padding is here from parent */
+    }
+
+    .chat-display-header {
+        padding: 15px;
+    }
+
+    .chat-display-header h5 {
+        font-size: 1.1rem;
+    }
+
+    .chat-body {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .chat-footer {
+        flex-shrink: 0;
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+        background-color: #f1f1f1;
+    }
+
+    .chat-footer .input-group {
+        gap: 10px;
+        width: 100%; /* Ensure input group itself takes full width */
+        box-sizing: border-box; /* Important for preventing overflow with padding/border */
+    }
+
+    .chat-footer .form-control {
+        flex-grow: 1;
+        min-width: 0;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.95rem;
+        box-sizing: border-box; /* Essential */
+    }
+
+    .chat-footer .btn-primary {
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem;
+        box-sizing: border-box; /* Essential */
+    }
+
+    /* Chat Message Styles (for larger screens) */
+    .chat-message {
+        max-width: 80%;
+        padding: 8px 12px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+    }
+
+    .chat-message .message-sender {
+        font-size: 0.85rem;
+    }
+
+    .chat-message .message-timestamp {
+        font-size: 0.7rem;
+    }
 }
