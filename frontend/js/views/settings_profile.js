@@ -117,9 +117,10 @@ export function settingsProfileController() {
 				errorDiv.style.display = 'block';
 			}
 			const data = await response.json();
+			console.log(data)
 	
-			if (data.message) {
-				errorDiv.textContent = data.message;
+			if (data.success) {
+				errorDiv.textContent = data.success;
 				errorDiv.classList.remove('text-danger');
 				errorDiv.classList.add('text-success');
 				errorDiv.style.display = 'block';
