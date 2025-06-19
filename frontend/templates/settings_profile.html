@@ -43,13 +43,16 @@
                 <form id="profileForm">
                   <div class="mb-3">
                     <label id="usernameLabel" for="inputUsername" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="inputUsername" placeholder="Username" />
+                    <input type="text" class="form-control" id="inputUsername" placeholder="Username" required/>
                   </div>
                   <div class="mb-3">
                     <label id="mailLabel" for="inputEmail4" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="inputEmail4" placeholder="Email" />
+                    <!--<input type="email" class="form-control" id="inputEmail4" placeholder="Email" />-->
                   </div>
-                  <button type="submit" class="btn btn-primary mt-3">Save profile</button>
+                  <div class="d-flex align-items-center gap-3 mt-3">
+                    <button type="submit" class="btn btn-primary mt-1">Save profile</button>
+                    <div id="errorMessageProfile" class="text-danger" style="display: block;"></div>
+                  </div>
                 </form>
               </div>
               <div class="col-md-4 text-center ps-4">
@@ -65,7 +68,7 @@
                     <button type="submit" class="btn btn-success">Save image</button>
                   </div>
                 </form>
-                <div id="errorMessage" class="text-danger" style="display: none;"></div>
+                <div id="errorMessageImgAvatar" class="text-danger" style="display: none;"></div>
               </div>
             </div>
           </div>
@@ -83,42 +86,62 @@
               <h5 class="card-title mb-0">Private info</h5>
             </div>
             <div class="card-body">
-              <form>
+              <form id="submitPrivateInfo">
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label id="firstNameLabel" for="inputFirstName" class="form-label">First name</label>
-                    <input type="text" class="form-control" id="inputFirstName" placeholder="First name" />
+                    <input type="text" class="form-control" id="inputFirstName" placeholder="First name" required />
                   </div>
                   <div class="col-md-6">
                     <label id="lastNameLabel" for="inputLastName" class="form-label">Last name</label>
-                    <input type="text" class="form-control" id="inputLastName" placeholder="Last name" />
+                    <input type="text" class="form-control" id="inputLastName" placeholder="Last name" required />
                   </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Save changes</button>
+                <div class="d-flex align-items-center gap-3 mt-3">
+                  <button type="submit" class="btn btn-primary mt-1">Save changes</button>
+                  <div id="errorMessagePrivateInfo" class="text-danger" style="display: none;"></div>
+                </div>
               </form>
             </div>
           </div>
         </div>
-
         <div class="tab-pane fade" id="list-password" role="tabpanel" aria-labelledby="list-password-list">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Password</h5>
-              <form>
+              <form id="changeMdp">
                 <div class="mb-3">
                   <label for="inputPasswordCurrent" class="form-label">Current password</label>
-                  <input type="password" class="form-control" id="inputPasswordCurrent" />
+                  <input type="password" class="form-control" id="inputPasswordCurrent" placeholder="Current password" />
                   <small><a href="#">Forgot your password?</a></small>
                 </div>
                 <div class="mb-3">
                   <label for="inputPasswordNew" class="form-label">New password</label>
-                  <input type="password" class="form-control" id="inputPasswordNew" />
+                  <input type="password" id="inputPasswordNew" class="form-control" placeholder="New password" aria-describedby="passwordHelpBlock">
+                
+                  <div id="passwordHelpBlock" class="form-text text-dark mt-2">
+                    Your password must contain at least:
+                    <ul id="password-rules" class="list-unstyled">
+                      <li id="rule-length" class="text-danger">❌ 8 characters minimum</li>
+                      <li id="rule-uppercase" class="text-danger">❌ 1 uppercase letter</li>
+                      <li id="rule-number" class="text-danger">❌ 1 number</li>
+                      <li id="rule-special-char" class="text-danger">❌ 1 special character</li>
+                    </ul>
+                  </div>
                 </div>
+                
                 <div class="mb-3">
                   <label for="inputPasswordNew2" class="form-label">Verify password</label>
-                  <input type="password" class="form-control" id="inputPasswordNew2" />
+                  <input type="password" class="form-control" id="inputPasswordNew2" placeholder="Verify password" />
+                  <div id="passwordMatchMessage" class="form-text mt-1 fw-bold"></div>
                 </div>
-                <button type="submit" class="btn btn-primary">Save changes</button>
+                
+                
+
+                <div class="d-flex align-items-center gap-3 mt-3">
+                  <button type="submit" class="btn btn-primary">Save changes</button>
+                  <div id="errorMessageMdp" class="text-danger" style="display: block;">ddd</div>
+                </div>
               </form>
             </div>
           </div>
