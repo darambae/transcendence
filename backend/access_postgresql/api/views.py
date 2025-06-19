@@ -14,6 +14,7 @@ from .models import USER, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 import json
 import logging
 from datetime import datetime
@@ -287,3 +288,43 @@ class uploadImgAvatar(APIView):
             return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
         except Exception as e:
             return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+		
+class uploadPrivateInfoUser(APIView):
+	permission_classes = [IsAuthenticated]
+    
+	def patch(self, request):
+
+		try:
+			user = request.user
+			data = request.data
+
+			user.first_name = data.get('firstName')
+			user.last_name = data.get('lastName')
+			user.save()
+
+			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+
+
+class uploadProfile(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+
+		try:
+			user = request.user
+			data = request.data
+			new_username = data.get('userName')
+
+			User = get_user_model()
+
+			if User.objects.filter(Q(user_name=new_username) & ~Q(id=user.id)).exists():
+				return JsonResponse({'error': 'This username is already taken'}, status=409)
+			user.user_name = new_username
+			user.save()
+
+			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+

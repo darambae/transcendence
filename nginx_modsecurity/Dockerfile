@@ -28,8 +28,9 @@ COPY --from=builder /crs /etc/nginx/modsec/crs
 COPY ./conf/nginx.conf /etc/nginx/nginx.conff
 COPY ./conf/default.conf /etc/nginx/my_config/default.conf
 COPY ./conf/modsecurity.conf /etc/nginx/modsec/modsecurity.conf
-
+COPY ./tools/authorization.sh /etc/nginx/authorization.sh
 #USER nginx
 
 EXPOSE 443
+ENTRYPOINT ["/etc/nginx/authorization.sh"]
 CMD ["nginx", "-c", "/etc/nginx/nginx.conff", "-g", "daemon off;"]

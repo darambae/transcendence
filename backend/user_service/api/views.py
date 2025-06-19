@@ -144,9 +144,9 @@ class avatar(APIView):
 class saveImg(APIView):
     permission_classes = [AllowAny]
 
-    def post(self, request):
+    def patch(self, request):
         token = request.headers.get('Authorization')
-        url_mail = "https://access-postgresql:4000/api/uploadImgAvatar/"
+        url_access = "https://access-postgresql:4000/api/uploadImgAvatar/"
         image = request.FILES.get('image')
 
         if not image:
@@ -163,7 +163,58 @@ class saveImg(APIView):
             'new_path': image.name
         }
         try:
-            response = requests.post(url_mail, json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+            response = requests.post(url_access, json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+class savePrivateInfo(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadPrivateInfoUser/"
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        if not data.get('firstName', '').strip():
+            return JsonResponse({'error': 'firstName is empty'}, status=400)
+
+        if not data.get('lastName', '').strip():
+            return JsonResponse({'error': 'lastName is empty'}, status=400)
+
+        try:
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+
+
+class saveProfile(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadProfile/"
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        if not data.get('userName', '').strip():
+            return JsonResponse({'error': 'userName is empty'}, status=400)
+
+        #if not data.get('mail', '').strip():
+        #    return JsonResponse({'error': 'mail is empty'}, status=400)
+        try:
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:

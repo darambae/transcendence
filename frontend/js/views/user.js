@@ -1,11 +1,17 @@
 export function userController() {
+	
+	userInfo()
+}
+
+export function userInfo()
+{
 	const dropdownBtn = document.getElementById('avatarDropdownBtn');
 	const dropdownMenu = document.getElementById('customDropdownMenu');
-
 	
 	const token = sessionStorage.getItem("accessToken");
+	
 
-	fetch("https://localhost:8443/user-service/avatar/", {
+	fetch("user-service/avatar/", {
 		method: "GET",
 		headers: {
 		  "Authorization": `Bearer ${token}`,
@@ -35,4 +41,4 @@ export function userController() {
 	} else {
 		console.error("Dropdown button or menu not found");
 	}
-	}
+}
