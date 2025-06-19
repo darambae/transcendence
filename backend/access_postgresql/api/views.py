@@ -140,8 +140,8 @@ class checkTfa(APIView):
 	def post(self, request):
 
 		data = request.data
-		with open("test-accessps.txt", "w+") as f :
-			print(f"data : {data}, type name : {type(data).__name__}", file=f)
+		# with open("test-accessps.txt", "w+") as f :
+		# 	print(f"data : {data}, type name : {type(data).__name__}", file=f)
 
 		try:
 			if "jwt" in data :

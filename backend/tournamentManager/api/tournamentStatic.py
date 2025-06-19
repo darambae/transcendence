@@ -13,6 +13,8 @@ keygame = "https://server-pong:8030/"
 jwtUri = "https://auth:4020/"
 dbUri = "https://access-postgresql:4000/"
 
+user_ws_connections = {}
+
 class Match() :
     def __init__(self, p1=None, p2=None, matchBefore=None) :
         self.key = getApiKeyTrnmt()
@@ -81,6 +83,8 @@ class Tournament() :
             return True
         else :
             return False
+    def listUsr(self) :
+        return [i.username for i in self.players]
     def removePlayer(self, playerClass) :
         if self.nbPl > 0 :
             self.players.remove(playerClass)
@@ -101,7 +105,9 @@ class Tournament() :
         self.matchWinnerBracket = Match()
         self.matchLoserBracket = Match()
 
-    
+    def listJWT(self) :
+        return [elem.jwt for elem in self.players]
+
     def listPlayers(self) :
         return [P.toTuple for P in self.players]
 

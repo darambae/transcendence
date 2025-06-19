@@ -1,2 +1,3 @@
-data : {'mail': 'rafaelmb.lycee@gmail.com', 'tfa': 'NZHK-GO7Q-9JSD-X9QI', 'jwt': {'token_type': 'access', 'exp': 1750277069, 'iat': 1750259069, 'jti': '9546b278ef7746799101beeb40d6ccc0', 'user_id': 1, 'username': 'rmichel-', 'avatar': 'default.png', 'invites': []}}, type name : dict
-invites : {'token_type': 'access', 'exp': 1750277069, 'iat': 1750259069, 'jti': '9546b278ef7746799101beeb40d6ccc0', 'user_id': 1, 'username': 'rmichel-', 'avatar': 'default.png', 'invites': []}
+data : {'mail': 'rafmb30@gmail.com', 'tfa': 'NZHK-GO7Q-9JSD-X9QI', 'jwt': {'token_type': 'access', 'exp': 1750335560, 'iat': 1750317560, 'jti': 'dfbc542c37554037a18f6bf43a81a14c', 'user_id': 2, 'username': 'Bob-rmichel', 'avatar': 'default.png', 'invites': []}}, type name : dict
+invites : {'token_type': 'access', 'exp': 1750335560, 'iat': 1750317560, 'jti': 'dfbc542c37554037a18f6bf43a81a14c', 'user_id': 2, 'username': 'Bob-rmichel', 'avatar': 'default.png', 'invites': []}
+invites : {'token_type': 'access', 'exp': 1750354174, 'iat': 1750336174, 'jti': '6c1a768f536a4c179fa56dd25f40c4ca', 'user_id': 2, 'username': 'Bob-rmichel', 'avatar': 'default.png', 'invites': []}
