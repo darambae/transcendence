@@ -11,11 +11,11 @@ from django.utils.timezone import datetime
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
 import asyncio
-
+import httpx
 from .models import Message, ChatGroup
 from django.core.serializers.json import DjangoJSONEncoder # NOUVEAU: Pour sérialiser les objets Django
 
-ACCESS_PG_URL = "http://access-postgresql:4000/api"
+ACCESS_PG_URL = "https://access-postgresql:4000/api"
 
 # Définition d'un encodeur JSON personnalisé pour les dates
 class CustomDjangoJSONEncoder(DjangoJSONEncoder):
@@ -115,31 +115,28 @@ async def create_or_get_private_group(request):
 
 
 # NOUVELLE VUE : Récupérer l'historique des messages
+
 @require_GET
 async def get_message_history(request, group_name):
+    offset = request.GET.get('offset', 0)
+    limit = request.GET.get('limit', 20)
+
+    # Build the URL for the access_postgresql service
+    url = f"{ACCESS_PG_URL}/chat/history/{group_name}/"
+    params = {'offset': offset, 'limit': limit}
+    print(f"Requesting message history from {url} with params {params}")
     try:
-        offset = int(request.GET.get('offset', 0))
-        limit = int(request.GET.get('limit', 20)) # Augmenté la limite par défaut pour plus de messages
-
-        chat_group = await sync_to_async(ChatGroup.objects.get)(name=group_name)
-
-        messages = await sync_to_async(list)(
-            Message.objects.filter(group=chat_group)
-            .order_by('-timestamp') # Tri inversé pour les derniers messages en premier
-            [offset : offset + limit]
-            .values('sender__username', 'content', 'timestamp') # <<--- C'EST ICI LA CLÉ: 'sender__username'
-        )
-
-        messages.reverse() # Pour afficher du plus ancien au plus récent
-
-        serialized_messages = json.dumps(list(messages), cls=CustomDjangoJSONEncoder)
-
-        return JsonResponse({'status': 'success', 'messages': json.loads(serialized_messages)})
-    except ChatGroup.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Groupe de chat non trouvé.'}, status=404)
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, params=params, timeout=10.0)
+            data = resp.json()
+            return JsonResponse(data, status=resp.status_code)
+    except httpx.RequestError as exc:
+        print(f"Error requesting access_postgresql: {exc}")
+        return JsonResponse({'status': 'error', 'message': 'Could not connect to data service.'}, status=502)
     except Exception as e:
-        print(f"Erreur lors de la récupération de l'historique: {e}")
-        return JsonResponse({'status': 'error', 'message': f'Erreur interne du serveur: {e}'}, status=500)
+        print(f"Unexpected error: {e}")
+        return JsonResponse({'status': 'error', 'message': 'Internal server error.'}, status=500)
+
 
 async def sse_chat_stream(request, group_name):
     channel_layer = get_channel_layer()

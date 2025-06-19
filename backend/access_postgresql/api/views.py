@@ -10,13 +10,14 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.shortcuts import render
-from .models import USER
+from .models import USER, ChatGroup, Message
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 import json
 import logging
 from datetime import datetime
+from django.core.paginator import Paginator, EmptyPage
 
 import jwt
 from django.conf import settings
@@ -201,7 +202,7 @@ class DecodeJwt(APIView):
 		except jwt.InvalidTokenError:
 			return Response({'error': 'Invalid token'}, status=401)
 
-
+ 
 
 class InfoUser(APIView):
     permission_classes = [IsAuthenticated]
@@ -220,3 +221,41 @@ class InfoUser(APIView):
 			"avatar": user.avatar
         })
 
+class GetMessageHistory(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, group_name):
+        offset = request.query_params.get('offset', 0)
+        limit = request.query_params.get('limit', 20)
+
+        try:
+            offset = int(offset)
+            limit = int(limit)
+        except ValueError:
+            return Response({'status': 'error', 'message': 'Invalid offset or limit'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Correct filtering by related group's name
+        messages_queryset = Message.objects.filter(group__name=group_name).order_by('timestamp')
+
+        paginator = Paginator(messages_queryset, limit)
+        page_number = (offset // limit) + 1
+
+        try:
+            page_obj = paginator.get_page(page_number)
+            messages_data = [
+                {
+                    'id': msg.id,
+                    'sender_username': msg.sender.user_name,  # Correct field
+                    'group_name': msg.group.name,             # Correct field
+                    'content': msg.content,
+                    'timestamp': msg.timestamp.isoformat(),
+                } for msg in page_obj
+            ]
+        except EmptyPage:
+            messages_data = []
+
+        return Response({
+            'status': 'success',
+            'messages': messages_data,
+            'has_next_page': page_obj.has_next() if 'page_obj' in locals() else False
+        }, status=status.HTTP_200_OK)

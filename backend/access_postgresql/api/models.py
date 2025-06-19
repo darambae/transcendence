@@ -49,6 +49,7 @@ class Message(models.Model):
     def __str__(self):
         # Affiche le nom de l'expéditeur et le début du message
         return f'{self.sender.user_name}: {self.content[:50]}'
+    
 class MATCHTABLE(models.Model):
     matchKey = models.CharField(unique=True, max_length=100)
     username1 = models.CharField(max_length=15)

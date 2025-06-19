@@ -26,5 +26,4 @@ urlpatterns = [
     path("chat/stream/<str:group_name>/", views.sse_chat_stream, name="sse_chat_stream"),
     # NOUVELLE URL pour l'historique
     path("chat/history/<str:group_name>/", views.get_message_history, name="get_message_history"),
-
 ]

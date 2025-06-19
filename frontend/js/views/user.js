@@ -5,7 +5,7 @@ export function userController() {
 	
 	const token = sessionStorage.getItem("accessToken");
 
-	fetch("https://localhost:8443/user-service/avatar/", {
+	fetch("https://transcendence.42.fr:8443/user-service/avatar/", {
 		method: "GET",
 		headers: {
 		  "Authorization": `Bearer ${token}`,

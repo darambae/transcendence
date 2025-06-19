@@ -17,13 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from api.views import info_link
-from api.views import api_signup
-from api.views import activate_account
-from api.views import checkPassword
-from api.views import checkTfa
-from api.views import DecodeJwt
-from api.views import InfoUser
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, GetMessageHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
@@ -35,5 +29,6 @@ urlpatterns = [
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
-	path('api/InfoUser/', InfoUser.as_view(), name='InfoUser')
+	path('api/InfoUser/', InfoUser.as_view(), name='InfoUser'),
+    path('api/chat/history/<str:group_name>/', GetMessageHistory.as_view(), name='get_message_history'),
 ]
