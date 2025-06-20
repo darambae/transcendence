@@ -18,10 +18,30 @@ import json
 import logging
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage
-
+from asgiref.sync import sync_to_async
+from channels.layers import get_channel_layer
 import jwt
 from django.conf import settings
-# Create your views here.
+# access_postgresql/views.py
+from django.core.paginator import Paginator, EmptyPage
+# Import your models
+# Ensure these imports correctly point to your models
+try:
+    from .models import USER, ChatGroup, Message
+except ImportError:
+    # Fallback/Error handling if models are not correctly configured
+    # In a real application, you'd want to ensure models are correctly imported.
+    logging.error("Failed to import models (USER, ChatGroup, Message) in access_postgresql/views.py. "
+                  "Please ensure your models are defined and accessible.")
+    # You might want to raise an exception or handle this more gracefully
+    # depending on your application's setup.
+    class USER: # Dummy classes to prevent NameError if import fails
+        objects = None
+    class ChatGroup:
+        objects = None
+    class Message:
+        objects = None
+		
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]
@@ -72,7 +92,6 @@ class info_link(APIView):
 		}
 
 		return JsonResponse(json_response, status=200)
-
 
 
 logger = logging.getLogger(__name__)
@@ -221,41 +240,320 @@ class InfoUser(APIView):
 			"avatar": user.avatar
         })
 
-class GetMessageHistory(APIView):
-    permission_classes = [IsAuthenticated]
+# --- Chat-Related Views (Directly interacting with DB and Channels) ---
 
-    def get(self, request, group_name):
-        offset = request.query_params.get('offset', 0)
-        limit = request.query_params.get('limit', 20)
+# ===============================================================
+# 1. Chat Group List/Create View
+# Handles:
+# - GET /api/chat/ (Lists chat groups for the authenticated user)
+# - POST /api/chat/ (Creates or retrieves a 1-to-1 chat group)
+# ===============================================================
+class ChatGroupListCreateView(APIView):
+    """
+    API endpoint to list existing chat groups for the authenticated user (GET)
+    and to create or retrieve new 1-to-1 chat groups (POST).
+    """
+    permission_classes = [IsAuthenticated] # Ensure only authenticated users can list/create chats
+
+    async def get(self, request) -> Response:
+        """
+        Lists chat groups for the currently authenticated user.
+        """
+        # request.user is already available because IsAuthenticated permission is used
+        current_user = request.user
 
         try:
-            offset = int(offset)
-            limit = int(limit)
+            # Get chat groups where the current user is a member
+            # .prefetch_related('members') to reduce N+1 queries when accessing members
+            chat_groups_qs = await sync_to_async(
+                lambda: ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
+            )() # Order by -id for reverse chronological order of group creation for now. Consider last message time.
+
+            chat_list_data = []
+            for group in await sync_to_async(list)(chat_groups_qs):
+                # For 1-to-1 chats, find the other participant
+                other_members = await sync_to_async(list)(group.members.exclude(id=current_user.id))
+
+                other_username = "Unknown User"
+                if other_members:
+                    # In a true 1-to-1, there should be exactly one other member
+                    other_username = other_members[0].user_name
+                else:
+                    # This case should ideally not happen for valid 1-to-1 chats
+                    # Or indicates a chat with self which should be prevented on creation
+                    logger.warning(f"Chat group {group.name} for user {current_user.user_name} has no other members.")
+
+                # You could fetch the last message for a preview here, but keep it efficient.
+                # Example (would need to make this method async and await ORM calls):
+                # last_message = await sync_to_async(
+                #     lambda: Message.objects.filter(group=group).order_by('-timestamp').first()
+                # )()
+                # last_message_preview = last_message.content if last_message else ""
+
+                chat_list_data.append({
+                    'group_name': group.name,
+                    'display_name': other_username,
+                    'last_message_preview': '', # Placeholder
+                })
+            
+            # Optionally sort chat_list_data by last_message_preview_timestamp if you fetch it
+            
+            return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during chat list retrieval.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    async def post(self, request) -> Response:
+        """
+        Creates or retrieves a private chat group between the authenticated user
+        and a target user.
+        """
+        current_user = request.user # Authenticated user
+        data = request.data
+        target_username = data.get('target_username')
+
+        if not target_username:
+            return Response({'status': 'error', 'message': 'Target username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if current_user.user_name == target_username:
+            return Response(
+                {'status': 'error', 'message': 'Cannot create a chat with yourself.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Get the target user (must exist)
+            target_user = await sync_to_async(USER.objects.get)(user_name=target_username)
+
+            # Ensure consistent group name generation (e.g., "private_ID1_ID2")
+            participants_ids = sorted([current_user.id, target_user.id])
+            group_name = f"private_{participants_ids[0]}_{participants_ids[1]}"
+
+            # Atomically create or get the chat group and add members
+            # Using transaction.atomic with sync_to_async ensures ORM ops are safe.
+            # get_or_create is synchronous, so it needs sync_to_async.
+            chat_group, created_group = await sync_to_async(ChatGroup.objects.get_or_create)(
+                name=group_name
+            )
+            # Add members to the group
+            await sync_to_async(chat_group.members.add)(current_user, target_user)
+
+            return Response(
+                {'status': 'success', 'group_name': group_name},
+                status=status.HTTP_200_OK
+            )
+        except USER.DoesNotExist:
+            return Response({'status': 'error', 'message': 'Target user not found.'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during chat group operation.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+# ===============================================================
+# 2. Chat Message History View
+# Handles: GET /api/chat/<str:group_name>/messages/
+# ===============================================================
+class ChatMessageHistoryView(APIView):
+    """
+    API endpoint to retrieve chat message history for a specific group.
+    Supports pagination using offset and limit.
+    """
+    permission_classes = [IsAuthenticated] # Only authenticated users can access history
+
+    async def get(self, request, group_name: str) -> Response:
+        """
+        Retrieves a paginated list of messages for a given chat group.
+        Ensures the requesting user is a member of the group.
+        """
+        current_user = request.user # Authenticated user
+        offset_str = request.query_params.get('offset', '0')
+        limit_str = request.query_params.get('limit', '20')
+
+        try:
+            offset = int(offset_str)
+            limit = int(limit_str)
+            if offset < 0 or limit <= 0:
+                return Response(
+                    {'status': 'error', 'message': 'Offset must be non-negative and limit must be positive.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         except ValueError:
-            return Response({'status': 'error', 'message': 'Invalid offset or limit'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Correct filtering by related group's name
-        messages_queryset = Message.objects.filter(group__name=group_name).order_by('timestamp')
-
-        paginator = Paginator(messages_queryset, limit)
-        page_number = (offset // limit) + 1
+            return Response(
+                {'status': 'error', 'message': 'Invalid offset or limit. Must be integers.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
-            page_obj = paginator.get_page(page_number)
+            # Retrieve the chat group. Check if current_user is a member.
+            chat_group = await sync_to_async(ChatGroup.objects.get)(name=group_name)
+            
+            # Check if the requesting user is a member of this chat group
+            is_member = await sync_to_async(chat_group.members.filter(id=current_user.id).exists)()
+            if not is_member:
+                logger.warning(f"User {current_user.user_name} is not a member of group '{group_name}'. Access denied.")
+                return Response(
+                    {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Filter messages by group and order by timestamp for consistent pagination
+            messages_queryset = await sync_to_async(
+                lambda: Message.objects.filter(group=chat_group).order_by('timestamp')
+            )()
+
+            # Initialize Paginator (Paginator is synchronous, so we get the queryset first)
+            paginator = Paginator(messages_queryset, limit)
+
+            page_number = (offset // limit) + 1
+
+            try:
+                page_obj = await sync_to_async(paginator.get_page)(page_number)
+            except EmptyPage:
+                logger.info(f"No messages found for group '{group_name}' at offset {offset}.")
+                return Response(
+                    {
+                        'status': 'success',
+                        'messages': [],
+                        'next_offset': None,
+                        'has_next_page': False
+                    },
+                    status=status.HTTP_200_OK
+                )
+
+            # Serialize message data. Note: `page_obj.object_list` is synchronous.
             messages_data = [
                 {
                     'id': msg.id,
-                    'sender_username': msg.sender.user_name,  # Correct field
-                    'group_name': msg.group.name,             # Correct field
+                    'sender_username': msg.sender.user_name,
+                    'group_name': msg.group.name,
                     'content': msg.content,
-                    'timestamp': msg.timestamp.isoformat(),
-                } for msg in page_obj
+                    'timestamp': msg.timestamp.isoformat(), # Ensure ISO formatted
+                } for msg in await sync_to_async(list)(page_obj.object_list)
             ]
-        except EmptyPage:
-            messages_data = []
 
-        return Response({
-            'status': 'success',
-            'messages': messages_data,
-            'has_next_page': page_obj.has_next() if 'page_obj' in locals() else False
-        }, status=status.HTTP_200_OK)
+            next_offset = offset + len(messages_data) if page_obj.has_next() else None
+
+            logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_name}' for user {current_user.user_name}.")
+            return Response({
+                'status': 'success',
+                'messages': messages_data,
+                'next_offset': next_offset,
+                'has_next_page': page_obj.has_next()
+            }, status=status.HTTP_200_OK)
+
+        except ChatGroup.DoesNotExist:
+            logger.warning(f"Chat group '{group_name}' not found for message history.")
+            return Response(
+                {'status': 'error', 'message': 'Chat group not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.exception(f"Error in ChatMessageHistoryView for group '{group_name}': {e}")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during message history retrieval.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+# ===============================================================
+# 3. Chat Message Send View
+# Handles: POST /api/chat/<str:group_name>/messages/
+# ===============================================================
+class ChatMessageSendView(APIView):
+    """
+    API endpoint to send a chat message to a specific group.
+    This view saves the message to the database and broadcasts it via Channel Layers.
+    """
+    permission_classes = [IsAuthenticated] # Only authenticated users can send messages
+
+    async def post(self, request, group_name: str) -> Response:
+        """
+        Sends a message, saves it to the database, and broadcasts it via Channel Layers.
+        Ensures the requesting user is a member of the group.
+        """
+        current_user = request.user # Authenticated user
+        data = request.data # DRF Request.data is already parsed
+        content = data.get('content') # content from frontend
+
+        if not content:
+            logger.warning("Message content is empty for sending message.")
+            return Response(
+                {'status': 'error', 'message': 'Message content cannot be empty.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Retrieve the chat group. Check if current_user is a member.
+            chat_group = await sync_to_async(ChatGroup.objects.get)(name=group_name)
+
+            # Check if the requesting user is a member of this chat group
+            is_member = await sync_to_async(chat_group.members.filter(id=current_user.id).exists)()
+            if not is_member:
+                logger.warning(f"User {current_user.user_name} is not a member of group '{group_name}'. Cannot send message.")
+                return Response(
+                    {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Create the message asynchronously within an atomic transaction for safety
+            message = await sync_to_async(Message.objects.create)(
+                sender=current_user, # Use the authenticated user directly
+                content=content,
+                group=chat_group
+            )
+            logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_name}.")
+
+            channel_layer = get_channel_layer()
+            if channel_layer is None:
+                logger.critical("Channel Layer not configured. Real-time features will not work.")
+                return Response(
+                    {'status': 'error', 'message': 'Server not configured for real-time communication.'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            channel_group_name = f"chat_{group_name}"
+
+            # Prepare message data for broadcasting (matching frontend's expected structure)
+            message_data = {
+                "id": message.id,
+                "sender": current_user.user_name, # Frontend expects 'sender'
+                "sender_username": current_user.user_name, # Frontend also expects 'sender_username'
+                "sender_id": current_user.id,
+                "content": content,
+                "timestamp": message.timestamp.isoformat(),
+                "group_name": group_name
+            }
+
+            # Send message to the channel group for real-time update
+            await channel_layer.group_send(
+                channel_group_name,
+                {
+                    "type": "chat_message", # This 'type' maps to a method in your consumer
+                    "message": message_data # The actual message payload
+                }
+            )
+            logger.info(f"Message broadcasted to group '{channel_group_name}'.")
+
+            return Response({
+                'status': 'success',
+                'message': 'Message sent and broadcasted.',
+                'message_data': message_data # Return the data that was broadcasted
+            }, status=status.HTTP_200_OK)
+
+        except ChatGroup.DoesNotExist:
+            logger.warning(f"Chat group '{group_name}' not found for sending message.")
+            return Response(
+                {'status': 'error', 'message': 'Chat group not found.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.exception(f"Error in ChatMessageSendView: {e}")
+            return Response(
+                {'status': 'error', 'message': f'Internal server error: {e}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

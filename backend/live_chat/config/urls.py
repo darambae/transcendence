@@ -17,13 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 #from django.contrib.auth import views as auth_views #pour créer un fenêtre d'auth//A SUPPRIMER
-from api import views
 
+from api.views import sse_chat_stream, ChatGroupListCreateView, ChatMessageHistoryView, ChatMessageSendView
 urlpatterns = [
-    path("chat/", views.chat_page, name="chat_page"),
-    path("chat/send/", views.send_message, name="send_message"),
-    path("chat/group/create/private", views.create_or_get_private_group, name="create_private_group"),
-    path("chat/stream/<str:group_name>/", views.sse_chat_stream, name="sse_chat_stream"),
-    # NOUVELLE URL pour l'historique
-    path("chat/history/<str:group_name>/", views.get_message_history, name="get_message_history"),
+    path('chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
+    path("chat/stream/<str:group_name>/", sse_chat_stream, name="sse_chat_stream"),
+    # RESTful chat message endpoints
+    path('chat/<str:group_name>/messages/', ChatMessageHistoryView.as_view(), name='chat_message_history'),  # GET=history
+    path('chat/<str:group_name>/messages/', ChatMessageSendView.as_view(), name='chat_message_send'),  # POST=send message
 ]

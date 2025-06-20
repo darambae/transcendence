@@ -84,7 +84,8 @@ class login(APIView):
 						}
 						return JsonResponse(data_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 					data_response = {
-						'success':'authentication code send'
+						'success':'authentication code send',
+						'user_name': data_response.get('user_name'),
 					}
 			return JsonResponse(data_response, status=response.status_code)
 

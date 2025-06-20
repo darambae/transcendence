@@ -94,12 +94,15 @@ export async function handleLoginSubmit(event) {
 				await double_authenticate(dataForm);
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
-				console.log('User successfully connected');
+				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
+				console.log(`User ${username} successfully connected`);
+
 				// --- NEW: 로그인 성공 후 chatController 호출 ---
 				if (!window.chatInitialized) {
 					// 중복 초기화 방지를 위한 플래그
 					console.log('Login successful, initializing chat system.');
-					chatController();
+					window.loggedInUser = username;
+					chatController(username);
 					window.chatInitialized = true;
 				}
 				// --- END NEW ---
