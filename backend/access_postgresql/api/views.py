@@ -135,6 +135,27 @@ class checkPassword(APIView):
 			return JsonResponse({'error': 'User not found'}, status=404)
 
 
+class checkCurrentPassword(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request):
+
+		try:
+			user = request.user
+			data = request.data
+			password = data.get('password')
+
+			if check_password(password, user.password):
+				return JsonResponse({'success': 'Valid password'}, status=200)
+			else:
+				return JsonResponse({'error': 'Invalid password'}, status=401)
+
+		except Exception as e:
+			return JsonResponse({'error': f'Error checking current password : {str(e)}'}, status=400)
+
+
+
+
 class checkTfa(APIView):
 	permission_classes = [AllowAny]
 
@@ -328,3 +349,20 @@ class uploadProfile(APIView):
 		except Exception as e:
 			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
 
+
+class uploadNewPassword(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+		try:
+			user = request.user
+			data = request.data
+			newPassword = data.get('password')
+
+			user.password = newPassword
+			user.save()
+
+			return JsonResponse({'success': 'Successfully saved new password'}, status=200)
+
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving new password : {str(e)}'}, status=400)
