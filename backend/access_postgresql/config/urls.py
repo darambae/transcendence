@@ -17,9 +17,9 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword
 from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
-from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile
+from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
@@ -28,6 +28,7 @@ urlpatterns = [
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
+	path('api/checkCurrentPassword/', checkCurrentPassword.as_view(), name='checkCurrentPassword'),
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
@@ -36,6 +37,7 @@ urlpatterns = [
 	path('api/uploadImgAvatar/', uploadImgAvatar.as_view(), name='uploadImgAvatar'),
 	path('api/uploadProfile/', uploadProfile.as_view(), name='uploadProfile'),
 	path('api/uploadPrivateInfoUser/', uploadPrivateInfoUser.as_view(), name='uploadPrivateInfoUser'),
+	path('api/uploadNewPassword/', uploadNewPassword.as_view(), name='uploadNewPassword'),
 	path('api/addResultGames/', addResultGames.as_view(), name='addResultGames'),
 	path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
 ]

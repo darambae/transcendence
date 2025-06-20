@@ -141,6 +141,7 @@ class avatar(APIView):
             return Response({'error': 'Access to access_postgres failed'}, status=500)
 
 
+
 class saveImg(APIView):
     permission_classes = [AllowAny]
 
@@ -168,6 +169,8 @@ class saveImg(APIView):
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+
 
 class savePrivateInfo(APIView):
     permission_classes = [AllowAny]
@@ -219,3 +222,41 @@ class saveProfile(APIView):
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+class saveNewPassword(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadNewPassword/"
+
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        
+        newPassword = data.get('inputPasswordNew')
+        json_data = {
+            'password':data.get('inputPasswordCurrent')
+        }
+
+        checkResponse = requests.post("https://access-postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+        if (checkResponse.status_code != 200):
+            return JsonResponse({'error': 'Current password is not valid'}, status=400)
+        if newPassword != data.get('inputPasswordNew2'):
+            return JsonResponse({'error': 'New password do not match'}, status=400)
+        elif (len(newPassword) < 8):
+            return JsonResponse({'error': 'New password is too short minimum body is 8 caracter'}, status=400)
+
+        json_data_newPassword = {
+            "password":make_password(newPassword)
+        }
+
+        uploadResponse = requests.patch(url_access, json=json_data_newPassword, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+        if (uploadResponse.status_code != 200):
+            return JsonResponse({'error': 'Error witch save new password'}, status=400)
+        
+        return JsonResponse({'success': 'Successfully saved new password'}, status=200)

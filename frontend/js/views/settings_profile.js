@@ -34,9 +34,23 @@ function removElemAccount(token) {
 }
 
 function removElemPassword(token) {
+	const ruleLength = document.getElementById("rule-length");
+	const ruleUppercase = document.getElementById("rule-uppercase");
+	const ruleNumber = document.getElementById("rule-number");
+	const ruleSpecial = document.getElementById("rule-special-char");
+	const matchMessage = document.getElementById("passwordMatchMessage");
+
 	document.getElementById('inputPasswordCurrent').value = '';
 	document.getElementById('inputPasswordNew').value = '';
 	document.getElementById('inputPasswordNew2').value = '';
+	ruleLength.textContent = "❌ 8 characters minimum";
+	ruleUppercase.textContent = "❌ 1 uppercase letter";
+	ruleNumber.textContent = "❌ 1 number";
+	ruleSpecial.textContent = "❌ 1 special character";
+	matchMessage.textContent = "";
+	matchMessage.classList.remove("text-success");
+	matchMessage.classList.add("text-danger");
+
 }
 
 
@@ -343,6 +357,7 @@ function SavePrivateProfile(token) {
 
 function changePassword(token) {
 	const form = document.getElementById('changeMdp')
+	const errorDiv = document.getElementById('errorMessageMdp')
 
 	if (!form) {
 		console.log("form or erroDiv is empty");
@@ -358,7 +373,10 @@ function changePassword(token) {
 			inputPasswordNew: form.elements["inputPasswordNew"].value,
 			inputPasswordNew2: form.elements["inputPasswordNew2"].value,
 		}
-		if (data.inputPasswordNew === data.inputPasswordNew2) {
+		if (
+			data.inputPasswordNew === data.inputPasswordNew2 &&
+			data.inputPasswordNew.length >= 8
+		) {
 			try {
 				const response = await fetch("user-service/saveNewPassword/", {
 					method: 'PATCH',
@@ -376,7 +394,12 @@ function changePassword(token) {
 					errorDiv.classList.remove('text-danger');
 					errorDiv.classList.add('text-success');
 					errorDiv.style.display = 'block';
-					setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+					setTimeout(() => {
+						errorDiv.style.display = 'none';
+						errorDiv.textContent = '';
+						errorDiv.classList.remove('text-success');
+						errorDiv.classList.add('text-danger');
+					  }, 2200);
 				} else if (result.error) {
 					errorDiv.textContent = result.error;
 					errorDiv.style.display = 'block';
@@ -391,6 +414,5 @@ function changePassword(token) {
 				removElemPassword();
 			}
 		}
-
 	});
 }

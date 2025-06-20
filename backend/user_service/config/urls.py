@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from api import views
 from api.views import infoUser, avatar
-from api.views import saveImg, savePrivateInfo, saveProfile
+from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +27,7 @@ urlpatterns = [
 	path('user-service/infoUser/', infoUser.as_view(), name='infoUser'),
 	path('user-service/avatar/', avatar.as_view(), name='avatar'),
 	path('user-service/saveImg/', saveImg.as_view(), name='saveImg'),
+	path('user-service/saveNewPassword/', saveNewPassword.as_view(), name='saveNewPassword'),
 	path('user-service/savePrivateInfo/', savePrivateInfo.as_view(), name='savePrivateInfo'),
 	path('user-service/saveProfile/', saveProfile.as_view(), name='saveProfile'),
 ]
