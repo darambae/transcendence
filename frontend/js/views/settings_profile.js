@@ -267,11 +267,6 @@ function SavePrivateInfo(token) {
 			});
 			const result = await response.json();
 
-			if (result.error) {
-				errorDiv.textContent = result.error;
-				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-			}
 			if (result.success) {
 				errorDiv.textContent = result.success;
 				errorDiv.classList.remove('text-danger');
@@ -279,6 +274,10 @@ function SavePrivateInfo(token) {
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 				getUserInfo(token)
+			} else if (result.error) {
+				errorDiv.textContent = result.error;
+				errorDiv.style.display = 'block';
+				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 			}
 			removElemAccount(token)
 		} catch (error) {
@@ -317,13 +316,7 @@ function SavePrivateProfile(token) {
 				body: JSON.stringify(data)
 			});
 			const result = await response.json();
-			console.log(result);
 
-			if (result.error) {
-				errorDiv.textContent = result.error;
-				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-			}
 			if (result.success) {
 				errorDiv.textContent = result.success;
 				errorDiv.classList.remove('text-danger');
@@ -331,6 +324,10 @@ function SavePrivateProfile(token) {
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 				getUserInfo(token)
+			} else if (result.error) {
+				errorDiv.textContent = result.error;
+				errorDiv.style.display = 'block';
+				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 			}
 			removElemAccount(token)
 		} catch (error) {
@@ -361,17 +358,39 @@ function changePassword(token) {
 			inputPasswordNew: form.elements["inputPasswordNew"].value,
 			inputPasswordNew2: form.elements["inputPasswordNew2"].value,
 		}
-		if (inputPasswordNew != inputPasswordNew2) {
+		if (data.inputPasswordNew === data.inputPasswordNew2) {
+			try {
+				const response = await fetch("user-service/saveNewPassword/", {
+					method: 'PATCH',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(data)
+				});
+				const result = await response.json();
+				console.log(result);
 
+				if (result.success) {
+					errorDiv.textContent = result.success;
+					errorDiv.classList.remove('text-danger');
+					errorDiv.classList.add('text-success');
+					errorDiv.style.display = 'block';
+					setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				} else if (result.error) {
+					errorDiv.textContent = result.error;
+					errorDiv.style.display = 'block';
+					setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				}
+				removElemPassword()
+
+			} catch (error) {
+				errorDiv.textContent = "Error network : ";
+				errorDiv.style.display = 'block';
+				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				removElemPassword();
+			}
 		}
 
-		try {
-
-		} catch (error) {
-			errorDiv.textContent = "Error network : ";
-			errorDiv.style.display = 'block';
-			setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-			removElemPassword();
-		}
 	});
 }
