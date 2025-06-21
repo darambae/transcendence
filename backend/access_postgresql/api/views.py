@@ -3,13 +3,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.encoding import force_str
 from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from django.shortcuts import render
 from .models import USER, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
@@ -243,6 +243,28 @@ class InfoUser(APIView):
 			"last_login": user.last_login,
 			"avatar": user.avatar
         })
+
+
+class infoOtherUser(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def get(self, request, username):
+
+		user = get_object_or_404(USER, user_name=username)
+	 
+		data = {
+			"id": user.id,
+            "user_name": user.user_name,
+			"first_name": user.first_name,
+			"last_name": user.last_name,
+            "mail": user.mail,
+			"online": user.online,
+			"created_at": user.created_at,
+			"last_login": user.last_login,
+			"avatar": user.avatar
+		}
+
+		return Response(data, status=200)
 
 
 class addResultGames(APIView):

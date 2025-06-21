@@ -113,7 +113,30 @@ class infoUser(APIView):
 
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres failed'}, status=500)
-        
+
+
+
+class infoOtherUser(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        token = request.headers.get('Authorization')
+
+        try:
+            response = requests.get(
+                f'https://access-postgresql:4000/api/infoOtherUser/{username}/',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql',
+                }
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
+
+
 
 class avatar(APIView):
     permission_classes = [AllowAny]
@@ -260,3 +283,18 @@ class saveNewPassword(APIView):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
         
         return JsonResponse({'success': 'Successfully saved new password'}, status=200)
+    
+class searchUsers(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.GET.get('q', '')
+        results = []
+
+        fake_users = [
+            { "id": 3, "username": "mario" },
+            { "id": 8, "username": "marie" },
+            { "id": 9, "username": "mark" }
+        ]
+        return JsonResponse({'results': fake_users}, status=200)
+    

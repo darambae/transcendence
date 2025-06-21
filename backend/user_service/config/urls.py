@@ -19,15 +19,18 @@ from django.urls import path
 from api import views
 from api.views import infoUser, avatar
 from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
+from api.views import searchUsers, infoOtherUser
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('user-service/csrf/', views.get_csrf_token, name='csrf'),
 	path('user-service/signup/', views.signup, name='signup'),
 	path('user-service/infoUser/', infoUser.as_view(), name='infoUser'),
+	path('user-service/infoOtherUser/<str:username>/', infoOtherUser.as_view(), name='infoOtherUser'),
 	path('user-service/avatar/', avatar.as_view(), name='avatar'),
 	path('user-service/saveImg/', saveImg.as_view(), name='saveImg'),
 	path('user-service/saveNewPassword/', saveNewPassword.as_view(), name='saveNewPassword'),
 	path('user-service/savePrivateInfo/', savePrivateInfo.as_view(), name='savePrivateInfo'),
 	path('user-service/saveProfile/', saveProfile.as_view(), name='saveProfile'),
+	path('user-service/searchUsers/', searchUsers.as_view(), name='searchUsers'),
 ]

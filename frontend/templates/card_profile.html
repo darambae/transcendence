@@ -2,30 +2,36 @@
 
 
 
-<div class="container py-4">
+<div>
+  <div class="container py-4">
     <article class="card player-card mx-auto" style="max-width: 600px;">
       <div class="row g-0">
         
         <section class="col-md-4 p-4 text-center">
           <img src="/assets/img/default.png" class="user-avatar" alt="Profile Picture" />
           <div class="mt-3">
-            <span class="badge-online">🟢 Online</span>
+            <span id="statusOtherUser" >Status</span>
           </div>
         </section>
         
         <section class="col-md-8">
           <div class="card-body">
-            <h5 class="card-title">👤 USER</h5>
+            <h4 id="otherUser" class="card-title">👤 USER</h4>
             
-            <div class="name-row">
-              <div>First Name:</div>
-              <div>John</div>
-              <div>Last Name:</div>
-              <div>Doe</div>
+            <div class="row text-start text-white">
+              <div class="col-12 mb-2">
+                <span id="otherFirstName">XXX</span>
+              </div>
+              <div class="col-12 mb-2">
+                <span id="otherLastName">XXX</span>
+              </div>
+              <div class="col-12 mb-2">
+                <span id="otherMail">XXX</span>
+              </div>
             </div>
             <div class="border-top pt-3">
-                <div class="row text-center">
-                  <div class="col">
+              <div class="row text-center">
+                <div class="col">
                     <h6>🎮 Games</h6>
                     <strong>XXX</strong>
                   </div>
@@ -39,20 +45,21 @@
                   </div>
                 </div>
               </div>
-          </div>
-        </section>
-      </div>
-      <footer class="card-footer text-center py-3">
-        <div class="d-flex justify-content-center align-items-center gap-3">
-          <button class="footer-btn" type="button">
-            <i class="fas fa-user-plus"></i> Add Friend
-          </button>
-          <div class="vr-footer"></div>
-          <button class="footer-btn" type="button">
-            <i class="fas fa-envelope"></i> Message
-          </button>
+            </div>
+          </section>
         </div>
-      </footer>      
-    </article>
+        <footer class="card-footer text-center py-3">
+          <div class="d-flex justify-content-center align-items-center gap-3">
+            <button class="footer-btn" type="button">
+              <i class="fas fa-user-plus"></i> Add Friend
+            </button>
+            <div class="vr-footer"></div>
+            <button class="footer-btn" type="button">
+              <i class="fas fa-envelope"></i> Message
+            </button>
+          </div>
+        </footer>      
+      </article>
+    </div>
   </div>
-  
+    

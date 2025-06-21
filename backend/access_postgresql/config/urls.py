@@ -20,6 +20,7 @@ from django.urls import path
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword
 from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword
+from api.views import infoOtherUser
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
@@ -34,6 +35,7 @@ urlpatterns = [
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
 	path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
 	path('api/InfoUser/', InfoUser.as_view(), name='InfoUser'),
+	path('api/infoOtherUser/<str:username>/', infoOtherUser.as_view(), name='infoOtherUser'),
 	path('api/uploadImgAvatar/', uploadImgAvatar.as_view(), name='uploadImgAvatar'),
 	path('api/uploadProfile/', uploadProfile.as_view(), name='uploadProfile'),
 	path('api/uploadPrivateInfoUser/', uploadPrivateInfoUser.as_view(), name='uploadPrivateInfoUser'),

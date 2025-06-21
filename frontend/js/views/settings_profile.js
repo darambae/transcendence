@@ -1,5 +1,6 @@
 
 import { userInfo } from './user.js';
+import * as Friends from './friends.js';
 
 export function settingsProfileController() {
 	const token = sessionStorage.getItem("accessToken");
@@ -16,7 +17,7 @@ export function settingsProfileController() {
 	SavePrivateProfile(token)
 	changePassword(token)
 	animationPassword()
-
+	Friends.searchFriends(token)
 }
 
 //  get user info end affich
@@ -123,22 +124,25 @@ function animationPassword() {
 }
 
 
-function getUserInfo(token) {
-	fetch("https://localhost:8443/user-service/infoUser/", {
+async function getUserInfo(token) {
+	try {
+	  const response = await fetch("user-service/infoUser/", {
 		method: "GET",
 		headers: {
-			"Authorization": `Bearer ${token}`,
-			"Content-Type": "application/json",
+		  "Authorization": `Bearer ${token}`,
+		  "Content-Type": "application/json",
 		},
-	})
-		.then(handleResponse)
-		.then(data => {
-			displayUserInfo(data);
-		})
-		.catch(error => {
-			console.error("Erreur lors de la récupération des infos utilisateur :", error);
-		});
-}
+	  });
+	  if (!response.ok) {
+		throw new Error(`Erreur HTTP ! status: ${response.status}`);
+	  }
+	  const data = await response.json();
+	  displayUserInfo(data);
+  
+	} catch (error) {
+	  console.error("Erreur lors de la récupération des infos utilisateur :", error);
+	}
+  }
 
 function handleResponse(response) {
 	if (!response.ok) {
@@ -149,7 +153,7 @@ function handleResponse(response) {
 
 //  get avatar end affich
 function getUserAvatar(token) {
-	fetch("https://localhost:8443/user-service/avatar/", {
+	fetch("user-service/avatar/", {
 		method: "GET",
 		headers: {
 			"Authorization": `Bearer ${token}`,
