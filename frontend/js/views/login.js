@@ -98,13 +98,13 @@ export async function handleLoginSubmit(event) {
 				console.log(`User ${username} successfully connected`);
 
 				// --- NEW: 로그인 성공 후 chatController 호출 ---
-				if (!window.chatInitialized) {
-					// 중복 초기화 방지를 위한 플래그
-					console.log('Login successful, initializing chat system.');
-					window.loggedInUser = username;
-					chatController(username);
-					window.chatInitialized = true;
-				}
+				// if (!window.chatInitialized) {
+				// 	// 중복 초기화 방지를 위한 플래그
+				// 	console.log('Login successful, initializing chat system.');
+				// 	window.loggedInUser = username;
+				// 	chatController(username);
+				// 	window.chatInitialized = true;
+				// }
 				// --- END NEW ---
 			} catch (error) {
 				console.log("Double auth error: ", error);

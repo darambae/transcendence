@@ -9,7 +9,12 @@ from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
 import asyncio
 import httpx
-
+import logging
+from datetime import datetime
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 # Configure logging
 # --- IMPORTANT: Ensure these models are correctly defined in .models ---
 # These are placeholder imports. Adjust based on your actual project structure
@@ -20,82 +25,166 @@ import httpx
 # but primarily, this service proxies to access_postgresql.
 from .models import USER, ChatGroup, Message # Example: from myapp.models import USER, ChatGroup, Message
 
+logger = logging.getLogger(__name__)
+
 # Base URL for your access_postgresql service (without the /api/ prefix)
-ACCESS_PG_BASE_URL = "http://access-postgresql:4000"
+ACCESS_PG_BASE_URL = "https://access-postgresql:4000"
 
-@method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
-class ChatGroupListCreateView(View):
+# @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
+# class ChatGroupListCreateView(View):
+#     """
+#     Handles listing existing chat groups for the authenticated user (GET)
+#     and creating new private chat groups (POST).
+#     Maps to: path('chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create')
+#     Communicates with access_postgresql's /api/chat/ endpoint.
+#     """
+
+#     async def get(self, request, *args, **kwargs):
+#         """
+#         Lists chat groups for the logged-in user by proxying to access_postgresql.
+#         Expects Authorization header for user identification to be passed along.
+#         """
+#         auth_header = request.headers.get('Authorization')
+#         headers = {'Content-Type': 'application/json', 'host': 'access-postgresql'}
+#         if auth_header:
+#             headers['Authorization'] = auth_header
+#         # for debugging purposes, you might want to log the auth header
+#         logger.debug(f"ChatGroupListCreateView GET request headers: {headers}")
+#         # Construct the URL including the /api/ prefix as per access_postgresql's urls.py
+#         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
+#         try:
+#             logger.info(f"ChatGroupListCreateView GET request to {url} with headers: {headers}")
+#             async with httpx.AsyncClient() as client:
+#                 resp = await client.get(url, headers=headers, timeout=100.0)
+#                 resp.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
+#                 return JsonResponse(resp.json(), status=resp.status_code)
+#         except httpx.RequestError as exc:
+#             logger.error(f"ChatGroupListCreateView GET request failed: {exc}")
+#             return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
+#         except httpx.HTTPStatusError as exc:
+#             return JsonResponse({'status': 'error', 'message': f'Error from data service: {exc.response.text}'}, status=exc.response.status_code)
+#         except Exception as e:
+#             return JsonResponse({'status': 'error', 'message': 'Internal server error during chat list retrieval.'}, status=500)
+
+#     async def post(self, request, *args, **kwargs):
+#         """
+#         Creates or retrieves a private chat group by proxying to access_postgresql.
+#         Expects 'current_username' and 'target_username' in the JSON body.
+#         """
+#         try:
+#             data = json.loads(request.body)
+#             current_username = data.get('current_username')
+#             target_username = data.get('target_username')
+
+#             if not current_username or not target_username:
+#                 return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
+
+#             auth_header = request.headers.get('Authorization')
+#             headers = {'Content-Type': 'application/json'}
+#             if auth_header:
+#                 headers['Authorization'] = auth_header
+
+#             # Construct the URL including the /api/ prefix as per access_postgresql's urls.py
+#             url = f"{ACCESS_PG_BASE_URL}/api/chat/"
+#             try:
+#                 async with httpx.AsyncClient() as client:
+#                     resp = await client.post(url, json={
+#                         'current_username': current_username,
+#                         'target_username': target_username
+#                     }, headers=headers, timeout=10.0)
+#                     resp.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
+#                     return JsonResponse(resp.json(), status=resp.status_code)
+#             except httpx.RequestError as exc:
+#                 return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for private chat.'}, status=502)
+#             except httpx.HTTPStatusError as exc:
+#                 return JsonResponse({'status': 'error', 'message': f'Error from data service: {exc.response.text}'}, status=exc.response.status_code)
+#             except Exception as e:
+#                 return JsonResponse({'status': 'error', 'message': 'Internal server error during private chat creation.'}, status=500)
+
+#         except json.JSONDecodeError:
+#             return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+#         except Exception as e:
+#             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
+
+class ChatGroupListCreateView(APIView):
     """
-    Handles listing existing chat groups for the authenticated user (GET)
-    and creating new private chat groups (POST).
-    Maps to: path('chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create')
-    Communicates with access_postgresql's /api/chat/ endpoint.
+    API endpoint to list existing chat groups for the authenticated user (GET)
+    and to create or retrieve new 1-to-1 chat groups (POST).
     """
-
-    async def get(self, request, *args, **kwargs):
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this view
+    # Check if this user has permission to access this view
+    def get(self, request):
         """
-        Lists chat groups for the logged-in user by proxying to access_postgresql.
-        Expects Authorization header for user identification to be passed along.
+        Lists chat groups for the currently authenticated user.
         """
-        auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json'}
-        if auth_header:
-            headers['Authorization'] = auth_header
-        
-        # Construct the URL including the /api/ prefix as per access_postgresql's urls.py
-        url = f"{ACCESS_PG_BASE_URL}/api/chat/"
+        logger.info("ChatGroupListCreateView GET request received : {request}")
+        current_user = request.user
+        logger.info(f"ChatGroupListCreateView GET request by user: {current_user}")
         try:
-            async with httpx.AsyncClient() as client:
-                resp = await client.get(url, headers=headers, timeout=10.0)
-                resp.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
-                return JsonResponse(resp.json(), status=resp.status_code)
-        except httpx.RequestError as exc:
-            return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
-        except httpx.HTTPStatusError as exc:
-            return JsonResponse({'status': 'error', 'message': f'Error from data service: {exc.response.text}'}, status=exc.response.status_code)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': 'Internal server error during chat list retrieval.'}, status=500)
+            logger.info(f"Retrieving chat groups for user {current_user.user_name}")
+            chat_groups_qs = ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
 
-    async def post(self, request, *args, **kwargs):
+            chat_list_data = []
+            for group in chat_groups_qs:
+                other_members = group.members.exclude(id=current_user.id)
+                other_username = "Unknown User"
+                if other_members.exists():
+                    other_username = other_members.first().user_name    
+                else:
+                    logger.warning(f"Chat group {group.name} for user {current_user.user_name} has no other members.")
+
+                chat_list_data.append({
+                    'group_name': group.name,
+                    'display_name': other_username,
+                    'last_message_preview': '',  # Placeholder
+                })
+
+            return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.exception("Error during chat list retrieval")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during chat list retrieval.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def post(self, request):
         """
-        Creates or retrieves a private chat group by proxying to access_postgresql.
-        Expects 'current_username' and 'target_username' in the JSON body.
+        Creates or retrieves a private chat group between the authenticated user and a target user.
         """
+        current_user = request.user
+        data = request.data
+        target_username = data.get('target_username')
+
+        if not target_username:
+            return Response({'status': 'error', 'message': 'Target username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if current_user.user_name == target_username:
+            return Response(
+                {'status': 'error', 'message': 'Cannot create a chat with yourself.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            data = json.loads(request.body)
-            current_username = data.get('current_username')
-            target_username = data.get('target_username')
+            target_user = USER.objects.get(user_name=target_username)
+            participants_ids = sorted([current_user.id, target_user.id])
+            group_name = f"private_{participants_ids[0]}_{participants_ids[1]}"
 
-            if not current_username or not target_username:
-                return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
+            chat_group, created_group = ChatGroup.objects.get_or_create(name=group_name)
+            chat_group.members.add(current_user, target_user)
 
-            auth_header = request.headers.get('Authorization')
-            headers = {'Content-Type': 'application/json'}
-            if auth_header:
-                headers['Authorization'] = auth_header
-
-            # Construct the URL including the /api/ prefix as per access_postgresql's urls.py
-            url = f"{ACCESS_PG_BASE_URL}/api/chat/"
-            try:
-                async with httpx.AsyncClient() as client:
-                    resp = await client.post(url, json={
-                        'current_username': current_username,
-                        'target_username': target_username
-                    }, headers=headers, timeout=10.0)
-                    resp.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
-                    return JsonResponse(resp.json(), status=resp.status_code)
-            except httpx.RequestError as exc:
-                return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for private chat.'}, status=502)
-            except httpx.HTTPStatusError as exc:
-                return JsonResponse({'status': 'error', 'message': f'Error from data service: {exc.response.text}'}, status=exc.response.status_code)
-            except Exception as e:
-                return JsonResponse({'status': 'error', 'message': 'Internal server error during private chat creation.'}, status=500)
-
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+            return Response(
+                {'status': 'success', 'group_name': group_name},
+                status=status.HTTP_200_OK
+            )
+        except USER.DoesNotExist:
+            return Response({'status': 'error', 'message': 'Target user not found.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
-
+            logger.exception("Error during chat group creation")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during chat group operation.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatMessageHistoryView(View):

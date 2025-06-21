@@ -253,8 +253,8 @@ class ChatGroupListCreateView(APIView):
     API endpoint to list existing chat groups for the authenticated user (GET)
     and to create or retrieve new 1-to-1 chat groups (POST).
     """
-    permission_classes = [IsAuthenticated] # Ensure only authenticated users can list/create chats
-
+    #permission_classes = [IsAuthenticated] # Ensure only authenticated users can list/create chats
+    permission_classes = [AllowAny] # For testing purposes, allow any user to access this view
     async def get(self, request) -> Response:
         """
         Lists chat groups for the currently authenticated user.
@@ -262,9 +262,11 @@ class ChatGroupListCreateView(APIView):
         # request.user is already available because IsAuthenticated permission is used
         current_user = request.user
 
+
         try:
             # Get chat groups where the current user is a member
             # .prefetch_related('members') to reduce N+1 queries when accessing members
+            logger.info(f"Retrieving chat groups for user {current_user.user_name}")
             chat_groups_qs = await sync_to_async(
                 lambda: ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
             )() # Order by -id for reverse chronological order of group creation for now. Consider last message time.

@@ -5,7 +5,7 @@ set -e
 # Create extfile for SAN
 echo "Creating SAN extfile..."
 cat <<EOF > /usr/share/elasticsearch/config/certs/san.ext
-subjectAltName = DNS:transcendence.42.fr, DNS:localhost, DNS:kibana, DNS:server_pong, DNS:tournament, IP:127.0.0.1
+subjectAltName = DNS:transcendence.42.fr, DNS:localhost, DNS:kibana, DNS:server_pong, DNS:tournament, DNS:live_chat, IP:127.0.0.1
 EOF
 
 echo "Generating private key and CSR for the server..."

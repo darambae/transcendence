@@ -234,7 +234,7 @@ function initEventSource(groupName) {
 }
 
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
-async function loadChatRoomList() {
+async function loadChatRoomList(current_user) {
     const chatRoomListUl = document.getElementById('chatRoomList');
     if (!chatRoomListUl) {
         console.error('Chat room list element not found!');
@@ -253,21 +253,34 @@ async function loadChatRoomList() {
         // Note: Your backend ChatGroupListCreateView GET should filter by the loggedInUser internally
         // or accept a query parameter for it. Based on your urls.py, it seems it's `/chat/`
         // which implies the view itself handles the user context for listing.
-        // If it requires a username in the URL, revert to `/chat/chats/${loggedInUser}/`
+        // If it requires a username in the URL, revert to `/chat/${loggedInUser}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         const csrf = getCookie('csrftoken');
         const token = sessionStorage.getItem('accessToken');
+        console.log('Loading chat list for user:', current_user);
+        if (!token) {
+            console.warn('No access token found in session storage. Cannot load chat list.');
+            chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
+            return;
+        }
+        //
         const response = await fetch(`/chat/`, {
-					method: 'GET',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrf, // For CSRF protection if needed
-					},
-				});
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf, // For CSRF protection if needed
+            },
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error loading chat list:', errorData.message || 'Unknown error');
+            alert('Error loading chat list: ' + (errorData.message || 'Unknown error'));
+            return;
+        }
         const data = await response.json();
 
-        if (response.ok && data.status === 'success') {
+        if (response.ok) {
             chatRoomListUl.innerHTML = ''; // Clear existing list
             if (data.chats.length === 0) {
                 chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">No active chats. Start one!</li>`;
@@ -401,7 +414,7 @@ async function promptPrivateChat(targetUsername) {
             const data = await response.json();
             if (response.ok && data.status === 'success' && data.group_name) {
                 console.log(`Chat group ${data.group_name} created/retrieved.`);
-                loadChatRoomList(); // Reload list to include new chat
+                loadChatRoomList(loggedInUser); // Reload list to include new chat
                 // Wait for the list to be updated in the DOM before switching
                 setTimeout(() => {
                     switchChatRoom(data.group_name); // Switch to the new chat
@@ -468,7 +481,7 @@ export function chatController(userLoggedInName) {
 
         mainChatWindowElement.addEventListener('shown.bs.modal', () => {
             console.log('Main Chat Window is shown');
-            loadChatRoomList(); // Load chat list dynamically
+            loadChatRoomList(loggedInUser); // Load chat list dynamically
             
             // Set initial state for chat log
             const chatLog = document.getElementById('chatLog-active');
