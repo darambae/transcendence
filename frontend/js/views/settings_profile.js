@@ -8,7 +8,7 @@ export function settingsProfileController() {
 		console.error("Token manquant !");
 		return;
 	}
-
+	
 	getUserInfo(token);
 	getUserAvatar(token);
 	setupAvatarUpload();
@@ -26,6 +26,8 @@ function displayUserInfo(data) {
 	document.getElementById('mailLabel').textContent = data.mail;
 	document.getElementById('firstNameLabel').textContent = data.first_name;
 	document.getElementById('lastNameLabel').textContent = data.last_name;
+	document.getElementById('createdAt').textContent = data.created_at;
+	document.getElementById('lastActive').textContent = data.last_login;
 }
 
 function removElemAccount(token) {
@@ -160,7 +162,7 @@ function getUserAvatar(token) {
 		},
 	})
 		.then(res => {
-			if (!res.ok) throw new Error("Erreur lors de la récupération de l'avatar");
+			if (!res.ok) throw new Error("Error retrieving avatar");
 			return res.blob();
 		})
 		.then(blob => {
@@ -168,7 +170,7 @@ function getUserAvatar(token) {
 			document.getElementById("avatar").src = imgUrl;
 		})
 		.catch(err => {
-			console.error("Erreur lors du chargement de l'avatar :", err);
+			console.error("Error loading avatar :", err);
 		});
 }
 
@@ -420,3 +422,4 @@ function changePassword(token) {
 		}
 	});
 }
+

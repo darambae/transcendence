@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.utils.dateformat import format
 import json
 import logging
 from datetime import datetime
@@ -22,6 +23,8 @@ import sys
 import jwt
 from django.conf import settings
 # Create your views here.
+
+
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]
@@ -239,8 +242,8 @@ class InfoUser(APIView):
 			"last_name": user.last_name,
             "mail": user.mail,
 			"online": user.online,
-			"created_at": user.created_at,
-			"last_login": user.last_login,
+			"created_at": format(user.created_at, 'Y-m-d  H:i'),
+			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
 			"avatar": user.avatar
         })
 
@@ -259,8 +262,8 @@ class infoOtherUser(APIView):
 			"last_name": user.last_name,
             "mail": user.mail,
 			"online": user.online,
-			"created_at": user.created_at,
-			"last_login": user.last_login,
+			"created_at": format(user.created_at, 'Y-m-d  H:i'),
+			"last_login": format(user.last_login, 'Y-m-d  H:i')  if user.last_login else None,
 			"avatar": user.avatar
 		}
 
@@ -388,3 +391,21 @@ class uploadNewPassword(APIView):
 
 		except Exception as e:
 			return JsonResponse({'error': f'Error saving new password : {str(e)}'}, status=400)
+
+
+class searchUsers(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def get(self, request):
+		query = request.GET.get('q', '')
+		me = request.user
+
+		users = USER.objects.filter(user_name__icontains=query).exclude(user_name=me.user_name)[:3]
+		results = []
+
+		for user in users:
+			results.append({
+				'id': user.id,
+				'username': user.user_name,
+			})
+		return JsonResponse({'results': results}, status=200)

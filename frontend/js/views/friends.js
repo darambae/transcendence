@@ -1,14 +1,11 @@
 
+
+
 export function searchFriends(token) {
 	
 	document.getElementById("userSearch").addEventListener("input", async function () {
 		const resultsBox = document.getElementById("resultsSearch");
 		const query = this.value;
-
-		if (query.length < 2) {
-			resultsBox.innerHTML = "sssss";
-			return;
-		}
 		
 		const response = await fetch(`user-service/searchUsers?q=${encodeURIComponent(query)}`, {
 			method: "GET",
@@ -25,9 +22,9 @@ export function searchFriends(token) {
 		const users = data.results ?? [];
 		
 		resultsBox.innerHTML = users
-		.map(user => `<li class="list-group-item"><a href="/profile/${user.id}" class="user-link">${user.username}</a></li>`)
+		.map(user => `<li class="list-group-item user-link"><a href="/#card_profile/${user.username}" data-username="${user.username}">${user.username}</a></li>`)
 			.join('');
-		
 		console.log(query);
 	})
 }
+

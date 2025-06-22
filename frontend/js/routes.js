@@ -46,6 +46,7 @@ export const routes = {
 	card_profile: {
 		template: 'card_profile',
 		controller: card_profileController,
+		isModal: true,
 	},
 	settings_profile: {
 		template: 'settings_profile',

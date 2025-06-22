@@ -163,6 +163,31 @@ class avatar(APIView):
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres failed'}, status=500)
 
+class avatarOther(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        token = request.headers.get('Authorization')
+
+        try:
+            response = requests.get(
+                f'https://access-postgresql:4000/api/infoOtherUser/{username}/',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql'
+                }
+            )
+            data = response.json()
+            path = data['avatar']
+            if path:
+                full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
+                return FileResponse(open(full_path, 'rb'), content_type='image/png')
+            else:
+                return JsonResponse({'error': 'not authorized'}, status=401)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
+
 
 
 class saveImg(APIView):
@@ -246,6 +271,8 @@ class saveProfile(APIView):
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
 
+
+
 class saveNewPassword(APIView):
     permission_classes = [AllowAny]
 
@@ -283,18 +310,34 @@ class saveNewPassword(APIView):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
         
         return JsonResponse({'success': 'Successfully saved new password'}, status=200)
-    
+
+
 class searchUsers(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        token = request.headers.get('Authorization')
         query = request.GET.get('q', '')
-        results = []
 
-        fake_users = [
-            { "id": 3, "username": "mario" },
-            { "id": 8, "username": "marie" },
-            { "id": 9, "username": "mark" }
-        ]
-        return JsonResponse({'results': fake_users}, status=200)
+        if not query:
+            return JsonResponse({'results': []}, status=200)
+        
+        try:
+            response = requests.get(
+                f'https://access-postgresql:4000/api/searchUsers?q={query}',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql'
+                }
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                return JsonResponse({'results': data.get('results', [])}, status=200)
+            else:
+                return JsonResponse({'error': 'Failed to fetch users'}, status=response.status_code)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres for search users failed'}, status=500)
+
     

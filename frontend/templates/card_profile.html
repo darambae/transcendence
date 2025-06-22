@@ -1,16 +1,18 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
 
-
 <div>
   <div class="container py-4">
     <article class="card player-card mx-auto" style="max-width: 600px;">
       <div class="row g-0">
         
         <section class="col-md-4 p-4 text-center">
-          <img src="/assets/img/default.png" class="user-avatar" alt="Profile Picture" />
-          <div class="mt-3">
-            <span id="statusOtherUser" >Status</span>
+          <img id="avatarother" alt="Avatar User" src="/assets/img/default.png" class="rounded-circle img-responsive mt-2" width="128" height="128" />
+          <div class="row text-start text-white mt-3">
+            <span id="statusOtherUser" class="">Status</span>
+            <div class="col-12 mb-2">
+              <strong></strong> <span id="lastActiveOther"></span>
+            </div>
           </div>
         </section>
         
@@ -28,7 +30,11 @@
               <div class="col-12 mb-2">
                 <span id="otherMail">XXX</span>
               </div>
+              <div class="col-12 mb-2">
+                <strong>📅 Created on : </strong> <span id="createdAtOther"></span>
+              </div>
             </div>
+            
             <div class="border-top pt-3">
               <div class="row text-center">
                 <div class="col">

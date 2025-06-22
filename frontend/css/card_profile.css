@@ -1,7 +1,7 @@
 .player-card {
     position: relative;
     overflow: hidden;
-    background-color: transparent !important;
+    background-color: rgba(139, 0, 0, 0.767)  !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 0,5rem !important;
     padding: 0;
@@ -49,6 +49,16 @@
     text-shadow: 0 0 3px rgba(0,0,0,0.5);
 }
 
+.badge-ofline {
+  background-color: #ff0000;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-weight: 600;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(207, 81, 81, 0.7);
+  text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
 
 .name-row {
     display: grid;
