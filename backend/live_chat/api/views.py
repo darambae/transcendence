@@ -29,7 +29,7 @@ from .models import USER, ChatGroup, Message # Example: from myapp.models import
 logger = logging.getLogger(__name__)
 
 # Base URL for your access_postgresql service (without the /api/ prefix)
-ACCESS_PG_BASE_URL = "https://access-postgresql:4000"
+ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
 # @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
 class ChatGroupListCreateView(View):
@@ -39,7 +39,7 @@ class ChatGroupListCreateView(View):
         Expects Authorization header for user identification to be passed along.
         """
         auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json', 'host': 'access-postgresql'}
+        headers = {'Content-Type': 'application/json', 'host': 'access_postgresql'}
         if auth_header:
             headers['Authorization'] = auth_header
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"

@@ -41,7 +41,7 @@ services:
     depends_on:
       - user_service
       - ai_pong
-      - server-pong
+      - server_pong
       #- auth
     networks:
       - nginx_network
@@ -129,11 +129,11 @@ services:
 
   ################## Access_posgresql ##################
 
-  access-postgresql:
+  access_postgresql:
     build:
       context: ./backend/access_postgresql
       dockerfile: Dockerfile
-    container_name: access-postgresql
+    container_name: access_postgresql
     volumes:
       - ./backend/access_postgresql:/app
       - certs:/certs
@@ -172,11 +172,11 @@ services:
       - elk_network
 
   ############### Game import ##################
-  server-pong:
+  server_pong:
     build: 
       context: ./backend/server_pong/
       dockerfile: ./Dockerfile
-    container_name: server-pong
+    container_name: server_pong
     depends_on:
       game_redis:
         condition: service_started

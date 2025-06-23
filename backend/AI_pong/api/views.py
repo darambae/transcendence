@@ -9,7 +9,7 @@ import sys
 import threading
 from http import HTTPStatus
 
-urlRequests = "https://server-pong:8030/"
+urlRequests = "https://server_pong:8030/"
 
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT

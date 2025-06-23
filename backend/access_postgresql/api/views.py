@@ -22,15 +22,14 @@ import logging
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage
 from asgiref.sync import sync_to_async
-from channels.layers import get_channel_layerimport sys
+from channels.layers import get_channel_layer
+import sys
 import jwt
 from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-# access_postgresql/views.py
 from django.core.paginator import Paginator, EmptyPage
-# Import your models
-# Ensure these imports correctly point to your models
+
 try:
     from .models import USER, ChatGroup, Message
 except ImportError:
@@ -47,8 +46,6 @@ except ImportError:
     class Message:
         objects = None
 		
-
-
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]

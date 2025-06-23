@@ -4,17 +4,17 @@ ELK=elk
 
 DOCKER_FILE=docker-compose.yml
 
-MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access-postgresql tournament live_chat
+MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access_postgresql live_chat # tournament	
 ELK_CONTAINERS=elasticsearch kibana logstash
 
 # POUR GAUTIER & OMAR
-USER_CONTAINER=nginx_modsecurity postgres access-postgresql auth user_service mail
+USER_CONTAINER=nginx_modsecurity postgres access_postgresql auth user_service mail
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server-pong game_redis nginx_modsecurity postgres user_service access-postgresql auth mail	 # tournament
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access_postgresql auth mail	 # tournament
 
 # POUR KELLY PLUS TARD
-CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access-postgresql server_pong ai_pong user_service tournament
+CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access_postgresql server_pong ai_pong user_service tournament
 
 COMPOSE=docker compose -f ${DOCKER_FILE}
 
@@ -39,7 +39,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator:
+certs_generator: #add-ca
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
