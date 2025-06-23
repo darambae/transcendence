@@ -33,10 +33,22 @@ def calcIntersections(A1 : Point, A2 : Point, B1 : Point, B2 : Point):
 		else -> ret1 = Intersections point | ret2 = fraction of 1 sec (deadtime)
 	"""
 
-	x1, y1 = A1.toTuple()																																					# Get positions
-	x2, y2 = A2.toTuple()																																					# Get positions
-	x3, y3 = B1.toTuple()																																					# Get positions
-	x4, y4 = B2.toTuple()																																					# Get positions
+	if type(A1).__name__ == "Point" :
+		x1, y1 = A1.toTuple()																																					# Get positions
+	else :
+		x1, y1 = A1
+	if type(A2).__name__ == "Point" :
+		x2, y2 = A2.toTuple()																																					# Get positions
+	else :
+		x2,y2 = A2
+	if type(B1).__name__ == "Point" :
+		x3, y3 = B1.toTuple()																																					# Get positions
+	else :
+		x3,y3 = B1
+	if type(B2).__name__ == "Point" :
+		x4, y4 = B2.toTuple()																																					# Get positions
+	else :
+		x4,y4 = B2
 
 	dXSpeed = x2 - x1																																						# Calc ball trajectory vector
 	dYSpeed = y2 - y1																																						# Calc ball trajectory vector
@@ -64,8 +76,6 @@ def calcIntersections(A1 : Point, A2 : Point, B1 : Point, B2 : Point):
 
 def	normalizeNormalVector(vector:Vector) :
 	norm = math.sqrt(vector.x**2 + vector.y**2)
-	if(norm == 0) :
-		print("vec : ", vector, file=sys.stderr)
 	return Vector(-(round(vector.y / norm, 2)), round(vector.x / norm, 2))
 
 def calcDotProduct(vec1:Vector, vec2:Vector) :
@@ -214,7 +224,7 @@ class	Movement() :
 
 	async def getWallsHit(self) -> None :
 		### Determine all movement ###
-		timeLeft : float = 0.005																																			# Set default time to 5 milliseconds	
+		timeLeft : float = 0.02																																			# Set default time to 5 milliseconds	
 
 		while timeLeft > 0.0:																																				# While there is time to calculate movement
 			linearMovementPoint:Point = await self.calculateLinearMovement(self.ball.spd, timeLeft)																			# Calculate linear movement (No collision)

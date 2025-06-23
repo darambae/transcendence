@@ -40,6 +40,8 @@ export async function handleSignupSubmit(event) {
 		let responseData = null; 
 		if (!response.ok) {
 			responseData = await response.json();
+
+			console.log(responseData)
 		}
 		
 		if (response.ok) {

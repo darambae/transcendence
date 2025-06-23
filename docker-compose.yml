@@ -41,7 +41,7 @@ services:
     depends_on:
       - user_service
       - ai_pong
-      - server_pong
+      - server-pong
       #- auth
     networks:
       - nginx_network
@@ -149,11 +149,11 @@ services:
       - elk_network
 
   ############### Game import ##################
-  server_pong:
+  server-pong:
     build: 
       context: ./backend/server_pong/
       dockerfile: ./Dockerfile
-    container_name: server_pong
+    container_name: server-pong
     depends_on:
       game_redis:
         condition: service_started

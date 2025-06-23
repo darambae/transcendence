@@ -156,3 +156,9 @@ async def listTournament(request) :
         return JsonResponse({"error" : "Internal server error"}, status=500)
 
 
+async def tournamentManager(request) :
+    try :
+        if request.method == "GET" :
+            return listTournament(request)
+        elif request.method == "POST" :
+            return 

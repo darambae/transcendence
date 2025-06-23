@@ -3,24 +3,30 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.encoding import force_str
 from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from django.shortcuts import render
-from .models import USER
+from .models import USER, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.utils.dateformat import format
 import json
 import logging
 from datetime import datetime
-
+import sys
 import jwt
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 # Create your views here.
+
+
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]
@@ -118,6 +124,7 @@ class checkPassword(APIView):
 			if user.activated:
 				if check_password(data.get('password'), user.password):
 					opt = generate_otp_send_mail(user)
+					# opt = "NZHK-GO7Q-9JSD-X9QI"
 					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',
@@ -133,61 +140,98 @@ class checkPassword(APIView):
 			return JsonResponse({'error': 'User not found'}, status=404)
 
 
+class checkCurrentPassword(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request):
+
+		try:
+			user = request.user
+			data = request.data
+			password = data.get('password')
+
+			if check_password(password, user.password):
+				return JsonResponse({'success': 'Valid password'}, status=200)
+			else:
+				return JsonResponse({'error': 'Invalid password'}, status=401)
+
+		except Exception as e:
+			return JsonResponse({'error': f'Error checking current password : {str(e)}'}, status=400)
+
+
+
+
 class checkTfa(APIView):
 	permission_classes = [AllowAny]
 
 	def post(self, request):
 
 		data = request.data
+		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
 		try:
-			user = USER.objects.get(mail=data.get('mail'))
-			if user.activated and user.two_factor_auth != None:
-				if check_password(data.get('tfa'), user.two_factor_auth):
-					user.two_factor_auth = False
-					user.online = True
-					user.last_login = datetime.now()
-					user.save()
+			if "jwt" in data :
+				print(f"invites : {data['jwt']}", file=sys.stderr)
+				user = USER.objects.get(mail=data.get('mail'))
+				if user.actived and user.two_factor_auth != None:
+					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+						data["jwt"]["invites"].append(user.user_name)
+						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
+						user.two_factor_auth = False
+						user.save()
+						response = JsonResponse({'success': 'authentication code send'}, status=200)
+						response.set_cookie(key='access_token',
+						  					value=str(data_generate_jwt['access']),
+											httponly=True,
+											samesite='Lax')
+						response.set_cookie(key='refresh_token',
+											value=str(data_generate_jwt['refresh']),
+											httponly=True,
+											samesite='Lax')
+						return response
+					else :
+						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+			else :
+				print(f"main : ", file=sys.stderr)
+				user = USER.objects.get(mail=data.get('mail'))
+				if user.actived and user.two_factor_auth != None:
+					if check_password(data.get('tfa'), user.two_factor_auth):
+						user.two_factor_auth = False
+						user.online = True
+						user.last_login = datetime.now()
+						user.save()
 
-					data_generate_jwt = generateJwt(user)
+						data_generate_jwt = generateJwt(user, user.toJson())
 
-					return JsonResponse({'success': 'authentication code send',
-						  				 'refresh': str(data_generate_jwt['refresh']),
-										 'access': str(data_generate_jwt['access'])},
-										 status=200)
+						response = JsonResponse({'success': 'authentication code send'}, status=200)
+						response.set_cookie(key='access_token',
+						  					value=str(data_generate_jwt['access']),
+											httponly=True,
+											samesite='Lax')
+						response.set_cookie(key='refresh_token',
+											value=str(data_generate_jwt['refresh']),
+											httponly=True,
+											samesite='Lax')
+						print("Access token generated : ", data_generate_jwt['access'], file=sys.stderr)
+						print("Refresh token generated : ", data_generate_jwt['refresh'], file=sys.stderr)
+						return response
+					else:
+						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
 				else:
-					return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
-			else:
-				return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+					return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
-
-
-#class GenerJwt(APIView):
-#	permission_classes = [AllowAny]
-
-#	def post(self, request):
-
-#		data = request.data
-
-#		try:
-#			user = USER.objects.get(mail=data.get('mail'))
-
-
-#		except USER.DoesNotExist:
-#			return JsonResponse({'error': 'User not found'}, status=404)
-
 
 
 class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
 	def get(self, request):
-		auth_header = request.headers.get('Authorization')
-		if not auth_header:
+		jwt_token = request.headers.get('Authorization')
+		if not jwt_token:
 			return Response({'error': 'Authorization header missing'}, status=400)
 
-		parts = auth_header.split()
+		parts = jwt_token.split()
 		if len(parts) != 2 or parts[0].lower() != 'bearer':
 			return Response({'error': 'Invalid Authorization header'}, status=400)
 
@@ -202,7 +246,6 @@ class DecodeJwt(APIView):
 			return Response({'error': 'Invalid token'}, status=401)
 
 
-
 class InfoUser(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -215,8 +258,170 @@ class InfoUser(APIView):
 			"last_name": user.last_name,
             "mail": user.mail,
 			"online": user.online,
-			"created_at": user.created_at,
-			"last_login": user.last_login,
+			"created_at": format(user.created_at, 'Y-m-d  H:i'),
+			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
 			"avatar": user.avatar
         })
 
+
+class infoOtherUser(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def get(self, request, username):
+
+		user = get_object_or_404(USER, user_name=username)
+	 
+		data = {
+			"id": user.id,
+            "user_name": user.user_name,
+			"first_name": user.first_name,
+			"last_name": user.last_name,
+            "mail": user.mail,
+			"online": user.online,
+			"created_at": format(user.created_at, 'Y-m-d  H:i'),
+			"last_login": format(user.last_login, 'Y-m-d  H:i')  if user.last_login else None,
+			"avatar": user.avatar
+		}
+
+		return Response(data, status=200)
+
+
+class addResultGames(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+
+		data = request.data
+
+		try:
+			with transaction.atomic():
+				tab = MATCHTABLE.objects.create (
+					matchKey = data['matchKey'],
+					username1 = data['username1'],
+					score1 = data['score1'],
+					score2 = data['score2'],
+					username2 = data['username2']
+				)
+		except IntegrityError as e:
+			err_msg = str(e)
+			if 'matchKey' in err_msg:
+				return JsonResponse({'error': 'matchKey already exists'}, status=400)
+			else:
+				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
+
+		return JsonResponse({'success': 'Result Match creat', 'matchKey': data['matchKey']}, status=200)
+
+
+class keyGame(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request, key):
+
+		try:
+			game = MATCHTABLE.objects.get(matchKey=key)
+
+			return JsonResponse({'succes': 'keu math found',
+								 'matchKey': game.matchKey,
+								 'dateMatch': game.dateMatch,
+								 'username1': game.username1,
+								 'score1': game.score1,
+								 'score2': game.score2,
+								 'username2': game.username2,
+								},
+					   			status=200)
+		except MATCHTABLE.DoesNotExist:
+			return JsonResponse({'error': 'Key Math not found'}, status=404)
+
+class uploadImgAvatar(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            user = request.user
+            data = request.data
+
+            new_avatar = data.get('new_path')
+            if not new_avatar:
+                return JsonResponse({'error': 'Missing new_path in request'}, status=400)
+
+            user.avatar = new_avatar
+            user.save()
+
+            return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+		
+class uploadPrivateInfoUser(APIView):
+	permission_classes = [IsAuthenticated]
+    
+	def patch(self, request):
+
+		try:
+			user = request.user
+			data = request.data
+
+			user.first_name = data.get('firstName')
+			user.last_name = data.get('lastName')
+			user.save()
+
+			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+
+
+class uploadProfile(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+
+		try:
+			user = request.user
+			data = request.data
+			new_username = data.get('userName')
+
+			User = get_user_model()
+
+			if User.objects.filter(Q(user_name=new_username) & ~Q(id=user.id)).exists():
+				return JsonResponse({'error': 'This username is already taken'}, status=409)
+			user.user_name = new_username
+			user.save()
+
+			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+
+
+class uploadNewPassword(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+		try:
+			user = request.user
+			data = request.data
+			newPassword = data.get('password')
+
+			user.password = newPassword
+			user.save()
+
+			return JsonResponse({'success': 'Successfully saved new password'}, status=200)
+
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving new password : {str(e)}'}, status=400)
+
+
+class searchUsers(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def get(self, request):
+		query = request.GET.get('q', '')
+		me = request.user
+
+		users = USER.objects.filter(user_name__icontains=query).exclude(user_name=me.user_name)[:3]
+		results = []
+
+		for user in users:
+			results.append({
+				'id': user.id,
+				'username': user.user_name,
+			})
+		return JsonResponse({'results': results}, status=200)
