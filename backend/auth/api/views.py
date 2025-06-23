@@ -23,17 +23,17 @@ def decodeJWT(request, encodedJwt=None) :
 	if not encodedJwt :
 		return [None]
 	
-	# res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access_postgresql'}, verify=False)
+	# res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
 	print(f"encoded: {encodedJwt}", file=sys.stderr)
-	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access_postgresql'}, verify=False)
+	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
 	res_json = res.json()
 	if res.status_code != 200 :
 		print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
 		if (res_json.get('error') == "Token expired"):
-			refresh_res = request.post(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access_postgresql'}, verify=False)
+			refresh_res = request.post(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"{encodedJwt}", 'Host': 'localhost'}, verify=False)
 			if refresh_res.status_code == 200:
 				new_access_token = refresh_res.json().get('access')
-				res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'access_postgresql'}, verify=False)
+				res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
 				return [res2.json()]
 			return[None]
 		return [None]
@@ -48,7 +48,7 @@ class data_link(APIView):
 		json_data = {
 			'mail':user.get('mail')
 		}
-		response = requests.post("https://access_postgresql:4000/api/info_link/", json=json_data, verify=False, headers={'Host': 'access_postgresql'})
+		response = requests.post("https://access_postgresql:4000/api/info_link/", json=json_data, verify=False, headers={'Host': 'localhost'})
 
 		try:
 			if not response.ok:
@@ -146,7 +146,7 @@ class verifyTwofa(APIView):
 				return JsonResponse({'error':'text size is different from 19 characters'}, status=400)
 
 
-			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'access_postgresql'})
+			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
 
 			data_response = None
 			try:
@@ -190,7 +190,7 @@ def activate_account(request, uidb64, token):
 		'token':token
 	}
 
-	response = requests.post("https://access_postgresql:4000/api/activate_account/", json=json_data, verify=False, headers={'Host': 'access_postgresql'})
+	response = requests.post("https://access_postgresql:4000/api/activate_account/", json=json_data, verify=False, headers={'Host': 'localhost'})
 
 	json_response = response.json()
 	template_html = json_response.get('html')

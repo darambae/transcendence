@@ -8,7 +8,7 @@ export function userInfo()
 	const dropdownBtn = document.getElementById('avatarDropdownBtn');
 	const dropdownMenu = document.getElementById('customDropdownMenu');
 
-	fetch("/user-service/avatar/", { //Need to test if this works
+	fetch("https://transcendence.42.fr/user-service/avatar/", { //Need to test if this works
 		method: "GET",
 		credentials: 'include'
 	  })

@@ -39,7 +39,7 @@ class ChatGroupListCreateView(View):
         Expects Authorization header for user identification to be passed along.
         """
         auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json', 'host': 'access_postgresql'}
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost'}
         if auth_header:
             headers['Authorization'] = auth_header
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"

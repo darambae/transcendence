@@ -51,8 +51,8 @@ def decodeJWT(request, encodedJwt=None) :
     if not encodedJwt :
         return [None]
     
-    # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access_postgresql'}, verify=False)
-    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access_postgresql'}, verify=False)
+    # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'localhost'}, verify=False)
     if res.status_code != 200 :
         print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]

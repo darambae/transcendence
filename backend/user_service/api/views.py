@@ -130,7 +130,7 @@ class infoOtherUser(APIView):
                 verify=False,
                 headers={
                     'Authorization': token,
-                    'Host': 'access_postgresql',
+                    'Host': 'localhost',
                 }
             )
             return Response(response.json(), status=response.status_code)
@@ -152,7 +152,7 @@ class avatar(APIView):
                 verify=False,
                 headers={
                     'Authorization': token,
-                    'Host': 'access_postgresql'
+                    'Host': 'localhost'
                 }
             )
             data = response.json()
@@ -177,7 +177,7 @@ class avatarOther(APIView):
                 verify=False,
                 headers={
                     'Authorization': token,
-                    'Host': 'access_postgresql'
+                    'Host': 'localhost'
                 }
             )
             data = response.json()
@@ -214,7 +214,7 @@ class saveImg(APIView):
             'new_path': image.name
         }
         try:
-            response = requests.post(url_access, json=json_data, verify=False, headers={'Host': 'access_postgresql', 'Authorization': token})
+            response = requests.post(url_access, json=json_data, verify=False, headers={'Host': 'localhost', 'Authorization': token})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
@@ -241,7 +241,7 @@ class savePrivateInfo(APIView):
             return JsonResponse({'error': 'lastName is empty'}, status=400)
 
         try:
-            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access_postgresql', 'Authorization': token})
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': token})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
@@ -267,7 +267,7 @@ class saveProfile(APIView):
         #if not data.get('mail', '').strip():
         #    return JsonResponse({'error': 'mail is empty'}, status=400)
         try:
-            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access_postgresql', 'Authorization': token})
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': token})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
@@ -293,7 +293,7 @@ class saveNewPassword(APIView):
             'password':data.get('inputPasswordCurrent')
         }
 
-        checkResponse = requests.post("https://access_postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'access_postgresql', 'Authorization': token})
+        checkResponse = requests.post("https://access_postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'localhost', 'Authorization': token})
 
         if (checkResponse.status_code != 200):
             return JsonResponse({'error': 'Current password is not valid'}, status=400)
@@ -306,7 +306,7 @@ class saveNewPassword(APIView):
             "password":make_password(newPassword)
         }
 
-        uploadResponse = requests.patch(url_access, json=json_data_newPassword, verify=False, headers={'Host': 'access_postgresql', 'Authorization': token})
+        uploadResponse = requests.patch(url_access, json=json_data_newPassword, verify=False, headers={'Host': 'localhost', 'Authorization': token})
 
         if (uploadResponse.status_code != 200):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
@@ -330,7 +330,7 @@ class searchUsers(APIView):
                 verify=False,
                 headers={
                     'Authorization': token,
-                    'Host': 'access_postgresql'
+                    'Host': 'localhost'
                 }
             )
 
