@@ -99,7 +99,6 @@ class infoUser(APIView):
 
     def get(self, request):
         access_token = request.COOKIES.get('access_token')
-        print("access token : ", access_token, file=sys.stderr)
         if not access_token:
              return Response({'error': 'No access token'}, status=401)
         
@@ -112,6 +111,7 @@ class infoUser(APIView):
                     'Host': 'access-postgresql'
                 }
             )
+
             return Response(response.json(), status=response.status_code)
 
         except requests.exceptions.RequestException:
@@ -123,14 +123,14 @@ class infoOtherUser(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, username):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
 
         try:
             response = requests.get(
                 f'https://access-postgresql:4000/api/infoOtherUser/{username}/',
                 verify=False,
                 headers={
-                    'Authorization': token,
+                    'Authorization': f"bearer {token}",
                     'Host': 'access-postgresql',
                 }
             )
@@ -145,17 +145,19 @@ class avatar(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
         
         try:
             response = requests.get(
                 'https://access-postgresql:4000/api/InfoUser/',
                 verify=False,
                 headers={
-                    'Authorization': token,
+                    'Authorization': f"bearer {token}",
                     'Host': 'access-postgresql'
                 }
             )
+            # with open("log.txt", "w+") as f:
+            #     print(f"status_code : {response.status_code}\nbody : {response.json()}\ntoken : {token}", file=f)
             data = response.json()
             path = data['avatar']
             if path:
@@ -170,14 +172,14 @@ class avatarOther(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, username):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
 
         try:
             response = requests.get(
                 f'https://access-postgresql:4000/api/infoOtherUser/{username}/',
                 verify=False,
                 headers={
-                    'Authorization': token,
+                    'Authorization': f"bearer {token}",
                     'Host': 'access-postgresql'
                 }
             )
@@ -197,7 +199,7 @@ class saveImg(APIView):
     permission_classes = [AllowAny]
 
     def patch(self, request):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
         url_access = "https://access-postgresql:4000/api/uploadImgAvatar/"
         image = request.FILES.get('image')
 
@@ -215,7 +217,7 @@ class saveImg(APIView):
             'new_path': image.name
         }
         try:
-            response = requests.post(url_access, json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+            response = requests.post(url_access, json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': f"bearer {token}"})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
@@ -227,7 +229,7 @@ class savePrivateInfo(APIView):
     permission_classes = [AllowAny]
 
     def patch(self, request):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
         url_access = "https://access-postgresql:4000/api/uploadPrivateInfoUser/"
 
         try:
@@ -242,7 +244,7 @@ class savePrivateInfo(APIView):
             return JsonResponse({'error': 'lastName is empty'}, status=400)
 
         try:
-            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': f"bearer {token}"})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
@@ -254,7 +256,7 @@ class saveProfile(APIView):
     permission_classes = [AllowAny]
 
     def patch(self, request):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
         url_access = "https://access-postgresql:4000/api/uploadProfile/"
 
         try:
@@ -268,7 +270,7 @@ class saveProfile(APIView):
         #if not data.get('mail', '').strip():
         #    return JsonResponse({'error': 'mail is empty'}, status=400)
         try:
-            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': f"bearer {token}"})
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
@@ -280,7 +282,7 @@ class saveNewPassword(APIView):
     permission_classes = [AllowAny]
 
     def patch(self, request):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
         url_access = "https://access-postgresql:4000/api/uploadNewPassword/"
 
 
@@ -294,7 +296,7 @@ class saveNewPassword(APIView):
             'password':data.get('inputPasswordCurrent')
         }
 
-        checkResponse = requests.post("https://access-postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+        checkResponse = requests.post("https://access-postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': f"bearer {token}"})
 
         if (checkResponse.status_code != 200):
             return JsonResponse({'error': 'Current password is not valid'}, status=400)
@@ -307,7 +309,7 @@ class saveNewPassword(APIView):
             "password":make_password(newPassword)
         }
 
-        uploadResponse = requests.patch(url_access, json=json_data_newPassword, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+        uploadResponse = requests.patch(url_access, json=json_data_newPassword, verify=False, headers={'Host': 'access-postgresql', 'Authorization': f"bearer {token}"})
 
         if (uploadResponse.status_code != 200):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
@@ -319,7 +321,7 @@ class searchUsers(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        token = request.headers.get('Authorization')
+        token = request.COOKIES.get('access_token')
         query = request.GET.get('q', '')
 
         if not query:
@@ -330,7 +332,7 @@ class searchUsers(APIView):
                 f'https://access-postgresql:4000/api/searchUsers?q={query}',
                 verify=False,
                 headers={
-                    'Authorization': token,
+                    'Authorization': f"bearer {token}",
                     'Host': 'access-postgresql'
                 }
             )

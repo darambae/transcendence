@@ -2,13 +2,8 @@
 
 export async function card_profileController(username) {
 	if (username) {
-		const token = sessionStorage.getItem("accessToken");
-		if (!token) {
-			console.error("Token manquant !");
-			return;
-		}
-		getOtherUserInfo(token, username);
-		getOtherUserAvatar(token, username);
+		getOtherUserInfo(username);
+		getOtherUserAvatar(username);
 	}
 }
 
@@ -39,12 +34,12 @@ function displayUserInfo(data) {
 }
 
 
-async function getOtherUserInfo(token, userName) {
+async function getOtherUserInfo(userName) {
 	try {
 		const response = await fetch(`user-service/infoOtherUser/${userName}`, {
 		  method: "GET",
+		  credentials: 'include',
 		  headers: {
-			"Authorization": `Bearer ${token}`,
 			"Content-Type": "application/json",
 		  },
 		});
@@ -61,12 +56,10 @@ async function getOtherUserInfo(token, userName) {
 }
 
 
-function getOtherUserAvatar(token, userName) {
+function getOtherUserAvatar(userName) {
 	fetch(`user-service/avatarOther/${userName}`, {
 		method: "GET",
-		headers: {
-			"Authorization": `Bearer ${token}`,
-		},
+		credentials: 'include',
 	})
 	.then(res => {
 		if (!res.ok) throw new Error("Error retrieving other Aaatar");

@@ -3,21 +3,16 @@ import { userInfo } from './user.js';
 import * as Friends from './friends.js';
 
 export function settingsProfileController() {
-	const token = sessionStorage.getItem("accessToken");
-	if (!token) {
-		console.error("Token manquant !");
-		return;
-	}
 	
-	getUserInfo(token);
-	getUserAvatar(token);
+	getUserInfo();
+	getUserAvatar();
 	setupAvatarUpload();
-	SaveImg(token)
-	SavePrivateInfo(token)
-	SavePrivateProfile(token)
-	changePassword(token)
+	SaveImg()
+	SavePrivateInfo()
+	SavePrivateProfile()
+	changePassword()
 	animationPassword()
-	Friends.searchFriends(token)
+	Friends.searchFriends()
 }
 
 //  get user info end affich
@@ -30,13 +25,13 @@ function displayUserInfo(data) {
 	document.getElementById('lastActive').textContent = data.last_login;
 }
 
-function removElemAccount(token) {
+function removElemAccount() {
 	document.getElementById('inputUsername').value = '';
 	document.getElementById('inputFirstName').value = '';
 	document.getElementById('inputLastName').value = '';
 }
 
-function removElemPassword(token) {
+function removElemPassword() {
 	const ruleLength = document.getElementById("rule-length");
 	const ruleUppercase = document.getElementById("rule-uppercase");
 	const ruleNumber = document.getElementById("rule-number");
@@ -126,14 +121,11 @@ function animationPassword() {
 }
 
 
-async function getUserInfo(token) {
+async function getUserInfo() {
 	try {
 	  const response = await fetch("user-service/infoUser/", {
 		method: "GET",
-		headers: {
-		  "Authorization": `Bearer ${token}`,
-		  "Content-Type": "application/json",
-		},
+		credentials: 'include',
 	  });
 	  if (!response.ok) {
 		throw new Error(`Erreur HTTP ! status: ${response.status}`);
@@ -154,12 +146,10 @@ function handleResponse(response) {
 }
 
 //  get avatar end affich
-function getUserAvatar(token) {
+function getUserAvatar() {
 	fetch("user-service/avatar/", {
 		method: "GET",
-		headers: {
-			"Authorization": `Bearer ${token}`,
-		},
+		credentials: 'include',
 	})
 		.then(res => {
 			if (!res.ok) throw new Error("Error retrieving avatar");
@@ -197,7 +187,7 @@ function setupAvatarUpload() {
 	}
 }
 
-function SaveImg(token) {
+function SaveImg() {
 	const form = document.getElementById('uploadForm');
 	const errorDiv = document.getElementById('errorMessageImgAvatar');
 	const saveBtnContainer = document.getElementById("saveImageContainer")
@@ -220,9 +210,7 @@ function SaveImg(token) {
 		try {
 			const response = await fetch("user-service/saveImg/", {
 				method: 'PATCH',
-				headers: {
-					"Authorization": `Bearer ${token}`,
-				},
+				credentials: 'include',
 				body: formData
 			});
 
@@ -260,7 +248,7 @@ function SaveImg(token) {
 	});
 }
 
-function SavePrivateInfo(token) {
+function SavePrivateInfo() {
 	const form = document.getElementById('submitPrivateInfo');
 	const errorDiv = document.getElementById('errorMessagePrivateInfo');
 
@@ -279,8 +267,8 @@ function SavePrivateInfo(token) {
 		try {
 			const response = await fetch("user-service/savePrivateInfo/", {
 				method: 'PATCH',
+				credentials: 'include',
 				headers: {
-					'Authorization': `Bearer ${token}`,
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify(data)
@@ -293,24 +281,24 @@ function SavePrivateInfo(token) {
 				errorDiv.classList.add('text-success');
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-				getUserInfo(token)
+				getUserInfo()
 			} else if (result.error) {
 				errorDiv.textContent = result.error;
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 			}
-			removElemAccount(token)
+			removElemAccount()
 		} catch (error) {
 			errorDiv.textContent = "Error network : ";
 			errorDiv.style.display = 'block';
 			setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-			removElemAccount(token)
+			removElemAccount()
 		}
 	});
 
 };
 
-function SavePrivateProfile(token) {
+function SavePrivateProfile() {
 	const form = document.getElementById('profileForm');
 	const errorDiv = document.getElementById('errorMessageProfile');
 
@@ -329,8 +317,8 @@ function SavePrivateProfile(token) {
 		try {
 			const response = await fetch("user-service/saveProfile/", {
 				method: 'PATCH',
+				credentials: 'include',
 				headers: {
-					'Authorization': `Bearer ${token}`,
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify(data)
@@ -343,25 +331,25 @@ function SavePrivateProfile(token) {
 				errorDiv.classList.add('text-success');
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-				getUserInfo(token)
+				getUserInfo()
 			} else if (result.error) {
 				errorDiv.textContent = result.error;
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 			}
-			removElemAccount(token)
+			removElemAccount()
 		} catch (error) {
 			errorDiv.textContent = "Error network : ";
 			errorDiv.style.display = 'block';
 			setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-			removElemAccount(token)
+			removElemAccount()
 		}
 	});
 
 };
 
 
-function changePassword(token) {
+function changePassword() {
 	const form = document.getElementById('changeMdp')
 	const errorDiv = document.getElementById('errorMessageMdp')
 
@@ -386,8 +374,8 @@ function changePassword(token) {
 			try {
 				const response = await fetch("user-service/saveNewPassword/", {
 					method: 'PATCH',
+					credentials: 'include',
 					headers: {
-						'Authorization': `Bearer ${token}`,
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify(data)

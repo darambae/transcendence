@@ -24,12 +24,12 @@ class CustomJWTAuthentication(BaseAuthentication):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
 
-            username = payload.get('username')
-            if not username:
+            id = payload.get('user_id')
+            if not id:
                 raise AuthenticationFailed('Invalid payload')
 
             try:
-                user = User.objects.get(pk=username)
+                user = User.objects.get(pk=id)
             except User.DoesNotExist:
                 raise AuthenticationFailed('User not found')
 

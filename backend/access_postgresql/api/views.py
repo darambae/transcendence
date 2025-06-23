@@ -22,8 +22,6 @@ from datetime import datetime
 import sys
 import jwt
 from django.conf import settings
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
 # Create your views here.
 
 
@@ -123,8 +121,8 @@ class checkPassword(APIView):
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.activated:
 				if check_password(data.get('password'), user.password):
-					opt = generate_otp_send_mail(user)
-					# opt = "NZHK-GO7Q-9JSD-X9QI"
+					# opt = generate_otp_send_mail(user)
+					opt = "NZHK-GO7Q-9JSD-X9QI"
 					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',
@@ -173,28 +171,22 @@ class checkTfa(APIView):
 			if "jwt" in data :
 				print(f"invites : {data['jwt']}", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				if user.actived and user.two_factor_auth != None:
+				if user.activated and user.two_factor_auth != None:
 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
 						user.two_factor_auth = False
 						user.save()
-						response = JsonResponse({'success': 'authentication code send'}, status=200)
-						response.set_cookie(key='access_token',
-						  					value=str(data_generate_jwt['access']),
-											httponly=True,
-											samesite='Lax')
-						response.set_cookie(key='refresh_token',
-											value=str(data_generate_jwt['refresh']),
-											httponly=True,
-											samesite='Lax')
-						return response
+						return JsonResponse({'success': 'authentication code send',
+							  				 'refresh': str(data_generate_jwt['refresh']),
+											 'access': str(data_generate_jwt['access'])},
+											 status=200)
 					else :
 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 			else :
 				print(f"main : ", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				if user.actived and user.two_factor_auth != None:
+				if user.activated and user.two_factor_auth != None:
 					if check_password(data.get('tfa'), user.two_factor_auth):
 						user.two_factor_auth = False
 						user.online = True
@@ -203,18 +195,10 @@ class checkTfa(APIView):
 
 						data_generate_jwt = generateJwt(user, user.toJson())
 
-						response = JsonResponse({'success': 'authentication code send'}, status=200)
-						response.set_cookie(key='access_token',
-						  					value=str(data_generate_jwt['access']),
-											httponly=True,
-											samesite='Lax')
-						response.set_cookie(key='refresh_token',
-											value=str(data_generate_jwt['refresh']),
-											httponly=True,
-											samesite='Lax')
-						print("Access token generated : ", data_generate_jwt['access'], file=sys.stderr)
-						print("Refresh token generated : ", data_generate_jwt['refresh'], file=sys.stderr)
-						return response
+						return JsonResponse({'success': 'authentication code send',
+							  				 'refresh': str(data_generate_jwt['refresh']),
+											 'access': str(data_generate_jwt['access'])},
+											 status=200)
 					else:
 						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
 				else:
@@ -227,11 +211,11 @@ class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
 	def get(self, request):
-		jwt_token = request.headers.get('Authorization')
-		if not jwt_token:
+		auth_header = request.headers.get('Authorization')
+		if not auth_header:
 			return Response({'error': 'Authorization header missing'}, status=400)
 
-		parts = jwt_token.split()
+		parts = auth_header.split()
 		if len(parts) != 2 or parts[0].lower() != 'bearer':
 			return Response({'error': 'Invalid Authorization header'}, status=400)
 
@@ -425,3 +409,15 @@ class searchUsers(APIView):
 				'username': user.user_name,
 			})
 		return JsonResponse({'results': results}, status=200)
+
+class refreshToken(APIView) :
+	permission_classes = [AllowAny]
+
+	def get(self, request) :
+		try :
+			refresh = request.headers.get("Authorization", "Error unauthorized").split(" ")[1]
+		except Exception :
+			return JsonResponse({"Error" : "Internal server error"}, status=500)
+		jwt_access = jwt.decode(refresh, settings.SECRET_KEY, algorithms=['HS256'])
+		dicoTokens = generateJwt(None, jwt_access, refresh)
+		return dicoTokens.get("access", "Error")
