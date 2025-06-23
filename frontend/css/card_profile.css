@@ -1,84 +1,144 @@
-	body {
-        background-color: #000000;
-        font-family: 'Poppins', sans-serif;
-        color: #000000;
-    }
+.player-card {
+    position: relative;
+    overflow: hidden;
+    background-color: rgba(139, 0, 0, 0.767)  !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 0,5rem !important;
+    padding: 0;
+    max-width: 600px;
+    margin: 1rem auto;
+}
 
-	.player-card {
-		background: linear-gradient(135deg, #ff4e50, #f9d423);
-		border-radius: 1rem;
-		overflow: hidden;
-		border: 2px solid rgba(255, 255, 255, 0.2);
-		box-shadow:
-			0 4px 6px rgba(0, 0, 0, 0.3),
-			0 8px 16px rgba(0, 0, 0, 0.25),
-			inset 0 0 10px rgba(255, 255, 255, 0.05);
-		transition: transform 0.3s ease, box-shadow 0.3s ease;
-		transform-style: preserve-3d;
-		perspective: 1000px;
-	}
-	
-	.player-card:hover {
-		transform: translateY(-6px) scale(1.02);
-		box-shadow:
-			0 10px 20px rgba(0, 0, 0, 0.35),
-			0 15px 40px rgba(0, 0, 0, 0.25),
-			inset 0 0 15px rgba(255, 255, 255, 0.1);
-	}
-    .player-card img {
-        border: 4px solid #4dabf7;
-    }
+.player-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/assets/img/header.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: 1rem;
+}
 
-    .badge-online {
-        background-color: #51cf66;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 50px;
-        font-weight: 600;
-    }
+.player-card > * {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
+}
 
-    .name-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem 1rem;
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-    }
+.player-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow:
+        0 12px 24px rgba(0,0,0,0.5),
+        0 20px 40px rgba(0,0,0,0.3);
+}
 
-    .card-footer {
-        background-color: #f1f3f5;
-        border-top: 1px solid #dee2e6;
-    }
 
-    .btn-link {
-        color: #4dabf7;
-        font-weight: 600;
-        transition: 0.2s ease;
-    }
+.badge-online {
+    background-color: #51cf66;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(81,207,102,0.7);
+    text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
 
-    .btn-link:hover {
-        color: #1c7ed6;
-    }
+.badge-ofline {
+  background-color: #ff0000;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-weight: 600;
+  display: inline-block;
+  box-shadow: 0 0 10px rgba(207, 81, 81, 0.7);
+  text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
 
-    .vr {
-        width: 2px;
-        background-color: #ced4da;
-        height: 100%;
-    }
+.name-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
 
-    h6 {
-        font-size: 0.9rem;
-        color: #5c7cfa;
-    }
 
-    strong {
-        font-size: 1.2rem;
-        color: #222;
-    }
+.border-top {
+    background-color: rgba(0,0,0,0.4);
+    border-top: 1px solid rgba(255,255,255,0.6) !important;
+    padding-top: 1rem;
+    color: #fff !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  }
+  
+.row.text-center, .col {
+    color: #fff !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    
+}
 
-    .card-title {
-        font-weight: bold;
-        font-size: 1.4rem;
-        color: #364fc7;
-        text-align: center;
-    }
+.card-title {
+    color: #fff !important;
+    text-align: center;
+}
+
+
+
+
+
+
+
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    padding: 1rem 1.5rem;
+  }
+  
+  /* Boutons du footer */
+  .footer-btn {
+    color: #a8d0ff;
+    font-weight: 600;
+    font-size: 1.15rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.6rem;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 150px;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .footer-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #4dabf7;
+    border-color: #4dabf7;
+    transform: scale(1.05);
+  }
+  /* Icônes dans les boutons */
+  .footer-btn i {
+    margin-right: 0.4rem;
+  }
+  
+  /* Séparateur vertical */
+  .vr-footer {
+    width: 2px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  

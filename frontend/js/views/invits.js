@@ -1,9 +1,8 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
-import { chatController } from "./chat.js";
 
 async function double_authenticate(data) {
-	const html = await loadTemplate('doubleAuth');
+	const html = await loadTemplate('double_auth');
 	const content = document.getElementById("login-form");
 	if (html) {
 		content.innerHTML = html;
@@ -26,13 +25,12 @@ async function double_authenticate(data) {
 
 			const code = document.getElementById('auth-code').value;
 			console.log("mail + code: ", code, mail);
-			const response = await fetch("auth/verifyTwofa/", {
+			const response = await fetch("auth/invits/verifyTwofa/", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
 				},
-				credentials: 'include',
 				body: JSON.stringify({ mail, code })
 			});
 
@@ -40,6 +38,16 @@ async function double_authenticate(data) {
 
 			if (response.ok) {
 				resolve(true);
+				let	accessToken = responseData.access; //Token to put in the authorization header of request trying to access protected roads
+				let	refreshToken = responseData.refresh; // Token to get a new acccess token if needed without having to reconnect		
+
+
+				console.log(accessToken)
+				console.log(refreshToken)
+
+
+				sessionStorage.setItem('accessToken', responseData.access);
+				sessionStorage.setItem('refreshToken', responseData.refresh);
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
@@ -71,13 +79,12 @@ export async function handleLoginSubmit(event) {
 		
 		const csrf = getCookie('csrftoken');
 		console.log("csrf: ", csrf);
-		const response = await fetch("/auth/login/", {
+		const response = await fetch("/auth/invits/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				'X-CSRFToken': csrf,
 			},
-			credentials: 'include',
 			body: JSON.stringify(dataForm)
 		});
 
@@ -85,21 +92,17 @@ export async function handleLoginSubmit(event) {
 		console.log("response data: ", data);
 		if (response.ok) {
 			try {
-				await double_authenticate(dataForm);
+				await double_authenticate(dataForm)
+				//tokens returned in the JWT to communicate with protected roads
+				//let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
+				//let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
+
+				//localStorage.setItem('accessToken', accessToken);
+				//localStorage.setItem('refreshToken', refreshToken);
+
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
-				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
-				console.log(`User ${username} successfully connected`);
-
-				// --- NEW: 로그인 성공 후 chatController 호출 ---
-				// if (!window.chatInitialized) {
-				// 	// 중복 초기화 방지를 위한 플래그
-				// 	console.log('Login successful, initializing chat system.');
-				// 	window.loggedInUser = username;
-				// 	chatController(username);
-				// 	window.chatInitialized = true;
-				// }
-				// --- END NEW ---
+				console.log("User successfully connected");
 			} catch (error) {
 				console.log("Double auth error: ", error);
 			}
@@ -117,7 +120,7 @@ export async function handleLoginSubmit(event) {
 			}
 		}
 	} catch (error) {
-		console.error("Connection error: ", error);
+		console.error("Connection error: ");
 	} finally {
 		submitButton.disabled = false;
 		if (loadingMessage)
@@ -126,7 +129,8 @@ export async function handleLoginSubmit(event) {
 }
 
 
-export function loginController() {
+
+export function invitController() {
 	const modalContainer = document.getElementById("modal-container");
 	const closeBtn = document.getElementById("close-login-form");
 

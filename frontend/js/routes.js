@@ -7,6 +7,8 @@ import { signupController } from './views/signup.js';
 // import { chatController } from './views/chat.js';
 import { userController } from './views/user.js';
 import { settingsProfileController } from './views/settings_profile.js';
+import { tournamentController } from './views/tournament.js';
+import { card_profileController } from './views/card_profile.js';
 
 export const routes = {
 
@@ -22,9 +24,9 @@ export const routes = {
 		template: 'multiplayer',
 		controller: multiplayerController,
 	},
-	duel: {
-		template: 'duel',
-		controller: duelController,
+	tournament: {
+		template: 'tournament',
+		controller: tournamentController,
 	},
 	login: {
 		template: 'login',
@@ -44,6 +46,8 @@ export const routes = {
 	},
 	card_profile: {
 		template: 'card_profile',
+		controller: card_profileController,
+		isModal: true,
 	},
 	settings_profile: {
 		template: 'settings_profile',
