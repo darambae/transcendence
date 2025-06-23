@@ -1,6 +1,6 @@
 
 import { routes } from './routes.js';
-import { actualizeIndexPage, getCookie } from './utils.js';
+import { actualizeIndexPage, getCookie, isUserAuthenticated } from './utils.js';
 
 window.addEventListener('hashchange', navigate);
 window.addEventListener('DOMContentLoaded', navigate);
@@ -20,12 +20,9 @@ export async function navigate() {
 	}
 	console.log("csrf home: ", csrf);
 
-	//check if JWT is already stored
-	const accessToken = sessionStorage.getItem('accessToken');
-	console.log('access token : ', accessToken);
-	let userIsAuth = false;
-	if (accessToken) {
-		userIsAuth = true;
+	let userIsAuth = await isUserAuthenticated();
+	console.log("is User Auth : ", userIsAuth);
+	if (userIsAuth) {
 		actualizeIndexPage('toggle-login', routes['user']);
 	}
 

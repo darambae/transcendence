@@ -7,18 +7,13 @@ export function userInfo()
 {
 	const dropdownBtn = document.getElementById('avatarDropdownBtn');
 	const dropdownMenu = document.getElementById('customDropdownMenu');
-	
-	const token = sessionStorage.getItem("accessToken");
-	
 
-	fetch("user-service/avatar/", {
+	fetch("/user-service/avatar/", {
 		method: "GET",
-		headers: {
-		  "Authorization": `Bearer ${token}`,
-		}
+		credentials: 'include'
 	  })
 	  .then(res => {
-		if (!res.ok) throw new Error("Erreur lors de la récupération de l'avatar");
+		if (!res.ok) throw new Error("No avatar found");
 		return res.blob();
 	  })
 	  .then(blob => {

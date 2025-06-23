@@ -22,6 +22,8 @@ from datetime import datetime
 import sys
 import jwt
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 # Create your views here.
 
 
@@ -177,10 +179,16 @@ class checkTfa(APIView):
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
 						user.two_factor_auth = False
 						user.save()
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
+						response = JsonResponse({'success': 'authentication code send'}, status=200)
+						response.set_cookie(key='access_token',
+						  					value=str(data_generate_jwt['access']),
+											httponly=True,
+											samesite='Lax')
+						response.set_cookie(key='refresh_token',
+											value=str(data_generate_jwt['refresh']),
+											httponly=True,
+											samesite='Lax')
+						return response
 					else :
 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 			else :
@@ -195,10 +203,18 @@ class checkTfa(APIView):
 
 						data_generate_jwt = generateJwt(user, user.toJson())
 
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
+						response = JsonResponse({'success': 'authentication code send'}, status=200)
+						response.set_cookie(key='access_token',
+						  					value=str(data_generate_jwt['access']),
+											httponly=True,
+											samesite='Lax')
+						response.set_cookie(key='refresh_token',
+											value=str(data_generate_jwt['refresh']),
+											httponly=True,
+											samesite='Lax')
+						print("Access token generated : ", data_generate_jwt['access'], file=sys.stderr)
+						print("Refresh token generated : ", data_generate_jwt['refresh'], file=sys.stderr)
+						return response
 					else:
 						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
 				else:
@@ -211,11 +227,11 @@ class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
 	def get(self, request):
-		auth_header = request.headers.get('Authorization')
-		if not auth_header:
+		jwt_token = request.headers.get('Authorization')
+		if not jwt_token:
 			return Response({'error': 'Authorization header missing'}, status=400)
 
-		parts = auth_header.split()
+		parts = jwt_token.split()
 		if len(parts) != 2 or parts[0].lower() != 'bearer':
 			return Response({'error': 'Invalid Authorization header'}, status=400)
 
