@@ -14,14 +14,14 @@ def generate_otp_send_mail(user):
 
 	return opt
 
-def generateJwt(user, jsonJwt:dict):
+def generateJwt(user, jsonJwt:dict, refresh=None):
 
-	refresh = RefreshToken.for_user(user)
+	if user :
+		refresh = RefreshToken.for_user(user)
 	access = refresh.access_token
 
 	access['user_id'] = jsonJwt["user_id"]
 	access['username'] = jsonJwt["username"]
-	access["avatar"] = jsonJwt["avatar"]
 	access['invites'] = jsonJwt["invites"]
 	
 	return {

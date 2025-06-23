@@ -15,8 +15,8 @@ class Map() :
 			self.winningTeam1 = [Point(-5, -50), Point(-5, 650)]
 			self.winningTeam2 = [Point(1005, -50), Point(1005, 650)]
 		else :
-			with open(filePath) as jsonMap :
-				dictParsingMap = json.load(jsonMap)
+			# with open(filePath) as jsonMap :
+			# 	dictParsingMap = json.load(jsonMap)
 			listWalls = dictParsingMap["Walls"]
 			tmpListWalls : list[list[Point]] = []
 			isFine : bool = True
