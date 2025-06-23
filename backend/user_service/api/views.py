@@ -9,7 +9,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db import transaction
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render
-from .utils import decodeJWT
 import sys
 from django.conf import settings
 import os
@@ -117,16 +116,231 @@ class infoUser(APIView):
 
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres failed'}, status=500)
-        
+
+
+
+class infoOtherUser(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        token = request.headers.get('Authorization')
+
+        try:
+            response = requests.get(
+                f'https://access-postgresql:4000/api/infoOtherUser/{username}/',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql',
+                }
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
+
+
 
 class avatar(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        path = decodeJWT(request)[0]['payload']['avatar']
-        if path:
-            full_path = "/app/api/media/imgs/" + path
-            print(full_path, file=sys.stderr)
-            return FileResponse(open(full_path, 'rb'), content_type='image/png')
-        else:
-            return JsonResponse({'error': 'not authorized'}, status=401)
+        token = request.headers.get('Authorization')
+        
+        try:
+            response = requests.get(
+                'https://access-postgresql:4000/api/InfoUser/',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql'
+                }
+            )
+            data = response.json()
+            path = data['avatar']
+            if path:
+                full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
+                return FileResponse(open(full_path, 'rb'), content_type='image/png')
+            else:
+                return JsonResponse({'error': 'not authorized'}, status=401)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
+
+class avatarOther(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        token = request.headers.get('Authorization')
+
+        try:
+            response = requests.get(
+                f'https://access-postgresql:4000/api/infoOtherUser/{username}/',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql'
+                }
+            )
+            data = response.json()
+            path = data['avatar']
+            if path:
+                full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
+                return FileResponse(open(full_path, 'rb'), content_type='image/png')
+            else:
+                return JsonResponse({'error': 'not authorized'}, status=401)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
+
+
+
+class saveImg(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadImgAvatar/"
+        image = request.FILES.get('image')
+
+        if not image:
+            return JsonResponse({'error': 'Save image.'}, status=400)
+        
+        upload_dir = os.path.join(settings.MEDIA_ROOT, 'imgs')
+        image_path = os.path.join(upload_dir, image.name)
+
+        with open(image_path, 'wb+') as destination:
+            for chunk in image.chunks():
+                destination.write(chunk)
+
+        json_data = {
+            'new_path': image.name
+        }
+        try:
+            response = requests.post(url_access, json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+
+
+class savePrivateInfo(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadPrivateInfoUser/"
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        if not data.get('firstName', '').strip():
+            return JsonResponse({'error': 'firstName is empty'}, status=400)
+
+        if not data.get('lastName', '').strip():
+            return JsonResponse({'error': 'lastName is empty'}, status=400)
+
+        try:
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+
+
+class saveProfile(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadProfile/"
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        if not data.get('userName', '').strip():
+            return JsonResponse({'error': 'userName is empty'}, status=400)
+
+        #if not data.get('mail', '').strip():
+        #    return JsonResponse({'error': 'mail is empty'}, status=400)
+        try:
+            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
+
+
+
+class saveNewPassword(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.headers.get('Authorization')
+        url_access = "https://access-postgresql:4000/api/uploadNewPassword/"
+
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        
+        newPassword = data.get('inputPasswordNew')
+        json_data = {
+            'password':data.get('inputPasswordCurrent')
+        }
+
+        checkResponse = requests.post("https://access-postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+        if (checkResponse.status_code != 200):
+            return JsonResponse({'error': 'Current password is not valid'}, status=400)
+        if newPassword != data.get('inputPasswordNew2'):
+            return JsonResponse({'error': 'New password do not match'}, status=400)
+        elif (len(newPassword) < 8):
+            return JsonResponse({'error': 'New password is too short minimum body is 8 caracter'}, status=400)
+
+        json_data_newPassword = {
+            "password":make_password(newPassword)
+        }
+
+        uploadResponse = requests.patch(url_access, json=json_data_newPassword, verify=False, headers={'Host': 'access-postgresql', 'Authorization': token})
+
+        if (uploadResponse.status_code != 200):
+            return JsonResponse({'error': 'Error witch save new password'}, status=400)
+        
+        return JsonResponse({'success': 'Successfully saved new password'}, status=200)
+
+
+class searchUsers(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.headers.get('Authorization')
+        query = request.GET.get('q', '')
+
+        if not query:
+            return JsonResponse({'results': []}, status=200)
+        
+        try:
+            response = requests.get(
+                f'https://access-postgresql:4000/api/searchUsers?q={query}',
+                verify=False,
+                headers={
+                    'Authorization': token,
+                    'Host': 'access-postgresql'
+                }
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                return JsonResponse({'results': data.get('results', [])}, status=200)
+            else:
+                return JsonResponse({'error': 'Failed to fetch users'}, status=response.status_code)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres for search users failed'}, status=500)
+
+    

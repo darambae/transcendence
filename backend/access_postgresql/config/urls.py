@@ -17,15 +17,11 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from api.views import info_link
-from api.views import api_signup
-from api.views import activate_account
-from api.views import checkPassword
-from api.views import checkTfa
-from api.views import DecodeJwt, addResultGames, keyGame, api_signup
-from api.views import tokenRefresh
-from api.views import InfoUser
-#from rest_framework_simplejwt.views import (TokenRefreshView)
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword
+from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
+from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword
+from api.views import infoOtherUser, searchUsers
+from rest_framework_simplejwt.views import (TokenRefreshView)
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
@@ -33,10 +29,18 @@ urlpatterns = [
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
+	path('api/checkCurrentPassword/', checkCurrentPassword.as_view(), name='checkCurrentPassword'),
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/token/refresh/', tokenRefresh.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
+	path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
 	path('api/InfoUser/', InfoUser.as_view(), name='InfoUser'),
+	path('api/infoOtherUser/<str:username>/', infoOtherUser.as_view(), name='infoOtherUser'),
+	path('api/uploadImgAvatar/', uploadImgAvatar.as_view(), name='uploadImgAvatar'),
+	path('api/uploadProfile/', uploadProfile.as_view(), name='uploadProfile'),
+	path('api/uploadPrivateInfoUser/', uploadPrivateInfoUser.as_view(), name='uploadPrivateInfoUser'),
+	path('api/uploadNewPassword/', uploadNewPassword.as_view(), name='uploadNewPassword'),
 	path('api/addResultGames/', addResultGames.as_view(), name='addResultGames'),
 	path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
+	path('api/searchUsers/', searchUsers.as_view(), name='searchUsers'),
 ]

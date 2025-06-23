@@ -1,4 +1,10 @@
 export function userController() {
+	
+	userInfo()
+}
+
+export function userInfo()
+{
 	const dropdownBtn = document.getElementById('avatarDropdownBtn');
 	const dropdownMenu = document.getElementById('customDropdownMenu');
 
@@ -30,4 +36,4 @@ export function userController() {
 	} else {
 		console.error("Dropdown button or menu not found");
 	}
-	}
+}

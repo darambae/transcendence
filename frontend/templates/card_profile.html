@@ -1,50 +1,71 @@
-<div class="container py-4">
-    <div class="card player-card" style="max-width: 600px; margin: 0 auto;">
-        <div class="row g-0">
-            <div class="col-md-4 p-4 text-center">
-                <img src="https://randomuser.me/api/portraits/men/64.jpg" class="rounded-circle img-thumbnail" alt="Profile Picture">
-                <div class="mt-3">
-                    <span class="badge-online">🟢 Online</span>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+
+<div>
+  <div class="container py-4">
+    <article class="card player-card mx-auto" style="max-width: 600px;">
+      <div class="row g-0">
+        
+        <section class="col-md-4 p-4 text-center">
+          <img id="avatarother" alt="Avatar User" src="/assets/img/default.png" class="rounded-circle img-responsive mt-2" width="128" height="128" />
+          <div class="row text-start text-white mt-3">
+            <span id="statusOtherUser" class="">Status</span>
+            <div class="col-12 mb-2">
+              <strong></strong> <span id="lastActiveOther"></span>
+            </div>
+          </div>
+        </section>
+        
+        <section class="col-md-8">
+          <div class="card-body">
+            <h4 id="otherUser" class="card-title">👤 USER</h4>
+            
+            <div class="row text-start text-white">
+              <div class="col-12 mb-2">
+                <span id="otherFirstName">XXX</span>
+              </div>
+              <div class="col-12 mb-2">
+                <span id="otherLastName">XXX</span>
+              </div>
+              <div class="col-12 mb-2">
+                <span id="otherMail">XXX</span>
+              </div>
+              <div class="col-12 mb-2">
+                <strong>📅 Created on : </strong> <span id="createdAtOther"></span>
+              </div>
+            </div>
+            
+            <div class="border-top pt-3">
+              <div class="row text-center">
+                <div class="col">
+                    <h6>🎮 Games</h6>
+                    <strong>XXX</strong>
+                  </div>
+                  <div class="col border-start">
+                    <h6>🏆 Wins</h6>
+                    <strong>XXX</strong>
+                  </div>
+                  <div class="col border-start">
+                    <h6>😵 Losses</h6>
+                    <strong>XXX</strong>
+                  </div>
                 </div>
+              </div>
             </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">👤 USER</h5>
-                    <div class="name-row">
-                        <div>First Name:</div>
-                        <div>John</div>
-                        <div>Last Name:</div>
-                        <div>Doe</div>
-                    </div>
-                    <div class="border-top pt-3">
-                        <div class="row text-center">
-                            <div class="col">
-                                <h6>🎮 Games</h6>
-                                <strong>XXX</strong>
-                            </div>
-                            <div class="col border-start">
-                                <h6>🏆 Wins</h6>
-                                <strong>XXX</strong>
-                            </div>
-                            <div class="col border-start">
-                                <h6>😵 Losses</h6>
-                                <strong>XXX</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </section>
         </div>
-        <div class="card-footer text-center py-3">
-            <div class="d-flex justify-content-around align-items-center">
-                <button class="btn btn-link text-decoration-none">
-                    <i class="fas fa-user-plus"></i> Follow
-                </button>
-                <div class="vr"></div>
-                <button class="btn btn-link text-decoration-none">
-                    <i class="fas fa-envelope"></i> Message
-                </button>
-            </div>
-        </div>
+        <footer class="card-footer text-center py-3">
+          <div class="d-flex justify-content-center align-items-center gap-3">
+            <button class="footer-btn" type="button">
+              <i class="fas fa-user-plus"></i> Add Friend
+            </button>
+            <div class="vr-footer"></div>
+            <button class="footer-btn" type="button">
+              <i class="fas fa-envelope"></i> Message
+            </button>
+          </div>
+        </footer>      
+      </article>
     </div>
-</div>
+  </div>
+    

@@ -26,13 +26,28 @@ export async function navigate() {
 		actualizeIndexPage('toggle-login', routes['user']);
 	}
 
-	let view;
-	if (!hash || hash === 'home' /* || (userIsAuth && (hash === 'login' || hash === 'signup'))*/) {
-		view = routes['home'];
-	} else {
-		view = routes[hash];
+	//let view;
+	//if (!hash || hash === 'home' /* || (userIsAuth && (hash === 'login' || hash === 'signup'))*/) {
+	//	view = routes['home'];
+	//} else {
+	//	view = routes[hash];
+	//}
+	
+//-----------------------------
+	let routeName = hash;
+	let param = null;
+
+	if (hash.includes('/')) {
+		[routeName, param] = hash.split('/');
 	}
 
+	let view;
+	if (!routeName || routeName === 'home') {
+		view = routes['home'];
+	} else {
+		view = routes[routeName];
+	}
+//-----------------------------
 	console.log(view);
 	
 	if (!view) {
@@ -40,17 +55,32 @@ export async function navigate() {
 		return;
 	}
 
+	//try {
+	//	if (view.isModal) {
+	//		actualizeIndexPage('modal-container', view);
+	//	} else {
+	//		actualizeIndexPage('main-content', view);
+	//	}
+	//} catch (error) {
+	//	console.error('Error loading template ', error);
+	//	const content = document.getElementById("main-content");
+	//	content.innerHTML = '<h2> Unable to load the page </h2>';
+	//}
 
-
-	try {
-		if (view.isModal) {
-			actualizeIndexPage('modal-container', view);
-		} else {
-			actualizeIndexPage('main-content', view);
-		}
-	} catch (error) {
-		console.error('Error loading template ', error);
-		const content = document.getElementById("main-content");
-		content.innerHTML = '<h2> Unable to load the page </h2>';
+//-------------------------------
+try {
+	if (view.isModal) {
+		await actualizeIndexPage('modal-container', view);
+	} else {
+		await actualizeIndexPage('main-content', view);
 	}
+	if (typeof view.controller === 'function') {
+		view.controller(param);
+	}
+} catch (error) {
+	console.error('Error loading template ', error);
+	const content = document.getElementById("main-content");
+	content.innerHTML = '<h2> Unable to load the page </h2>';
+}
+//-------------------------------
 }

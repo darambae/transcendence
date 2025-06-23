@@ -146,8 +146,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 # MEDIA FOR IMG
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/app/api/media/'
+MEDIA_ROOT = '/app/api/media/'
 
 import logging
 
