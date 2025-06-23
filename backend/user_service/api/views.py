@@ -99,14 +99,17 @@ class infoUser(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        token = request.headers.get('Authorization')
+        access_token = request.COOKIES.get('access_token')
+        print("access token : ", access_token, file=sys.stderr)
+        if not access_token:
+             return Response({'error': 'No access token'}, status=401)
         
         try:
             response = requests.get(
                 'https://access-postgresql:4000/api/InfoUser/',
                 verify=False,
                 headers={
-                    'Authorization': token,
+                    'Authorization': f'Bearer {access_token}',
                     'Host': 'access-postgresql'
                 }
             )

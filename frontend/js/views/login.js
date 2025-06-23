@@ -30,8 +30,8 @@ async function double_authenticate(data) {
 				headers: {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
-					"Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
 				},
+				credentials: 'include',
 				body: JSON.stringify({ mail, code })
 			});
 
@@ -39,14 +39,6 @@ async function double_authenticate(data) {
 
 			if (response.ok) {
 				resolve(true);
-				let	accessToken = responseData.access; //Token to put in the authorization header of request trying to access protected roads
-				let	refreshToken = responseData.refresh; // Token to get a new acccess token if needed without having to reconnect		
-
-				console.log(accessToken)
-				console.log(refreshToken)
-
-				sessionStorage.setItem('accessToken', responseData.access);
-				sessionStorage.setItem('refreshToken', responseData.refresh);
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
@@ -84,6 +76,7 @@ export async function handleLoginSubmit(event) {
 				"Content-Type": "application/json",
 				'X-CSRFToken': csrf,
 			},
+			credentials: 'include',
 			body: JSON.stringify(dataForm)
 		});
 

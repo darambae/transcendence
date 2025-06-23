@@ -17,19 +17,27 @@ import os
 def decodeJWT(request, encodedJwt=None) :
 	if not encodedJwt :
 		#print(f"headers : {request.headers}", file=sys.stderr)
-		# encodedJwt = request.COOKIES.get("access", None)
-		encodedJwt = request.headers.get("Authorization", None)
+		encodedJwt = request.COOKIES.get("access_token", None)
+		#encodedJwt = request.headers.get("Authorization", None)
 		#print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
 	if not encodedJwt :
 		return [None]
 	
 	# res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
 	print(f"encoded: {encodedJwt}", file=sys.stderr)
-	res = requests.get(f'https://access-postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+	res = requests.get(f'https://access-postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+	res_json = res.json()
 	if res.status_code != 200 :
 		print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
+		if (res_json.get('error') == "Token expired"):
+			refresh_res = request.post(f'https://access-postgresql:4000/api/token/refresh', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+			if refresh_res.status_code == 200:
+				new_access_token = refresh_res.json().get('access')
+				res2 = requests.post('https://access-postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'access-postgresql'}, verify=False)
+				return [res2.json()]
+			return[None]
 		return [None]
-	return [res.json()]
+	return [res_json]
 
 class data_link(APIView):
 	permission_classes = [AllowAny]
@@ -143,16 +151,25 @@ class verifyTwofa(APIView):
 
 			if response.status_code == 200:
 				data_response = {
-					'success':'authentication you are connect',
-					'refresh':data_response.get('refresh'),
-					'access':data_response.get('access'),
+					'success':'authentication successfull, you are connected',
 				}
 			else:
 				data_response = {
 					'error':response.text
 				}
-
-			return JsonResponse(data_response, status=response.status_code)
+			set_cookies = response.cookies
+			resp = JsonResponse(data_response, status=response.status_code)
+			if set_cookies:
+				for key in set_cookies.keys():
+					value = set_cookies.get(key)
+					print(key, " : ", set_cookies.get(key))
+					resp.set_cookie(
+						key=key,
+						value=value,
+						httponly=True,
+						samesite='Lax'
+					)
+			return resp
 
 
 def activate_account(request, uidb64, token):

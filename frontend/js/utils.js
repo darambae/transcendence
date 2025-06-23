@@ -44,3 +44,18 @@ export function getCookie(name) {
 	}
 	return cookieValue;
 }
+
+export async function isUserAuthenticated() {
+	const response = await fetch('user-service/infoUser/', {
+		method: 'GET',
+		credentials: 'include'
+	});
+	if (response.ok) {
+		if (response.online)
+			console.log("online : ", response.online);
+		return true;
+	} else {
+		console.log("is auth error : ", response.error, response.status);
+		return false;
+	}
+}
