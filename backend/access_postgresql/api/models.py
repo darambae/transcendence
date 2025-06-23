@@ -61,3 +61,14 @@ class FRIEND(models.Model):
 
     def __str__(self):
         return f"{self.from_user} ➜ {self.to_user} ({self.status})"
+
+class BlockedUser(models.Model):
+    blocker = models.ForeignKey(USER, on_delete=models.CASCADE, related_name='blocks_sent')
+    blocked = models.ForeignKey(USER, on_delete=models.CASCADE, related_name='blocks_received')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('blocker', 'blocked')
+
+    def __str__(self):
+        return f"{self.blocker} blocked {self.blocked}"

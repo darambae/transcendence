@@ -18,6 +18,7 @@ export function settingsProfileController() {
 	changePassword(token)
 	animationPassword()
 	Friends.searchFriends(token)
+	Friends.listennerFriends(token)
 }
 
 //  get user info end affich

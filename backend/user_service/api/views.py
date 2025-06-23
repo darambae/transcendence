@@ -340,4 +340,42 @@ class searchUsers(APIView):
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres for search users failed'}, status=500)
 
+
+class listennerFriends(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.headers.get('Authorization')
+
+        return JsonResponse({'results': [
+            {"username": "blabla"},
+            {"username": "bloblo"},
+            {"username": "blibli"},
+        ]}, status=200)
     
+class addFriend(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.headers.get('Authorization')
+        data = request.data
+
+        username = data.get('userName')
+
+        if not username:
+            return JsonResponse({'error': "username is empty"}, status=400)
+
+        json_data = {
+            'userName':username,
+		}
+
+        try:
+            response = requests.post("https://access-postgresql:4000/api/add/friend/", json=json_data, verify=False, headers={'Host': 'access-postgresql'})
+
+            if response.status_code == 201:
+                data_response = response.json()
+                return JsonResponse({'results': data_response}, status=response.status_code)
+            else:
+                return JsonResponse({'error': 'Failed add friend'}, status=response.status_code)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres add friend'}, status=500)

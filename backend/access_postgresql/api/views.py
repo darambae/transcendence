@@ -10,7 +10,7 @@ from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from .models import USER, MATCHTABLE
+from .models import USER, MATCHTABLE, FRIEND
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
@@ -409,3 +409,28 @@ class searchUsers(APIView):
 				'username': user.user_name,
 			})
 		return JsonResponse({'results': results}, status=200)
+
+class addFriend(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request):
+		me = request.user
+		friendadd = request.data.get('userName')
+
+		try:
+			friend_user = USER.objects.get(username=friendadd)
+		except USER.DoesNotExist:
+			return Response({"message": "User not found"}, status=404)
+
+		friend, created = FRIEND.objects.get_or_create(
+            from_user=me,
+            to_user=friend_user,
+            defaults={"status": "pending"}
+        )
+
+		if not created:
+			return Response({"message": "Request already exists"}, status=200)
+
+		return Response({"message": "Friend request sent"}, status=201)
+
+

@@ -19,7 +19,7 @@ from django.urls import path
 from api import views
 from api.views import infoUser, avatar
 from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
-from api.views import searchUsers, infoOtherUser, avatarOther
+from api.views import searchUsers, infoOtherUser, avatarOther, addFriend, listennerFriends
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,4 +34,6 @@ urlpatterns = [
 	path('user-service/savePrivateInfo/', savePrivateInfo.as_view(), name='savePrivateInfo'),
 	path('user-service/saveProfile/', saveProfile.as_view(), name='saveProfile'),
 	path('user-service/searchUsers/', searchUsers.as_view(), name='searchUsers'),
+	path('user-service/add/friend/', addFriend.as_view(), name='addFriend'),
+	path('user-service/listennerFriends/', listennerFriends.as_view(), name='listennerFriends'),
 ]
