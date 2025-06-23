@@ -271,6 +271,7 @@ async function loadChatRoomList(current_user) {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrf, // For CSRF protection if needed
             },
+            // credentials: 'include'
         });
         if (!response.ok) {
             const errorData = await response.json();
@@ -280,7 +281,7 @@ async function loadChatRoomList(current_user) {
         }
         const data = await response.json();
 
-        if (response.ok) {
+        if (response.ok && Array.isArray(data.chats)) {
             chatRoomListUl.innerHTML = ''; // Clear existing list
             if (data.chats.length === 0) {
                 chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">No active chats. Start one!</li>`;
@@ -301,8 +302,13 @@ async function loadChatRoomList(current_user) {
                 chatRoomListUl.appendChild(listItem);
             });
         } else {
-            console.error('Error loading chat list:', data.message || 'Unknown error');
-            alert('Error loading chat list: ' + (data.message || 'Unknown error'));
+            console.error(
+                'Error loading chat list:',
+                data.message || 'Unknown error'
+            );
+            alert(
+                'Error loading chat list: ' + (data.message || 'Unknown error')
+            );
         }
     } catch (error) {
         console.error('Network error while loading chat list:', error);
@@ -481,6 +487,7 @@ export function chatController(userLoggedInName) {
 
         mainChatWindowElement.addEventListener('shown.bs.modal', () => {
             console.log('Main Chat Window is shown');
+            console.log('Logged in user:', loggedInUser);
             loadChatRoomList(loggedInUser); // Load chat list dynamically
             
             // Set initial state for chat log
