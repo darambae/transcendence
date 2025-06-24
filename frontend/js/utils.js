@@ -26,7 +26,9 @@ export async function closeModal() {
 
 	modalContainer.style.display = "none";
 	modalContainer.innerHTML = "";
-	loginForm.classList.remove("active");
+	if (loginForm) {
+		loginForm.classList.remove("active");
+	}
 	//window.location = "#home";
 }
 

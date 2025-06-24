@@ -58,6 +58,8 @@ export async function navigate() {
 	let view;
 	if (!routeName || routeName === 'home') {
 		view = routes['home'];
+	} else if (typeof routes[routeName] === 'function') {
+		view = routes[routeName](param);
 	} else {
 		view = routes[routeName];
 	}

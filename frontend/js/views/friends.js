@@ -1,4 +1,5 @@
-
+import { actualizeIndexPage } from "../utils.js";
+import { routes } from "../routes.js"
 
 
 export function searchFriends() {
@@ -22,9 +23,16 @@ export function searchFriends() {
 		const users = data.results ?? [];
 		
 		resultsBox.innerHTML = users
-		.map(user => `<li class="list-group-item user-link"><a href="/#card_profile/${user.username}" data-username="${user.username}">${user.username}</a></li>`)
+		.map(user => `<li class="list-group-item user-link"> <button class="profile-btn" data-username="${user.username}">${user.username}</button>						</li>`)
 			.join('');
 		console.log(query);
+
+		document.querySelectorAll('.profile-btn').forEach(btn => {
+			btn.addEventListener('click', function() {
+				const username = btn.dataset.username;
+				actualizeIndexPage('modal-container', routes.card_profile(username))
+			})
+		})
 	})
 }
 
