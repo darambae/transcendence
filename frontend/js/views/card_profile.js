@@ -16,6 +16,7 @@ export async function card_profileController(username) {
 	if (username) {
 		getOtherUserInfo(username);
 		getOtherUserAvatar(username);
+		addFriend()
 	}
 }
 
@@ -26,10 +27,16 @@ function displayUserInfo(data) {
 	document.getElementById('otherLastName').textContent = data.last_name;;
 	document.getElementById('otherMail').textContent = data.mail;
 	document.getElementById('createdAtOther').textContent = data.created_at;
-	const lastOne = document.getElementById('lastActiveOther').textContent = data.last_login;
 
+	const addFriendsBtn = document.getElementById('addFriendsid');
+	const lastOne = document.getElementById('lastActiveOther').textContent = data.last_login;
 	const statusBadge = document.getElementById('statusOtherUser');
 	const isOnline = data.online;
+	
+	const card = document.querySelector('.player-card');
+	
+	
+	addFriendsBtn.dataset.username = data.user_name;
 
 	if (isOnline) {
 	  statusBadge.textContent = '🟢 Online';
@@ -42,6 +49,32 @@ function displayUserInfo(data) {
 		if (lastOne) {
 			lastOne.textContent = "";
 		}
+	}
+
+	if (!data.friend_status) {
+		card.classList.add("card-default");
+	  } else if (data.friend_status === "pending") {
+		card.classList.add("card-pending");
+	  } else if (data.friend_status === "accepted") {
+		card.classList.add("card-accepted");
+	  }
+}
+
+
+async function gestFooter(friend_status) {
+	const btnAdd = document.getElementById('addFriendsid')
+	const sep = document.getElementById('separation')
+
+	console.log(friend_status)
+	if (friend_status === null) {
+		btnAdd.style.display = "block"
+		sep.style.display = "block"
+		
+	}
+	else if (friend_status === "pending") {
+		sep.style.display = "none"
+		btnAdd.style.display = "none"
+
 	}
 }
 
@@ -59,6 +92,7 @@ async function getOtherUserInfo(userName) {
 		  console.log(`Erreur HTTP ! status: ${response.status}`);
 		}
 		const data = await response.json();
+		gestFooter(data.friend_status)
 		displayUserInfo(data)
 		console.log(data)
 	
@@ -84,4 +118,38 @@ function getOtherUserAvatar(userName) {
 	.catch(err => {
 		console.error("Error loading other avatar :", err);
 	});
+}
+
+
+function addFriend() {
+
+	try {
+		const addFriendsBtn = document.getElementById('addFriendsid');
+		
+		addFriendsBtn.addEventListener("click", async() => {
+			const userName = addFriendsBtn.dataset.username
+
+			const response = await fetch("user-service/add/friend/", {
+				method: "POST",
+				credentials: 'include',
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					userName: userName,
+				}),
+			});
+
+			const data = await response.json();
+
+			console.log(data);
+			if (data.message) {
+				getOtherUserInfo(userName)
+			}
+
+		})
+
+	} catch (error) {
+		console.error("Error add friend :", error);
+	}
 }

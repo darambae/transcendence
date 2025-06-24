@@ -344,4 +344,118 @@ class searchUsers(APIView):
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres for search users failed'}, status=500)
 
-    
+
+class listennerFriends(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.COOKIES.get('access_token')
+
+        try:
+            response = requests.get(
+                'https://access_postgresql:4000/api/listennerFriends/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                }
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+
+
+class addFriend(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.COOKIES.get('access_token')
+        data = request.data
+
+        username = data.get('userName')
+
+        if not username:
+            return JsonResponse({'error': "username is empty"}, status=400)
+
+        json_data = {
+            'userName':username,
+		}
+
+        try:
+            response = requests.post(
+                'https://access_postgresql:4000/api/add/friend/',
+                json=json_data,
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                }
+            )
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres add friend'}, status=500)
+
+
+class declineInvite(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.COOKIES.get('access_token')
+        username = request.data.get('username')
+
+        json_data = {
+            'username':username
+        }
+
+        try:
+            response = requests.patch(
+                'https://access_postgresql:4000/api/declineInvite/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+                json=json_data,
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+
+class acceptInvite(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.COOKIES.get('access_token')
+        username = request.data.get('username')
+
+        json_data = {
+            'username':username
+        }
+
+        try:
+            response = requests.patch(
+                'https://access_postgresql:4000/api/acceptInvite/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+                json=json_data,
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )

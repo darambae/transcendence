@@ -10,8 +10,7 @@ from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from django.shortcuts import render
-from .models import USER, ChatGroup, Message
+from .models import USER, ChatGroup, Message, FRIEND
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
@@ -26,7 +25,6 @@ from channels.layers import get_channel_layer
 import sys
 import jwt
 from django.conf import settings
-from rest_framework_simplejwt.exceptions import TokenError
 from django.core.paginator import Paginator, EmptyPage
 # Create your views here.
 
@@ -273,25 +271,37 @@ class InfoUser(APIView):
 
 
 class infoOtherUser(APIView):
-	permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
-	def get(self, request, username):
+    def get(self, request, username):
+        user = get_object_or_404(USER, user_name=username)
+        me = request.user
 
-		user = get_object_or_404(USER, user_name=username)
-	 
-		data = {
-			"id": user.id,
+        friend_relation = FRIEND.objects.filter(
+            (Q(from_user=me) & Q(to_user=user)) | (Q(from_user=user) & Q(to_user=me)),
+            status__in=['pending', 'accepted']
+        ).first()
+
+        if friend_relation:
+            friend_status = friend_relation.status
+        else:
+            friend_status = None
+
+        data = {
+            "id": user.id,
             "user_name": user.user_name,
-			"first_name": user.first_name,
-			"last_name": user.last_name,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
             "mail": user.mail,
-			"online": user.online,
-			"created_at": format(user.created_at, 'Y-m-d  H:i'),
-			"last_login": format(user.last_login, 'Y-m-d  H:i')  if user.last_login else None,
-			"avatar": user.avatar
-		}
+            "online": user.online,
+            "created_at": format(user.created_at, 'Y-m-d  H:i'),
+            "last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
+            "avatar": user.avatar,
+            "friend_status": friend_status,
+        }
 
-		return Response(data, status=200)
+        return Response(data, status=200)
+
 
 
 class addResultGames(APIView):
@@ -860,3 +870,115 @@ class refreshToken(APIView) :
 		jwt_access = jwt.decode(refresh, settings.SECRET_KEY, algorithms=['HS256'])
 		dicoTokens = generateJwt(None, jwt_access, refresh)
 		return dicoTokens.get("access", "Error")
+
+
+class listennerFriends(APIView) :
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request) :
+        user = request.user
+
+        friends = FRIEND.objects.filter(
+            Q(from_user=user) | Q(to_user=user),
+            status__in=["pending", "accepted"]
+        )
+
+        results = []
+        for f in friends:
+            if f.from_user == user:
+                other = f.to_user
+                direction = "sent"
+            else:
+                other = f.from_user
+                direction = "received"
+
+            results.append({
+                "username": other.user_name,
+                "status": f.status,
+                "direction": direction,
+            })
+
+        return Response({"results": results})
+
+
+class addFriend(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from_user = request.user
+        username = request.data.get("userName")
+    
+        try:
+            to_user = USER.objects.get(user_name=username)
+        except USER.DoesNotExist:
+            return Response({"error": "User friend not found"}, status=404)
+    
+        if to_user == from_user:
+            return Response({"error": "You cannot add yourself as a friend"}, status=400)
+
+        inverse_request_exists = FRIEND.objects.filter(
+            from_user=to_user,
+            to_user=from_user,
+            status="pending"
+        ).exists()
+
+        if inverse_request_exists:
+            return Response({"error": "This user has already sent you a friend request"}, status=400)
+
+        friend, created = FRIEND.objects.get_or_create(
+            from_user=from_user,
+            to_user=to_user,
+            defaults={"status": "pending"}
+        )
+
+        if not created:
+            return Response({"error": "Friend request already sent or exists"}, status=400)
+
+        return Response({"message": "Friend request sent successfully"}, status=201)
+
+
+class declineInvite(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        from_user = request.user
+        to_username = request.data.get("username")
+            
+        to_user = get_object_or_404(USER, user_name=to_username)
+		
+        friend_req = get_object_or_404(
+            FRIEND,
+            from_user=to_user,
+            to_user=from_user,
+            status="pending")
+			
+        friend_req.delete()
+		
+        return Response(
+            {"message": f"Friend request from {to_user.user_name} declined"},
+            status=200
+        )
+
+
+class acceptInvite(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        from_user = request.user
+        to_username = request.data.get("username")
+	
+        to_user = get_object_or_404(USER, user_name=to_username)
+	
+        friend_req = get_object_or_404(
+            FRIEND,
+            from_user=to_user,
+            to_user=from_user,
+            status="pending")
+		
+        friend_req.status = "accepted"
+        friend_req.save()
+		
+        return Response(
+            {"message": f"Friend request from {to_user.user_name} accepted"},
+            status=200
+        )

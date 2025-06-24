@@ -19,8 +19,9 @@ from django.urls import path
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword
 from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshToken
-from api.views import infoOtherUser, searchUsers
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, ChatGroupListCreateView, ChatMessageHistoryView, ChatMessageSendView
+from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
+from api.views import ChatGroupListCreateView, ChatMessageHistoryView, ChatMessageSendView
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 # POST   /api/chat/                       # Create a chat group
@@ -49,6 +50,10 @@ urlpatterns = [
 	path('api/addResultGames/', addResultGames.as_view(), name='addResultGames'),
 	path('api/game/<str:key>/', keyGame.as_view(), name='keyGame'),
 	path('api/searchUsers/', searchUsers.as_view(), name='searchUsers'),
+	path('api/listennerFriends/', listennerFriends.as_view(), name='listennerFriends'),
+	path('api/add/friend/', addFriend.as_view(), name='addFriend'),
+	path('api/declineInvite/', declineInvite.as_view(), name='declineInvite'),
+	path('api/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
 
     # RESTful chat message endpoints

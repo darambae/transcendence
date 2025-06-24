@@ -8,6 +8,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	if (toggleLogin) {
 		toggleLogin.addEventListener('click', async (event) => {
 			//event.preventDefault();
+			let userIsAuth = await isUserAuthenticated();
 			console.log("user auth : ", userIsAuth);
 			if (userIsAuth == false) {
 				actualizeIndexPage('modal-container', routes.login);
