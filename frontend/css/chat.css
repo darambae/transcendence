@@ -1,9 +1,3 @@
-/* chat.css */
-
-/* --- Global Reset / Base Styles (unchanged) --- */
-/* (Keep any existing global styles from your styles.css here if they apply) */
-
-/* --- Main Chat Toggle Button (Fixed - generally fine as is) --- */
 #mainChatToggleButton {
     background-color: rgba(135, 5, 5, 1);
     color: white;
@@ -29,12 +23,7 @@
     transform: scale(1.05);
 }
 
-/* =============================================================== */
-/* --- DEFAULT CHAT WINDOW STYLES (for Smaller Screens/Mobile) --- */
-/* These styles apply by default, and will be overridden by media queries for larger screens */
-/* Think of this as your "mobile-first" approach for the chat modal */
-/* =============================================================== */
-
+/* --- Chat Modal Styles (Mobile First) --- */
 #mainChatWindow .modal-dialog {
     max-width: 98vw;
     max-height: 98vh;
@@ -70,15 +59,15 @@
 #mainChatWindow .modal-body {
     flex-grow: 1;
     display: flex;
-    flex-direction: column; /* Stacks columns vertically on small screens */
+    flex-direction: column;
     padding: 0;
 }
 
-/* Left Column: Chat Room List (for small screens) */
+/* --- Chat Room List (Left Column, Mobile) --- */
 .chat-rooms-list {
     flex-shrink: 0;
     width: 100%;
-    height: 120px; /* Fixed height for the list */
+    height: 120px;
     background-color: #f8f9fa;
     overflow-y: auto;
     padding: 10px;
@@ -115,7 +104,7 @@
     font-weight: bold;
 }
 
-/* Right Column: Active Chat Display (for small screens) */
+/* --- Chat Display (Right Column, Mobile) --- */
 .chat-display {
     flex-grow: 1;
     background-color: white;
@@ -123,38 +112,74 @@
     flex-direction: column;
 }
 
-/* New: Chat Start Header for user ID input */
+/* --- Chat Start Header (User Search) --- */
 .chat-start-header {
     flex-shrink: 0;
-    padding: 10px; /* Adjusted padding for small screens */
-    background-color: #f1f1f1; /* Light background for the new chat input section */
+    padding: 10px;
+    background-color: #f1f1f1;
     border-bottom: 1px solid #dee2e6;
 }
 
 .chat-start-header .input-group {
-    display: flex;
+    position: relative;
+    width: 100%;
     gap: 5px;
+    display: flex;
 }
 
 .chat-start-header .form-control {
-    flex-grow: 1;
+    flex: 1 1 0;
     min-width: 0;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-    box-sizing: border-box;
+    width: 100%;
 }
 
 .chat-start-header .btn-secondary {
     flex-shrink: 0;
     white-space: nowrap;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.9rem;
-    line-height: 1.2;
-    box-sizing: border-box;
 }
 
 
-/* Existing: Chat Display Header (for displaying active chat room name) */
+/* --- User Search Dropdown (Always absolute, all screens) --- */
+
+#resultsSearch {
+    position: absolute;
+    z-index: 1050;
+    width: 100%; /* Full width of .input-group */
+    left: 0;
+    top: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 0;
+    list-style: none;
+}
+
+#resultsSearch .list-group-item {
+    cursor: default;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 1px solid #f1f1f1;
+    background: #fff;
+    transition: background 0.2s;
+    font-size: 0.95rem;
+    color: #333;
+    user-select: none;
+}
+
+#resultsSearch .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#resultsSearch .list-group-item:hover,
+#resultsSearch .list-group-item:focus {
+    background: #f8f9fa;
+}
+
+/* --- Chat Display Header --- */
 .chat-display-header {
     flex-shrink: 0;
     background-color: #f8f9fa;
@@ -170,6 +195,7 @@
     white-space: normal;
 }
 
+/* --- Chat Body --- */
 .chat-body {
     flex-grow: 1;
     overflow-y: auto;
@@ -180,18 +206,18 @@
     gap: 8px;
 }
 
-/* New: No Chat Selected Message */
+/* --- No Chat Selected Message --- */
 .no-chat-selected {
-    display: flex; /* Make it a flex container */
-    flex-direction: column; /* Stack children vertically */
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
-    height: 100%; /* Take full height of its parent */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
     text-align: center;
-    color: #6c757d; /* Muted text color */
+    color: #6c757d;
 }
 
-
+/* --- Chat Footer --- */
 .chat-footer {
     flex-shrink: 0;
     padding: 8px 10px;
@@ -224,7 +250,7 @@
     box-sizing: border-box;
 }
 
-/* Chat Message Styles (for small screens) */
+/* --- Chat Message Styles --- */
 .chat-message {
     max-width: 90%;
     padding: 7px 10px;
@@ -270,13 +296,8 @@
     text-align: left;
 }
 
-
-/* =============================================================== */
-/* --- MEDIA QUERY FOR LARGER SCREENS (e.g., Desktops, Laptops) --- */
-/* These styles will override the default styles when the screen width is >= 992px */
-/* =============================================================== */
-@media (min-width: 992px) { /* Applies when viewport width is 992px or wider */
-
+/* --- Desktop/Large Screen Overrides --- */
+@media (min-width: 992px) {
     #mainChatWindow .modal-dialog {
         max-width: 90vw;
         max-height: 90vh;
@@ -297,11 +318,10 @@
     }
 
     #mainChatWindow .modal-body {
-        flex-direction: row; /* Layout columns side-by-side on larger screens */
+        flex-direction: row;
         width: 100%; 
     }
 
-    /* Left Column: Chat Room List (for larger screens) */
     .chat-rooms-list {
         flex-basis: 220px;
         flex-shrink: 0;
@@ -323,7 +343,6 @@
         margin-bottom: 5px;
     }
 
-    /* Right Column: Active Chat Display (for larger screens) */
     .chat-display {
         flex-grow: 1;
         flex-shrink: 1;
@@ -334,13 +353,13 @@
         padding: 0;
     }
 
-    /* New: Chat Start Header for user ID input (desktop styles) */
     .chat-start-header {
-        padding: 15px; /* Restore larger padding for desktop */
+        padding: 15px;
     }
 
     .chat-start-header .input-group {
-        gap: 10px; /* Restore larger gap */
+        gap: 10px;
+        position: relative;
     }
 
     .chat-start-header .form-control {
@@ -353,7 +372,6 @@
         font-size: 0.95rem;
     }
 
-    /* Existing: Chat Display Header (desktop styles) */
     .chat-display-header {
         padding: 15px;
     }
@@ -385,7 +403,6 @@
         font-size: 0.95rem;
     }
 
-    /* Chat Message Styles (for larger screens) */
     .chat-message {
         max-width: 80%;
         padding: 8px 12px;
