@@ -87,6 +87,10 @@ export async function handleLoginSubmit(event) {
 				await double_authenticate(dataForm);
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
+				const hash = location.hash.slice(1);
+				if (hash === 'signup') {
+					actualizeIndexPage('main-content', routes.home);
+				}
 				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
 				console.log(`User ${username} successfully connected`);
 				window.loggedInUser = username;
@@ -129,7 +133,7 @@ export function loginController() {
 	const modalContainer = document.getElementById("modal-container");
 	const closeBtn = document.getElementById("close-login-form");
 
-	closeBtn.addEventListener("click", (event) => {
+	closeBtn.addEventListener("click", () => {
 		closeModal();
 	});
 

@@ -142,3 +142,14 @@
     background-color: rgba(255, 255, 255, 0.3);
   }
   
+ #close-card-btn {
+  color: #fff !important;
+  background-color: transparent !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+#close-card-btn:hover, #close-card-btn:focus {
+  color: #fff !important;
+  background-color: rgba(255,255,255,0.15) !important;
+  opacity: 1 !important;
+}

@@ -1,6 +1,18 @@
-
+import { closeModal } from "../utils.js";
 
 export async function card_profileController(username) {
+	const modalContainer = document.getElementById("modal-container");
+	modalContainer.addEventListener("click", (event) => {
+		if(event.target.id === "modal-container") {
+			closeModal();
+		}
+	});
+
+	const closeBtn = document.getElementById("close-card-btn");
+	closeBtn.addEventListener("click", () => {
+		closeModal();
+	});
+
 	if (username) {
 		getOtherUserInfo(username);
 		getOtherUserAvatar(username);

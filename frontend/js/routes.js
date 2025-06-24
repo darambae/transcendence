@@ -44,11 +44,12 @@ export const routes = {
 		template: 'user',
 		controller: userController,
 	},
-	card_profile: {
+	card_profile: (username) => ({
 		template: 'card_profile',
-		controller: card_profileController,
+		controller: () => card_profileController(username),
 		isModal: true,
-	},
+		username: username
+	}),
 	settings_profile: {
 		template: 'settings_profile',
 		controller: settingsProfileController,
