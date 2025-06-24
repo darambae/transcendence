@@ -1,20 +1,19 @@
 
-import { actualizeIndexPage, getCookie } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import { actualizeIndexPage, getCookie, isUserAuthenticated } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 
 let mainChatBootstrapModal; // Bootstrap Modal instance
 let currentActiveChatGroup = null; // No default active group, will be set on selection
-let loggedInUser = window.loggedInUser || null;
 const eventSources = {}; // Stores EventSource objects per groupName
 const messageOffsets = {}; // Stores the offset for message history for each group
 
 // Helper to create an HTML message element
-function createMessageElement(messageData) {
+function createMessageElement(messageData, username) {
     const msg = document.createElement('div');
     msg.classList.add('chat-message');
 
     // Determine if the message sender is the current logged-in user
-    const isSelf = messageData.sender === loggedInUser || messageData.sender_username === loggedInUser;
+    const isSelf = messageData.sender === username || messageData.sender_username === username;
 
     if (isSelf) {
         msg.classList.add('self');
@@ -47,7 +46,7 @@ function createMessageElement(messageData) {
 }
 
 // Function to load message history for the active group
-async function loadMessageHistory(groupName, prepend = false) {
+async function loadMessageHistory(username, groupName, prepend = false) {
     const chatLog = document.getElementById('chatLog-active');
     if (!chatLog) {
         console.error(`chatLog-active not found for loading history.`);
@@ -67,8 +66,6 @@ async function loadMessageHistory(groupName, prepend = false) {
     const offset = messageOffsets[groupName] || 0;
     const limit = 20;
 
-    const token = `Bearer ${sessionStorage.getItem('accessToken')}`; // Assuming token is stored in sessionStorage
-
     try {
         // UPDATED URL: /chat/{group_name}/messages/
         const response = await fetch(
@@ -76,9 +73,9 @@ async function loadMessageHistory(groupName, prepend = false) {
             {
                 method: 'GET',
                 headers: {
-                    'Authorization': token,
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include',
             }
         );
         const data = await response.json();
@@ -87,7 +84,7 @@ async function loadMessageHistory(groupName, prepend = false) {
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
                 data.messages.forEach((msgData) => {
-                    const msgElement = createMessageElement(msgData);
+                    const msgElement = createMessageElement(msgData, username);
                     fragment.appendChild(msgElement);
                 });
 
@@ -121,21 +118,19 @@ async function loadMessageHistory(groupName, prepend = false) {
 }
 
 // Function to send a message to the active group
-async function sendMessage() {
-    const usernameInput = document.getElementById('usernameInput-active'); // This should now hold loggedInUser
+async function sendMessage(username) {
+    const usernameInput = document.getElementById('usernameInput-active'); // This should now hold username
     const messageInput = document.getElementById('messageInput-active');
     const groupNameInput = document.getElementById('groupNameInput-active'); // Contains the current active groupName
 
-    const username = usernameInput.value.trim(); // Should be `loggedInUser`
+    const user_name = usernameInput.value.trim(); // Should be `username`
     const content = messageInput.value.trim();
     const groupName = groupNameInput.value;
 
-    if (!username || !content || !groupName) {
+    if (!user_name || !content || !groupName) {
         alert('Please ensure you are logged in, selected a chat, and typed a message.');
         return;
     }
-
-    const token = `Bearer ${sessionStorage.getItem('accessToken')}`;
 
     try {
         // UPDATED URL: /chat/{group_name}/messages/ (POST)
@@ -144,10 +139,10 @@ async function sendMessage() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken'), // For Django's CSRF protection on your frontend
-                'Authorization': token, // Pass auth token to the backend
             },
+            credentials: 'include', // Include cookies for session management
             body: JSON.stringify({
-                username: username,
+                username: user_name,
                 content: content,
                 group_name: groupName, // Still useful for backend context, though redundant with URL
             }),
@@ -176,7 +171,7 @@ async function sendMessage() {
 }
 
 // Function to initialize EventSource (SSE) for a group
-function initEventSource(groupName) {
+function initEventSource(groupName, username) {
     // Close any other active EventSources before opening a new one
     for (const key in eventSources) {
         if (eventSources[key].readyState === EventSource.OPEN) {
@@ -192,8 +187,9 @@ function initEventSource(groupName) {
         return;
     }
 
-    const token = `Bearer ${sessionStorage.getItem('accessToken')}`;
     // UPDATED URL: /chat/stream/{group_name}/
+    // ********* how do I get the token? *******
+    const token = sessionStorage.getItem('accessToken');
     const source = new EventSource(`/chat/stream/${groupName}/?token=${encodeURIComponent(token)}`);
 
     eventSources[groupName] = source;
@@ -208,7 +204,7 @@ function initEventSource(groupName) {
                 if (noMessagesDiv) {
                     noMessagesDiv.remove();
                 }
-                const msgElement = createMessageElement(messageData);
+                const msgElement = createMessageElement(messageData, username);
                 chatLog.appendChild(msgElement);
                 chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
             }
@@ -251,28 +247,20 @@ async function loadChatRoomList(current_user) {
 
     try {
         // UPDATED URL: /chat/ (GET)
-        // Note: Your backend ChatGroupListCreateView GET should filter by the loggedInUser internally
+        // Note: Your backend ChatGroupListCreateView GET should filter by the username internally
         // or accept a query parameter for it. Based on your urls.py, it seems it's `/chat/`
         // which implies the view itself handles the user context for listing.
-        // If it requires a username in the URL, revert to `/chat/${loggedInUser}/`
+        // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         const csrf = getCookie('csrftoken');
-        const token = sessionStorage.getItem('accessToken');
         console.log('Loading chat list for user:', current_user);
-        if (!token) {
-            console.warn('No access token found in session storage. Cannot load chat list.');
-            chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
-            return;
-        }
-        //
         const response = await fetch(`/chat/`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrf, // For CSRF protection if needed
             },
-            // credentials: 'include'
+            credentials: 'include'
         });
         if (!response.ok) {
             const errorData = await response.json();
@@ -318,7 +306,7 @@ async function loadChatRoomList(current_user) {
 }
 
 // Function to switch between chat rooms
-function switchChatRoom(newGroupName) {
+function switchChatRoom(username, newGroupName) {
     if (currentActiveChatGroup === newGroupName) {
         return; // Already in this room
     }
@@ -362,7 +350,7 @@ function switchChatRoom(newGroupName) {
 
     // Load history and initialize SSE for the new group
     messageOffsets[newGroupName] = 0; // Reset offset for new room
-    loadMessageHistory(newGroupName);
+    loadMessageHistory(username, newGroupName);
     initEventSource(newGroupName);
 
     // Focus on message input
@@ -373,13 +361,13 @@ function switchChatRoom(newGroupName) {
 }
 
 // Function to request creation/retrieval of a private group
-async function promptPrivateChat(targetUsername) {
-    if (!loggedInUser) {
+async function promptPrivateChat(username, targetUsername) {
+    if (!username) {
         alert('Please log in to start a new chat.');
         return;
     }
 
-    if (loggedInUser === targetUsername) {
+    if (username === targetUsername) {
         alert('You cannot start a chat with yourself.');
         return;
     }
@@ -401,7 +389,6 @@ async function promptPrivateChat(targetUsername) {
     }
 
     if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-        const token = `Bearer ${sessionStorage.getItem('accessToken')}`;
 
         try {
             // UPDATED URL: /chat/ (POST)
@@ -410,18 +397,18 @@ async function promptPrivateChat(targetUsername) {
                 headers: {
                     'Content-Type': 'application/json', // Backend expects JSON now
                     'X-CSRFToken': getCookie('csrftoken'),
-                    'Authorization': token,
                 },
                 body: JSON.stringify({ // Send as JSON
-                    current_username: loggedInUser,
+                    current_username: username,
                     target_username: targetUsername,
                 }),
+                credentials: 'include', // Include cookies for session management
             });
 
             const data = await response.json();
             if (response.ok && data.status === 'success' && data.group_name) {
                 console.log(`Chat group ${data.group_name} created/retrieved.`);
-                loadChatRoomList(loggedInUser); // Reload list to include new chat
+                loadChatRoomList(username); // Reload list to include new chat
                 // Wait for the list to be updated in the DOM before switching
                 setTimeout(() => {
                     switchChatRoom(data.group_name); // Switch to the new chat
@@ -438,7 +425,7 @@ async function promptPrivateChat(targetUsername) {
 }
 
 // Event handler for "Start New Chat" button in the modal
-async function handleStartNewChat() {
+async function handleStartNewChat(username) {
     const targetUserInput = document.getElementById('targetUserInput');
     const targetUsername = targetUserInput.value.trim();
 
@@ -447,7 +434,7 @@ async function handleStartNewChat() {
         return;
     }
 
-    if (targetUsername === loggedInUser) {
+    if (targetUsername === username) {
         alert('You cannot start a chat with yourself.');
         return;
     }
@@ -467,7 +454,7 @@ export function chatController(username) {
 
     const usernameInputActive = document.getElementById('usernameInput-active');
     if (usernameInputActive) {
-        usernameInputActive.value = loggedInUser;
+        usernameInputActive.value = username;
     }
 
     // 1. Initialize Bootstrap Modal
@@ -477,8 +464,8 @@ export function chatController(username) {
 
         mainChatWindowElement.addEventListener('shown.bs.modal', () => {
             console.log('Main Chat Window is shown');
-            console.log('Logged in user:', loggedInUser);
-            loadChatRoomList(loggedInUser); // Load chat list dynamically
+            console.log('Logged in user:', username);
+            loadChatRoomList(username); // Load chat list dynamically
             
             // Set initial state for chat log
             const chatLog = document.getElementById('chatLog-active');
@@ -541,7 +528,7 @@ export function chatController(username) {
         messageInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                sendMessage();
+                sendMessage(username);
             }
         });
     }
@@ -551,4 +538,29 @@ export function chatController(username) {
     if (startNewChatBtn) {
         startNewChatBtn.addEventListener('click', handleStartNewChat);
     }
+}
+
+export async function renderChatButtonIfAuthenticated() {
+	let userIsAuth = await isUserAuthenticated();
+	if (userIsAuth) {
+		const username = await fetch('user-service/infoUser/', {
+			method: 'GET',
+			credentials: 'include',
+		})
+			.then((response) => response.json())
+			.then((data) => data.user_name)
+			.catch((error) => {
+				console.error('Error fetching user info:', error);
+				return null;
+			});
+		if (!username) {
+			console.error('Username not found');
+			return;
+		}
+		try {
+			await actualizeIndexPage('chat-container', routes['chat'](username));
+		} catch (e) {
+			console.error('Could not load chat UI:', e);
+		}
+	}
 }

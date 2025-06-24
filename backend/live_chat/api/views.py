@@ -23,7 +23,6 @@ import requests
 # but often Django projects define common models for consistency.
 # For the purpose of this file, we assume they are available if needed for local ORM ops,
 # but primarily, this service proxies to access_postgresql.
-from .models import USER, ChatGroup, Message # Example: from myapp.models import USER, ChatGroup, Message
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +36,10 @@ class ChatGroupListCreateView(View):
         Lists chat groups for the logged-in user by proxying to access_postgresql.
         Expects Authorization header for user identification to be passed along.
         """
-        auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json', 'Host': 'localhost'}
-        if auth_header:
-            headers['Authorization'] = auth_header
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+             return Response({'error': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
         try:
             resp = requests.get(url, headers=headers, timeout=10, verify=False)
@@ -66,11 +65,11 @@ class ChatGroupListCreateView(View):
             if not current_username or not target_username:
                 return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
 
-            auth_header = request.headers.get('Authorization')
-            headers = {'Content-Type': 'application/json'}
-            if auth_header:
-                headers['Authorization'] = auth_header
-
+            
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return Response({'error': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
             url = f"{ACCESS_PG_BASE_URL}/api/chat/"
             try:
                 resp = requests.post(url, json={
@@ -103,11 +102,10 @@ class ChatMessageHistoryView(View):
         offset = request.GET.get('offset', 0)
         limit = request.GET.get('limit', 20)
 
-        auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json'}
-        if auth_header:
-            headers['Authorization'] = auth_header
-
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+             return Response({'error': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_name}/messages/"
         params = {'offset': offset, 'limit': limit}
         try:
@@ -136,11 +134,10 @@ class ChatMessageSendView(View):
             if not username or not content:
                 return JsonResponse({'status': 'error', 'message': 'Username and content are required.'}, status=400)
 
-            auth_header = request.headers.get('Authorization')
-            headers = {'Content-Type': 'application/json'}
-            if auth_header:
-                headers['Authorization'] = auth_header
-
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return Response({'error': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
             url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_name}/messages/"
             try:
                 resp = requests.post(url, json={
