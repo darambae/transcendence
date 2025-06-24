@@ -1,28 +1,27 @@
+
 export function userController() {
-	
-	userInfo()
+	userInfo();
 }
 
-export function userInfo()
-{
+export function userInfo() {
 	const dropdownBtn = document.getElementById('avatarDropdownBtn');
 	const dropdownMenu = document.getElementById('customDropdownMenu');
 
-	fetch("user-service/avatar/", {
-		method: "GET",
-		credentials: 'include'
-	  })
-	  .then(res => {
-		if (!res.ok) throw new Error("No avatar found");
-		return res.blob();
-	  })
-	  .then(blob => {
-		const imgUrl = URL.createObjectURL(blob);
-		document.getElementById("user-avatar").src = imgUrl;
-	  })
-	  .catch(err => {
-		console.error("Erreur:", err);
-	  });
+	fetch('user-service/avatar/', {
+		method: 'GET',
+		credentials: 'include',
+	})
+		.then((res) => {
+			if (!res.ok) throw new Error('No avatar found');
+			return res.blob();
+		})
+		.then((blob) => {
+			const imgUrl = URL.createObjectURL(blob);
+			document.getElementById('user-avatar').src = imgUrl;
+		})
+		.catch((err) => {
+			console.error('Erreur:', err);
+		});
 	if (dropdownBtn && dropdownMenu) {
 		dropdownBtn.addEventListener('click', () => {
 			dropdownMenu.classList.toggle('show');
@@ -34,6 +33,6 @@ export function userInfo()
 			}
 		});
 	} else {
-		console.error("Dropdown button or menu not found");
+		console.error('Dropdown button or menu not found');
 	}
 }

@@ -8,7 +8,6 @@ from django.utils.decorators import method_decorator # To apply csrf_exempt to c
 from channels.layers import get_channel_layer
 from asgiref.sync import sync_to_async
 import asyncio
-import httpx
 import logging
 from datetime import datetime
 from rest_framework.views import APIView
@@ -24,7 +23,6 @@ import requests
 # but often Django projects define common models for consistency.
 # For the purpose of this file, we assume they are available if needed for local ORM ops,
 # but primarily, this service proxies to access_postgresql.
-from .models import USER, ChatGroup, Message # Example: from myapp.models import USER, ChatGroup, Message
 
 logger = logging.getLogger(__name__)
 
@@ -38,10 +36,10 @@ class ChatGroupListCreateView(View):
         Lists chat groups for the logged-in user by proxying to access_postgresql.
         Expects Authorization header for user identification to be passed along.
         """
-        auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json', 'Host': 'localhost'}
-        if auth_header:
-            headers['Authorization'] = auth_header
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+             return Response({'error': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
         try:
             resp = requests.get(url, headers=headers, timeout=10, verify=False)
@@ -67,11 +65,11 @@ class ChatGroupListCreateView(View):
             if not current_username or not target_username:
                 return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
 
-            auth_header = request.headers.get('Authorization')
-            headers = {'Content-Type': 'application/json'}
-            if auth_header:
-                headers['Authorization'] = auth_header
-
+            
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return Response({'error': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
             url = f"{ACCESS_PG_BASE_URL}/api/chat/"
             try:
                 resp = requests.post(url, json={
@@ -100,27 +98,22 @@ class ChatMessageHistoryView(View):
     Maps to: path('chat/<str:group_name>/messages/', ChatMessageHistoryView.as_view(), name='chat_message_history')
     Communicates with access_postgresql's /api/chat/<str:group_name>/messages/ endpoint (GET).
     """
-    async def get(self, request, group_name):
+    def get(self, request, group_name):
         offset = request.GET.get('offset', 0)
         limit = request.GET.get('limit', 20)
 
-        auth_header = request.headers.get('Authorization')
-        headers = {'Content-Type': 'application/json'}
-        if auth_header:
-            headers['Authorization'] = auth_header
-
-        # Construct the URL including the /api/ prefix as per access_postgresql's urls.py
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+             return Response({'error': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_name}/messages/"
         params = {'offset': offset, 'limit': limit}
         try:
-            async with httpx.AsyncClient() as client:
-                resp = await client.get(url, params=params, headers=headers, timeout=10.0)
-                resp.raise_for_status()
-                return JsonResponse(resp.json(), status=resp.status_code)
-        except httpx.RequestError as exc:
+            resp = requests.get(url, params=params, headers=headers, timeout=10, verify=False)
+            resp.raise_for_status()
+            return JsonResponse(resp.json(), status=resp.status_code)
+        except requests.RequestException as exc:
             return JsonResponse({'status': 'error', 'message': 'Could not connect to data service for message history.'}, status=502)
-        except httpx.HTTPStatusError as exc:
-            return JsonResponse({'status': 'error', 'message': f'Error from data service: {exc.response.text}'}, status=exc.response.status_code)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': 'Internal server error during message history retrieval.'}, status=500)
 
@@ -132,7 +125,7 @@ class ChatMessageSendView(View):
     Maps to: path('chat/<str:group_name>/messages/', ChatMessageSendView.as_view(), name='chat_message_send')
     Communicates with access_postgresql's /api/chat/<str:group_name>/messages/ endpoint (POST).
     """
-    async def post(self, request, group_name):
+    def post(self, request, group_name):
         try:
             data = json.loads(request.body)
             username = data.get('username')
@@ -141,56 +134,49 @@ class ChatMessageSendView(View):
             if not username or not content:
                 return JsonResponse({'status': 'error', 'message': 'Username and content are required.'}, status=400)
 
-            auth_header = request.headers.get('Authorization')
-            headers = {'Content-Type': 'application/json'}
-            if auth_header:
-                headers['Authorization'] = auth_header
-
-            # Construct the URL including the /api/ prefix as per access_postgresql's urls.py
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return Response({'error': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
             url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_name}/messages/"
             try:
-                async with httpx.AsyncClient() as client:
-                    resp = await client.post(url, json={
-                        'group_name': group_name, # Still pass group_name in body for consistency
-                        'username': username,
-                        'content': content
-                    }, headers=headers, timeout=10.0)
-                    resp.raise_for_status()
-                    pg_response_data = resp.json()
+                resp = requests.post(url, json={
+                    'group_name': group_name,
+                    'username': username,
+                    'content': content
+                }, headers=headers, timeout=10, verify=False)
+                resp.raise_for_status()
+                pg_response_data = resp.json()
 
-                    # After successfully sending to access_postgresql, forward the message via Channels
-                    if pg_response_data.get('status') == 'success' and 'message_data' in pg_response_data:
-                        # Use the message data returned from access_postgresql for real-time update
-                        message_data_for_channels = pg_response_data['message_data']
-                    else:
-                        # Fallback if access_postgresql doesn't return full message_data as expected
-                        # It's crucial for access_postgresql to return this for consistency
-                        message_data_for_channels = {
-                            "sender": username,
-                            "sender_id": None, # Should be filled by access_postgresql
-                            "content": content,
-                            "timestamp": datetime.now().isoformat(), # Fallback timestamp
-                            "group_name": group_name
-                        }
+                # After successfully sending to access_postgresql, forward the message via Channels
+                if pg_response_data.get('status') == 'success' and 'message_data' in pg_response_data:
+                    message_data_for_channels = pg_response_data['message_data']
+                else:
+                    message_data_for_channels = {
+                        "sender": username,
+                        "sender_id": None,
+                        "content": content,
+                        "timestamp": datetime.now().isoformat(),
+                        "group_name": group_name
+                    }
 
-                    channel_layer = get_channel_layer()
-                    if channel_layer is None:
-                        return JsonResponse({'status': 'error', 'message': 'Real-time server not configured.'}, status=500)
+                channel_layer = get_channel_layer()
+                if channel_layer is None:
+                    return JsonResponse({'status': 'error', 'message': 'Real-time server not configured.'}, status=500)
 
-                    channel_group_name = f"chat_{group_name}"
+                channel_group_name = f"chat_{group_name}"
 
-                    await channel_layer.group_send(
-                        channel_group_name,
-                        {
-                            "type": "chat_message",
-                            "message": message_data_for_channels
-                        }
-                    )
-                    return JsonResponse({'status': 'success', 'message': 'Message sent and forwarded.'})
-            except httpx.RequestError as exc:
+                # Use sync_to_async for group_send in a sync view
+                sync_to_async(channel_layer.group_send)(
+                    channel_group_name,
+                    {
+                        "type": "chat_message",
+                        "message": message_data_for_channels
+                    }
+                )
+                return JsonResponse({'status': 'success', 'message': 'Message sent and forwarded.'})
+            except requests.RequestException as exc:
                 return JsonResponse({'status': 'error', 'message': 'Could not connect to data service to send message.'}, status=502)
-            except httpx.HTTPStatusError as exc:
-                return JsonResponse({'status': 'error', 'message': f'Error from data service: {exc.response.text}'}, status=exc.response.status_code)
             except Exception as e:
                 return JsonResponse({'status': 'error', 'message': 'Internal server error during message sending.'}, status=500)
 
@@ -198,7 +184,6 @@ class ChatMessageSendView(View):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
-
 
 async def sse_chat_stream(request, group_name):
     """

@@ -5,7 +5,7 @@
 
 /* --- Main Chat Toggle Button (Fixed - generally fine as is) --- */
 #mainChatToggleButton {
-    background-color: #007bff;
+    background-color: rgba(135, 5, 5, 1);
     color: white;
     border: none;
     border-radius: 50%;
@@ -25,7 +25,7 @@
 }
 
 #mainChatToggleButton:hover {
-    background-color: #0056b3;
+    background-color: rgba(135, 5, 5, 1);
     transform: scale(1.05);
 }
 
@@ -51,9 +51,9 @@
 }
 
 #mainChatWindow .modal-header {
-    background-color: #007bff;
+    background-color: rgba(135, 5, 5, 1);
     color: white;
-    border-bottom: 1px solid #0056b3;
+    border-bottom: 1px solid rgba(135, 5, 5, 1);
     padding: 0.8rem 1rem;
     flex-shrink: 0;
 }
@@ -110,7 +110,7 @@
 }
 
 .chat-rooms-list .list-group-item.active {
-    background-color: #007bff;
+    background-color: rgba(135, 5, 5, 1);
     color: white;
     font-weight: bold;
 }

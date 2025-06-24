@@ -1,13 +1,13 @@
 
 import { routes } from './routes.js';
 import { actualizeIndexPage, getCookie, isUserAuthenticated } from './utils.js';
-
+import { renderChatButtonIfAuthenticated } from './views/chat.js';
+window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
 	const toggleLogin = document.querySelector('.login-link');
 	if (toggleLogin) {
 		toggleLogin.addEventListener('click', async (event) => {
 			//event.preventDefault();
-			let userIsAuth = await isUserAuthenticated();
 			console.log("user auth : ", userIsAuth);
 			if (userIsAuth == false) {
 				actualizeIndexPage('modal-container', routes.login);
