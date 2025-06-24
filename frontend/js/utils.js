@@ -25,8 +25,9 @@ export async function closeModal() {
 	const modalContainer = document.getElementById("modal-container")
 
 	modalContainer.style.display = "none";
+	modalContainer.innerHTML = "";
 	loginForm.classList.remove("active");
-	window.location = "#home";
+	//window.location = "#home";
 }
 
 //csrf token getter

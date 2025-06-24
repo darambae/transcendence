@@ -2,6 +2,20 @@
 import { routes } from './routes.js';
 import { actualizeIndexPage, getCookie, isUserAuthenticated } from './utils.js';
 
+window.addEventListener('DOMContentLoaded', async () => {
+	const toggleLogin = document.querySelector('.login-link');
+	if (toggleLogin) {
+		toggleLogin.addEventListener('click', async (event) => {
+			//event.preventDefault();
+			let userIsAuth = await isUserAuthenticated();
+			console.log("user auth : ", userIsAuth);
+			if (userIsAuth == false) {
+				actualizeIndexPage('modal-container', routes.login);
+			}
+		});
+	}
+});
+
 window.addEventListener('hashchange', navigate);
 window.addEventListener('DOMContentLoaded', navigate);
 
@@ -69,14 +83,10 @@ export async function navigate() {
 
 //-------------------------------
 try {
-	if (view.isModal) {
-		await actualizeIndexPage('modal-container', view);
-	} else {
-		await actualizeIndexPage('main-content', view);
-	}
-	if (typeof view.controller === 'function') {
-		view.controller(param);
-	}
+	await actualizeIndexPage('main-content', view);
+	// if (typeof view.controller === 'function') {
+	// 	view.controller(param);
+	// }
 } catch (error) {
 	console.error('Error loading template ', error);
 	const content = document.getElementById("main-content");
