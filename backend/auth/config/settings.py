@@ -75,7 +75,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            FRONTEND_DIR, "templates"
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -164,6 +164,42 @@ REST_FRAMEWORK = {
     ),
 }
 
+import logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {asctime} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'level': 'DEBUG',  # Show all logs
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # Show all logs
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Show all logs from Django
+            'propagate': False,
+        },
+        'api': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Show all logs from your app
+            'propagate': False,
+        },
+    },
+}
+
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):
 #     def filter(self, record):
@@ -179,18 +215,12 @@ REST_FRAMEWORK = {
 #         },
 #     },
 #     'formatters': {
-#         'json': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-#         },
 #         'text': {
 #             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
 #             'class': 'logging.Formatter',
 #         },
 #         'logstash': {
 #             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-#             # You might want to explore additional options in DjangoLogstashFormatter
-#             # For example, 'extra_fields': {'environment': 'production'}
 #         },
 #     },
 #     'handlers': {
@@ -214,16 +244,16 @@ REST_FRAMEWORK = {
 #     },
 #     'loggers': {
 #         'django': {
-#             'handlers': ['console'], # Only send Django logs to console by default
+#             'handlers': ['console', 'logstash'], # Only send Django logs to console by default
 #             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger
+#             'propagate': False, # Prevent duplicate logging via root logger
 #         },
 #         'django.request': {
 #             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger
 #         },
-#         'user_service': {
+#         'api': {
 #             'handlers': ['console' ,'logstash'],
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger if needed

@@ -1,0 +1,13 @@
+
+channels==4.2.2
+daphne==4.2.0
+Django==5.2.2
+psycopg2-binary
+Pillow
+python-logstash-async
+python-json-logger
+channels-redis
+redis
+dj-database-url
+httpx
+djangorestframework

@@ -19,9 +19,9 @@ from serverPong.ball import calcIntersections
 
 channel_layer = get_channel_layer()
 
-uri = "wss://server-pong:8030/ws/game/"
+uri = "wss://server_pong:8030/ws/game/"
 
-uriJwt = "https://access-postgresql:4000/"
+uriJwt = "https://access_postgresql:4000/"
 
 class HttpResponseNoContent(HttpResponse):
     status_code = HTTPStatus.NO_CONTENT
@@ -51,8 +51,8 @@ def decodeJWT(request, encodedJwt=None) :
     if not encodedJwt :
         return [None]
     
-    # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
-    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'access-postgresql'}, verify=False)
+    # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'localhost'}, verify=False)
     if res.status_code != 200 :
         print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]

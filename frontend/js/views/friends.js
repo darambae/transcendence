@@ -1,7 +1,7 @@
 
 
 
-export function searchFriends(token) {
+export function searchFriends() {
 	
 	document.getElementById("userSearch").addEventListener("input", async function () {
 		const resultsBox = document.getElementById("resultsSearch");
@@ -9,8 +9,8 @@ export function searchFriends(token) {
 		
 		const response = await fetch(`user-service/searchUsers?q=${encodeURIComponent(query)}`, {
 			method: "GET",
+			credentials: 'include',
 			headers: {
-				"Authorization": `Bearer ${token}`,
 				"Content-Type": "application/json",
 			},
 		})

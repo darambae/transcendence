@@ -13,4 +13,6 @@ set -ex
 #   echo "Waiting for Logstash to be ready..."
 #   sleep 15
 # done
+python manage.py collectstatic --noinput
+
 exec "$@"

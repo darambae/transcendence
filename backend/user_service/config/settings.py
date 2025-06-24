@@ -22,7 +22,8 @@ from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 
-ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql', 'localhost']
+ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql']
+#ALLOWED_HOSTS = ['*']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -72,7 +73,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            FRONTEND_DIR,
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,11 +93,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy'
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.dummy'
+#     }
+# }
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -185,6 +190,41 @@ LOGGING = {
     },
 }
 
+import logging
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {asctime} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'level': 'DEBUG',  # Show all logs
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # Show all logs
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Show all logs from Django
+            'propagate': False,
+        },
+        'api': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Show all logs from your app
+            'propagate': False,
+        },
+    },
+}
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):
@@ -201,18 +241,12 @@ LOGGING = {
 #         },
 #     },
 #     'formatters': {
-#         'json': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-#         },
 #         'text': {
 #             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
 #             'class': 'logging.Formatter',
 #         },
 #         'logstash': {
 #             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-#             # You might want to explore additional options in DjangoLogstashFormatter
-#             # For example, 'extra_fields': {'environment': 'production'}
 #         },
 #     },
 #     'handlers': {
@@ -245,7 +279,7 @@ LOGGING = {
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger
 #         },
-#         'user_service': {
+#         'api': {
 #             'handlers': ['console' ,'logstash'],
 #             'level': 'DEBUG',
 #             'propagate': True, # Prevent duplicate logging via root logger if needed

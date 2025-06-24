@@ -41,7 +41,7 @@ services:
     depends_on:
       - user_service
       - ai_pong
-      - server-pong
+      - server_pong
       #- auth
     networks:
       - nginx_network
@@ -49,7 +49,7 @@ services:
       - .env
     restart: always
 
-  ################## User_Services ##################
+  ################## User_service ##################
   user_service:
     build:
       context: ./backend/user_service
@@ -70,6 +70,29 @@ services:
       - mail_network
       - elk_network
       - nginx_network
+
+#################### Chat ####################
+  live_chat:
+    build:
+      context: ./backend/live_chat
+      dockerfile: Dockerfile
+    container_name: live_chat
+    volumes:
+      - ./backend/live_chat:/app
+      - certs:/certs
+    depends_on:
+      redis:
+        condition: service_started
+      certs_generator:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - data_network
+      - elk_network
+      - nginx_network
+
   redis:
     image: redis:latest
     container_name: redis
@@ -106,11 +129,11 @@ services:
 
   ################## Access_posgresql ##################
 
-  access-postgresql:
+  access_postgresql:
     build:
       context: ./backend/access_postgresql
       dockerfile: Dockerfile
-    container_name: access-postgresql
+    container_name: access_postgresql
     volumes:
       - ./backend/access_postgresql:/app
       - certs:/certs
@@ -149,11 +172,11 @@ services:
       - elk_network
 
   ############### Game import ##################
-  server-pong:
+  server_pong:
     build: 
       context: ./backend/server_pong/
       dockerfile: ./Dockerfile
-    container_name: server-pong
+    container_name: server_pong
     depends_on:
       game_redis:
         condition: service_started

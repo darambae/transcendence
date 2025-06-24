@@ -1,5 +1,6 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
+import { chatController } from "./chat.js";
 
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
@@ -84,14 +85,25 @@ export async function handleLoginSubmit(event) {
 		console.log("response data: ", data);
 		if (response.ok) {
 			try {
-				await double_authenticate(dataForm)
+				await double_authenticate(dataForm);
 				closeModal();
 				actualizeIndexPage('toggle-login', routes['user']);
 				const hash = location.hash.slice(1);
 				if (hash === 'signup') {
 					actualizeIndexPage('main-content', routes.home);
 				}
-				console.log("User successfully connected");
+				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
+				console.log(`User ${username} successfully connected`);
+
+				// --- NEW: 로그인 성공 후 chatController 호출 ---
+				// if (!window.chatInitialized) {
+				// 	// 중복 초기화 방지를 위한 플래그
+				// 	console.log('Login successful, initializing chat system.');
+				// 	window.loggedInUser = username;
+				// 	chatController(username);
+				// 	window.chatInitialized = true;
+				// }
+				// --- END NEW ---
 			} catch (error) {
 				console.log("Double auth error: ", error);
 			}
@@ -109,7 +121,7 @@ export async function handleLoginSubmit(event) {
 			}
 		}
 	} catch (error) {
-		console.error("Connection error: ");
+		console.error("Connection error: ", error);
 	} finally {
 		submitButton.disabled = false;
 		if (loadingMessage)
