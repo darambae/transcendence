@@ -1,6 +1,6 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
-import { chatController } from "./chat.js";
+import { chatController, loadChatUI } from "./chat.js";
 
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
@@ -90,16 +90,15 @@ export async function handleLoginSubmit(event) {
 				actualizeIndexPage('toggle-login', routes['user']);
 				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
 				console.log(`User ${username} successfully connected`);
-
-				// --- NEW: 로그인 성공 후 chatController 호출 ---
+				window.loggedInUser = username;
+				// After successful login, initialize chat system
 				// if (!window.chatInitialized) {
-				// 	// 중복 초기화 방지를 위한 플래그
 				// 	console.log('Login successful, initializing chat system.');
-				// 	window.loggedInUser = username;
-				// 	chatController(username);
+					
+				// 	loadChatUI(chatController(username));
 				// 	window.chatInitialized = true;
 				// }
-				// --- END NEW ---
+				//
 			} catch (error) {
 				console.log("Double auth error: ", error);
 			}

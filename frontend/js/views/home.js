@@ -5,7 +5,9 @@ export async function homeController() {
 	// if user is authenticated, render chat button with username
 	const token = sessionStorage.getItem('accessToken');
 	if (!token) return;
-
+	if (window.LoggedInUser) {
+		loadChatUI(chatController(window.LoggedInUser));
+	}
 	try {
 		const response = await fetch('/user-service/infoUser/', {
 			method: 'GET',

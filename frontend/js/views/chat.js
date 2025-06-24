@@ -1,5 +1,6 @@
 
-import { getCookie } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import { actualizeIndexPage, getCookie } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import { routes } from '../routes.js';
 
 let mainChatBootstrapModal; // Bootstrap Modal instance
 let currentActiveChatGroup = null; // No default active group, will be set on selection
@@ -561,4 +562,17 @@ export function chatController(userLoggedInName) {
     if (startNewChatBtn) {
         startNewChatBtn.addEventListener('click', handleStartNewChat);
     }
+}
+
+export async function loadChatUI(callback) {
+	const container = document.getElementById('chat-container');
+	if (!container) {
+		console.error('No #chat-container found in DOM.');
+		return;
+	}
+	try {
+		await actualizeIndexPage('chat-container', routes['chat']);
+	} catch (e) {
+		console.error('Could not load chat UI:', e);
+	}
 }

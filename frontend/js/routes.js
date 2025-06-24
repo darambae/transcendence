@@ -4,7 +4,7 @@ import { multiplayerController } from './views/multiplayer.js';
 import { duelController } from './views/duel.js';
 import { loginController } from './views/login.js';
 import { signupController } from './views/signup.js';
-// import { chatController } from './views/chat.js';
+import { chatController, loadChatUI } from './views/chat.js';
 import { userController } from './views/user.js';
 import { settingsProfileController } from './views/settings_profile.js';
 import { tournamentController } from './views/tournament.js';
@@ -53,9 +53,9 @@ export const routes = {
 		template: 'settings_profile',
 		controller: settingsProfileController,
 	},
-	// chat: {
-	// 	template: 'chat',
-	// 	controller: chatController
-	// },
+	chat: {
+		template: 'chat',
+		controller: chatController
+	},
 };
 		
