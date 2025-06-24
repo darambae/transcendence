@@ -25,8 +25,11 @@ export async function closeModal() {
 	const modalContainer = document.getElementById("modal-container")
 
 	modalContainer.style.display = "none";
-	loginForm.classList.remove("active");
-	window.location = "#home";
+	modalContainer.innerHTML = "";
+	if (loginForm) {
+		loginForm.classList.remove("active");
+	}
+	//window.location = "#home";
 }
 
 
