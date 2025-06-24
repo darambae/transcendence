@@ -18,8 +18,6 @@ export function searchFriends() {
 
 		const data = await response.json();
 
-		console.log("Résultat JSON :", data);
-		
 		const users = data.results ?? [];
 		
 		resultsBox.innerHTML = users
@@ -36,3 +34,117 @@ export function searchFriends() {
 	})
 }
 
+export async function listennerFriends() {
+	const resultsBox = document.getElementById("resultsListFriends");
+	let html = "";
+
+	const response = await fetch("user-service/listennerFriends/", {
+		method: "GET",
+		credentials: 'include',
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+
+	const data = await response.json();
+	console.log("Résultat JSON :", data);
+
+	const users = data.results ?? [];
+ 
+	// for tabl friends
+	for (const user of users) {
+		html += `<li class="list-group-item user-link">
+		  <div class="d-flex justify-content-between align-items-center">
+			<a href="/#card_profile/${user.username}"
+			   data-username="${user.username}"
+			   class="text-decoration-none">
+			  ${user.username}
+			</a>`;
+		if (user.direction === 'sent' && user.status === "pending") {
+		  html += `<span class="badge bg-warning text-dark">${user.status}</span>`;
+		}
+		else if (user.direction === 'received' && user.status === "pending") {
+		  html += `<div>
+			<button class="btn btn-sm btn-success me-1"
+					onclick="acceptInvite('${user.username}')">
+			  Accepter
+			</button>
+			<button class="btn btn-sm btn-danger"
+					onclick="declineInvite('${user.username}')">
+			  Refuser
+			</button>
+		  </div>`;
+		}
+		else {
+		  const badgeClass = user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
+		  html += `<span class="badge ${badgeClass}">${user.status}</span>`;
+		}
+	
+		html += `
+		  </div>
+		</li>`;
+	  }
+	
+	  resultsBox.innerHTML = html;
+}
+
+
+export async function acceptInvite(username) {
+	
+	try {
+		const data_body = {
+			username: username
+		}
+
+		const response = await fetch("user-service/acceptInvite/", {
+			method: "PATCH",
+			credentials: 'include',
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data_body),
+		})
+
+		const data = await response.json();
+		console.log("Résultat JSON :", data);
+		if (data.message) {
+			listennerFriends()
+		}
+
+
+	} catch (err) {
+		console.error("Erreur réseau acceptInvite :", err);
+	}
+}
+
+
+export async function declineInvite(username) {
+	
+	try {
+		const data_body = {
+			username: username
+		}
+
+		const response = await fetch("user-service/declineInvite/", {
+			method: "PATCH",
+			credentials: 'include',
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data_body),
+		})
+
+		const data = await response.json();
+		console.log("Résultat JSON :", data);
+		if (data.message) {
+			listennerFriends()
+		}
+
+
+	} catch (err) {
+		console.error("Erreur réseau declineInvite :", err);
+	}
+}
+
+window.acceptInvite  = acceptInvite;
+window.declineInvite = declineInvite;
