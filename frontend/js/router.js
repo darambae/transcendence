@@ -74,9 +74,9 @@ try {
 	} else {
 		await actualizeIndexPage('main-content', view);
 	}
-	if (typeof view.controller === 'function') {
-		view.controller(param);
-	}
+	// if (typeof view.controller === 'function') {
+	// 	view.controller(param);
+	// }
 } catch (error) {
 	console.error('Error loading template ', error);
 	const content = document.getElementById("main-content");

@@ -27,6 +27,7 @@ export async function sendGameCreation() {
         // ctx.fillText("Game State : ", 50, 50)
         // ctx.fillText(`Room ID to give -> : ${data["api_key"]}!`, 150, 150);
         gameState.innerHTML = data["api_key"]
+        console.log('key get : ', data["api_key"])
         apiKey = data["api_key"]
       })
       .catch(error => {

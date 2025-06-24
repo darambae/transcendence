@@ -62,8 +62,9 @@ def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-    with open(f"{func}_decodeJWT.txt", "a") as f :
-        print("--------------------------\nBeginning : ", file=f) 
+    with open(f"{func}_decodeJWT.txt", "a+") as f :
+        tm = datetime.now()
+        print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
     with open(f"{func}_decodeJWT.txt", "a") as f : 
         if not encodedJwt :
             encodedJwt = request.COOKIES.get("access_token", None)
@@ -126,14 +127,13 @@ async def  checkForUpdates(uriKey, key) :
     except Exception as e :
         yield f"data: WebSocket stop, error : {e}\n\n"
 
-
-async def sse(request):
-    JWT = decodeJWT(request, "sse")
-    with open("logs-sse.txt", "w+") as f:
-        print(f"JWT : {JWT[0]}", file=f)
+async def sseCheck(request) :
+    JWT = decodeJWT(request, "sseCheck")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    
+    return JsonResponse({"username" : JWT[0]['payload']["username"], "guest" : JWT[0]["payload"]["invites"]})
+
+async def sse(request):
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = int(request.GET.get("idplayer"))
@@ -143,14 +143,14 @@ async def sse(request):
         idp1 = int(request.GET.get("JWTidP1"))
         idp2 = int(request.GET.get("JWTidP2"))
         if idp1 < 0 :
-            username1 = JWT[0]["payload"]["username"]
+            username1 = request.GET.get("username", "Default")
         else :
-            username1 = JWT[0]["payload"]["invites"][idp1]
+            username1 = request.GET.get(f"guest{idp1 + 1}", "Default")
 
         if idp2 < 0 :
-            username2 = JWT[0]["payload"]["username"]
+            username2 = request.GET.get("username", "Default")
         else :
-            username2 = JWT[0]["payload"]["invites"][idp2]
+            username2 = request.GET.get(f"guest{idp2 + 1}", "Default")
         
         if (rq.apiKey) :
             #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
@@ -159,21 +159,20 @@ async def sse(request):
     elif idplayer == 1 :
         idp1 = int(request.GET.get("JWTid"))
         if idp1 < 0 :
-            username1 = JWT[0]["payload"]["username"]
+            username1 = request.GET.get("username", "Default")
         else :
-            username1 = JWT[0]["payload"]["invites"][idp1]
+            username1 = request.GET.get(f"guest{idp1 + 1}", "Default")
 
         if (rq.apiKey) :
             #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
-            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
+            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}", rq.apiKey), content_type="text/event-stream")
         
     else :
         idp2 = int(request.GET.get("JWTid"))
         if idp2 < 0 :
-            username2 = JWT[0]["payload"]["username"]
+            username2 = request.GET.get("username", "Default")
         else :
-            username2 = JWT[0]["payload"]["invites"][idp2]
-        username1 = "None"
+            username2 = request.GET.get(f"guest{idp2 + 1}", "Default")
 
         if (rq.apiKey) :
             #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)

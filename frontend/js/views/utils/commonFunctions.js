@@ -75,20 +75,53 @@ export function sleep(ms) {
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   // console.log(adress);
-  let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}`;
   let url_post = `server-pong/send-message`;
   let started = false;
   let game_stats;
+  let a = undefined;
+  let b = undefined;
+  let c = undefined;
+  let username;
   const csrf = getCookie('csrftoken');
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   let mul = await fetch('./templates/localGame.html')
   let mulTxt = await mul.text()
-
+  
   let gameState  = document.getElementById("replace-state");
   gameState.innerHTML = mulTxt;
-    
-  const SSEStream = new EventSource(url_sse);
+  
+  await fetch(`server-pong/check-sse`, {
+    headers: {
+      'X-CSRFToken': csrf,
+    },
+    credentials: 'include',
+  })
+  .then(response => {
+      if (!response.ok) throw new Error("https Error: " + response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log(data)
+      ([a,b,c] = data["guest"])
+      username = data["username"]
+    })
+    .catch(error => {
+      console.error("Erreur de requête :", error);
+    })
+    console.log(username, a, b, c)
+    let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&username=${username}`;
+    if (a !== undefined) {
+      url_sse += `&guest1=${a}`
+    }
+    if (b !== undefined) {
+      url_sse += `&guest2=${b}`
+    }
+    if (c !== undefined) {
+      url_sse += `&guest3=${c}`
+    }
+
+    const SSEStream = new EventSource(url_sse);
   
   SSEStream.onerror = function(event) {
     console.error("Erreur SSE :", event);
@@ -252,7 +285,7 @@ export async function loadGamePlayable(apikey) {
           return response.json();
         })
         .then(data => {
-          // console.log("Données reçues loadPlayable:", data["playable"]);
+          console.log("Données reçues loadPlayable:", data["playable"]);
           isPlayable =  data["playable"]
         })
         .catch(error => {
@@ -263,9 +296,9 @@ export async function loadGamePlayable(apikey) {
 }
 
 export async function setApiKeyWeb(apikey) {
-  // console.log("apikey Set : ", apikey);
+  console.log("apikey Set : ", apikey);
   const csrf = getCookie('csrftoken');
-  return fetch(`server-pong/api-key`, {
+  return await fetch(`server-pong/api-key`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -279,7 +312,7 @@ export async function setApiKeyWeb(apikey) {
     return response.json();
   })
   .then(data => {
-    // console.log("Données reçues SetKey:", data["playable"]);
+    console.log("Données reçues SetKey:", data["playable"]);
     return data["playable"];
   })
   .catch(error => {

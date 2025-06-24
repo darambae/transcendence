@@ -17,7 +17,7 @@ export function multiplayerController() {
 	});
 
   joinButton.addEventListener("click", (event) => {
-    sendGameJoining();
+    	sendGameJoining();
   })
 
 	console.log("here in multiplayer ")
