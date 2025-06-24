@@ -1,18 +1,22 @@
+import { getCookie } from '../../utils.js';
 import {sleep, handleGame2Players, loadGamePlayable, setApiKeyWeb, adress} from './commonFunctions.js'
 
 export async function sendGameCreation() {
     let apiKey;
+    const csrf = getCookie('csrftoken');
     const mul = await fetch('./js/views/utils/MatchCreation.html')
-    const mulTxt = await mul.text()
+    const mulTxt = await mul.text();
     // console.log(mulTxt)
 
+    let keepGoing = true;
     let gameState  = document.getElementById("replace-state");
     gameState.innerHTML = mulTxt;
     gameState = document.getElementById('gameid')
     await fetch(`server-pong/api-key`, {
       headers: {
-        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
-      }
+        'X-CSRFToken': csrf,
+      },
+      credentials: 'include',
     })
       .then(response => {
         if (!response.ok) throw new Error("https Error: " + response.status);
@@ -31,12 +35,13 @@ export async function sendGameCreation() {
     // console.log("apikey : ", apiKey)
     let isGamePlayable = await setApiKeyWeb(apiKey);
     // console.log("Données reçues :", isGamePlayable);
-    while (true) {
+    while (keepGoing) {
       isGamePlayable = await loadGamePlayable(apiKey);
       // console.log("Donnees reçues :", isGamePlayable);
       // ctx.clearRect(150, 220 - 20, 650, 50);
       // ctx.fillText(`Game state : ${isGamePlayable}`, 150, 220);
       if (isGamePlayable == "Game can start") {
+        keepGoing = false;
         return handleGame2Players(apiKey, 1, 0, -1);
       }
       await sleep(500);

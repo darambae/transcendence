@@ -42,21 +42,52 @@ class   RequestParsed :
 
 # Create your views here.
 
-def decodeJWT(request, encodedJwt=None) :
-    if not encodedJwt :
-        #print(f"headers : {request.headers}", file=sys.stderr)
-        # encodedJwt = request.COOKIES.get("access", None)
-        encodedJwt = request.headers.get("Authorization", None)
-        #print(f"encodedJWT : {encodedJwt}", file=sys.stderr)
-    if not encodedJwt :
-        return [None]
-    
-    # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-    res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"{encodedJwt}", 'Host': 'localhost'}, verify=False)
-    if res.status_code != 200 :
-        print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
-        return [None]
-    return [res.json()]
+def setTheCookie(response, access=None, refresh=None) :
+	if access :
+		response.set_cookie(
+			key="access_token",
+			value=access,
+			httponly=True,
+			samesite='Lax'
+		)
+	if refresh :
+		response.set_cookie(
+			key="refresh_token",
+			value=refresh,
+			httponly=True,
+			samesite='Lax'
+		)
+	# with open("log-auth-cookie.txt", "w+") as f :
+	# 	print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
+	return response
+
+def decodeJWT(request, func=None, encodedJwt=None) :
+    with open(f"{func}_decodeJWT.txt", "a") as f :
+        print("--------------------------\nBeginning : ", file=f) 
+    with open(f"{func}_decodeJWT.txt", "a") as f : 
+        if not encodedJwt :
+            encodedJwt = request.COOKIES.get("access_token", None)
+        if not encodedJwt :
+            print("Error 1", file=f)
+            return [None] * 3
+        
+        print(f"encoded: {encodedJwt}", file=f)
+        res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+        print(f"res : {res}", file=f)
+        res_json = res.json()
+        print(f"res.json() : {res_json}", file=f)
+        if res.status_code != 200 :
+            print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
+            if (res_json.get('error') == "Token expired"):
+                refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+                if refresh_res.status_code == 200:
+                    new_access_token = refresh_res.json().get('access')
+                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+                    return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+                return [None] * 3
+            return [None] * 3
+        return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
@@ -97,10 +128,12 @@ async def  checkForUpdates(uriKey, key) :
 
 
 async def sse(request):
-    encodedJwt = f'bearer {request.GET.get("jwt", None)}'
-    JWT = decodeJWT(request, encodedJwt)
+    JWT = decodeJWT(request, "sse")
+    with open("logs-sse.txt", "w+") as f:
+        print(f"JWT : {JWT[0]}", file=f)
     if not JWT[0] :
         return HttpResponse401() # Set an error 
+    
     apikey=request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = int(request.GET.get("idplayer"))
@@ -148,7 +181,7 @@ async def sse(request):
 
 @csrf_exempt
 def setApiKeySp(request):
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "setApiKeySp")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
     # print(f" Jwt : {JWT[0]}", file=sys.stderr)
@@ -161,7 +194,7 @@ def setApiKeySp(request):
 
 @csrf_exempt
 def setApiKey(request):
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "setApiKey")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
     # fil = open('test.txt', 'w+')
@@ -186,7 +219,7 @@ def setApiKey(request):
 
 @csrf_exempt
 def isGamePlayable(request) :
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "isGamePlayable")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
     #print(f" Jwt : {JWT[0]}", file=sys.stderr)
@@ -201,7 +234,7 @@ def isGamePlayable(request) :
 
 
 def get_api_key(request):
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "getApiKey")
     fil = open('test.txt', 'w+')
     print(f" Jwt : {JWT[0]}", file=fil)
     fil.close()
@@ -260,7 +293,7 @@ async def sendNewJSON(request):
 
 async def forfaitUser(request) :
     
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "forfeitUser")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
    # print(f" Jwt : {JWT[0]}", file=sys.stderr)

@@ -2,6 +2,7 @@ import { versusController } from "../versusGame.js";
 import { homeController } from "../home.js";
 import { localGameController } from "../localGame.js";
 import { loginController } from "../login.js";
+import { getCookie } from "../../utils.js";
 
 export let adress = "10.18.161"
 let canvas;
@@ -74,10 +75,11 @@ export function sleep(ms) {
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   // console.log(adress);
-  let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&jwt=${sessionStorage.getItem("accessToken")}`;
+  let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}`;
   let url_post = `server-pong/send-message`;
   let started = false;
   let game_stats;
+  const csrf = getCookie('csrftoken');
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   let mul = await fetch('./templates/localGame.html')
@@ -87,6 +89,22 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   gameState.innerHTML = mulTxt;
     
   const SSEStream = new EventSource(url_sse);
+  
+  SSEStream.onerror = function(event) {
+    console.error("Erreur SSE :", event);
+
+    // L'objet "event" n'a pas de "reason" directement, mais tu peux diagnostiquer via :
+    // - source.readyState
+    // - vérification manuelle du serveur (logs backend)
+    if (SSEStream.readyState === EventSource.CLOSED) {
+        console.warn("Connexion SSE fermée.");
+    } else if (SSEStream.readyState === EventSource.CONNECTING) {
+        console.warn("Reconnexion en cours...");
+    } else {
+        console.warn("État inconnu :", SSEStream.readyState);
+    }
+};
+
   SSEStream.onmessage = function(event) {
       try {
         // const data = JSON.parse(event.data);
@@ -145,8 +163,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                        'X-CSRFToken': csrf,
                       },
+                      credentials: 'include',
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "start"}'})
                     });
               };
@@ -156,8 +175,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
               if (started == true) {
                 fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
                   headers: {
-                    "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
-                  }
+                    'X-CSRFToken': csrf,
+                  },
+                  credentials: 'include',
                 });
               }
               break;
@@ -167,8 +187,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                    'X-CSRFToken': csrf,
                   },
+                  credentials: 'include',
                   body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "up"}', "player" : "1"})
                 });
               }
@@ -177,8 +198,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                        'X-CSRFToken': csrf,
                       },
+                      credentials: 'include',
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}', "player" : "2"})
                     });
               } ;
@@ -189,8 +211,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                    'X-CSRFToken': csrf,
                   },
+                  credentials: 'include',
                   body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "down"}', "player" : "1"})
                 });
               }
@@ -199,8 +222,9 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+                        'X-CSRFToken': csrf,
                       },
+                      credentials: 'include',
                       body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}', "player" : "2"})
                     });
               } ;
@@ -212,13 +236,15 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 export async function loadGamePlayable(apikey) {
   let isPlayable;
+  const csrf = getCookie('csrftoken');
 
     await fetch(`server-pong/game-status?apikey=${apikey}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+          'X-CSRFToken': csrf,
         },
+        credentials: 'include',
         body: JSON.stringify({"apiKey": apikey})
       })
       .then(response => {
@@ -238,12 +264,14 @@ export async function loadGamePlayable(apikey) {
 
 export async function setApiKeyWeb(apikey) {
   // console.log("apikey Set : ", apikey);
+  const csrf = getCookie('csrftoken');
   return fetch(`server-pong/api-key`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+      'X-CSRFToken': csrf,
     },
+    credentials: 'include',
     body: JSON.stringify({ "apiKey": apikey })
   })
   .then(response => {
@@ -262,12 +290,14 @@ export async function setApiKeyWeb(apikey) {
 
 export async function setApiKeyWebSP(apikey) {
   // console.log("apikey Set : ", apikey);
+  const csrf = getCookie('csrftoken');
   return fetch(`server-pong/api-key-alone`, {
     method: 'POST',
     headers: {
+      'X-CSRFToken': csrf,
       'Content-Type': 'application/json',
-      "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
     },
+    credentials: 'include',
     body: JSON.stringify({ "apiKey": apikey })
   })
   .then(response => {
