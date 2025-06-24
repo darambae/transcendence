@@ -24,6 +24,11 @@ export async function navigate() {
 	console.log("is User Auth : ", userIsAuth);
 	if (userIsAuth) {
 		actualizeIndexPage('toggle-login', routes['user']);
+		try {
+			await actualizeIndexPage('chat-container', routes['chat']);
+		} catch (e) {
+			console.error('Could not load chat UI:', e);
+		}
 	}
 
 	//let view;

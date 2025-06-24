@@ -32,7 +32,7 @@ from django.core.paginator import Paginator, EmptyPage
 
 
 try:
-    from .models import USER, ChatGroup, Message
+    from .models import USER, ChatGroup, Message, MATCHTABLE
 except ImportError:
     # Fallback/Error handling if models are not correctly configured
     # In a real application, you'd want to ensure models are correctly imported.
@@ -45,6 +45,8 @@ except ImportError:
     class ChatGroup:
         objects = None
     class Message:
+        objects = None
+    class MATCHTABLE:
         objects = None
 		
 

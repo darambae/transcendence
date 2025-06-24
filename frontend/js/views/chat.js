@@ -242,7 +242,7 @@ async function loadChatRoomList(current_user) {
         return;
     }
 
-    if (!loggedInUser) {
+    if (!current_user) {
         console.log("Not logged in, cannot load chat list.");
         chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
         return;
@@ -458,28 +458,17 @@ async function handleStartNewChat() {
 
 
 // Main chat controller function, called after login
-export function chatController(userLoggedInName) {
-    // Set the loggedInUser globally
-    if (userLoggedInName) {
-        loggedInUser = userLoggedInName;
-        window.loggedInUser = loggedInUser; // Also set it on the global window object for other scripts
-        const usernameInputActive = document.getElementById('usernameInput-active');
-        if (usernameInputActive) {
-            usernameInputActive.value = loggedInUser;
-        }
-    } else {
-        console.warn("chatController called without userLoggedInName. Chat features may be limited.");
-        // Potentially disable chat functionality if user not logged in
-        document.getElementById('sendMessageBtn').disabled = true;
-        document.getElementById('messageInput-active').disabled = true;
-        document.getElementById('startNewChatBtn').disabled = true;
-        const chatLog = document.getElementById('chatLog-active');
-        if (chatLog) {
-            chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Please log in to start chatting.</p></div>`;
-        }
+export function chatController(username) {
+    const container = document.getElementById('chat-container');
+    if (!container) {
+        console.error('No #chat-container found in DOM.');
         return;
     }
 
+    const usernameInputActive = document.getElementById('usernameInput-active');
+    if (usernameInputActive) {
+        usernameInputActive.value = loggedInUser;
+    }
 
     // 1. Initialize Bootstrap Modal
     const mainChatWindowElement = document.getElementById('mainChatWindow');
@@ -562,17 +551,4 @@ export function chatController(userLoggedInName) {
     if (startNewChatBtn) {
         startNewChatBtn.addEventListener('click', handleStartNewChat);
     }
-}
-
-export async function loadChatUI(callback) {
-	const container = document.getElementById('chat-container');
-	if (!container) {
-		console.error('No #chat-container found in DOM.');
-		return;
-	}
-	try {
-		await actualizeIndexPage('chat-container', routes['chat']);
-	} catch (e) {
-		console.error('Could not load chat UI:', e);
-	}
 }

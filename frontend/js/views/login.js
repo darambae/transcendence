@@ -1,6 +1,5 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
-import { chatController, loadChatUI } from "./chat.js";
 
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
@@ -91,6 +90,7 @@ export async function handleLoginSubmit(event) {
 				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
 				console.log(`User ${username} successfully connected`);
 				window.loggedInUser = username;
+				
 				// After successful login, initialize chat system
 				// if (!window.chatInitialized) {
 				// 	console.log('Login successful, initializing chat system.');
