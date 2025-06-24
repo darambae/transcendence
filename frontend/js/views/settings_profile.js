@@ -13,6 +13,7 @@ export function settingsProfileController() {
 	changePassword()
 	animationPassword()
 	Friends.searchFriends()
+	Friends.listennerFriends()
 }
 
 //  get user info end affich

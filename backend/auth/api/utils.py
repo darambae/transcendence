@@ -4,6 +4,7 @@ from django.conf import settings
 import random
 import string
 import requests
+import sys
 
 def generate_otp_send_mail(user):
 	tab = []
