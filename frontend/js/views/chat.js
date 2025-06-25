@@ -443,6 +443,47 @@ async function handleStartNewChat(username) {
     targetUserInput.value = ''; // Clear input field
 }
 
+function setupUserSearchAutocomplete() {
+	const userInput = document.getElementById('targetUserInput');
+	const resultsBox = document.getElementById('resultsSearch');
+	if (!userInput || !resultsBox) return;
+
+	userInput.addEventListener('input', async function () {
+		const query = this.value.trim();
+		if (!query) {
+			resultsBox.innerHTML = '';
+			return;
+		}
+		const response = await fetch(
+			`user-service/searchUsers?q=${encodeURIComponent(query)}`,
+			{
+				method: 'GET',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+		);
+
+		const data = await response.json();
+		const users = data.results ?? [];
+
+		resultsBox.innerHTML = users
+			.map(
+				(user) => `<li class="list-group-item user-link">${user.username}</li>`
+			)
+			.join('');
+
+		// When a user is clicked, fill the input and clear the results
+		document.querySelectorAll('.profile-btn').forEach((btn) => {
+			btn.addEventListener('click', function () {
+				userInput.value = btn.dataset.username;
+				resultsBox.innerHTML = '';
+			});
+		});
+	});
+}
+
 
 // Main chat controller function, called after login
 export function chatController(username) {
@@ -476,7 +517,7 @@ export function chatController(username) {
             if (currentActiveChatGroup) {
                 switchChatRoom(currentActiveChatGroup);
             }
-
+            setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
             // Focus on new chat user ID input initially
             const targetUserInput = document.getElementById('targetUserInput');
             if (targetUserInput) {

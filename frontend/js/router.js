@@ -5,6 +5,7 @@ import { renderChatButtonIfAuthenticated } from './views/chat.js';
 window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
 	const toggleLogin = document.querySelector('.login-link');
+	let userIsAuth = await isUserAuthenticated();
 	if (toggleLogin) {
 		toggleLogin.addEventListener('click', async (event) => {
 			//event.preventDefault();
