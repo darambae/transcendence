@@ -212,7 +212,6 @@ class checkTfa(APIView):
 											 'access': str(data_generate_jwt['access'])},
 											 status=200)
 					else :
-						print(00000000000000, file=sys.stderr)
 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 			else :
 				print(f"main : ", file=sys.stderr)
@@ -316,7 +315,8 @@ class addResultGames(APIView):
 					username1 = data['username1'],
 					score1 = data['score1'],
 					score2 = data['score2'],
-					username2 = data['username2']
+					username2 = data['username2'],
+					winner = data['winner']
 				)
 		except IntegrityError as e:
 			err_msg = str(e)
@@ -441,6 +441,28 @@ class searchUsers(APIView):
 				'username': user.user_name,
 			})
 		return JsonResponse({'results': results}, status=200)
+
+
+class DeleteGuest(APIView) : 
+	permission_classes = [IsAuthenticated]
+
+	def delete(self, request) :
+		user = request.user
+		token = request.headers.get("Authorization", "Error Unknown").split(" ")[1]
+
+		jwt_access = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+		jwt_access["invites"] = []
+		data_generate_jwt = generateJwt(user, jwt_access)
+
+		return JsonResponse({'success': 'authentication code send',
+							 'refresh': str(data_generate_jwt['refresh']),
+							 'access': str(data_generate_jwt['access'])},
+							 status=200)
+
+
+
+
+
 # --- Chat-Related Views (Directly interacting with DB and Channels) ---
 
 # ===============================================================

@@ -170,7 +170,7 @@ async def joinGuest(request) :
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		print(666, file=sys.stderr)
 		player = Player(jwt_token, guest)
-		print(777, file=stderr)
+		print(777, file=sys.stderr)
 		trnmtDict[tKey].addPlayers(player)
 
 	except Exception as e :
@@ -262,7 +262,12 @@ async def leaveTournament(request):
 			print("666", file=sys.stderr)
 			print("777", file=sys.stderr)
 
-			return JsonResponse({"Result" : "Player removed from lobby"})
+			response = requests.delete("https://access_postgresql:4000/api/guest/", headers={"Authorization" : f"bearer {access_token}", 'Host': 'localhost'}, verify=False)
+			if response.status_code == 200 :
+				res_json = response.json()
+				access = res_json.get("access", "None")
+				refresh = res_json.get("refresh", "None")
+				return setTheCookie(JsonResponse({"Result" : "Player removed from lobby"}), access, refresh)
 		return JsonResponse({"Error" : "Tournament not found"}, status=404)
 	except Exception as e:
 		return JsonResponse({"error" : f"Internal server errrrror : {e}"}, status=500)

@@ -60,6 +60,7 @@ class MATCHTABLE(models.Model):
     score1 = models.IntegerField()
     score2 = models.IntegerField()
     username2 = models.CharField(max_length=15)
+    winner = models.CharField(max_length=15)
 
     def __str__(self):
         return f"{self.username1} {self.score1} - {self.score2} {self.username2}"

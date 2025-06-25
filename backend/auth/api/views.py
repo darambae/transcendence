@@ -186,3 +186,19 @@ class refreshToken(APIView):
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
 		else :
 			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
+
+
+class ClearGuest(APIView) :
+	permission_class = [AllowAny] :
+
+	def delete(self, request) :
+		access_token = request.COOKIES.get("access_token", None)
+		response = requests.delete("https://access_postgresql:4000/api/guest/", headers={"Authorization" : f"bearer {access_token}", 'Host': 'localhost'}, verify=False)
+		if response.status_code == 200 :
+			res_json = response.json()
+			access = res_json.get("access", "None")
+			refresh = res_json.get("refresh", "None")
+			return setTheCookie(JsonResponse({"Success" : "Guests deleted"}, status=200), access, refresh)
+		else :
+			return JsonResponse({"Error" : "No token provided"}, status=401)
+

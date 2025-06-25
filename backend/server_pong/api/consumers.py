@@ -202,12 +202,17 @@ class GameConsumer(AsyncWebsocketConsumer):
 									"game_stats" : stats
 								}
 							)
+							if stats['team1Score'] == 200 :
+								winnerTeam = 0
+							else :
+								winnerTeam = 1
 							json_data = {
 								"matchKey" : self.room_group_name,
 								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0],
 								"score1" : stats['team1Score'],
 								"score2" : stats['team2Score'],
-								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1]
+								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1],
+								"winner" : dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam],
 							}
 							requests.post("https://access_postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'localhost'})
 							if self.t2 is not None :
