@@ -108,7 +108,7 @@ function getOtherUserAvatar(userName) {
 		credentials: 'include',
 	})
 	.then(res => {
-		if (!res.ok) throw new Error("Error retrieving other Aaatar");
+		if (!res.ok) throw new Error("Error retrieving other Avatar");
 		return res.blob();
 	})
 	.then(blob => {
