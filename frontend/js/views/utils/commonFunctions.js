@@ -102,14 +102,14 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
       return response.json();
     })
     .then(data => {
-      console.log(data)
+      console.log("data", data);
       ([a,b,c] = data["guest"])
       username = data["username"]
     })
     .catch(error => {
       console.error("Erreur de requête :", error);
     })
-    console.log(username, a, b, c)
+    console.log("results: ", username, a, b, c)
     let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&username=${username}`;
     if (a !== undefined) {
       url_sse += `&guest1=${a}`
@@ -120,6 +120,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     if (c !== undefined) {
       url_sse += `&guest3=${c}`
     }
+
+    console.log("url_sse ->->-> ", url_sse);
 
     const SSEStream = new EventSource(url_sse);
   

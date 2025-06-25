@@ -7,7 +7,7 @@ import asyncio
 import requests
 from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .tournamentStatic import Tournament, Player, trnmtDict, getApiKeyTrnmt, LOCAL, REMOTE, supervise_match, Match
+from .tournamentStatic import Tournament, Player, trnmtDict, getApiKeyTrnmt, LOCAL, REMOTE, supervise_match, Match, user_ws_connections
 
 async def setResults(trnmt, username) :
 	if (roundMatch == 1) :
@@ -70,6 +70,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps({
 			't_state': "Succefully joined tournament"
 		}))
+
+		user_ws_connections[self.myJWT] = self
 	
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(
@@ -148,6 +150,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 				await setResults(trnmt, "username1")
 			else :
 				await setResults(trnmt, "username2")
+		
+		# elif action == "leave" :
+		# 	await self.disconnect(200)
 				
 
 

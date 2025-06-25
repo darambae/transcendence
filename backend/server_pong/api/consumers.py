@@ -209,24 +209,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 								"score2" : stats['team2Score'],
 								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1]
 							}
-							requests.post("https://access-postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'access-postgresql'})
-######################################### Writing into a file, waiting for Db #########################################
-							# outfile = open(f"replay_{self.room_group_name}.json", 'w')
-							# json.dump(self.matchReplay, outfile)
-							# outfile.close()
-######################################### Writing into a file, waiting for Db #########################################
+							requests.post("https://access_postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'localhost'})
 							if self.t2 is not None :
 								self.task.cancel()
 								await self.task
 							self.gameSimulation.stopSimulation()
 						if self.usrID <= 1 :
 							await self.gameSimulation.setRedisCache(self.room_group_name)
-							# r = redis.Redis(host='game_redis', port=6379, db=0)
-							# cles_redis = r.keys('*')
-							# #print([clé.decode('utf-8') for clé in cles_redis], file=sys.stderr)
 							stats = cache.get(f'simulation_state_{self.room_group_name}')
-							# #print(f"caches: {str(cache)}", file=sys.stderr)
-							# #print(f"usrID : {self.usrID}\nstats: {stats}", file=sys.stderr)
 							await self.channel_layer.group_send(
 								self.room_group_name,
 								{
@@ -237,7 +227,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 					except Exception as e:
 						print(f"!!! Failed to send update: {e}", file=sys.stderr)
 		except asyncio.CancelledError:
-			# #print("Task send_game_update Cancelled", file=sys.stderr)
 			self.t2.cancel()
 			await self.t2
 
