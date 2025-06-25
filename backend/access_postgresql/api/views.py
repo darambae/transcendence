@@ -10,7 +10,7 @@ from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from .models import USER, ChatGroup, Message, FRIEND
+from .models import USER, ChatGroup, Message, FRIEND, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
@@ -287,6 +287,28 @@ class infoOtherUser(APIView):
         else:
             friend_status = None
 
+        user_matches = MATCHTABLE.objects.filter(
+            Q(username1=user.user_name) | Q(username2=user.user_name)
+        )
+
+        total_matches = user_matches.count()
+
+        wins = 0
+        losses = 0
+
+        for match in user_matches:
+            if match.username1 == user.user_name:
+                if match.score1 > match.score2:
+                    wins += 1
+                elif match.score1 < match.score2:
+                    losses += 1
+            elif match.username2 == user.user_name:
+                if match.score2 > match.score1:
+                    wins += 1
+                elif match.score2 < match.score1:
+                    losses += 1
+
+
         data = {
             "id": user.id,
             "user_name": user.user_name,
@@ -298,6 +320,9 @@ class infoOtherUser(APIView):
             "last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
             "avatar": user.avatar,
             "friend_status": friend_status,
+			"total_games": total_matches,
+			"game_wins": wins,
+			"game_losses": losses
         }
 
         return Response(data, status=200)
@@ -318,7 +343,8 @@ class addResultGames(APIView):
 					username1 = data['username1'],
 					score1 = data['score1'],
 					score2 = data['score2'],
-					username2 = data['username2']
+					username2 = data['username2'],
+					winner = data['winner'],
 				)
 		except IntegrityError as e:
 			err_msg = str(e)
@@ -896,6 +922,7 @@ class listennerFriends(APIView) :
                 "username": other.user_name,
                 "status": f.status,
                 "direction": direction,
+				"online": other.online,
             })
 
         return Response({"results": results})
@@ -982,3 +1009,27 @@ class acceptInvite(APIView):
             {"message": f"Friend request from {to_user.user_name} accepted"},
             status=200
         )
+
+from pathlib import Path
+class matchHistory(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.user.user_name
+
+        matches = MATCHTABLE.objects.filter(
+            Q(username1=username) | Q(username2=username)
+        ).order_by('-dateMatch')
+
+        data = []
+        for match in matches:
+            data.append({
+                "date": match.dateMatch,
+                "username1": match.username1,
+                "username2": match.username2,
+                "score1": match.score1,
+                "score2": match.score2,
+                "winner": match.winner,
+            })
+
+        return Response({'result': data})

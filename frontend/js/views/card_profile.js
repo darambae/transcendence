@@ -1,6 +1,7 @@
 import { closeModal } from "../utils.js";
 
 export async function card_profileController(username) {
+
 	const modalContainer = document.getElementById("modal-container");
 	modalContainer.addEventListener("click", (event) => {
 		if(event.target.id === "modal-container") {
@@ -26,6 +27,9 @@ function displayUserInfo(data) {
 	document.getElementById('otherFirstName').textContent = data.first_name;
 	document.getElementById('otherLastName').textContent = data.last_name;;
 	document.getElementById('otherMail').textContent = data.mail;
+	document.getElementById('idTotalGames').textContent = data.total_games;
+	document.getElementById('idGameWin').textContent = data.game_wins;
+	document.getElementById('idGameLosses').textContent = data.game_losses;
 	document.getElementById('createdAtOther').textContent = data.created_at;
 
 	const addFriendsBtn = document.getElementById('addFriendsid');
@@ -153,3 +157,4 @@ function addFriend() {
 		console.error("Error add friend :", error);
 	}
 }
+

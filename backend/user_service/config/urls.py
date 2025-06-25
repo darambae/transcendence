@@ -20,7 +20,7 @@ from api import views
 from api.views import infoUser, avatar
 from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
 from api.views import searchUsers, infoOtherUser, avatarOther, listennerFriends, addFriend, acceptInvite, declineInvite
-
+from api.views import matchHistory
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('user-service/csrf/', views.get_csrf_token, name='csrf'),
@@ -37,5 +37,6 @@ urlpatterns = [
 	path('user-service/add/friend/', addFriend.as_view(), name='addFriend'),
 	path('user-service/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
 	path('user-service/declineInvite/', declineInvite.as_view(), name='declineInvite'),
+	path('user-service/matchHistory/', matchHistory.as_view(), name='matchHistory'),
 	path('user-service/listennerFriends/', listennerFriends.as_view(), name='listennerFriends'),
 ]
