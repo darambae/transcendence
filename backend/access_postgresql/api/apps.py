@@ -5,6 +5,7 @@ class ApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'api'
 
+
     def ready(self):
         from django.db.utils import IntegrityError
         from .models import USER, MATCHTABLE
