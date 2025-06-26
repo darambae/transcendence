@@ -371,6 +371,39 @@ function initEventSource(groupId, username) {
     console.log(`Opened SSE for group: ${groupId}`);
 }
 
+async function getBlockedStatus(other_user) {
+    //rajouter peut-être une vérif du other-user
+    try {
+        const response = await fetch('/chat/${other_user}/blockedStatus', {
+            method : 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+			credentials: 'include'
+        });
+		if (!response.ok) {
+			const errorData = await response.json();
+			console.error('error loading blocked status', errorData.message || 'unknown error');
+			alert('error loading blocked status' + (errorData.message || 'unknown error'));
+			return;
+		}
+		const data = response.json();
+		if (data.status.isBlocked == true) {
+			//proposer de débloquer le user
+		}
+		else if (data.status.hasBlocked == true) {
+			//afficher un message pour informer que le current user est bloqué
+		}
+		else {
+			//démarrer le chat
+		}
+    } catch (error) {
+		console.error('Network error loading blocked status :', error);
+		alert('network error: could not load blocked status');
+	}
+}
+
+
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
 async function loadChatRoomList(current_user) {
     const chatRoomListUl = document.getElementById('chatRoomList');
@@ -496,7 +529,14 @@ function switchChatRoom(username, newgroupId) {
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
     loadMessageHistory(username, newgroupId);
-    initEventSource(newgroupId);
+	const blockedStatus = getBlockedStatus(targetChatListItem.dataset.receiver)
+    if (blockedStatus.isBlocked) {
+		//proposer de débloquer
+	}
+	else if (blockedStatus.hasBlocked) {
+		
+	}
+	initEventSource(newgroupId);
 
     // Focus on message input
     const messageInput = document.getElementById('messageInput-active');
@@ -731,7 +771,7 @@ export function chatController(username) {
             console.log('Main Chat Window is shown');
             console.log('Logged in user:', username);
             loadChatRoomList(username); // Load chat list dynamically
-            
+
             // Set initial state for chat log
             const chatLog = document.getElementById('chatLog-active');
             if (chatLog && !currentActiveChatGroup) { // Only show initial message if no group is active
@@ -759,7 +799,7 @@ export function chatController(username) {
             // Clear chat log and reset UI state
             const chatLog = document.getElementById('chatLog-active');
             if (chatLog) chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
-            
+
             document.getElementById('messageInput-active').disabled = true;
             document.getElementById('sendMessageBtn').disabled = true;
             document.getElementById('activeChatRoomName').textContent = ''; // Clear header
