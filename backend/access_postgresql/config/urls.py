@@ -20,7 +20,7 @@ from api.views import info_link, api_signup, activate_account, checkPassword, ch
 from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshToken
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
-from api.views import ChatGroupListCreateView, ChatMessageHistoryView, ChatMessageSendView
+from api.views import ChatGroupListCreateView, ChatMessageView
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite, logout
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
@@ -58,7 +58,6 @@ urlpatterns = [
 	path('api/logout/', logout.as_view(), name='logout'),
 
     # RESTful chat message endpoints
-    path('api/chat/<str:group_name>/messages/', ChatMessageHistoryView.as_view(), name='chat_message_history'),  # GET=history
-    path('api/chat/<str:group_name>/messages/', ChatMessageSendView.as_view(), name='chat_message_send'),  # POST=send message
+    path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
 
 ]
