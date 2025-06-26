@@ -8,6 +8,7 @@ import { userController } from './views/user.js';
 import { settingsProfileController } from './views/settings_profile.js';
 import { tournamentController } from './views/tournament.js';
 import { card_profileController } from './views/card_profile.js';
+import { dashboardsController } from './views/dashboards.js';
 
 export const routes = {
 
@@ -57,6 +58,10 @@ export const routes = {
 		template: 'chat',
 		controller: () => chatController(username),
 		username: username	
-	})
+	}),
+	dashboards: {
+		template: 'dashboards',
+		controller: dashboardsController,
+	},
 };
 		
