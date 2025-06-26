@@ -186,3 +186,33 @@ class refreshToken(APIView):
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
 		else :
 			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
+		
+
+class logout(APIView):
+	permission_classes = [AllowAny]
+
+	def patch(self, request):
+		# jwtDecoded = decodeJWT(request)
+		# user_payload = jwtDecoded[0]["payload"] if jwtDecoded and jwtDecoded[0] else None
+		# mail = user_payload.get('mail') if user_payload else None
+		# if not mail:
+		# 	return JsonResponse({'error': 'User mail not found in JWT'}, status=400)
+
+		try:
+			token = request.COOKIES.get('access_token')
+			headers = {'Host': 'localhost'}
+			if (token): 
+				headers['Authorization'] = f'Bearer {token}'
+			response = requests.patch(
+				"https://access_postgresql:4000/api/logout/",
+				json={}, 
+				verify=False,
+				headers=headers
+			)
+		except Exception as e:
+			return JsonResponse({'error': f'Error contacting access_postgresql: {str(e)}'}, status=500)
+
+		resp = JsonResponse({'message': 'User logged out successfully'}, status=response.status_code)
+		resp.delete_cookie('access_token')
+		resp.delete_cookie('refresh_token')
+		return resp

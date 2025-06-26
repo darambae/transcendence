@@ -1,3 +1,5 @@
+import { routes } from "./routes.js";
+
 export async function loadTemplate(viewName) {
 	const response = await fetch(`templates/${viewName}.html`);
 	if (!response.ok) {
@@ -10,7 +12,9 @@ export async function actualizeIndexPage(elementId, view) {
 	const content = document.getElementById(elementId);
 	const html = await loadTemplate(view.template);
 
-	content.innerHTML = html;
+	if (html) {
+		content.innerHTML = html;
+	}
 	if (view.isModal) {
 		content.style.display = 'block';
 	}
@@ -61,5 +65,18 @@ export async function isUserAuthenticated() {
 	} else {
 		console.log("is auth error : ", response.error, response.status);
 		return false;
+	}
+}
+
+export function attachLoginListener() {
+	const toggleLogin = document.querySelector('.login-link');
+	if (toggleLogin) {
+		toggleLogin.addEventListener('click', async (event) => {
+			let userIsAuth = await isUserAuthenticated();
+			console.log(" is user auth : ", userIsAuth);
+			if (userIsAuth == false) {
+				actualizeIndexPage('modal-container', routes.login);
+			}
+		});
 	}
 }

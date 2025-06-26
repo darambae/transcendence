@@ -57,6 +57,6 @@ export const routes = {
 		template: 'chat',
 		controller: () => chatController(username),
 		username: username	
-	}),
+	})
 };
 		

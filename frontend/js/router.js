@@ -1,21 +1,11 @@
 
 import { routes } from './routes.js';
-import { actualizeIndexPage, getCookie, isUserAuthenticated } from './utils.js';
+import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
+
 window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
-	const toggleLogin = document.querySelector('.login-link');
-	let userIsAuth = await isUserAuthenticated();
-	if (toggleLogin) {
-		toggleLogin.addEventListener('click', async (event) => {
-			//event.preventDefault();
-			let userIsAuth = await isUserAuthenticated();
-			console.log("user auth : ", userIsAuth);
-			if (userIsAuth == false) {
-				actualizeIndexPage('modal-container', routes.login);
-			}
-		});
-	}
+	attachLoginListener();
 });
 
 window.addEventListener('hashchange', navigate);
@@ -66,31 +56,16 @@ export async function navigate() {
 		view = routes[routeName];
 	}
 //-----------------------------
-	console.log(view);
+	console.log("view: ", view);
 	
 	if (!view) {
 		content.innerHTML = `<h2>404</h2><p>Page not Found</p>`;
 		return;
 	}
 
-	//try {
-	//	if (view.isModal) {
-	//		actualizeIndexPage('modal-container', view);
-	//	} else {
-	//		actualizeIndexPage('main-content', view);
-	//	}
-	//} catch (error) {
-	//	console.error('Error loading template ', error);
-	//	const content = document.getElementById("main-content");
-	//	content.innerHTML = '<h2> Unable to load the page </h2>';
-	//}
-
 //-------------------------------
 try {
 	await actualizeIndexPage('main-content', view);
-	// if (typeof view.controller === 'function') {
-	// 	view.controller(param);
-	// }
 } catch (error) {
 	console.error('Error loading template ', error);
 	const content = document.getElementById("main-content");
