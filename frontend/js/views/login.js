@@ -28,11 +28,11 @@ async function double_authenticate(data) {
 			console.log("mail + code: ", code, mail);
 			const response = await fetch("auth/verifyTwofa/", {
 				method: "POST",
+				credentials: 'include',
 				headers: {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
 				},
-				credentials: 'include',
 				body: JSON.stringify({ mail, code })
 			});
 

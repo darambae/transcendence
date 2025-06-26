@@ -85,7 +85,143 @@ class ApiConfig(AppConfig):
                     "score2": 6,
                     "username2": "kelly",
                     "winner": "kelly"
-                }
+                },
+                {
+                    "matchKey": "match4",
+                    "username1": "kelly",
+                    "score1": 3,
+                    "score2": 5,
+                    "username2": "omar",
+                    "winner": "omar"
+                },
+                {
+                    "matchKey": "match5",
+                    "username1": "omar",
+                    "score1": 4,
+                    "score2": 5,
+                    "username2": "gautier",
+                    "winner": "gautier"
+                },
+                {
+                    "matchKey": "match6",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match7",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match8",
+                    "username1": "kelly",
+                    "score1": 3,
+                    "score2": 5,
+                    "username2": "omar",
+                    "winner": "omar"
+                },
+                {
+                    "matchKey": "match9",
+                    "username1": "omar",
+                    "score1": 4,
+                    "score2": 5,
+                    "username2": "gautier",
+                    "winner": "gautier"
+                },
+                {
+                    "matchKey": "match10",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match11",
+                    "username1": "kelly",
+                    "score1": 5,
+                    "score2": 3,
+                    "username2": "omar",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match12",
+                    "username1": "omar",
+                    "score1": 4,
+                    "score2": 5,
+                    "username2": "gautier",
+                    "winner": "gautier"
+                },
+                {
+                    "matchKey": "match13",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match14",
+                    "username1": "kelly",
+                    "score1": 3,
+                    "score2": 5,
+                    "username2": "omar",
+                    "winner": "omar"
+                },
+                {
+                    "matchKey": "match15",
+                    "username1": "omar",
+                    "score1": 4,
+                    "score2": 5,
+                    "username2": "gautier",
+                    "winner": "gautier"
+                },
+                {
+                    "matchKey": "match16",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match17",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
+                {
+                    "matchKey": "match18",
+                    "username1": "kelly",
+                    "score1": 3,
+                    "score2": 5,
+                    "username2": "omar",
+                    "winner": "omar"
+                },
+                {
+                    "matchKey": "match19",
+                    "username1": "omar",
+                    "score1": 4,
+                    "score2": 5,
+                    "username2": "gautier",
+                    "winner": "gautier"
+                },
+                {
+                    "matchKey": "match20",
+                    "username1": "gautier",
+                    "score1": 2,
+                    "score2": 6,
+                    "username2": "kelly",
+                    "winner": "kelly"
+                },
             ]
 
             for m in test_matches:

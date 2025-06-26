@@ -257,6 +257,7 @@ class InfoUser(APIView):
 
     def get(self, request):
         user = request.user
+
         return Response({
             "id": user.id,
             "user_name": user.user_name,
@@ -266,7 +267,7 @@ class InfoUser(APIView):
 			"online": user.online,
 			"created_at": format(user.created_at, 'Y-m-d  H:i'),
 			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
-			"avatar": user.avatar
+			"avatar": user.avatar,
         })
 
 
@@ -1010,20 +1011,44 @@ class acceptInvite(APIView):
             status=200
         )
 
-from pathlib import Path
 class matchHistory(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         username = request.user.user_name
-
+		
         matches = MATCHTABLE.objects.filter(
             Q(username1=username) | Q(username2=username)
         ).order_by('-dateMatch')
 
+        total_matches = matches.count()
+
+        wins = 0
+        losses = 0
+
+        for match in matches:
+            if match.username1 == username:
+                if match.score1 > match.score2:
+                    wins += 1
+                elif match.score1 < match.score2:
+                    losses += 1
+            elif match.username2 == username:
+                if match.score2 > match.score1:
+                    wins += 1
+                elif match.score2 < match.score1:
+                    losses += 1
+
+
         data = []
+        data.append({
+			"user": username,
+            "total_games": total_matches,
+			"game_wins": wins,
+			"game_losses": losses,
+        })
         for match in matches:
             data.append({
+				"user": username,
                 "date": match.dateMatch,
                 "username1": match.username1,
                 "username2": match.username2,

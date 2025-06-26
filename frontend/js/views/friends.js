@@ -23,7 +23,6 @@ export function searchFriends() {
 		resultsBox.innerHTML = users
 		.map(user => `<li class="list-group-item user-link"> <button class="profile-btn" data-username="${user.username}">${user.username}</button>						</li>`)
 			.join('');
-		console.log(query);
 
 		document.querySelectorAll('.profile-btn').forEach(btn => {
 			btn.addEventListener('click', function() {
@@ -84,7 +83,7 @@ export async function listennerFriends() {
 		  html += `<span class="badge ${badgeClass}">${user.status}</span>`;
 		}
 	  
-		html += `
+		html += `resultsListFriends
 		  </div>
 		</li>`;
 	  }
