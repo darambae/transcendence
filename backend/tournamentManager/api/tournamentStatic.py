@@ -1,5 +1,6 @@
 import os
 import shortuuid
+import sys
 import requests
 from django.http import JsonResponse, StreamingHttpResponse
 
@@ -92,18 +93,30 @@ class Tournament() :
             return True
         return False
     def launchTournament(self) :
+        print("launch-tr", file=sys.stderr)
         if self.nbPl != 4 :
-            raise TournamentError("Tournament must contain 4 players")
+            print("launch-tr-end-1", file=sys.stderr)
+            return (False, "Tournament must contain 4 players")
+        print("launch-tr", file=sys.stderr)
         lstTemp = [self.players.pop(random.randint(0, 3))]
+        print("launch-tr", file=sys.stderr)
         lstTemp.append(self.players.pop(random.randint(0, 2)))
+        print("launch-tr", file=sys.stderr)
         self.tournamentPl = [lstTemp, players]
         print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
         self.match1 = Match(self.tournamentPl[0][0], self.tournamentPl[0][1])
+        print("launch-tr", file=sys.stderr)
         self.match2 = Match(self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
+        print("launch-tr", file=sys.stderr)
         self.match1.initValues()
+        print("launch-tr", file=sys.stderr)
         self.match2.initValues()
+        print("launch-tr", file=sys.stderr)
         self.matchWinnerBracket = Match()
+        print("launch-tr", file=sys.stderr)
         self.matchLoserBracket = Match()
+        print("launch-tr", file=sys.stderr)
+        return (True, None)
 
     def listJWT(self) :
         return [elem.jwt for elem in self.players]

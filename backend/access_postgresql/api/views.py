@@ -447,12 +447,18 @@ class DeleteGuest(APIView) :
 	permission_classes = [IsAuthenticated]
 
 	def delete(self, request) :
+		print("d-1", file=sys.stderr)
 		user = request.user
+		print("d-2", file=sys.stderr)
 		token = request.headers.get("Authorization", "Error Unknown").split(" ")[1]
+		print("d-3", file=sys.stderr)
 
 		jwt_access = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+		print("d-4", file=sys.stderr)
 		jwt_access["invites"] = []
+		print("d-5", file=sys.stderr)
 		data_generate_jwt = generateJwt(user, jwt_access)
+		print("d-6", file=sys.stderr)
 
 		return JsonResponse({'success': 'authentication code send',
 							 'refresh': str(data_generate_jwt['refresh']),

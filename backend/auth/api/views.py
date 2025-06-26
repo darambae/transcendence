@@ -189,7 +189,7 @@ class refreshToken(APIView):
 
 
 class ClearGuest(APIView) :
-	permission_class = [AllowAny] :
+	permission_class = [AllowAny]
 
 	def delete(self, request) :
 		access_token = request.COOKIES.get("access_token", None)

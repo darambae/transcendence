@@ -124,13 +124,3 @@ export async function handleInvitSubmit(event) {
 			loadingMessage.style.display = "none";
 	}
 }
-
-
-export function invitsController() {
-	const modalContainer = document.getElementById("modal-container");
-
-	const form = document.getElementById("log-form");
-	if (form) {
-	  form.addEventListener("submit", handleInvitSubmit);
-	}
-}

@@ -107,13 +107,24 @@ async def launchFinals(request) :
 		return JsonResponse({"error": "Internal server error"}, status=500)
 
 # # @csrf_exempt
-async def launchFirstRound(request) :
+async def launchMatch(request) :
 	try:
+		print("lm-1", file=sys.stderr)
 		body = json.loads(request.body)
+		print("lm-1", file=sys.stderr)
 		tkey = body["tKey"]
+		print(f"tkey : {tkey}, tr : {trnmtDict[tkey]}", file=sys.stderr)
+		print("lm-1", file=sys.stderr)
 		if tkey not in trnmtDict:
+			print("lm-1-end", file=sys.stderr)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
-		await trnmtDict[tkey].launchTournament()
+		print("lm-1", file=sys.stderr)
+		trStart = trnmtDict[tkey].launchTournament()
+		print("lm-1", file=sys.stderr)
+		if not trStart[0] :
+			print("lm-1-end3", file=sys.stderr)
+			return JsonResponse({"Info" : trStart[1]})
+		print("lm-1", file=sys.stderr)
 
 		await channel_layer.group_send(
 			tkey,
@@ -122,10 +133,13 @@ async def launchFirstRound(request) :
 				"text_data": "create-bracket"
 			}
 		)
+		print("lm-1", file=sys.stderr)
+		return JsonResponse({"Info" : "Ready to start"})
 	except TournamentError as e:
+		print("lm-2-end", file=sys.stderr)
 		return JsonResponse({"Error": str(e)}, status=401)
-	except Exception:
-		return JsonResponse({"error": "Internal server error"}, status=500)
+	except Exception as e:
+		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
 # @csrf_exempt
 async def launchFinals(request) :
@@ -172,6 +186,7 @@ async def joinGuest(request) :
 		player = Player(jwt_token, guest)
 		print(777, file=sys.stderr)
 		trnmtDict[tKey].addPlayers(player)
+		return JsonResponse({"Success" : f"{guest} added as a guest"})
 
 	except Exception as e :
 		print(f"Error : {e}", file=sys.stderr)
@@ -228,6 +243,7 @@ async def leaveTournament(request):
 		body = json.loads(request.body)
 		print("22", file=sys.stderr)
 		jwt_token = await decodeJWT(request)
+		encoded = request.COOKIES.get("access_token", None)
 		print("33", file=sys.stderr)
 		try :
 			print("44", file=sys.stderr)
@@ -244,7 +260,8 @@ async def leaveTournament(request):
 		print(f"99 : {tKey}", file=sys.stderr)
 		if tKey in trnmtDict :
 			listJWT = trnmtDict[tKey].listJWT()
-			print(f"111 : {listJWT}", file=sys.stderr)
+			listUsername = trnmtDict[tKey].listUsr()
+			print(f"111 : {listJWT} | {listUsername}", file=sys.stderr)
 			lsTmp = []
 			for i in range(len(listJWT)) :
 				print(f"222 : {i}", file=sys.stderr)
@@ -262,12 +279,13 @@ async def leaveTournament(request):
 			print("666", file=sys.stderr)
 			print("777", file=sys.stderr)
 
-			response = requests.delete("https://access_postgresql:4000/api/guest/", headers={"Authorization" : f"bearer {access_token}", 'Host': 'localhost'}, verify=False)
+			response = requests.delete("https://access_postgresql:4000/api/guest/", headers={"Authorization" : f"bearer {encoded}", 'Host': 'localhost'}, verify=False)
+			print("888", file=sys.stderr)
 			if response.status_code == 200 :
 				res_json = response.json()
 				access = res_json.get("access", "None")
 				refresh = res_json.get("refresh", "None")
-				return setTheCookie(JsonResponse({"Result" : "Player removed from lobby"}), access, refresh)
+				return await setTheCookie(JsonResponse({"Result" : "Player removed from lobby"}), access, refresh)
 		return JsonResponse({"Error" : "Tournament not found"}, status=404)
 	except Exception as e:
 		return JsonResponse({"error" : f"Internal server errrrror : {e}"}, status=500)

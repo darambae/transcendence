@@ -38,6 +38,15 @@ class ApiConfig(AppConfig):
                         "activated": True,
                         "avatar": "default.png"
                     },
+                    {
+                        "user_name": "bobby",
+                        "first_name": "Bob",
+                        "last_name" : "Dummy",
+                        "mail" : "bobby@dummy.com",
+                        "password" : "bobby1234",
+                        "activated" : True,
+                        "avatar": "default.png"
+                    }
                 ]
                 for u in test_users:
                     if not USER.objects.filter(mail=u["mail"]).exists():

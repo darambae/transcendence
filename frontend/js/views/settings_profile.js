@@ -17,6 +17,7 @@ export function settingsProfileController() {
 
 //  get user info end affich
 function displayUserInfo(data) {
+	console.log(data);
 	document.getElementById('usernameLabel').textContent = data.user_name;
 	document.getElementById('mailLabel').textContent = data.mail;
 	document.getElementById('firstNameLabel').textContent = data.first_name;
