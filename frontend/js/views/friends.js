@@ -21,7 +21,7 @@ export function searchFriends() {
 		const users = data.results ?? [];
 		
 		resultsBox.innerHTML = users
-		.map(user => `<li class="list-group-item user-link"> <button class="profile-btn" data-username="${user.username}">${user.username}</button>						</li>`)
+		.map(user => `<li class="list-group-item user-link"> <button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
 			.join('');
 		console.log(query);
 
@@ -55,11 +55,7 @@ export async function listennerFriends() {
 	for (const user of users) {
 		html += `<li class="list-group-item user-link">
 		  <div class="d-flex justify-content-between align-items-center">
-			<a href="/#card_profile/${user.username}"
-			   data-username="${user.username}"
-			   class="text-decoration-none">
-			  ${user.username}
-			</a>`;
+			<button class="profile-btn" data-username="${user.username}">${user.username}</button>`;
 		if (user.direction === 'sent' && user.status === "pending") {
 		  html += `<span class="badge bg-warning text-dark">${user.status}</span>`;
 		}
@@ -86,6 +82,12 @@ export async function listennerFriends() {
 	  }
 	
 	  resultsBox.innerHTML = html;
+	  document.querySelectorAll('.profile-btn').forEach(btn => {
+			btn.addEventListener('click', function() {
+				const username = btn.dataset.username;
+				actualizeIndexPage('modal-container', routes.card_profile(username))
+			})
+		})
 }
 
 
@@ -142,7 +144,7 @@ export async function declineInvite(username) {
 
 
 	} catch (err) {
-		console.error("Erreur réseau declineInvite :", err);
+		console.error("declineInvite network error :", err);
 	}
 }
 
