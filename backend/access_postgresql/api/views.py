@@ -486,7 +486,7 @@ class searchUsers(APIView):
 #                 else:
 #                     # This case should ideally not happen for valid 1-to-1 chats
 #                     # Or indicates a chat with self which should be prevented on creation
-#                     logger.warning(f"Chat group {group.name} for user {current_user.user_name} has no other members.")
+#                     logger.warning(f"Chat group {group.id} for user {current_user.user_name} has no other members.")
 
 #                 # You could fetch the last message for a preview here, but keep it efficient.
 #                 # Example (would need to make this method async and await ORM calls):
@@ -496,7 +496,7 @@ class searchUsers(APIView):
 #                 # last_message_preview = last_message.content if last_message else ""
 
 #                 chat_list_data.append({
-#                     'group_name': group.name,
+#                     'group_id': group.id,
 #                     'display_name': other_username,
 #                     'last_message_preview': '', # Placeholder
 #                 })
@@ -535,19 +535,19 @@ class searchUsers(APIView):
 
 #             # Ensure consistent group name generation (e.g., "private_ID1_ID2")
 #             participants_ids = sorted([current_user.id, target_user.id])
-#             group_name = f"private_{participants_ids[0]}_{participants_ids[1]}"
+#             group_id = f"private_{participants_ids[0]}_{participants_ids[1]}"
 
 #             # Atomically create or get the chat group and add members
 #             # Using transaction.atomic with sync_to_async ensures ORM ops are safe.
 #             # get_or_create is synchronous, so it needs sync_to_async.
 #             chat_group, created_group = await sync_to_async(ChatGroup.objects.get_or_create)(
-#                 name=group_name
+#                 id=group_id
 #             )
 #             # Add members to the group
 #             await sync_to_async(chat_group.members.add)(current_user, target_user)
 
 #             return Response(
-#                 {'status': 'success', 'group_name': group_name},
+#                 {'status': 'success', 'group_id': group_id},
 #                 status=status.HTTP_200_OK
 #             )
 #         except USER.DoesNotExist:
@@ -592,12 +592,12 @@ class ChatGroupListCreateView(APIView):
                     else:
                         # Only self in group (should not happen)
                         other_username = "Unknown User"
-                        logger.warning(f"Chat group {group.name} for user {current_user.user_name} has no other members.")
+                        logger.warning(f"Chat group {group.id} for user {current_user.user_name} has no other members.")
 
                     chat_list_data.append({
-                        'group_name': group.name,
-                        'display_name': other_username,
-                        'last_message_preview': '',  # Placeholder
+                        'group_id': group.id,
+                        'receiver': other_username,
+						'group_name': group.name,  # Include group name for clarity
                     })
             else:
                 logger.info(f"No chat groups found for user {current_user.user_name}.")
@@ -632,18 +632,21 @@ class ChatGroupListCreateView(APIView):
             target_user = USER.objects.get(user_name=target_username)
 
             # Ensure consistent group name generation (e.g., "private_ID1_ID2")
-            participants_ids = sorted([current_user.id, target_user.id])
-            group_name = f"private_{participants_ids[0]}_{participants_ids[1]}"
+            participants_usernames = sorted([current_user.user_name, target_user.user_name])
+            group_name = f"chat_{participants_usernames[0]}&{participants_usernames[1]}"
 
             # Atomically create or get the chat group and add members
             chat_group, created_group = ChatGroup.objects.get_or_create(
-                name=group_name
+                name=group_name,
             )
-            # Add members to the group
-            chat_group.members.add(current_user, target_user)
+            # If the group was just created, log and add members
+            if created_group:
+                logger.info(f"Created new chat group '{group_name}' for users {current_user.user_name} and {target_user.user_name}.")
+                chat_group.members.add(current_user, target_user)
+            # chat_group.members.add(current_user, target_user)
 
             return Response(
-                {'status': 'success', 'group_name': group_name},
+                {'status': 'success', 'group_id': chat_group.id, 'group_name': chat_group.name},
                 status=status.HTTP_200_OK
             )
         except USER.DoesNotExist:
@@ -657,21 +660,126 @@ class ChatGroupListCreateView(APIView):
 
 # ===============================================================
 # 2. Chat Message History View
-# Handles: GET /api/chat/<str:group_name>/messages/
+# Handles: GET /api/chat/<int:group_id>/messages/
 # ===============================================================
-class ChatMessageHistoryView(APIView):
+# class ChatMessageHistoryView(APIView):
+#     """
+#     API endpoint to retrieve chat message history for a specific group.
+#     Supports pagination using offset and limit.
+#     """
+#     permission_classes = [IsAuthenticated] # Only authenticated users can access history
+
+#     async def get(self, request, group_id: str) -> Response:
+#         """
+#         Retrieves a paginated list of messages for a given chat group.
+#         Ensures the requesting user is a member of the group.
+#         """
+#         current_user = request.user # Authenticated user
+#         offset_str = request.query_params.get('offset', '0')
+#         limit_str = request.query_params.get('limit', '20')
+
+#         try:
+#             offset = int(offset_str)
+#             limit = int(limit_str)
+#             if offset < 0 or limit <= 0:
+#                 return Response(
+#                     {'status': 'error', 'message': 'Offset must be non-negative and limit must be positive.'},
+#                     status=status.HTTP_400_BAD_REQUEST
+#                 )
+#         except ValueError:
+#             return Response(
+#                 {'status': 'error', 'message': 'Invalid offset or limit. Must be integers.'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+
+#         try:
+#             # Retrieve the chat group. Check if current_user is a member.
+#             chat_group = await sync_to_async(ChatGroup.objects.get)(id=group_id)
+            
+#             # Check if the requesting user is a member of this chat group
+#             is_member = await sync_to_async(chat_group.members.filter(id=current_user.id).exists)()
+#             if not is_member:
+#                 logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Access denied.")
+#                 return Response(
+#                     {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
+#                     status=status.HTTP_403_FORBIDDEN
+#                 )
+
+#             # Filter messages by group and order by timestamp for consistent pagination
+#             messages_queryset = await sync_to_async(
+#                 lambda: Message.objects.filter(group=chat_group).order_by('timestamp')
+#             )()
+
+#             # Initialize Paginator (Paginator is synchronous, so we get the queryset first)
+#             paginator = Paginator(messages_queryset, limit)
+
+#             page_number = (offset // limit) + 1
+
+#             try:
+#                 page_obj = await sync_to_async(paginator.get_page)(page_number)
+#             except EmptyPage:
+#                 logger.info(f"No messages found for group '{group_id}' at offset {offset}.")
+#                 return Response(
+#                     {
+#                         'status': 'success',
+#                         'messages': [],
+#                         'next_offset': None,
+#                         'has_next_page': False
+#                     },
+#                     status=status.HTTP_200_OK
+#                 )
+
+#             # Serialize message data. Note: `page_obj.object_list` is synchronous.
+#             messages_data = [
+#                 {
+#                     'id': msg.id,
+#                     'sender_username': msg.sender.user_name,
+#                     'group_id': msg.group.id,
+#                     'content': msg.content,
+#                     'timestamp': msg.timestamp.isoformat(), # Ensure ISO formatted
+#                 } for msg in await sync_to_async(list)(page_obj.object_list)
+#             ]
+
+#             next_offset = offset + len(messages_data) if page_obj.has_next() else None
+
+#             logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_id}' for user {current_user.user_name}.")
+#             return Response({
+#                 'status': 'success',
+#                 'messages': messages_data,
+#                 'next_offset': next_offset,
+#                 'has_next_page': page_obj.has_next()
+#             }, status=status.HTTP_200_OK)
+
+#         except ChatGroup.DoesNotExist:
+#             logger.warning(f"Chat group '{group_id}' not found for message history.")
+#             return Response(
+#                 {'status': 'error', 'message': 'Chat group not found.'},
+#                 status=status.HTTP_404_NOT_FOUND
+#             )
+#         except Exception as e:
+#             logger.exception(f"Error in ChatMessageHistoryView for group '{group_id}': {e}")
+#             return Response(
+#                 {'status': 'error', 'message': 'Internal server error during message history retrieval.'},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
+
+# ===============================================================
+# 3. Chat Message Send & History View
+# Handles: GET & POST /api/chat/<int:group_id>/messages/
+# ===============================================================
+class ChatMessageView(APIView):
     """
     API endpoint to retrieve chat message history for a specific group.
     Supports pagination using offset and limit.
     """
-    permission_classes = [IsAuthenticated] # Only authenticated users can access history
+    permission_classes = [IsAuthenticated]  # Only authenticated users can access history
 
-    async def get(self, request, group_name: str) -> Response:
+    def get(self, request, group_id: int) -> Response:
         """
         Retrieves a paginated list of messages for a given chat group.
         Ensures the requesting user is a member of the group.
         """
-        current_user = request.user # Authenticated user
+        current_user = request.user  # Authenticated user
         offset_str = request.query_params.get('offset', '0')
         limit_str = request.query_params.get('limit', '20')
 
@@ -691,31 +799,28 @@ class ChatMessageHistoryView(APIView):
 
         try:
             # Retrieve the chat group. Check if current_user is a member.
-            chat_group = await sync_to_async(ChatGroup.objects.get)(name=group_name)
-            
+            chat_group = ChatGroup.objects.get(id=group_id)
+
             # Check if the requesting user is a member of this chat group
-            is_member = await sync_to_async(chat_group.members.filter(id=current_user.id).exists)()
+            is_member = chat_group.members.filter(id=current_user.id).exists()
             if not is_member:
-                logger.warning(f"User {current_user.user_name} is not a member of group '{group_name}'. Access denied.")
+                logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Access denied.")
                 return Response(
                     {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
             # Filter messages by group and order by timestamp for consistent pagination
-            messages_queryset = await sync_to_async(
-                lambda: Message.objects.filter(group=chat_group).order_by('timestamp')
-            )()
+            messages_queryset = Message.objects.filter(group=chat_group).order_by('timestamp')
 
-            # Initialize Paginator (Paginator is synchronous, so we get the queryset first)
+            # Initialize Paginator
             paginator = Paginator(messages_queryset, limit)
-
             page_number = (offset // limit) + 1
 
             try:
-                page_obj = await sync_to_async(paginator.get_page)(page_number)
+                page_obj = paginator.get_page(page_number)
             except EmptyPage:
-                logger.info(f"No messages found for group '{group_name}' at offset {offset}.")
+                logger.info(f"No messages found for group '{group_id}' at offset {offset}.")
                 return Response(
                     {
                         'status': 'success',
@@ -726,20 +831,20 @@ class ChatMessageHistoryView(APIView):
                     status=status.HTTP_200_OK
                 )
 
-            # Serialize message data. Note: `page_obj.object_list` is synchronous.
+            # Serialize message data
             messages_data = [
                 {
                     'id': msg.id,
                     'sender_username': msg.sender.user_name,
-                    'group_name': msg.group.name,
+                    'group_id': msg.group.id,
                     'content': msg.content,
-                    'timestamp': msg.timestamp.isoformat(), # Ensure ISO formatted
-                } for msg in await sync_to_async(list)(page_obj.object_list)
+                    'timestamp': msg.timestamp.isoformat(),
+                } for msg in page_obj.object_list
             ]
 
             next_offset = offset + len(messages_data) if page_obj.has_next() else None
 
-            logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_name}' for user {current_user.user_name}.")
+            logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_id}' for user {current_user.user_name}.")
             return Response({
                 'status': 'success',
                 'messages': messages_data,
@@ -748,39 +853,26 @@ class ChatMessageHistoryView(APIView):
             }, status=status.HTTP_200_OK)
 
         except ChatGroup.DoesNotExist:
-            logger.warning(f"Chat group '{group_name}' not found for message history.")
+            logger.warning(f"Chat group '{group_id}' not found for message history.")
             return Response(
                 {'status': 'error', 'message': 'Chat group not found.'},
                 status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            logger.exception(f"Error in ChatMessageHistoryView for group '{group_name}': {e}")
+            logger.exception(f"Error in ChatMessageHistoryView for group '{group_id}': {e}")
             return Response(
                 {'status': 'error', 'message': 'Internal server error during message history retrieval.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
-# ===============================================================
-# 3. Chat Message Send View
-# Handles: POST /api/chat/<str:group_name>/messages/
-# ===============================================================
-class ChatMessageSendView(APIView):
     """
     API endpoint to send a chat message to a specific group.
     This view saves the message to the database and broadcasts it via Channel Layers.
     """
-    permission_classes = [IsAuthenticated] # Only authenticated users can send messages
-
-    async def post(self, request, group_name: str) -> Response:
-        """
-        Sends a message, saves it to the database, and broadcasts it via Channel Layers.
-        Ensures the requesting user is a member of the group.
-        """
-        current_user = request.user # Authenticated user
-        data = request.data # DRF Request.data is already parsed
-        content = data.get('content') # content from frontend
-
+    def post(self, request, group_id) -> Response:
+        current_user = request.user
+        data = request.data
+        content = data.get('content')
+        # group_id = data.get('group_id')
         if not content:
             logger.warning("Message content is empty for sending message.")
             return Response(
@@ -789,25 +881,21 @@ class ChatMessageSendView(APIView):
             )
 
         try:
-            # Retrieve the chat group. Check if current_user is a member.
-            chat_group = await sync_to_async(ChatGroup.objects.get)(name=group_name)
-
-            # Check if the requesting user is a member of this chat group
-            is_member = await sync_to_async(chat_group.members.filter(id=current_user.id).exists)()
+            chat_group = ChatGroup.objects.get(id=group_id)
+            is_member = chat_group.members.filter(id=current_user.id).exists()
             if not is_member:
-                logger.warning(f"User {current_user.user_name} is not a member of group '{group_name}'. Cannot send message.")
+                logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Cannot send message.")
                 return Response(
                     {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
                     status=status.HTTP_403_FORBIDDEN
                 )
 
-            # Create the message asynchronously within an atomic transaction for safety
-            message = await sync_to_async(Message.objects.create)(
-                sender=current_user, # Use the authenticated user directly
+            message = Message.objects.create(
+                sender=current_user,
                 content=content,
                 group=chat_group
             )
-            logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_name}.")
+            logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_id}.")
 
             channel_layer = get_channel_layer()
             if channel_layer is None:
@@ -817,37 +905,37 @@ class ChatMessageSendView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-            channel_group_name = f"chat_{group_name}"
+            channel_group_id = f"chat_{group_id}"
 
-            # Prepare message data for broadcasting (matching frontend's expected structure)
             message_data = {
                 "id": message.id,
-                "sender": current_user.user_name, # Frontend expects 'sender'
-                "sender_username": current_user.user_name, # Frontend also expects 'sender_username'
+                "sender": current_user.user_name,
+                "sender_username": current_user.user_name,
                 "sender_id": current_user.id,
                 "content": content,
                 "timestamp": message.timestamp.isoformat(),
-                "group_name": group_name
+                "group_id": group_id
             }
 
-            # Send message to the channel group for real-time update
-            await channel_layer.group_send(
-                channel_group_name,
+            # Use async_to_sync to call async channel layer from sync code
+            from asgiref.sync import async_to_sync
+            async_to_sync(channel_layer.group_send)(
+                channel_group_id,
                 {
-                    "type": "chat_message", # This 'type' maps to a method in your consumer
-                    "message": message_data # The actual message payload
+                    "type": "chat_message",
+                    "message": message_data
                 }
             )
-            logger.info(f"Message broadcasted to group '{channel_group_name}'.")
+            logger.info(f"Message broadcasted to group '{channel_group_id}'.")
 
             return Response({
                 'status': 'success',
                 'message': 'Message sent and broadcasted.',
-                'message_data': message_data # Return the data that was broadcasted
+                'message_data': message_data
             }, status=status.HTTP_200_OK)
 
         except ChatGroup.DoesNotExist:
-            logger.warning(f"Chat group '{group_name}' not found for sending message.")
+            logger.warning(f"Chat group '{group_id}' not found for sending message.")
             return Response(
                 {'status': 'error', 'message': 'Chat group not found.'},
                 status=status.HTTP_404_NOT_FOUND

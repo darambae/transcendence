@@ -14,3 +14,4 @@ djangorestframework
 requests
 djangorestframework-simplejwt
 python-decouple
+asgiref
