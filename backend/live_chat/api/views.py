@@ -28,6 +28,24 @@ logger = logging.getLogger(__name__)
 # Base URL for your access_postgresql service (without the /api/ prefix)
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
+class blockedUser(View):
+    def get(self, request, *args, **kwargs):
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+            return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+        url = f"{ACCESS_PG_BASE_URL}/api/chat"
+        try:
+            resp = requests.get(url, headers=headers, timeout=10, verify=False)
+            resp.raise_for_status()
+            return JsonResponse(resp.json(), status=resp.status_code)
+        except requests.RequestException as exc:
+            logger.error(f"blocked Status GET request failed: {exc}")
+            return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
+        except Exception as e:
+            logger.error(f"Failed to decode JSON from backend: {e}")
+            return JsonResponse({'status': 'error', 'message': 'Internal server error during chat list retrieval.'}, status=500)
+
 # @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
 class ChatGroupListCreateView(View):
     def get(self, request, *args, **kwargs):
@@ -65,7 +83,7 @@ class ChatGroupListCreateView(View):
             if not current_username or not target_username:
                 return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
 
-            
+
             access_token = request.COOKIES.get('access_token')
             if not access_token:
                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)

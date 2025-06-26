@@ -314,14 +314,14 @@ function sendMessage(username) {
 }
 // Function to initialize EventSource (SSE) for a group
 function initEventSource(groupId, username) {
-    // Close any other active EventSources before opening a new one
-    for (const key in eventSources) {
-        if (eventSources[key].readyState === EventSource.OPEN) {
-            eventSources[key].close();
-            delete eventSources[key];
-            console.log(`Closed SSE for group: ${key}`);
-        }
-    }
+    // // Close any other active EventSources before opening a new one
+    // for (const key in eventSources) {
+    //     if (eventSources[key].readyState === EventSource.OPEN) {
+    //         eventSources[key].close();
+    //         delete eventSources[key];
+    //         console.log(`Closed SSE for group: ${key}`);
+    //     }
+    // }
 
     const chatLog = document.getElementById('chatLog-active');
     if (!chatLog) {
@@ -331,7 +331,7 @@ function initEventSource(groupId, username) {
 
     // UPDATED URL: /chat/stream/{group_id}/
     // ********* how do I get the token? *******
-    const source = new EventSource(`/chat/stream/${groupId}/?token=${encodeURIComponent(token)}`);
+    const source = new EventSource(`/chat/stream/${groupId}/`);
 
     eventSources[groupId] = source;
 
@@ -348,7 +348,9 @@ function initEventSource(groupId, username) {
                 const msgElement = createMessageElement(messageData, username);
                 chatLog.appendChild(msgElement);
                 chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
-            }
+            } else {
+				//ajoute une pastille avec un chiffre correspondant au nombre de messages à lire
+			}
         } catch (error) {
             console.error(
                 'JSON parsing error or SSE message processing error:',
@@ -388,15 +390,7 @@ async function getBlockedStatus(other_user) {
 			return;
 		}
 		const data = response.json();
-		if (data.status.isBlocked == true) {
-			//proposer de débloquer le user
-		}
-		else if (data.status.hasBlocked == true) {
-			//afficher un message pour informer que le current user est bloqué
-		}
-		else {
-			//démarrer le chat
-		}
+		return (data.status);
     } catch (error) {
 		console.error('Network error loading blocked status :', error);
 		alert('network error: could not load blocked status');
@@ -534,7 +528,8 @@ function switchChatRoom(username, newgroupId) {
 		//proposer de débloquer
 	}
 	else if (blockedStatus.hasBlocked) {
-		
+		//mettre un message "this user blocked you"
+		return;
 	}
 	initEventSource(newgroupId);
 

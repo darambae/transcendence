@@ -64,5 +64,5 @@ urlpatterns = [
 
     # RESTful chat message endpoints
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
-
+	path('api/chat/<str:targetUser/blockedStatus/', blockedUser.as_view(), name='blockedUser')
 ]

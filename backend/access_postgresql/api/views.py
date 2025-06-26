@@ -45,7 +45,7 @@ except ImportError:
         objects = None
     class MATCHTABLE:
         objects = None
-		
+
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]
@@ -394,10 +394,10 @@ class uploadImgAvatar(APIView):
             return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
         except Exception as e:
             return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
-		
+
 class uploadPrivateInfoUser(APIView):
 	permission_classes = [IsAuthenticated]
-    
+
 	def patch(self, request):
 
 		try:
@@ -526,9 +526,9 @@ class searchUsers(APIView):
 #                     'display_name': other_username,
 #                     'last_message_preview': '', # Placeholder
 #                 })
-            
+
 #             # Optionally sort chat_list_data by last_message_preview_timestamp if you fetch it
-            
+
 #             return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
 
 #         except Exception as e:
@@ -597,7 +597,7 @@ class ChatGroupListCreateView(APIView):
         """
         current_user = request.user
         logger.info(f"Retrieving chat groups for user {current_user.user_name}")
-        
+
         try:
             # Get chat groups where the current user is a member
             chat_groups_qs = ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
@@ -721,7 +721,7 @@ class ChatGroupListCreateView(APIView):
 #         try:
 #             # Retrieve the chat group. Check if current_user is a member.
 #             chat_group = await sync_to_async(ChatGroup.objects.get)(id=group_id)
-            
+
 #             # Check if the requesting user is a member of this chat group
 #             is_member = await sync_to_async(chat_group.members.filter(id=current_user.id).exists)()
 #             if not is_member:
@@ -793,6 +793,8 @@ class ChatGroupListCreateView(APIView):
 # 3. Chat Message Send & History View
 # Handles: GET & POST /api/chat/<int:group_id>/messages/
 # ===============================================================
+class blockedUser(APIView):
+
 class ChatMessageView(APIView):
     """
     API endpoint to retrieve chat message history for a specific group.
@@ -1022,12 +1024,12 @@ class addFriend(APIView):
     def post(self, request):
         from_user = request.user
         username = request.data.get("userName")
-    
+
         try:
             to_user = USER.objects.get(user_name=username)
         except USER.DoesNotExist:
             return Response({"error": "User friend not found"}, status=404)
-    
+
         if to_user == from_user:
             return Response({"error": "You cannot add yourself as a friend"}, status=400)
 
@@ -1058,17 +1060,17 @@ class declineInvite(APIView):
     def patch(self, request):
         from_user = request.user
         to_username = request.data.get("username")
-            
+
         to_user = get_object_or_404(USER, user_name=to_username)
-		
+
         friend_req = get_object_or_404(
             FRIEND,
             from_user=to_user,
             to_user=from_user,
             status="pending")
-			
+
         friend_req.delete()
-		
+
         return Response(
             {"message": f"Friend request from {to_user.user_name} declined"},
             status=200
@@ -1081,18 +1083,18 @@ class acceptInvite(APIView):
     def patch(self, request):
         from_user = request.user
         to_username = request.data.get("username")
-	
+
         to_user = get_object_or_404(USER, user_name=to_username)
-	
+
         friend_req = get_object_or_404(
             FRIEND,
             from_user=to_user,
             to_user=from_user,
             status="pending")
-		
+
         friend_req.status = "accepted"
         friend_req.save()
-		
+
         return Response(
             {"message": f"Friend request from {to_user.user_name} accepted"},
             status=200
@@ -1112,7 +1114,7 @@ class matchHistory(APIView):
 
     def get(self, request):
         username = request.user.user_name
-		
+
         matches = MATCHTABLE.objects.filter(
             Q(username1=username) | Q(username2=username)
         ).order_by('-dateMatch')
