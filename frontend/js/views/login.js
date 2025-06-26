@@ -2,6 +2,7 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 import { renderChatButtonIfAuthenticated } from "./chat.js";
+
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
 	const content = document.getElementById("login-form");

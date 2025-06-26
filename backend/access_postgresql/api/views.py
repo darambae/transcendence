@@ -10,7 +10,7 @@ from .utils import generate_otp_send_mail, generateJwt
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from .models import USER, ChatGroup, Message, FRIEND
+from .models import USER, ChatGroup, Message, FRIEND, MATCHTABLE
 from django.http import JsonResponse
 from django.db import IntegrityError, transaction
 from django.contrib.auth import get_user_model
@@ -25,7 +25,6 @@ from channels.layers import get_channel_layer
 import sys
 import jwt
 from django.conf import settings
-from django.core.paginator import Paginator, EmptyPage
 # Create your views here.
 
 
@@ -982,3 +981,13 @@ class acceptInvite(APIView):
             {"message": f"Friend request from {to_user.user_name} accepted"},
             status=200
         )
+
+class logout(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        user = request.user
+        user.online = False
+        user.save()
+        return Response({'message': 'User logged out successfully'}, status=200)
+
