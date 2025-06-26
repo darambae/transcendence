@@ -6,13 +6,12 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator # To apply csrf_exempt to class-based views
 from channels.layers import get_channel_layer
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync
 import asyncio
 import logging
 from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
 from rest_framework import status
 import requests
 # Configure logging
@@ -38,7 +37,8 @@ class ChatGroupListCreateView(View):
         """
         access_token = request.COOKIES.get('access_token')
         if not access_token:
-             return Response({'error': 'No access token'}, status=401)
+            return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+        # Forward the access token in the request headers to access_postgresql
         headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
         try:
@@ -68,7 +68,7 @@ class ChatGroupListCreateView(View):
             
             access_token = request.COOKIES.get('access_token')
             if not access_token:
-                return Response({'error': 'No access token'}, status=401)
+                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
             headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
             url = f"{ACCESS_PG_BASE_URL}/api/chat/"
             try:
@@ -92,21 +92,21 @@ class ChatGroupListCreateView(View):
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ChatMessageHistoryView(View):
+class ChatMessageView(View):
     """
     Handles fetching message history for a specific chat group by proxying to access_postgresql.
-    Maps to: path('chat/<str:group_name>/messages/', ChatMessageHistoryView.as_view(), name='chat_message_history')
-    Communicates with access_postgresql's /api/chat/<str:group_name>/messages/ endpoint (GET).
+    Maps to: path('chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message')
+    Communicates with access_postgresql's /api/chat/<int:group_id>/messages/ endpoint (GET).
     """
-    def get(self, request, group_name):
+    def get(self, request, group_id):
         offset = request.GET.get('offset', 0)
         limit = request.GET.get('limit', 20)
 
         access_token = request.COOKIES.get('access_token')
         if not access_token:
-             return Response({'error': 'No access token'}, status=401)
+            return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
         headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-        url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_name}/messages/"
+        url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_id}/messages/"
         params = {'offset': offset, 'limit': limit}
         try:
             resp = requests.get(url, params=params, headers=headers, timeout=10, verify=False)
@@ -118,31 +118,27 @@ class ChatMessageHistoryView(View):
             return JsonResponse({'status': 'error', 'message': 'Internal server error during message history retrieval.'}, status=500)
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class ChatMessageSendView(View):
     """
     Handles sending a message to a specific chat group by proxying to access_postgresql.
-    Maps to: path('chat/<str:group_name>/messages/', ChatMessageSendView.as_view(), name='chat_message_send')
-    Communicates with access_postgresql's /api/chat/<str:group_name>/messages/ endpoint (POST).
+    Maps to: path('chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message')
+    Communicates with access_postgresql's /api/chat/<int:group_id>/messages/ endpoint (POST).
     """
-    def post(self, request, group_name):
+    def post(self, request, group_id):
         try:
             data = json.loads(request.body)
-            username = data.get('username')
             content = data.get('content')
-
-            if not username or not content:
-                return JsonResponse({'status': 'error', 'message': 'Username and content are required.'}, status=400)
+            # groupId = data.get('group_id')
+            if not content:
+                return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
 
             access_token = request.COOKIES.get('access_token')
             if not access_token:
-                return Response({'error': 'No access token'}, status=401)
+                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
             headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-            url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_name}/messages/"
+            url = f"{ACCESS_PG_BASE_URL}/api/chat/{group_id}/messages/"
             try:
                 resp = requests.post(url, json={
-                    'group_name': group_name,
-                    'username': username,
+                    'group_id': group_id,
                     'content': content
                 }, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
@@ -153,21 +149,19 @@ class ChatMessageSendView(View):
                     message_data_for_channels = pg_response_data['message_data']
                 else:
                     message_data_for_channels = {
-                        "sender": username,
-                        "sender_id": None,
                         "content": content,
                         "timestamp": datetime.now().isoformat(),
-                        "group_name": group_name
+                        "group_id": group_id
                     }
 
                 channel_layer = get_channel_layer()
                 if channel_layer is None:
                     return JsonResponse({'status': 'error', 'message': 'Real-time server not configured.'}, status=500)
 
-                channel_group_name = f"chat_{group_name}"
+                channel_group_name = f"chat_{group_id}"
 
                 # Use sync_to_async for group_send in a sync view
-                sync_to_async(channel_layer.group_send)(
+                async_to_sync(channel_layer.group_send)(
                     channel_group_name,
                     {
                         "type": "chat_message",
@@ -185,17 +179,17 @@ class ChatMessageSendView(View):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
-async def sse_chat_stream(request, group_name):
+async def sse_chat_stream(request, group_id):
     """
     Server-Sent Events stream for real-time chat messages.
-    Maps to: path("chat/stream/<str:group_name>/", views.sse_chat_stream, name="sse_chat_stream")
+    Maps to: path("chat/stream/<int:group_id>/", views.sse_chat_stream, name="sse_chat_stream")
     This view directly handles SSE via Django Channels, it does not proxy to access_postgresql.
     """
     channel_layer = get_channel_layer()
     if channel_layer is None:
         return StreamingHttpResponse("Internal Server Error: Channel layer not configured.", status=500, content_type="text/plain")
 
-    channel_group_name = f"chat_{group_name}"
+    channel_group_name = f"chat_{group_id}"
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
 
@@ -219,16 +213,16 @@ async def sse_chat_stream(request, group_name):
     #     validated_token = await sync_to_async(auth.get_validated_token)(clean_token)
     #     user = await sync_to_async(auth.get_user)(validated_token)
     #     if user:
-    #         logger.info(f"live_chat (SSE): Authenticated user '{user.username}' for group '{group_name}'.")
-    #         # Optionally, check if 'user' is allowed to access 'group_name' here
+    #         logger.info(f"live_chat (SSE): Authenticated user '{user.username}' for group '{group_id}'.")
+    #         # Optionally, check if 'user' is allowed to access 'group_id' here
     #     else:
     #         raise InvalidToken("User not found for token.")
     # except (InvalidToken, TokenError) as e:
-    #     logger.warning(f"live_chat (SSE): Invalid token for group '{group_name}': {e}")
+    #     logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}': {e}")
     #     await channel_layer.group_discard(channel_group_name, client_channel_name)
     #     return StreamingHttpResponse("Unauthorized: Invalid token.", status=401, content_type="text/plain")
     # except Exception as e:
-    #     logger.exception(f"live_chat (SSE): Error validating token for SSE stream for group '{group_name}': {e}")
+    #     logger.exception(f"live_chat (SSE): Error validating token for SSE stream for group '{group_id}': {e}")
     #     await channel_layer.group_discard(channel_group_name, client_channel_name)
     #     return StreamingHttpResponse("Internal Server Error during authentication.", status=500, content_type="text/plain")
 
@@ -256,7 +250,7 @@ async def sse_chat_stream(request, group_name):
             # Timeout is normal, just a heartbeat, the loop continues
             pass # Explicit heartbeat already yielded by the else block
         except asyncio.CancelledError:
-            print(f"SSE stream for group '{group_name}' (channel {client_channel_name}) cancelled.")
+            print(f"SSE stream for group '{group_id}' (channel {client_channel_name}) cancelled.")
         except Exception as e:
             yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
         finally:
