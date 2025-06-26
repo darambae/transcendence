@@ -459,3 +459,27 @@ class acceptInvite(APIView):
                 {'error': f'Access to access_postgres for search friends: {str(e)}'},
                 status=500
             )
+
+class matchHistory(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.COOKIES.get('access_token')
+    
+        try:
+            response = requests.get(
+                'https://access_postgresql:4000/api/matchHistory/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+            )
+            
+            return Response(response.json().get("result"), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for matchHistory: {str(e)}'},
+                status=500
+            )
