@@ -350,7 +350,8 @@ async function switchChatRoom(username, newgroupId) {
     const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${newgroupId}"]`);
     if (activeChatRoomName && targetChatListItem) {
         const receiverUsername = targetChatListItem.dataset.receiver;
-        activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
+        const displayName = receiverUsername.charAt(0).toUpperCase() + receiverUsername.slice(1);
+        activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${displayName}</a>`;
 
         const profileLink = document.getElementById('receiverProfileLink');
         if (profileLink) {
@@ -555,7 +556,7 @@ function handleStartNewChat(username) {
 
 function setupUserSearchAutocomplete() {
 	const userInput = document.getElementById('targetUserInput');
-	const resultsBox = document.getElementById('resultsSearch');
+	const resultsBox = document.getElementById('chat-user-search');
 	if (!userInput || !resultsBox) return;
 
 	userInput.addEventListener('input', async function () {
