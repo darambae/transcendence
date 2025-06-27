@@ -1,6 +1,7 @@
 
 import { actualizeIndexPage, getCookie, isUserAuthenticated } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
+import { card_profileController } from './card_profile.js';
 
 let mainChatBootstrapModal; // Bootstrap Modal instance
 let currentActiveChatGroup = null; // No default active group, will be set on selection
@@ -120,140 +121,7 @@ async function loadMessageHistory(username, groupId, prepend = false) {
         alert('Network error: Could not load chat history.');
     }
 }
-// function loadMessageHistory(username, groupId, prepend = false) {
-//     const chatLog = document.getElementById('chatLog-active');
-//     if (groupId === null || groupId === undefined) {
-//         console.error('No groupId provided for loading history.');
-//         return;
-//     }
-// 	if (!chatLog) {
-// 		console.error(`chatLog-active not found for loading history.`);
-// 		return;
-// 	}
 
-// 	// Clear "No chat selected" or "No messages yet" messages before loading
-// 	const noChatSelectedDiv = chatLog.querySelector('.no-chat-selected');
-// 	if (noChatSelectedDiv) {
-// 		noChatSelectedDiv.remove();
-// 	}
-// 	const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
-// 	if (noMessagesDiv) {
-// 		noMessagesDiv.remove();
-// 	}
-
-// 	const offset = messageOffsets[groupId] || 0;
-// 	const limit = 20;
-
-// 	fetch(`/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`, {
-// 		method: 'GET',
-// 		headers: {
-// 			'Content-Type': 'application/json',
-// 		},
-// 		credentials: 'include',
-// 	})
-// 		.then((response) =>
-// 			response.json().then((data) => ({ data, ok: response.ok }))
-// 		)
-// 		.then(({ data, ok }) => {
-// 			if (ok && data.status === 'success') {
-// 				if (data.messages.length > 0) {
-// 					const fragment = document.createDocumentFragment();
-// 					data.messages.forEach((msgData) => {
-// 						const msgElement = createMessageElement(msgData, username);
-// 						fragment.appendChild(msgElement);
-// 					});
-
-// 					if (prepend) {
-// 						const oldScrollHeight = chatLog.scrollHeight;
-// 						chatLog.insertBefore(fragment, chatLog.firstChild);
-// 						const newScrollHeight = chatLog.scrollHeight;
-// 						chatLog.scrollTop = newScrollHeight - oldScrollHeight;
-// 					} else {
-// 						chatLog.appendChild(fragment);
-// 						chatLog.scrollTop = chatLog.scrollHeight;
-// 					}
-// 					// Update offset based on backend's next_offset
-// 					messageOffsets[groupId] = data.next_offset;
-// 				} else if (!prepend && chatLog.children.length === 0) {
-// 					// If no messages at all and not prepending, show "No messages yet"
-// 					const noMessagesYet = document.createElement('div');
-// 					noMessagesYet.classList.add(
-// 						'no-messages-yet',
-// 						'text-center',
-// 						'text-muted',
-// 						'py-5'
-// 					);
-// 					noMessagesYet.innerHTML =
-// 						'<p>No messages yet. Start the conversation!</p>';
-// 					chatLog.appendChild(noMessagesYet);
-// 				}
-// 			} else {
-// 				console.error(
-// 					'Error loading history:',
-// 					data.message || 'Unknown error'
-// 				);
-// 				alert(
-// 					'Error loading chat history: ' + (data.message || 'Unknown error')
-// 				);
-// 			}
-// 		})
-// 		.catch((error) => {
-// 			console.error('Network error while loading history:', error);
-// 			alert('Network error: Could not load chat history.');
-// 		});
-// }
-// Function to send a message to the active group
-// async function sendMessage(username) {
-//     const usernameInput = document.getElementById('usernameInput-active'); // This should now hold username
-//     const messageInput = document.getElementById('messageInput-active');
-//     const groupIdInput = document.getElementById('groupIdInput-active'); // Contains the current active groupId
-
-//     const user_name = usernameInput.value.trim(); // Should be `username`
-//     const content = messageInput.value.trim();
-//     const groupId = groupIdInput.value;
-
-//     if (!user_name || !content || !groupId) {
-//         alert('Please ensure you are logged in, selected a chat, and typed a message.');
-//         return;
-//     }
-
-//     try {
-//         // UPDATED URL: /chat/{group_id}/messages/ (POST)
-//         const response = await fetch(`/chat/${groupId}/messages/`, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRFToken': getCookie('csrftoken'), // For Django's CSRF protection on your frontend
-//             },
-//             credentials: 'include', // Include cookies for session management
-//             body: JSON.stringify({
-//                 username: user_name,
-//                 content: content,
-//                 group_id: groupId, // Still useful for backend context, though redundant with URL
-//             }),
-//         });
-
-//         const data = await response.json();
-//         if (response.ok) {
-//             if (data.status === 'success') {
-//                 messageInput.value = ''; // Clear message input
-//             } else {
-//                 console.error('Server error sending message:', data.message);
-//                 alert('Error sending message: ' + data.message);
-//             }
-//         } else {
-//             console.error(
-//                 'HTTP error sending message:',
-//                 response.status,
-//                 data.message || response.statusText
-//             );
-//             alert('HTTP Error: ' + (data.message || response.statusText));
-//         }
-//     } catch (error) {
-//         console.error('Network or JSON error:', error);
-//         alert('Cannot connect to server to send message.');
-//     }
-// }
 function sendMessage(username) {
 	const messageInput = document.getElementById('messageInput-active');
 	const groupIdInput = document.getElementById('groupIdInput-active');
@@ -428,7 +296,15 @@ async function loadChatRoomList(current_user) {
                 listItem.textContent = chat.receiver; // Display receiver's username
                 listItem.style.cursor = 'pointer';
                 console.log(`Adding chat room: ${chat.group_name} (ID: ${chat.group_id})`);
-                listItem.onclick = () => switchChatRoom(current_user ,chat.group_id);
+                listItem.onclick = async () => {
+                    try {
+                        await switchChatRoom(current_user, chat.group_id);
+                    } catch (e) {
+                        console.error('Error switching chat room:', e);
+                        alert('Could not switch chat room. Please try again.');
+                    }
+                }
+                // switchChatRoom(current_user, chat.group_id);
                 chatRoomListUl.appendChild(listItem);
             });
         } else {
@@ -447,7 +323,7 @@ async function loadChatRoomList(current_user) {
 }
 
 // Function to switch between chat rooms
-function switchChatRoom(username, newgroupId) {
+async function switchChatRoom(username, newgroupId) {
     if (newgroupId === null || newgroupId === undefined) {
 			console.error('No groupId provided for loading history.');
 			return;
@@ -473,7 +349,16 @@ function switchChatRoom(username, newgroupId) {
     const activeChatRoomName = document.getElementById('activeChatRoomName');
     const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${newgroupId}"]`);
     if (activeChatRoomName && targetChatListItem) {
-        activeChatRoomName.textContent = `Chat with ${targetChatListItem.dataset.receiver}`;
+        const receiverUsername = targetChatListItem.dataset.receiver;
+        activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
+
+        const profileLink = document.getElementById('receiverProfileLink');
+        if (profileLink) {
+            profileLink.addEventListener('click', async function (e) {
+                e.preventDefault();
+                await actualizeIndexPage('modal-container', routes['card_profile'](receiverUsername));
+            });
+        }
     }
 
     // Update hidden input for sending messages
@@ -586,7 +471,7 @@ function switchChatRoom(username, newgroupId) {
 //     targetUserInput.value = ''; // Clear input field
 // }
 
-function promptPrivateChat(username, targetUsername) {
+async function promptPrivateChat(username, targetUsername) {
 	console.log(
 		`Requesting private chat with ${targetUsername} for user ${username}`
 	);
@@ -611,7 +496,7 @@ function promptPrivateChat(username, targetUsername) {
 
 	if (existinggroupId) {
 		console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
-		switchChatRoom(username, existinggroupId);
+		await switchChatRoom(username, existinggroupId);
 		return;
 	}
 

@@ -15,12 +15,15 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 1000;
+    z-index: 1;
 }
 
 #mainChatToggleButton:hover {
     background-color: rgba(135, 5, 5, 1);
     transform: scale(1.05);
+}
+#mainChatWindow {
+    z-index: 1100; /* Ensure the chat modal is above other content */
 }
 
 /* --- Chat Modal Styles (Mobile First) --- */
@@ -143,7 +146,7 @@
 
 #resultsSearch {
     position: absolute;
-    z-index: 1050;
+    z-index: 10;
     width: 100%; /* Full width of .input-group */
     left: 0;
     top: 100%;

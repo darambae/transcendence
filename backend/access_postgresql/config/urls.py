@@ -28,12 +28,6 @@ from api.views import info_link, api_signup, activate_account, checkPassword, ch
 from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
-# POST   /api/chat/                       # Create a chat group
-# GET    /api/chat/                       # List all chat groups
-# DELETE /api/chat/<group_name>/          # Delete a chat group
-
-# GET    /api/chat/<group_name>/messages/ # Get messages (with ?offset, ?limit)
-# POST   /api/chat/<group_name>/messages/ # Send a message
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
