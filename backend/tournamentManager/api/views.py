@@ -4,6 +4,7 @@ import sys
 import requests
 import ssl
 import websockets
+import asyncio
 import redis
 from .tournamentStatic import Tournament, Player, trnmtDict, user_ws_connections
 from channels.layers import get_channel_layer
@@ -14,15 +15,6 @@ channel_layer = get_channel_layer()
 
 consumerUri = "wss://tournament:8050/ws/game/"
 
-############ JWT ghost player #########
-'''
-{
-	idPlayer : u_int
-	username: str 
-	isGost: 0/1 [0 : real player / 1 : ghost player ]
-	idConnectedPlayer: u_int [ == idPlayer if isGhost : 0 ]
-}
-'''
 # Create your views here.
 
 class TournamentError(Exception) :
@@ -38,10 +30,14 @@ async def  checkForUpdates(uriKey) :
 		async with websockets.connect(uriKey, ssl=ssl_context) as ws:
 			print("1", file=sys.stderr)
 			while True:
-				print("2", file=sys.stderr)
-				message = await ws.recv()
-				print(f"data: {message}\n\n", file=sys.stderr)
-				yield f"data: {message}\n\n"
+				try:
+					message = await asyncio.wait_for(ws.recv(), timeout=20)
+					print(f"data: {message}\n\n", file=sys.stderr)
+					yield f"data: {message}\n\n"
+				except asyncio.TimeoutError:
+					# Do something else on timeout
+					print("No message received within timeout.", file=sys.stderr)
+					yield "data: hearthbeat\n\n"  # or any other fallback action
 	except Exception as e :
 		print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
 		yield f"data: WebSocket stop, error : {e}\n\n"
@@ -67,33 +63,33 @@ async def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 async def decodeJWT(request, func=None, encodedJwt=None) :
-    # with open(f"{func}_decodeJWT.txt", "a+") as f :
-    #     tm = datetime.now()
-    #     print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-    # with open(f"{func}_decodeJWT.txt", "a") as f : 
-    if not encodedJwt :
-        encodedJwt = request.COOKIES.get("access_token", None)
-    if not encodedJwt :
-        # print("Error 1", file=f)
-        return [None] * 3
-    
-    # print(f"encoded: {encodedJwt}", file=f)
-    res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-    # print(f"res : {res}", file=f)
-    res_json = res.json()
-    # print(f"res.json() : {res_json}", file=f)
-    if res.status_code != 200 :
-        # print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
-        if (res_json.get('error') == "Token expired"):
-            refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-            if refresh_res.status_code == 200:
-                new_access_token = refresh_res.json().get('access')
-                res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-                res2 = await setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-                return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-            return [None] * 3
-        return [None] * 3
-    return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
+	# with open(f"{func}_decodeJWT.txt", "a+") as f :
+	#     tm = datetime.now()
+	#     print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
+	# with open(f"{func}_decodeJWT.txt", "a") as f : 
+	if not encodedJwt :
+		encodedJwt = request.COOKIES.get("access_token", None)
+	if not encodedJwt :
+		# print("Error 1", file=f)
+		return [None] * 3
+	
+	# print(f"encoded: {encodedJwt}", file=f)
+	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+	# print(f"res : {res}", file=f)
+	res_json = res.json()
+	# print(f"res.json() : {res_json}", file=f)
+	if res.status_code != 200 :
+		# print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
+		if (res_json.get('error') == "Token expired"):
+			refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+			if refresh_res.status_code == 200:
+				new_access_token = refresh_res.json().get('access')
+				res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+				res2 = await setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+				return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+			return [None] * 3
+		return [None] * 3
+	return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 # # @csrf_exempt
 async def launchFinals(request) :
@@ -124,7 +120,7 @@ async def launchMatch(request) :
 		if not trStart[0] :
 			print("lm-1-end3", file=sys.stderr)
 			return JsonResponse({"Info" : trStart[1]})
-		print("lm-1", file=sys.stderr)
+		print(f"lm-1, tkey : {tkey}", file=sys.stderr)
 
 		await channel_layer.group_send(
 			tkey,
@@ -232,7 +228,8 @@ async def joinTournament(request):
 
 
 async def sse(request) :
-	tKey = request.GET.get("tkey", None)
+	tKey = request.GET.get("tKey", None)
+	print(f"sse - tKey : {tKey}", file=sys.stderr)
 	jwt = request.GET.get("jwt", None)
 	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt}'), content_type='text/event-stream')
 # @csrf_exempt

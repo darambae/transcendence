@@ -4,12 +4,12 @@ import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
 
 
-function invitsController() {
+export function invitsController() {
 	const modalContainer = document.getElementById("modal-container");
 
-	const form = document.getElementById("log-form");
+	let form = document.getElementById("log-form");
 	if (form) {
-	  form.addEventListener("submit", handleInvitSubmit);
+	  form.addEventListener("submit", (e) => {handleInvitSubmit(e, form)});
 	}
 }
 
@@ -148,6 +148,7 @@ export async function tournamentController() {
             SSEStream = new EventSource(url_sse);
             SSEStream.onmessage = function(event) {
               try {
+                console.log(event.data);
                 const data = JSON.parse(event.data);
                 console.log(data);
               }

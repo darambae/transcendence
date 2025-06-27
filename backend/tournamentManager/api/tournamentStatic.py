@@ -3,6 +3,7 @@ import shortuuid
 import sys
 import requests
 from django.http import JsonResponse, StreamingHttpResponse
+import random
 
 
 LOCAL = 1
@@ -10,42 +11,63 @@ REMOTE = 2
 
 trnmtDict = {} # Usage : {str : Tournament}
 
-keygame = "https://server-pong:8030/"
+keygame = "https://server_pong:8030/"
 jwtUri = "https://auth:4020/"
-dbUri = "https://access-postgresql:4000/"
+dbUri = "https://access_postgresql:4000/"
 
 user_ws_connections = {}
 
 class Match() :
     def __init__(self, p1=None, p2=None, matchBefore=None) :
+        print(f"match-class", file=sys.stderr)
         self.key = getApiKeyTrnmt()
+        print(f"match-class", file=sys.stderr)
         self.p1 = p1
+        print(f"match-class", file=sys.stderr)
         self.p2 = p2
+        print(f"match-class", file=sys.stderr)
         self.jwtP1 = None
+        print(f"match-class", file=sys.stderr)
         self.jwtP2 = None
+        print(f"match-class", file=sys.stderr)
         self.gameMode = REMOTE
+        print(f"match-class", file=sys.stderr)
         self.launchable = True
+        print(f"match-class", file=sys.stderr)
         self.mainAccount = -1
+        print(f"match-class", file=sys.stderr)
 
         self.first = None
+        print(f"match-class", file=sys.stderr)
         self.second = None
+        print(f"match-class", file=sys.stderr)
         self.third = None
+        print(f"match-class", file=sys.stderr)
         self.fourth = None
+        print(f"match-class", file=sys.stderr)
+        self.matchBefore = matchBefore
 
     def initValues(self) :
-        self.jwtP1 = requests.get(f"{jwtUri}api/DecodeJwt", headers={"Authorization" : f"bearer {self.p1.jwt}"})
-        
-        self.jwtP2 = requests.get(f"{jwtUri}api/DecodeJwt", headers={"Authorization" : f"bearer {self.p2.jwt}"})
-        
-        if self.jwtP1 == self.jwtP2 :
+        print("match-init", file=sys.stderr)
+        self.jwtP1 = self.p1.jwt
+        self.jwtP2 = self.p2.jwt
+
+        if self.jwtP1["username"] == self.jwtP2["username"] :
+            print("match-init", file=sys.stderr)
             self.gameMode = LOCAL
+            print("match-init", file=sys.stderr)
             if self.jwtP1["username"] == self.p1.username:
-                self.mainAccount = p1
+                print("match-init-p1", file=sys.stderr)
+                self.mainAccount = self.p1
             else:
-                self.mainAccount = p2
-        
-        if (matchBefore and (matchBefore.p1.username in self.jwtP1["invites"]) or (matchBefore.p1.username in self.jwtP2["invites"]) or (matchBefore.p2.username in self.jwtP1["invites"]) or (matchBefore.p2.username in self.jwtP2["invites"])) :
+                print("match-init-p2", file=sys.stderr)
+                self.mainAccount = self.p2
+        print("match-init", file=sys.stderr)
+        print(self.matchBefore, file=sys.stderr)
+        # print
+        if (self.matchBefore and ((self.matchBefore.p1.username in self.jwtP1["invites"]) or (self.matchBefore.p1.username in self.jwtP2["invites"]) or (self.matchBefore.p2.username in self.jwtP1["invites"]) or (self.matchBefore.p2.username in self.jwtP2["invites"]))) :
             self.launchable = False
+        print("match-init", file=sys.stderr)
         
 
 
@@ -97,18 +119,21 @@ class Tournament() :
         if self.nbPl != 4 :
             print("launch-tr-end-1", file=sys.stderr)
             return (False, "Tournament must contain 4 players")
-        print("launch-tr", file=sys.stderr)
+        print(f"launch-tr : {self.players}", file=sys.stderr)
         lstTemp = [self.players.pop(random.randint(0, 3))]
         print("launch-tr", file=sys.stderr)
         lstTemp.append(self.players.pop(random.randint(0, 2)))
         print("launch-tr", file=sys.stderr)
-        self.tournamentPl = [lstTemp, players]
+        print(lstTemp, file=sys.stderr)
+        print(self.players, file=sys.stderr)
+        
+        self.tournamentPl = [lstTemp, self.players]
         print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
         self.match1 = Match(self.tournamentPl[0][0], self.tournamentPl[0][1])
         print("launch-tr", file=sys.stderr)
-        self.match2 = Match(self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
-        print("launch-tr", file=sys.stderr)
         self.match1.initValues()
+        print("launch-tr", file=sys.stderr)
+        self.match2 = Match(self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
         print("launch-tr", file=sys.stderr)
         self.match2.initValues()
         print("launch-tr", file=sys.stderr)
@@ -126,9 +151,14 @@ class Tournament() :
 
 
 def getApiKeyTrnmt() :
-    res = requests.get(f"{keygame}server-pong/api-key")
+    print("get-api-key-trnmt", file=sys.stderr)
+    res = requests.get(f"{keygame}server-pong/api-key", verify=False, headers={"Host": "localhost"})
+    print("get-api-key-trnmt", file=sys.stderr)
     if (res.status_code == 200) :
+        print("get-api-key-trnmt", file=sys.stderr)
         return res.json()["api_key"]
+    print("get-api-key-trnmt", file=sys.stderr)
+    return (JsonResponse({"Error" : f"Status code {res.status_code}"}, status=res.status_code))
 
 async def supervise_match(tkey) :
     infoResultsMatch = None

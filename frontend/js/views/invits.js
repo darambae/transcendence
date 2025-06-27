@@ -57,7 +57,7 @@ export async function handleInvitSubmit(event) {
 
 	event.preventDefault();
 	
-	const form = event.target;
+	let form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
 	const loadingMessage = form.querySelector("#loading-message");
 
@@ -86,11 +86,6 @@ export async function handleInvitSubmit(event) {
 		if (response.ok) {
 			try {
 				await double_authenticate(dataForm)
-				let divGuest = document.getElementById("guest-add")
-				let text = await fetch('./templates/invits.html')
-	            console.log(text);
-    	        text = await text.text()
-        	    divGuest.innerHTML = text
 				await fetch("tournament/guest", {
 					headers : {
 						'X-CSRFToken': csrf,
@@ -98,7 +93,7 @@ export async function handleInvitSubmit(event) {
 					credentials: 'include',
 				})
 
-				// actualizeIndexPage('toggle-login', routes['user']);
+				actualizeIndexPage('guest-add', routes['guest']);
 				console.log("User successfully connected");
 			} catch (error) {
 				console.log("Double auth error: ", error);

@@ -54,6 +54,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		params = parse_qs(query_string)
 
 		self.room_group_name = params.get('tkey', [None])[0]
+		print(f"self.room_group_name : {self.room_group_name}", file=sys.stderr)
 		self.myJWT = params.get("jwt", [None])[0] #Encoded 
 
 		if not self.room_group_name:
@@ -105,7 +106,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		action = data.get("action")
+		print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
+			print(f"self.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=sys.stderr)
 			if self.myJWT == trnmtDict[self.room_group_name].match1.p1.jwt or self.myJWT == trnmtDict[self.room_group_name].match1.p2.jwt :
 				if trnmtDict[self.room_group_name].match1.lauchable :
 					await self.launchGame(trnmtDict[self.room_group_name].match1)
@@ -174,6 +177,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 	async def tempReceived(self, event) :
+		print("tempReceived", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	
