@@ -331,7 +331,7 @@ function initEventSource(groupId, username) {
 
     // UPDATED URL: /chat/stream/{group_id}/
     // ********* how do I get the token? *******
-    const source = new EventSource(`/chat/stream/${groupId}/?token=${encodeURIComponent(token)}`);
+    const source = new EventSource(`/chat/stream/${groupId}/`);
 
     eventSources[groupId] = source;
 
