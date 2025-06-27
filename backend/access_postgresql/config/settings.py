@@ -170,102 +170,102 @@ REST_FRAMEWORK = {
 
 import logging
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '[{levelname}] {asctime} {name}: {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-            'level': 'DEBUG',  # Show all logs
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',  # Show all logs
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Show all logs from Django
-            'propagate': False,
-        },
-        'api': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Show all logs from your app
-            'propagate': False,
-        },
-    },
-}
-
-
-# # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
-# class AddAppNameFilter(logging.Filter):
-#     def filter(self, record):
-#         if not hasattr(record, 'app_name'):
-#             record.app_name = APP_NAME
-#         return True
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,
-#     'filters': {
-#         'add_app_name': {
-#             '()': AddAppNameFilter,
-#         },
-#     },
 #     'formatters': {
-#         'text': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'logging.Formatter',
-#         },
-#         'logstash': {
-#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+#         'simple': {
+#             'format': '[{levelname}] {asctime} {name}: {message}',
+#             'style': '{',
 #         },
 #     },
 #     'handlers': {
-#         'logstash': {
-#             'level': 'DEBUG',
-#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-#             'host': 'logstash',
-#             'port': 6006,
-#             'database_path': os.path.join(BASE_DIR, 'logstash.db'),
-#             'ssl_enable': False,
-#             'formatter': 'logstash',
-#             'ensure_ascii': True,
-#             'filters': ['add_app_name'],
-#         },
 #         'console': {
-#             'level': 'DEBUG',
 #             'class': 'logging.StreamHandler',
-#             'formatter': 'text',
-#             'filters': ['add_app_name'],
-#         }
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'], # Only send Django logs to console by default
-#             'level': 'DEBUG',
-#             'propagate': False, # Prevent duplicate logging via root logger
-#         },
-#         'django.request': {
-#             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
-#             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger
-#         },
-#         'api': {
-#             'handlers': ['console' ,'logstash'],
-#             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger if needed
+#             'formatter': 'simple',
+#             'level': 'DEBUG',  # Show all logs
 #         },
 #     },
 #     'root': {
-#         'handlers': ['console', 'logstash'],
-#         'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
+#         'handlers': ['console'],
+#         'level': 'DEBUG',  # Show all logs
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from Django
+#             'propagate': False,
+#         },
+#         'api': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from your app
+#             'propagate': False,
+#         },
 #     },
 # }
+
+
+# # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
+class AddAppNameFilter(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, 'app_name'):
+            record.app_name = APP_NAME
+        return True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
+        },
+    },
+    'formatters': {
+        'text': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'logging.Formatter',
+        },
+        'logstash': {
+            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+            'host': 'logstash',
+            'port': 6006,
+            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+            'ssl_enable': False,
+            'formatter': 'logstash',
+            'ensure_ascii': True,
+            'filters': ['add_app_name'],
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'text',
+            'filters': ['add_app_name'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'], # Only send Django logs to console by default
+            'level': 'DEBUG',
+            'propagate': False, # Prevent duplicate logging via root logger
+        },
+        'django.request': {
+            'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger
+        },
+        'api': {
+            'handlers': ['console' ,'logstash'],
+            'level': 'DEBUG',
+            'propagate': True, # Prevent duplicate logging via root logger if needed
+        },
+    },
+    'root': {
+        'handlers': ['console', 'logstash'],
+        'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
+    },
+}

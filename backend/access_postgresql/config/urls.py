@@ -59,10 +59,10 @@ urlpatterns = [
 	path('api/declineInvite/', declineInvite.as_view(), name='declineInvite'),
 	path('api/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
 	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
-    path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
 	path('api/logout/', logout.as_view(), name='logout'),
 
     # RESTful chat message endpoints
+    path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
 
 ]
