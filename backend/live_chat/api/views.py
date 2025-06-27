@@ -196,37 +196,37 @@ async def sse_chat_stream(request, group_id):
     # --- SSE Token Authentication (Crucial for security) ---
     # The frontend passes the token as a query parameter.
     # You MUST validate this token here against your authentication system.
-    token_str = request.GET.get('token')
-    if not token_str:
-        await channel_layer.group_discard(channel_group_name, client_channel_name) # Discard channel on auth failure
-        return StreamingHttpResponse("Unauthorized: Token required.", status=401, content_type="text/plain")
+    # token_str = request.GET.get('token')
+    # if not token_str:
+    #     await channel_layer.group_discard(channel_group_name, client_channel_name) # Discard channel on auth failure
+    #     return StreamingHttpResponse("Unauthorized: Token required.", status=401, content_type="text/plain")
 
-    # TODO: Implement actual token validation (e.g., JWT verification, Django Rest Framework Token lookup)
-    # This example is a placeholder. For production, replace with proper security.
-    # from rest_framework_simplejwt.authentication import JWTAuthentication
-    # from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-    # try:
-    #     auth = JWTAuthentication()
-    #     # Remove "Bearer " prefix if present
-    #     clean_token = token_str.replace('Bearer ', '')
-    #     # get_validated_token also performs expiration checks
-    #     validated_token = await sync_to_async(auth.get_validated_token)(clean_token)
-    #     user = await sync_to_async(auth.get_user)(validated_token)
-    #     if user:
-    #         logger.info(f"live_chat (SSE): Authenticated user '{user.username}' for group '{group_id}'.")
-    #         # Optionally, check if 'user' is allowed to access 'group_id' here
-    #     else:
-    #         raise InvalidToken("User not found for token.")
-    # except (InvalidToken, TokenError) as e:
-    #     logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}': {e}")
-    #     await channel_layer.group_discard(channel_group_name, client_channel_name)
-    #     return StreamingHttpResponse("Unauthorized: Invalid token.", status=401, content_type="text/plain")
-    # except Exception as e:
-    #     logger.exception(f"live_chat (SSE): Error validating token for SSE stream for group '{group_id}': {e}")
-    #     await channel_layer.group_discard(channel_group_name, client_channel_name)
-    #     return StreamingHttpResponse("Internal Server Error during authentication.", status=500, content_type="text/plain")
+    # # TODO: Implement actual token validation (e.g., JWT verification, Django Rest Framework Token lookup)
+    # # This example is a placeholder. For production, replace with proper security.
+    # # from rest_framework_simplejwt.authentication import JWTAuthentication
+    # # from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+    # # try:
+    # #     auth = JWTAuthentication()
+    # #     # Remove "Bearer " prefix if present
+    # #     clean_token = token_str.replace('Bearer ', '')
+    # #     # get_validated_token also performs expiration checks
+    # #     validated_token = await sync_to_async(auth.get_validated_token)(clean_token)
+    # #     user = await sync_to_async(auth.get_user)(validated_token)
+    # #     if user:
+    # #         logger.info(f"live_chat (SSE): Authenticated user '{user.username}' for group '{group_id}'.")
+    # #         # Optionally, check if 'user' is allowed to access 'group_id' here
+    # #     else:
+    # #         raise InvalidToken("User not found for token.")
+    # # except (InvalidToken, TokenError) as e:
+    # #     logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}': {e}")
+    # #     await channel_layer.group_discard(channel_group_name, client_channel_name)
+    # #     return StreamingHttpResponse("Unauthorized: Invalid token.", status=401, content_type="text/plain")
+    # # except Exception as e:
+    # #     logger.exception(f"live_chat (SSE): Error validating token for SSE stream for group '{group_id}': {e}")
+    # #     await channel_layer.group_discard(channel_group_name, client_channel_name)
+    # #     return StreamingHttpResponse("Internal Server Error during authentication.", status=500, content_type="text/plain")
 
-    # --- END SSE Token Authentication ---
+    # # --- END SSE Token Authentication ---
 
 
     async def event_generator():

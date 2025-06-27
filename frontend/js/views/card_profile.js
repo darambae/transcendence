@@ -3,16 +3,20 @@ import { closeModal } from "../utils.js";
 export async function card_profileController(username) {
 
 	const modalContainer = document.getElementById("modal-container");
-	modalContainer.addEventListener("click", (event) => {
-		if(event.target.id === "modal-container") {
-			closeModal();
-		}
-	});
-
+	if (modalContainer) {
+		modalContainer.addEventListener("click", (event) => {
+			if (event.target.id === "modal-container") {
+				closeModal();
+			}
+		});
+	}
+	
 	const closeBtn = document.getElementById("close-card-btn");
-	closeBtn.addEventListener("click", () => {
-		closeModal();
-	});
+	if (closeBtn) {
+		closeBtn.addEventListener("click", () => {
+			closeModal();
+		});
+	}
 
 	if (username) {
 		getOtherUserInfo(username);
@@ -93,7 +97,8 @@ async function getOtherUserInfo(userName) {
 		  },
 		});
 		if (!response.ok) {
-		  console.log(`Erreur HTTP ! status: ${response.status}`);
+			console.log(`Erreur HTTP ! status: ${response.status}`);
+			return;
 		}
 		const data = await response.json();
 		gestFooter(data.friend_status)
@@ -129,30 +134,29 @@ function addFriend() {
 
 	try {
 		const addFriendsBtn = document.getElementById('addFriendsid');
-		
-		addFriendsBtn.addEventListener("click", async() => {
-			const userName = addFriendsBtn.dataset.username
+		if (addFriendsBtn) {
+			addFriendsBtn.addEventListener('click', async () => {
+				const userName = addFriendsBtn.dataset.username;
 
-			const response = await fetch("user-service/add/friend/", {
-				method: "POST",
-				credentials: 'include',
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					userName: userName,
-				}),
+				const response = await fetch('user-service/add/friend/', {
+					method: 'POST',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						userName: userName,
+					}),
+				});
+
+				const data = await response.json();
+
+				console.log(data);
+				if (data.message) {
+					getOtherUserInfo(userName);
+				}
 			});
-
-			const data = await response.json();
-
-			console.log(data);
-			if (data.message) {
-				getOtherUserInfo(userName)
-			}
-
-		})
-
+		}
 	} catch (error) {
 		console.error("Error add friend :", error);
 	}
