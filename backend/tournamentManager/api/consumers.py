@@ -83,13 +83,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def launchGame(self, match) :
 		if match.gameMode == REMOTE :
-			if self.myJWT == match.p1.jwt :
+			if self.myJWT == match.p1.username :
 				user = match.p1.username
+				playerId = 1
 			else :
 				user = match.p2.username
+				playerId = 2
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-start",
-				"mode" : "remote", 
+				"mode" : "remote",
+				"playerId" : playerId
 				"player" : user,
 				"key" : match.key
 			}))
@@ -104,7 +107,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 							
 	async def receive(self, text_data):
-		data = json.loads(text_data)
+		print(f"data : {text_data}", file=sys.stderr)
+		data = text_data # json.loads(text_data)
 		action = data.get("action")
 		print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
@@ -177,7 +181,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 	async def tempReceived(self, event) :
-		print("tempReceived", file=sys.stderr)
+		print(f"tempReceived : {event}", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	

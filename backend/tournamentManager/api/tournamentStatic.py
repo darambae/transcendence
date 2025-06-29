@@ -10,6 +10,7 @@ LOCAL = 1
 REMOTE = 2
 
 trnmtDict = {} # Usage : {str : Tournament}
+dictJwt = {}
 
 keygame = "https://server_pong:8030/"
 jwtUri = "https://auth:4020/"

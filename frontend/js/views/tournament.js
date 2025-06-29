@@ -116,7 +116,7 @@ export async function tournamentController() {
 
         console.log(view);
 
-        await fetch("server-pong/check-sse", {
+        await fetch("tournament/check-sse", {
           headers : {
             'X-CSRFToken': csrf,
           },

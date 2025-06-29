@@ -2,11 +2,12 @@ from django.shortcuts import render
 import random
 import sys
 import requests
+import uuid
 import ssl
 import websockets
 import asyncio
 import redis
-from .tournamentStatic import Tournament, Player, trnmtDict, user_ws_connections
+from .tournamentStatic import Tournament, Player, trnmtDict, user_ws_connections, dictJwt
 from channels.layers import get_channel_layer
 from django.http import JsonResponse, StreamingHttpResponse
 import json
@@ -126,7 +127,7 @@ async def launchMatch(request) :
 			tkey,
 			{
 				"type": "tempReceived",
-				"text_data": "create-bracket"
+				"text_data": {"action" : "create-bracket"}
 			}
 		)
 		print("lm-1", file=sys.stderr)
@@ -154,6 +155,14 @@ async def launchFinals(request) :
 	
 	except Exception as e:
 		return JsonResponse({"error": "Internal server error"}, status=500)
+
+async def checkSSE(request) :
+	try:
+		jwt = decodeJWT(request)[0]
+		vlue = uuid.uuid4()
+		dictJwt[vlue] = jwt
+		return JsonResponse({"key" : vlue})
+
 
 
 async def joinGuest(request) :
@@ -231,6 +240,7 @@ async def sse(request) :
 	tKey = request.GET.get("tKey", None)
 	print(f"sse - tKey : {tKey}", file=sys.stderr)
 	jwt = request.GET.get("jwt", None)
+	jwt = dictJwt.get(jwt, None)
 	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt}'), content_type='text/event-stream')
 # @csrf_exempt
 
