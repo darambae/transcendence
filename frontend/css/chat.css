@@ -144,7 +144,7 @@
 
 /* --- User Search Dropdown (Always absolute, all screens) --- */
 
-#chat-user-search {
+#resultsSearch {
     position: absolute;
     z-index: 10;
     width: 100%; /* Full width of .input-group */
@@ -161,7 +161,7 @@
     list-style: none;
 }
 
-#chat-user-search .list-group-item {
+#resultsSearch .list-group-item {
     cursor: default;
     padding: 8px 12px;
     border: none;
@@ -173,12 +173,12 @@
     user-select: none;
 }
 
-#chat-user-search .list-group-item:last-child {
+#resultsSearch .list-group-item:last-child {
     border-bottom: none;
 }
 
-#chat-user-search .list-group-item:hover,
-#chat-user-search .list-group-item:focus {
+#resultsSearch .list-group-item:hover,
+#resultsSearch .list-group-item:focus {
     background: #f8f9fa;
 }
 
