@@ -1,4 +1,4 @@
-import { actualizeIndexPage, getCookie } from '../utils.js';
+import { actualizeIndexPage, getCookie, fetchWithRefresh } from '../utils.js';
 import { routes } from '../routes.js';
 
 export async function handleSignupSubmit(event) {
@@ -27,7 +27,7 @@ export async function handleSignupSubmit(event) {
 		const { username, mail, firstName, lastName, password } = data;
 		const cleanData = { username, mail, firstName, lastName, password };
 		
-		const response = await fetch('user-service/signup/', {
+		const response = await fetchWithRefresh('user-service/signup/', {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

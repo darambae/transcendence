@@ -1,4 +1,4 @@
-import { actualizeIndexPage } from "../utils.js";
+import { actualizeIndexPage, fetchWithRefresh } from "../utils.js";
 import { routes } from "../routes.js"
 
 
@@ -10,7 +10,7 @@ export async function dashboardsController() {
 	matchBody.innerHTML = "";
 
 	try {
-		const response = await fetch("user-service/matchHistory/", {
+		const response = await fetchWithRefresh("user-service/matchHistory/", {
 			method: "GET",
 			credentials: 'include',
 			headers: {

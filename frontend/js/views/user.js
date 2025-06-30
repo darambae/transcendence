@@ -1,4 +1,4 @@
-import { attachLoginListener } from "../utils.js";
+import { attachLoginListener, fetchWithRefresh } from "../utils.js";
 
 export function userController() {
 	userInfo();
@@ -7,7 +7,7 @@ export function userController() {
 			event.preventDefault();
 		} else {
 			try {
-				const response = await fetch('auth/logout/', {
+				const response = await fetchWithRefresh('auth/logout/', {
 					method: 'PATCH',
 					credentials: 'include'
 				});
@@ -38,7 +38,7 @@ export function userInfo() {
 	const dropdownBtn = document.getElementById('avatarDropdownBtn');
 	const dropdownMenu = document.getElementById('customDropdownMenu');
 
-	fetch('user-service/avatar/', {
+	fetchWithRefresh('user-service/avatar/', {
 		method: 'GET',
 		credentials: 'include',
 	})

@@ -125,7 +125,7 @@ class verifyTwofa(APIView):
 				return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
 			if len(json_data.get('tfa')) != 19:
-				return setTheCookie(JsonRespo0nse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+				return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
 
 			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
@@ -180,12 +180,12 @@ class refreshToken(APIView):
 
 	def get(self, request) :
 		refresh_token = request.COOKIES.get("refresh_token", None)
-		refresh_res = request.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
+		refresh_res = requests.get('https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
 		if refresh_res.status_code == 200:
 			access = refresh_res.json().get("access", None)
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
 		else :
-			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
+			return JsonResponse({"Error" : "Refresh token expired"}, status=401)
 		
 
 class logout(APIView):

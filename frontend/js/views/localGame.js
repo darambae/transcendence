@@ -69,7 +69,7 @@ export async function localGameController() {
                 case "p" :
                     if (started == false) {
                         started = true;
-                        fetch(url_post, {
+                        z(url_post, {
                             method: 'POST',
                             headers: {
                               'Content-Type': 'application/json'

@@ -475,7 +475,9 @@ class matchHistory(APIView):
                     'Host': 'localhost'
                 },
             )
-            
+            res = requests.get('https://access_postgresql:4000/api/DecodeJwt/', headers={"Authorization" : f"bearer {token}", 'Host': 'localhost'}, verify=False)
+            print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
+
             return Response(response.json().get("result"), status=response.status_code)
 
         except requests.exceptions.RequestException as e:

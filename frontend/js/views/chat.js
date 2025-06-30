@@ -1,5 +1,5 @@
 
-import { actualizeIndexPage, getCookie, isUserAuthenticated } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
@@ -73,7 +73,7 @@ async function loadMessageHistory(username, groupId, prepend = false) {
 
     try {
         // UPDATED URL: /chat/{group_id}/messages/
-        const response = await fetch(
+        const response = await fetchWithRefresh(
             `/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`,
             {
                 method: 'GET',
@@ -136,7 +136,7 @@ function sendMessage(username) {
 		return;
 	}
 
-	fetch(`/chat/${groupId}/messages/`, {
+	fetchWithRefresh(`/chat/${groupId}/messages/`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -263,7 +263,7 @@ async function loadChatRoomList(current_user) {
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         const csrf = getCookie('csrftoken');
         console.log('Loading chat list for user:', current_user);
-        const response = await fetch(`/chat/`, {
+        const response = await fetchWithRefresh(`/chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -501,7 +501,7 @@ async function promptPrivateChat(username, targetUsername) {
 	}
 
 	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetch('/chat/', {
+		fetchWithRefresh('/chat/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -564,7 +564,7 @@ function setupUserSearchAutocomplete() {
 			resultsBox.innerHTML = '';
 			return;
 		}
-		const response = await fetch(
+		const response = await fetchWithRefresh(
 			`user-service/searchUsers?q=${encodeURIComponent(query)}`,
 			{
 				method: 'GET',
@@ -693,7 +693,7 @@ export function chatController(username) {
 export async function renderChatButtonIfAuthenticated() {
 	let userIsAuth = await isUserAuthenticated();
 	if (userIsAuth) {
-		const username = await fetch('user-service/infoUser/', {
+		const username = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',
 			credentials: 'include',
 		})
