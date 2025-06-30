@@ -140,7 +140,6 @@ function sendMessage(username) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'X-CSRFToken': getCookie('csrftoken'),
 		},
 		credentials: 'include',
 		body: JSON.stringify({
@@ -241,10 +240,10 @@ function initEventSource(groupId, username) {
     console.log(`Opened SSE for group: ${groupId}`);
 }
 
-async function getBlockedStatus(other_user) {
+async function getBlockedStatus(targetUser) {
     //rajouter peut-être une vérif du other-user
     try {
-        const response = await fetch('/chat/${other_user}/blockedStatus', {
+        const response = await fetch('/chat/${targetUser}/blockedStatus', {
             method : 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -258,7 +257,7 @@ async function getBlockedStatus(other_user) {
 			return;
 		}
 		const data = response.json();
-		return (data.status);
+		return (data);
     } catch (error) {
 		console.error('Network error loading blocked status :', error);
 		alert('network error: could not load blocked status');
@@ -409,9 +408,61 @@ async function switchChatRoom(username, newgroupId) {
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
     loadMessageHistory(username, newgroupId);
-	const blockedStatus = getBlockedStatus(targetChatListItem.dataset.receiver)
+	const targetUser = targetChatListItem.dataset.receiver;
+	const blockedStatus = getBlockedStatus(targetUser)
     if (blockedStatus.isBlocked) {
-		//proposer de débloquer
+		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
+		if (unblockTargetUser) {
+			fetch('/chat/${targetUser}/blockedStatus', {
+				method : 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials : 'include',
+				body: JSON.stringify({
+					isBlocked: False,
+				}),
+			})
+				.then((response) =>
+					response
+						.json()
+						.then((data) => ({
+							data,
+							ok: response.ok,
+							status: response.status,
+							statusText: response.statusText,
+						}))
+			)
+			.then(({ data, ok, status, statusText }) => {
+				if (ok) {
+					if (data.status === 'success') {
+						initEventSource(newgroupId);
+						const messageInput = document.getElementById('messageInput-active');
+						if (messageInput) {
+							messageInput.focus();
+						}
+					} else {
+						console.error('Server error unblocking the user:', targetUser);
+						alert('Error unblocking the user: ' + targetUser);
+					}
+				} else {
+					console.error(
+					'HTTP error unblocking the user :',
+					status,
+					targetUser || statusText
+				);
+				alert('HTTP Error: ' + (targetUser || statusText));
+				}
+			})
+			.catch((error) => {
+			console.error('Network or JSON error:', error);
+			alert('Cannot connect to server to unblock the user.');
+		});
+		}
+		else {
+			//mettre un message "you blocked this user"
+			return;
+		}
 	}
 	else if (blockedStatus.hasBlocked) {
 		//mettre un message "this user blocked you"

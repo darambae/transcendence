@@ -22,7 +22,7 @@ from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, upl
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
 from api.views import ChatGroupListCreateView, ChatMessageView
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite, logout
-from api.views import ChatGroupListCreateView
+from api.views import ChatGroupListCreateView, blockedStatus
 #, ChatMessageHistoryView, ChatMessageSendView
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite
 from api.views import matchHistory
@@ -58,5 +58,5 @@ urlpatterns = [
 
     # RESTful chat message endpoints
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
-	path('api/chat/<str:targetUser/blockedStatus/', blockedUser.as_view(), name='blockedUser')
+	path('api/chat/<str:targetUser>/blockedStatus/', blockedStatus.as_view(), name='blockedUser')
 ]

@@ -583,6 +583,34 @@ class searchUsers(APIView):
 #                 {'status': 'error', 'message': 'Internal server error during chat group operation.'},
 #                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
 #             )
+class blockedStatus(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
+
+    def get(self, request, targetUser) -> Response:
+        current_user = request.user
+        logger.info(f"Retrieving chat groups for user {current_user.user_name}")
+        status = {'isBlocked':False, 'hasBlocked':False}
+        try:
+            target_user = USER.objects.filter(user_name=targetUser)
+            if target_user.exists():
+                for otherUser in current_user.blocked_user:
+                    if otherUser.user_name == target_user.user_name:
+                          status['isBlocked'] = True
+                          break
+                for otherUser in target_user.blocked_user:
+                    if otherUser.user_name == current_user.user_name:
+                          status['hasBlocked'] = True
+            else:
+                logger.info(f"No data found for the user {target_user.user_name}.")
+            return Response({'status': 'success', 'blockedStatus':status}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception("Internal server error during blocked status retrieval.")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during blocked status retrieval.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
 
 class ChatGroupListCreateView(APIView):
     """
@@ -793,7 +821,6 @@ class ChatGroupListCreateView(APIView):
 # 3. Chat Message Send & History View
 # Handles: GET & POST /api/chat/<int:group_id>/messages/
 # ===============================================================
-class blockedUser(APIView):
 
 class ChatMessageView(APIView):
     """

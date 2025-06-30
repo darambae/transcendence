@@ -28,13 +28,13 @@ logger = logging.getLogger(__name__)
 # Base URL for your access_postgresql service (without the /api/ prefix)
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
-class blockedUser(View):
-    def get(self, request, *args, **kwargs):
+class blockedStatus(View):
+    def get(self, request, targetUser):
         access_token = request.COOKIES.get('access_token')
         if not access_token:
             return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
         headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-        url = f"{ACCESS_PG_BASE_URL}/api/chat"
+        url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUser}/blockedStatus/"
         try:
             resp = requests.get(url, headers=headers, timeout=10, verify=False)
             resp.raise_for_status()
