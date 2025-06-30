@@ -142,7 +142,7 @@
 /* --- User Search Dropdown (Always absolute, all screens) --- */
 
 #resultsSearch {
-    position: absolute;
+    position: static;
     z-index: 1050;
     width: 100%; /* Full width of .input-group */
     left: 0;

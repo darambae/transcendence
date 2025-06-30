@@ -145,6 +145,10 @@ export function loginController() {
 		}
 	});
 
+	document.getElementById('forgotten-password').onclick = async function(event) {
+		actualizeIndexPage('modal-container', routes.forgotPassword);
+	}
+
 	const form = document.getElementById("log-form");
 	if (form) {
 	  form.addEventListener("submit", handleLoginSubmit);
