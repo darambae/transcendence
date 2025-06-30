@@ -7,6 +7,7 @@
 @import url('./card_profile.css');
 @import url('./settings_profile.css');
 @import url('./friends.css');
+@import url('./dashboards.css');
 @import url('./forgotPassword.css');
 
 
@@ -105,8 +106,8 @@ h2 {
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.5); 
-	z-index: 999;
-  }
+	z-index: 2000;
+}
 
 @font-face {
 	font-family: 'Sankyu';

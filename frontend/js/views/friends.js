@@ -23,7 +23,6 @@ export function searchFriends() {
 		resultsBox.innerHTML = users
 		.map(user => `<li class="list-group-item user-link"><button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
 			.join('');
-		console.log(query);
 
 		document.querySelectorAll('.profile-btn').forEach(btn => {
 			btn.addEventListener('click', function() {
@@ -53,13 +52,22 @@ export async function listennerFriends() {
  
 	// for tabl friends
 	for (const user of users) {
+		const statusColor = user.online ? 'bg-success' : 'bg-danger';
+	  
 		html += `<li class="list-group-item user-link">
 		  <div class="d-flex justify-content-between align-items-center">
-			<button class="profile-btn" data-username="${user.username}">${user.username}</button>`;
+			<div class="d-flex align-items-center gap-2">
+			  <span class="rounded-circle ${statusColor}" style="width: 10px; height: 10px; display: inline-block;"></span>
+			  <a href="/#card_profile/${user.username}"
+				 data-username="${user.username}"
+				 class="text-decoration-none">
+				${user.username}
+			  </a>
+			</div>`;
+	  
 		if (user.direction === 'sent' && user.status === "pending") {
 		  html += `<span class="badge bg-warning text-dark">${user.status}</span>`;
-		}
-		else if (user.direction === 'received' && user.status === "pending") {
+		} else if (user.direction === 'received' && user.status === "pending") {
 		  html += `<div>
 			<button class="btn btn-sm btn-success me-1"
 					onclick="acceptInvite('${user.username}')">
@@ -70,16 +78,16 @@ export async function listennerFriends() {
 			  Refuser
 			</button>
 		  </div>`;
-		}
-		else {
+		} else {
 		  const badgeClass = user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
 		  html += `<span class="badge ${badgeClass}">${user.status}</span>`;
 		}
-	
-		html += `
+	  
+		html += `resultsListFriends
 		  </div>
 		</li>`;
 	  }
+	  
 	
 	  resultsBox.innerHTML = html;
 	  document.querySelectorAll('.profile-btn').forEach(btn => {

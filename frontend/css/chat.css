@@ -15,12 +15,15 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 1000;
+    z-index: 1;
 }
 
 #mainChatToggleButton:hover {
     background-color: rgba(135, 5, 5, 1);
     transform: scale(1.05);
+}
+#mainChatWindow {
+    z-index: 1100; /* Ensure the chat modal is above other content */
 }
 
 /* --- Chat Modal Styles (Mobile First) --- */
@@ -141,9 +144,9 @@
 
 /* --- User Search Dropdown (Always absolute, all screens) --- */
 
-#resultsSearch {
-    position: static;
-    z-index: 1050;
+#chat-user-search {
+    position: absolute;
+    z-index: 10;
     width: 100%; /* Full width of .input-group */
     left: 0;
     top: 100%;
@@ -158,7 +161,7 @@
     list-style: none;
 }
 
-#resultsSearch .list-group-item {
+#chat-user-search .list-group-item {
     cursor: default;
     padding: 8px 12px;
     border: none;
@@ -170,12 +173,12 @@
     user-select: none;
 }
 
-#resultsSearch .list-group-item:last-child {
+#chat-user-search .list-group-item:last-child {
     border-bottom: none;
 }
 
-#resultsSearch .list-group-item:hover,
-#resultsSearch .list-group-item:focus {
+#chat-user-search .list-group-item:hover,
+#chat-user-search .list-group-item:focus {
     background: #f8f9fa;
 }
 

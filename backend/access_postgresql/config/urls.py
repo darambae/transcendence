@@ -22,14 +22,12 @@ from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, upl
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
 from api.views import ChatGroupListCreateView, ChatMessageView
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite, logout
+from api.views import ChatGroupListCreateView
+#, ChatMessageHistoryView, ChatMessageSendView
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite
+from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
-# POST   /api/chat/                       # Create a chat group
-# GET    /api/chat/                       # List all chat groups
-# DELETE /api/chat/<group_name>/          # Delete a chat group
-
-# GET    /api/chat/<group_name>/messages/ # Get messages (with ?offset, ?limit)
-# POST   /api/chat/<group_name>/messages/ # Send a message
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -54,6 +52,7 @@ urlpatterns = [
 	path('api/add/friend/', addFriend.as_view(), name='addFriend'),
 	path('api/declineInvite/', declineInvite.as_view(), name='declineInvite'),
 	path('api/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
+	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
 	path('api/logout/', logout.as_view(), name='logout'),
 	path('api/forgotPassword/', forgotPassword.as_view(), name='forgotPassword'),
