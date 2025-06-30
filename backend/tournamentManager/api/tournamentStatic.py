@@ -19,10 +19,10 @@ dbUri = "https://access_postgresql:4000/"
 user_ws_connections = {}
 
 class Match() :
-    def __init__(self, p1=None, p2=None, matchBefore=None) :
+    def __init__(self, cookies, p1=None, p2=None, matchBefore=None) :
         print(f"match-class", file=sys.stderr)
-        self.key = getApiKeyTrnmt()
-        print(f"match-class", file=sys.stderr)
+        self.key = getApiKeyTrnmt(cookies)
+        print(f"match-class : {self.key}", file=sys.stderr)
         self.p1 = p1
         print(f"match-class", file=sys.stderr)
         self.p2 = p2
@@ -103,6 +103,7 @@ class Tournament() :
     def addPlayers(self, playerClass) :
         if self.nbPl < 4 :
             self.players.append(playerClass)
+            self.players = playerUpdate(self.players, playerClass.jwt)
             self.nbPl += 1
             return True
         else :
@@ -115,7 +116,7 @@ class Tournament() :
             self.nbPl -= 1
             return True
         return False
-    def launchTournament(self) :
+    def launchTournament(self, cookies) :
         print("launch-tr", file=sys.stderr)
         if self.nbPl != 4 :
             print("launch-tr-end-1", file=sys.stderr)
@@ -130,17 +131,17 @@ class Tournament() :
         
         self.tournamentPl = [lstTemp, self.players]
         print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
-        self.match1 = Match(self.tournamentPl[0][0], self.tournamentPl[0][1])
+        self.match1 = Match(cookies,self.tournamentPl[0][0], self.tournamentPl[0][1])
         print("launch-tr", file=sys.stderr)
         self.match1.initValues()
         print("launch-tr", file=sys.stderr)
-        self.match2 = Match(self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
+        self.match2 = Match(cookies,self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
         print("launch-tr", file=sys.stderr)
         self.match2.initValues()
         print("launch-tr", file=sys.stderr)
-        self.matchWinnerBracket = Match()
+        self.matchWinnerBracket = Match(cookies)
         print("launch-tr", file=sys.stderr)
-        self.matchLoserBracket = Match()
+        self.matchLoserBracket = Match(cookies)
         print("launch-tr", file=sys.stderr)
         return (True, None)
 
@@ -151,12 +152,18 @@ class Tournament() :
         return [P.toTuple for P in self.players]
 
 
-def getApiKeyTrnmt() :
+def playerUpdate(lstPlayer, jwt) :
+    for elem in lstPlayer :
+        if elem.jwt["username"] == jwt["username"] :
+            elem.jwt = jwt
+    return lstPlayer
+
+def getApiKeyTrnmt(cookies) :
     print("get-api-key-trnmt", file=sys.stderr)
-    res = requests.get(f"{keygame}server-pong/api-key", verify=False, headers={"Host": "localhost"})
-    print("get-api-key-trnmt", file=sys.stderr)
-    if (res.status_code == 200) :
-        print("get-api-key-trnmt", file=sys.stderr)
+    res = requests.get(f"{keygame}server-pong/api-key", verify=False, cookies=cookies, headers={"Host": "localhost"})
+    print(f"get-api-key-trnmt\nres status code : {res.status_code}\nres.content : {res.json()}", file=sys.stderr)
+    if (res.status_code == 200 or res.status_code == 204) :
+        print(f"get-api-key-trnmt", file=sys.stderr)
         return res.json()["api_key"]
     print("get-api-key-trnmt", file=sys.stderr)
     return (JsonResponse({"Error" : f"Status code {res.status_code}"}, status=res.status_code))

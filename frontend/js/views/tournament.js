@@ -1,7 +1,8 @@
-import { actualizeIndexPage } from "../utils.js"
-import { routesSp } from "./utils/commonFunctions.js"
+import { actualizeIndexPage, loadTemplate } from "../utils.js"
+import { setSSE, getSSE } from "./utils/commonFunctions.js"
 import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
+import { localGameTr } from "./tournamentLocalGame.js";
 
 
 export function invitsController() {
@@ -87,6 +88,7 @@ export async function tournamentController() {
     let launchButton = undefined;
     const tournamentInfo = document.getElementById("Tournament-info");
     const tournamentLeave = document.getElementById("Tournament-leave");
+    const tournamentGame = document.getElementById("Tournament-game");
     const tournamentLaunch = document.getElementById("Tournament-launch")
     const refreshButton = document.getElementById("refresh-trnmt");
     const createButton = document.getElementById("create-trnmt");
@@ -108,6 +110,9 @@ export async function tournamentController() {
     ulDropdown.addEventListener('click', async (event) => {
       const target = event.target;
       let usernameJwt;
+      let jwtInfo;
+      let guestJwt;
+
 
       // Check if the clicked element is an <a> tag
       if (target.tagName === "A") {
@@ -124,8 +129,10 @@ export async function tournamentController() {
         })
         .then(response => {
           if (!response.ok) throw new Error("https Error: " + response.status);
-          usernameJwt = response.json();
-          usernameJwt = usernameJwt["username"];
+          jwtInfo = response.json();
+          console.log(jwtInfo);
+          usernameJwt = jwtInfo["key"];
+          guestJwt = jwtInfo["guests"]
         })
 
 
@@ -144,16 +151,43 @@ export async function tournamentController() {
         })
           .then(async data => {
             console.log("Données reçues Join:", data["key"]);
-            const url_sse = `tournament/events?tKey=${data["key"]}&jwt=${usernameJwt}`;
+            const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
             SSEStream = new EventSource(url_sse);
+            setSSE(SSEStream);
             SSEStream.onmessage = function(event) {
               try {
                 console.log(event.data);
                 const data = JSON.parse(event.data);
                 console.log(data);
+                if (data.t_state == "game-start") {
+                  console.log("SSE 1")
+                  const buttonGame =  document.createElement("button");
+                  console.log("SSE 2")
+                  buttonGame.className = "btn btn-outline-primary";
+                  console.log("SSE 3")
+                  buttonGame.textContent = "Launch game";
+                  console.log("SSE 4")
+                  buttonGame.dataset.type = data.mode;
+                  console.log("SSE 5")
+                  if (data.mode == "local") {
+                    console.log("SSE 6")
+                    buttonGame.dataset.p1 = data.player1;
+                    console.log("SSE 7")
+                    buttonGame.dataset.p2 = data.player2;
+                  }
+                  else {
+                    console.log("To do");
+                  }
+                  console.log("SSE 8")
+                  buttonGame.dataset.key = data.key;
+                  console.log("SSE 9")
+                  tournamentGame.innerHTML = "";
+                  console.log("SSE 10")
+                  tournamentGame.appendChild(buttonGame);
+                }
               }
               catch (error) {
-                console.log("Error");
+                console.log("Error", error);
               }
             };
 
@@ -225,7 +259,7 @@ export async function tournamentController() {
         await fetch("tournament/match", {
           method: "POST",
           headers: {
-            'X-CSRFToken': csrf,
+            'X-CSRFToken': csrf, 
             'Content-Type': 'application/json', 
           },
           credentials: 'include',
@@ -242,6 +276,22 @@ export async function tournamentController() {
             console.error("Erreur de requête :", error);
             throw error;
           });
+      }
+    })
+
+    tournamentGame.addEventListener('click', async (event) => {
+      const target = event.target;
+
+      if (target.tagName === "BUTTON") {
+        event.preventDefault();
+
+        const KeepInfo = document.getElementById("Tournament-Lobby");
+        const contentInfo = KeepInfo.innerHTML;
+        
+        localStorage.setItem("SSEtr", SSEStream);
+        KeepInfo.innerHTML = await loadTemplate("tournamentMatch");
+        await localGameTr(target.dataset.p1, target.dataset.p2, target.dataset.key);
+        KeepInfo.innerHTML = contentInfo;
       }
     })
 }

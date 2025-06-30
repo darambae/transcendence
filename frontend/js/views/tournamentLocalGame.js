@@ -2,23 +2,55 @@ import { getCookie } from "../utils.js";
 import { getPlayersLocalName } from "./utils/commonFunctions.js"
 import { adress } from "./utils/commonFunctions.js";
 import { drawMap } from "./utils/commonFunctions.js";
+import { setCanvasAndContext, setSSE, getSSE } from "./utils/commonFunctions.js";
 
-export async function localGameController() {
-    let key = getPlayersLocalName();
-
+export async function localGameTr(id1, id2, key, tkey) {
     let url_post = `server-pong/send-message`;
     let started = false;
     let game_stats;
+    let sseTournament = getSSE();
     const csrf = getCookie("csrftoken");
     let username;
     let a;
     let b;
     let c;
 
+    // console.log("aaa")
+    // sseTournament.onmessage = function(event) {
+    //   try {
+    //     console.log(event.data);
+    //     const data = JSON.parse(event.data);
+    //     console.log(data);
+    //     if (data.t_state == "game-finished") {
+    //       return ;
+    //     }
+    //   }
+    //   catch(error) {
+    //     console.log(error)
+    //   }
+    // }
+    // console.log("bbb")
+
+    await fetch('tournament/id-players', {
+        method : "POST",
+        headers : {
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': csrf,
+        },
+        credentials: "include", 
+        body : JSON.stringify({"tkey" : tkey, "u1" : id1, "u2" : id2})
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("https Error: " + response.status);
+        return response.json();
+    })
+    .then(data => {
+        id1 = data.id1
+        id2 = data.id2
+    })
+
     // ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let score1 = document.getElementById("player1score")
-    let score2 = document.getElementById("player2score")
     await fetch(`server-pong/check-sse`, {
       headers: {
         'X-CSRFToken': csrf,
@@ -38,7 +70,7 @@ export async function localGameController() {
         console.error("Erreur de requête :", error);
       })
       console.log("results: ", username, a, b, c)
-      let url_sse = `server-pong/events?apikey=${key}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
+      let url_sse = `server-pong/events?apikey=${key}&idplayer=0&ai=0&JWTidP1=${id1}&JWTidP2=${id2}&username=${username}`;
       if (a !== undefined) {
         url_sse += `&guest1=${a}`
       }
@@ -50,14 +82,15 @@ export async function localGameController() {
       }
   
       console.log("url_sse ->->-> ", url_sse);
-  
+      
+      await setCanvasAndContext();
       const SSEStream = new EventSource(url_sse);
     SSEStream.onmessage = function(event) {
       try {
-        // const data = JSON.parse(event.data);
-        // // console.log("Received data: ", data);
-        // console.log("Heyyo");
         const data = JSON.parse(event.data);
+        console.log("Received data: ", data);
+        // console.log("Heyyo");
+        // const data = JSON.parse(event.data);
 
         let sc1 = document.getElementById("player1score");
         let sc2 = document.getElementById("player1score");
@@ -114,6 +147,7 @@ export async function localGameController() {
                             },
                             body: JSON.stringify({"apiKey": key, "message": '{"action": "start"}'})
                           });
+                        fetch(`tournament/supervise?key=${key}&tkey=${tkey}`);
                     };
                     break;
                 case "q" :

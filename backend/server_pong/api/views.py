@@ -153,7 +153,6 @@ async def sse(request):
             username2 = request.GET.get(f"guest{idp2 + 1}", "Default")
         
         if (rq.apiKey) :
-            #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}", rq.apiKey), content_type="text/event-stream")
 
     elif idplayer == 1 :
@@ -164,7 +163,6 @@ async def sse(request):
             username1 = request.GET.get(f"guest{idp1 + 1}", "Default")
 
         if (rq.apiKey) :
-            #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}", rq.apiKey), content_type="text/event-stream")
         
     else :
@@ -175,7 +173,6 @@ async def sse(request):
             username2 = request.GET.get(f"guest{idp2 + 1}", "Default")
 
         if (rq.apiKey) :
-            #print(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2} <--> JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ", file=sys.stderr)
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt
@@ -315,7 +312,7 @@ async def forfaitUser(request) :
             try :
                 dictApiSp.pop(apikey)
             except KeyError :
-                return
+                return HttpResponseNoContent()
         try :
             apiKeys.remove(apikey)
         except Exception :

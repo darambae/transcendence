@@ -4,9 +4,18 @@ import { localGameController } from "../localGame.js";
 import { loginController } from "../login.js";
 import { getCookie } from "../../utils.js";
 
+let sseTournament;
 export let adress = "10.18.161"
 let canvas;
 let ctx;
+
+export function setSSE(sseObj) {
+  sseTournament = sseObj;
+}
+
+export function getSSE() {
+  return sseTournament;
+}
 
 export const routesSp = {
 	home: {

@@ -2,6 +2,8 @@ from django.shortcuts import render
 import random
 import sys
 import requests
+from django.http import HttpResponse
+from http import HTTPStatus
 import uuid
 import ssl
 import websockets
@@ -15,6 +17,9 @@ import json
 channel_layer = get_channel_layer()
 
 consumerUri = "wss://tournament:8050/ws/game/"
+
+class HttpResponseNoContent(HttpResponse):
+    status_code = HTTPStatus.NO_CONTENT
 
 # Create your views here.
 
@@ -99,7 +104,7 @@ async def launchFinals(request) :
 		tkey = body["tKey"]
 		if tkey not in trnmtDict:
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
-		trnmtDict[tkey].launchTournament()
+		trnmtDict[tkey].launchTournament(request.COOKIES)
 	except Exception :
 		return JsonResponse({"error": "Internal server error"}, status=500)
 
@@ -116,7 +121,7 @@ async def launchMatch(request) :
 			print("lm-1-end", file=sys.stderr)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		print("lm-1", file=sys.stderr)
-		trStart = trnmtDict[tkey].launchTournament()
+		trStart = trnmtDict[tkey].launchTournament(request.COOKIES)
 		print("lm-1", file=sys.stderr)
 		if not trStart[0] :
 			print("lm-1-end3", file=sys.stderr)
@@ -158,10 +163,18 @@ async def launchFinals(request) :
 
 async def checkSSE(request) :
 	try:
-		jwt = decodeJWT(request)[0]
-		vlue = uuid.uuid4()
-		dictJwt[vlue] = jwt
-		return JsonResponse({"key" : vlue})
+		print("111", file=sys.stderr)
+		jwt = await decodeJWT(request)
+		if not jwt[0] :
+			return JsonResponse({"Error" : "Unauthorized"}, status=401)
+		print(f"222 : {jwt}", file=sys.stderr)
+		jwt = jwt[0]['payload']
+		print(f"333 : {jwt}", file=sys.stderr)
+		print({"key" : jwt["username"], "guests" : ','.join(jwt["invites"])}, file=sys.stderr)
+		return JsonResponse({"key" : jwt["username"], "guests" : ','.join(jwt["invites"])})
+	except Exception as e :
+		print(f"error : {e}", file=sys.stderr)
+		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
 
 
@@ -169,6 +182,8 @@ async def joinGuest(request) :
 	try:
 		print(f"111", file=sys.stderr)
 		jwt_token = await decodeJWT(request)
+		if not jwt_token[0] :
+			return JsonResponse({"Error" : "Unauthorized"}, status=401)
 		try :
 			print(f"223 : {jwt_token}")
 			jwt_token = jwt_token[0]
@@ -203,6 +218,8 @@ async def joinTournament(request):
 		body = json.loads(request.body)
 		print(f"222 : {body}", file=sys.stderr)
 		jwt_token = await decodeJWT(request)
+		if not jwt_token[0] :
+			return JsonResponse({"Error" : "Unauthorized"}, status=401)
 		try :
 			print(f"223 : {jwt_token}")
 			jwt_token = jwt_token[0]
@@ -244,12 +261,28 @@ async def sse(request) :
 	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt}'), content_type='text/event-stream')
 # @csrf_exempt
 
+async def getIds(request) :
+	jwt = await decodeJWT(request)
+	jwt = jwt[0]['payload']
+	body = json.loads(request.body)
+	tkey = body.get("tkey")
+	u1 = body.get("u1")
+	u2 = body.get("u2")
+
+	listPl = [jwt["username"]] + jwt["invites"]
+
+	i1 = listPl.index(u1) - 1
+	i2 = listPl.index(u2) - 1
+	return JsonResponse({"id1" : i1, "id2" : i2})
+
 async def leaveTournament(request):
 	try :
 		print("11", file=sys.stderr)
 		body = json.loads(request.body)
 		print("22", file=sys.stderr)
 		jwt_token = await decodeJWT(request)
+		if not jwt_token[0] :
+			return JsonResponse({"Error" : "Unauthorized"}, status=401)
 		encoded = request.COOKIES.get("access_token", None)
 		print("33", file=sys.stderr)
 		try :
@@ -334,3 +367,19 @@ async def tournamentManager(request) :
 		# elif request.method == "DELETE" :
 	except Exception as e :
 		return JsonResponse({"error" : "Internal server error"}, status=500)
+
+async def Supervise(request) :
+	try :
+		tkey = request.GET.get("tkey")
+		mkey = request.GET.get("key")
+
+		await channel_layer.group_send(
+			tkey,
+			{
+				"type": "tempReceived",
+				"text_data": {"action" : "supervise", "round" : 1, "mKey" : mkey}
+			}
+		)
+		return HttpResponseNoContent()
+	except Exception as e :
+		return HttpResponseNoContent()
