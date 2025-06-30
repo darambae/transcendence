@@ -14,6 +14,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 import requests
+import httpx
+
 # Configure logging
 # --- IMPORTANT: Ensure these models are correctly defined in .models ---
 # These are placeholder imports. Adjust based on your actual project structure
@@ -28,7 +30,6 @@ logger = logging.getLogger(__name__)
 # Base URL for your access_postgresql service (without the /api/ prefix)
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
-# @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
 class ChatGroupListCreateView(View):
     def get(self, request, *args, **kwargs):
         """
@@ -91,7 +92,6 @@ class ChatGroupListCreateView(View):
             logger.error(f"Internal server error: {e}")
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
-@method_decorator(csrf_exempt, name='dispatch')
 class ChatMessageView(View):
     """
     Handles fetching message history for a specific chat group by proxying to access_postgresql.
@@ -127,7 +127,6 @@ class ChatMessageView(View):
         try:
             data = json.loads(request.body)
             content = data.get('content')
-            # groupId = data.get('group_id')
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
 
@@ -193,40 +192,42 @@ async def sse_chat_stream(request, group_id):
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
 
-    # --- SSE Token Authentication (Crucial for security) ---
-    # The frontend passes the token as a query parameter.
-    # You MUST validate this token here against your authentication system.
-    # token_str = request.GET.get('token')
-    # if not token_str:
-    #     await channel_layer.group_discard(channel_group_name, client_channel_name) # Discard channel on auth failure
-    #     return StreamingHttpResponse("Unauthorized: Token required.", status=401, content_type="text/plain")
-
-    # # TODO: Implement actual token validation (e.g., JWT verification, Django Rest Framework Token lookup)
-    # # This example is a placeholder. For production, replace with proper security.
-    # # from rest_framework_simplejwt.authentication import JWTAuthentication
-    # # from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-    # # try:
-    # #     auth = JWTAuthentication()
-    # #     # Remove "Bearer " prefix if present
-    # #     clean_token = token_str.replace('Bearer ', '')
-    # #     # get_validated_token also performs expiration checks
-    # #     validated_token = await sync_to_async(auth.get_validated_token)(clean_token)
-    # #     user = await sync_to_async(auth.get_user)(validated_token)
-    # #     if user:
-    # #         logger.info(f"live_chat (SSE): Authenticated user '{user.username}' for group '{group_id}'.")
-    # #         # Optionally, check if 'user' is allowed to access 'group_id' here
-    # #     else:
-    # #         raise InvalidToken("User not found for token.")
-    # # except (InvalidToken, TokenError) as e:
-    # #     logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}': {e}")
-    # #     await channel_layer.group_discard(channel_group_name, client_channel_name)
-    # #     return StreamingHttpResponse("Unauthorized: Invalid token.", status=401, content_type="text/plain")
-    # # except Exception as e:
-    # #     logger.exception(f"live_chat (SSE): Error validating token for SSE stream for group '{group_id}': {e}")
-    # #     await channel_layer.group_discard(channel_group_name, client_channel_name)
-    # #     return StreamingHttpResponse("Internal Server Error during authentication.", status=500, content_type="text/plain")
-
-    # # --- END SSE Token Authentication ---
+        # --- SSE Token Authentication ---
+    # Get access token from cookies (consistent with other views)
+    access_token = request.COOKIES.get('access_token')
+    if not access_token:
+        await channel_layer.group_discard(channel_group_name, client_channel_name)
+        return StreamingHttpResponse("Unauthorized: No access token", status=401, content_type="text/plain")
+    
+    # Validate the token by making a request to access_postgresql
+    # This matches the pattern used in other views
+    try:
+        # We need to use httpx which supports async requests
+        async with httpx.AsyncClient(verify=False) as client:
+            resp = await client.get(
+                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/",  # Adjust endpoint as needed
+                headers={
+                    'Authorization': f'Bearer {access_token}',
+                    'Host': 'localhost'
+                },
+                timeout=10
+            )
+            
+        if resp.status_code != 200:
+            logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}'")
+            await channel_layer.group_discard(channel_group_name, client_channel_name)
+            return StreamingHttpResponse("Unauthorized: Invalid token", status=401, content_type="text/plain")
+            
+        # Optional: Check if user has access to this specific group
+        # You might need another endpoint or include group_id in verification
+        user_data = resp.json()
+        logger.info(f"live_chat (SSE): Authenticated user '{user_data.get('user_name')}' for group '{group_id}'")
+        
+    except httpx.RequestError as e:
+        logger.exception(f"live_chat (SSE): Error validating token for group '{group_id}': {e}")
+        await channel_layer.group_discard(channel_group_name, client_channel_name)
+        return StreamingHttpResponse("Internal Server Error during authentication", status=500, content_type="text/plain")
+    # --- END SSE Token Authentication ---
 
 
     async def event_generator():

@@ -39,7 +39,7 @@
     display: flex;
     flex-direction: column;
     border-radius: 0.5rem;
-    overflow: hidden;
+    overflow: hidden; /* Keep this to prevent overflow */
 }
 
 #mainChatWindow .modal-header {
@@ -64,6 +64,7 @@
     display: flex;
     flex-direction: column;
     padding: 0;
+    overflow: hidden; /* Prevent double scrollbars */
 }
 
 /* --- Chat Room List (Left Column, Mobile) --- */
@@ -161,12 +162,15 @@
 /* --- Chat Body --- */
 .chat-body {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: auto;  /* Keep this */
     padding: 10px;
     background-color: #fff;
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-height: calc(100% - 120px); /* Ensure there's space for input */
+    min-height: 100px; /* Prevent collapse */
+    position: relative; /* For proper scrolling reference */
 }
 
 /* --- No Chat Selected Message --- */
@@ -182,10 +186,14 @@
 
 /* --- Chat Footer --- */
 .chat-footer {
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent shrinking */
     padding: 8px 10px;
     border-top: 1px solid #dee2e6;
     background-color: #f1f1f1;
+    position: sticky; /* Keep visible */
+    bottom: 0; /* Stick to bottom */
+    width: 100%;
+    z-index: 10; /* Stay above content */
 }
 
 .chat-footer .input-group {
@@ -283,6 +291,7 @@
     #mainChatWindow .modal-body {
         flex-direction: row;
         width: 100%; 
+        overflow: hidden; /* Prevent double scrollbars */
     }
 
     .chat-rooms-list {
@@ -308,12 +317,11 @@
 
     .chat-display {
         flex-grow: 1;
-        flex-shrink: 1;
-        flex-basis: auto;
         background-color: white;
         display: flex;
         flex-direction: column;
-        padding: 0;
+        height: 100%; /* Ensure it takes full height */
+        overflow: hidden; /* Prevent double scrollbars */
     }
 
     .chat-start-header {
@@ -344,8 +352,7 @@
     }
 
     .chat-body {
-        padding: 15px;
-        gap: 10px;
+        max-height: calc(100% - 130px); /* Slightly larger for desktop */
     }
 
     .chat-footer {
@@ -379,5 +386,36 @@
 
     .chat-message .message-timestamp {
         font-size: 0.7rem;
+    }
+}
+@media (max-width: 991px) {
+    /* Ensure chat body takes appropriate space and shows scrollbar */
+    .chat-body {
+        max-height: calc(100vh - 280px); /* Fixed height calculation for medium screens */
+        min-height: 200px;
+        overflow-y: auto !important; /* Force scrollbar when needed */
+    }
+    
+    /* Ensure modal content is tall enough */
+    #mainChatWindow .modal-content {
+        min-height: 400px;
+        height: auto;
+        max-height: 90vh;
+    }
+    
+    /* Make display area take full remaining height */
+    .chat-display {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    /* Fix input area to stay visible */
+    .chat-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 50;
     }
 }

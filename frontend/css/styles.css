@@ -108,6 +108,12 @@ h2 {
 	z-index: 2000;
 }
 
+#chat-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+  }
+
 @font-face {
 	font-family: 'Sankyu';
 	src: url('/assets/fonts/sankyu/Sankyu.otf') format('opentype'),
