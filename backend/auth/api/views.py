@@ -14,6 +14,8 @@ import requests
 import sys
 import os
 from .utils import setTheCookie, decodeJWT
+import random
+import string
 
 
 class data_link(APIView):
@@ -216,3 +218,51 @@ class logout(APIView):
 		resp.delete_cookie('access_token')
 		resp.delete_cookie('refresh_token')
 		return resp
+
+
+class	forgotPassword(APIView):
+	permission_classes = [AllowAny]
+
+	def patch(self, request):
+		requestData = request.data
+		email = requestData.get('mail')
+		if not email:
+			return JsonResponse({'error': 'Missing mail parameter'}, status=400)
+
+		def generate_temp_password(length=12):
+			chars = string.ascii_letters + string.digits
+			return ''.join(random.choices(chars, k=length))
+
+		try:
+			user_info_url = "https://access_postgresql:4000/api/info_link/"
+			user_info_data = {"mail": email}
+			print("forgot password, mail to find in DB : ", email)
+			user_info_response = requests.post(user_info_url, json=user_info_data, verify=False, headers={'Host': 'localhost'})
+			if user_info_response.status_code == 404:
+				print("error: user does not exist")
+				return JsonResponse({'error': 'User does not exist'}, status=404)
+			if not user_info_response.ok:
+				return JsonResponse({'error': 'Failed to retrieve user info'}, status=500)
+			user_info = user_info_response.json()
+			username = user_info.get('user_name', None)
+			if not username:
+				return JsonResponse({'error': 'Username not found for this mail'}, status=500)
+
+			temp_password = generate_temp_password()
+			hashedPassword = make_password(temp_password)
+			patch_url = "https://access_postgresql:4000/api/forgotPassword/"
+			patch_data = {"username": username, "mail": email, "new_password": hashedPassword}
+			patch_response = requests.patch(patch_url, json=patch_data, verify=False, headers={'Host': 'localhost'})
+			if patch_response.ok:
+				mail_url = "https://mail:4010/mail/send_temp_password/"
+				mail_data = {"mail": email, "user_name": username, "temp_password": temp_password}
+				mail_response = requests.post(mail_url, json=mail_data, verify=False, headers={'Host': 'mail'})
+				if mail_response.ok:
+					return JsonResponse({'success': 'Temporary password set and sent', 'mail': email}, status=200)
+				else:
+					return JsonResponse({'error': 'Failed to send temporary password email'}, status=500)
+			else:
+				return JsonResponse({'error': 'Failed to update password in database'}, status=500)
+		except Exception as e:
+			return JsonResponse({'error': f'Exception: {str(e)}'}, status=500)
+
