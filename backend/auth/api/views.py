@@ -127,15 +127,16 @@ class verifyTwofa(APIView):
 				return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
 			if len(json_data.get('tfa')) != 19:
-				return setTheCookie(JsonRespo0nse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+				return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
 
 			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
 			
 			# with open("log-tfa.txt", "a") as f :
 			# 	print(f"response json : {response.data}\nstatusCode : {response.status_code}", file=f)
-			jwtDecoded[1] = response.json().get("access")
-			jwtDecoded[2] = response.json().get("refresh")
+			if response.ok:
+				jwtDecoded[1] = response.json().get("access")
+				jwtDecoded[2] = response.json().get("refresh")
 
 			data_response = None
 			try:

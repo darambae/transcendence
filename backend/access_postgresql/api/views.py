@@ -193,11 +193,11 @@ class checkTfa(APIView):
 			if "jwt" in data :
 				print(f"invites : {data['jwt']}", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				if user.activated and user.two_factor_auth != None:
+				if user.activated and user.two_factor_auth != "":
 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-						user.two_factor_auth = False
+						user.two_factor_auth = ""
 						user.save()
 						return JsonResponse({'success': 'authentication code send',
 							  				 'refresh': str(data_generate_jwt['refresh']),
@@ -208,9 +208,9 @@ class checkTfa(APIView):
 			else :
 				print(f"main : ", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				if user.activated and user.two_factor_auth != None:
+				if user.activated and user.two_factor_auth != "":
 					if check_password(data.get('tfa'), user.two_factor_auth):
-						user.two_factor_auth = False
+						user.two_factor_auth = ""
 						user.online = True
 						user.last_login = datetime.now()
 						user.save()

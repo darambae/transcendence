@@ -35,7 +35,7 @@ async function double_authenticate(data) {
 					'X-CSRFToken': csrf,
 				},
 				body: JSON.stringify({ mail, code })
-			});
+			}, { once: true });
 
 			const responseData = await response.json();
 
@@ -44,8 +44,9 @@ async function double_authenticate(data) {
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
-					const errorMsg = responseData.error;
-					errorDiv.textContent = errorMsg;
+					const errorMsg = responseData.error.error;
+					console.log("wrong 2FA code error: ", errorMsg);
+					errorDiv.textContent = "error: " + errorMsg;
 					errorDiv.style.display = "block";
 				}
 				reject(new Error("invalid code"));
