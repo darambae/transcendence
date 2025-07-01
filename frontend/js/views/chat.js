@@ -127,14 +127,29 @@ function sendMessage(username) {
 	const groupIdInput = document.getElementById('groupIdInput-active');
 
 	const content = messageInput.value.trim();
-	const groupId = groupIdInput.value;
-
+    const groupId = groupIdInput.value;
+    
+	const MIN_LENGTH = 1;
+    const MAX_LENGTH = 1000; // Set appropriate limit
+    
 	if (!content || !groupId) {
 		alert(
 			'Please ensure you are logged in, selected a chat, and typed a message.'
 		);
 		return;
-	}
+    }
+    if (content.length < MIN_LENGTH) {
+        alert(
+            `Message too short (${content.length}/${MIN_LENGTH} characters). Please type a longer message.`
+        );
+        return;
+    }
+    if (content.length > MAX_LENGTH) {
+        alert(
+            `Message too long (${content.length}/${MAX_LENGTH} characters). Please shorten your message.`
+        );
+        return;
+    }
 
 	// Create temporary message data to display immediately
 	const tempMessageData = {
@@ -652,7 +667,31 @@ export function chatController(username) {
 				e.preventDefault();
 				sendMessage(username);
 			}
-		});
+        });
+        const charCounter = document.getElementById('char-counter');
+        const MAX_LENGTH = 1000;
+
+        // Initial counter value
+        if (charCounter) {
+            charCounter.textContent = `0/${MAX_LENGTH}`;
+        }
+
+        messageInput.addEventListener('input', function () {
+            if (charCounter) {
+                const length = this.value.length;
+                charCounter.textContent = `${length}/${MAX_LENGTH}`;
+
+                // Add visual feedback based on length
+                if (length > MAX_LENGTH) {
+                    charCounter.className = 'char-counter danger';
+                } else if (length > MAX_LENGTH * 0.8) {
+                    // At 80% of limit
+                    charCounter.className = 'char-counter warning';
+                } else {
+                    charCounter.className = 'char-counter';
+                }
+            }
+        });
 	}
 
 	// 4. Attach "Start New Chat" button event listener
