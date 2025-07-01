@@ -8,6 +8,7 @@
 @import url('./settings_profile.css');
 @import url('./friends.css');
 @import url('./dashboards.css');
+@import url('./forgotPassword.css');
 
 
 h1 {
@@ -107,6 +108,12 @@ h2 {
 	background-color: rgba(0, 0, 0, 0.5); 
 	z-index: 2000;
 }
+
+#chat-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+  }
 
 @font-face {
 	font-family: 'Sankyu';

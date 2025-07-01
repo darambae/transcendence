@@ -14,6 +14,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 import requests
+import httpx
+
 # Configure logging
 # --- IMPORTANT: Ensure these models are correctly defined in .models ---
 # These are placeholder imports. Adjust based on your actual project structure
@@ -109,7 +111,6 @@ class ChatGroupListCreateView(View):
             logger.error(f"Internal server error: {e}")
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
-@method_decorator(csrf_exempt, name='dispatch')
 class ChatMessageView(View):
     """
     Handles fetching message history for a specific chat group by proxying to access_postgresql.
@@ -145,7 +146,6 @@ class ChatMessageView(View):
         try:
             data = json.loads(request.body)
             content = data.get('content')
-            # groupId = data.get('group_id')
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
 

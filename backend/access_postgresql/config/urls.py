@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.urls import path
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword, forgotPassword
 from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshToken
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
@@ -55,6 +55,7 @@ urlpatterns = [
 	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
 	path('api/logout/', logout.as_view(), name='logout'),
+	path('api/forgotPassword/', forgotPassword.as_view(), name='forgotPassword'),
 
     # RESTful chat message endpoints
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message

@@ -9,6 +9,7 @@ import { settingsProfileController } from './views/settings_profile.js';
 import { tournamentController } from './views/tournament.js';
 import { card_profileController } from './views/card_profile.js';
 import { dashboardsController } from './views/dashboards.js';
+import { forgotPasswordController } from './views/forgotPassword.js';
 
 export const routes = {
 
@@ -63,5 +64,9 @@ export const routes = {
 		template: 'dashboards',
 		controller: dashboardsController,
 	},
+	forgotPassword: {
+		template: 'forgotPassword',
+		controller: forgotPasswordController
+	}
 };
 		

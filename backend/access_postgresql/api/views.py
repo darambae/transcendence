@@ -20,7 +20,7 @@ import json
 import logging
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import sys
 import jwt
@@ -92,7 +92,9 @@ class info_link(APIView):
 
 		json_response = {
 			'uid':uid,
-			'token':token
+			'token':token,
+			'user_name': user.user_name,
+			'mail': user.mail
 		}
 
 		return JsonResponse(json_response, status=200)
@@ -471,118 +473,6 @@ class searchUsers(APIView):
 		return JsonResponse({'results': results}, status=200)
 # --- Chat-Related Views (Directly interacting with DB and Channels) ---
 
-# ===============================================================
-# 1. Chat Group List/Create View
-# Handles:
-# - GET /api/chat/ (Lists chat groups for the authenticated user)
-# - POST /api/chat/ (Creates or retrieves a 1-to-1 chat group)
-# ===============================================================
-# class ChatGroupListCreateView(APIView):
-#     """
-#     API endpoint to list existing chat groups for the authenticated user (GET)
-#     and to create or retrieve new 1-to-1 chat groups (POST).
-#     """
-#     permission_classes = [IsAuthenticated] # Ensure only authenticated users can list/create chats
-#     # permission_classes = [AllowAny] # For testing purposes, allow any user to access this view
-#     async def get(self, request) -> Response:
-#         """
-#         Lists chat groups for the currently authenticated user.
-#         """
-#         # request.user is already available because IsAuthenticated permission is used
-#         current_user = request.user
-
-
-#         try:
-#             # Get chat groups where the current user is a member
-#             # .prefetch_related('members') to reduce N+1 queries when accessing members
-#             logger.info(f"Retrieving chat groups for user {current_user.user_name}")
-#             chat_groups_qs = await sync_to_async(
-#                 lambda: ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
-#             )() # Order by -id for reverse chronological order of group creation for now. Consider last message time.
-
-#             chat_list_data = []
-#             for group in await sync_to_async(list)(chat_groups_qs):
-#                 # For 1-to-1 chats, find the other participant
-#                 other_members = await sync_to_async(list)(group.members.exclude(id=current_user.id))
-
-#                 other_username = "Unknown User"
-#                 if other_members:
-#                     # In a true 1-to-1, there should be exactly one other member
-#                     other_username = other_members[0].user_name
-#                 else:
-#                     # This case should ideally not happen for valid 1-to-1 chats
-#                     # Or indicates a chat with self which should be prevented on creation
-#                     logger.warning(f"Chat group {group.id} for user {current_user.user_name} has no other members.")
-
-#                 # You could fetch the last message for a preview here, but keep it efficient.
-#                 # Example (would need to make this method async and await ORM calls):
-#                 # last_message = await sync_to_async(
-#                 #     lambda: Message.objects.filter(group=group).order_by('-timestamp').first()
-#                 # )()
-#                 # last_message_preview = last_message.content if last_message else ""
-
-#                 chat_list_data.append({
-#                     'group_id': group.id,
-#                     'display_name': other_username,
-#                     'last_message_preview': '', # Placeholder
-#                 })
-
-#             # Optionally sort chat_list_data by last_message_preview_timestamp if you fetch it
-
-#             return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
-
-#         except Exception as e:
-#             return Response(
-#                 {'status': 'error', 'message': 'Internal server error during chat list retrieval.'},
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
-
-#     async def post(self, request) -> Response:
-#         """
-#         Creates or retrieves a private chat group between the authenticated user
-#         and a target user.
-#         """
-#         current_user = request.user # Authenticated user
-#         data = request.data
-#         target_username = data.get('target_username')
-
-#         if not target_username:
-#             return Response({'status': 'error', 'message': 'Target username is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-#         if current_user.user_name == target_username:
-#             return Response(
-#                 {'status': 'error', 'message': 'Cannot create a chat with yourself.'},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#         try:
-#             # Get the target user (must exist)
-#             target_user = await sync_to_async(USER.objects.get)(user_name=target_username)
-
-#             # Ensure consistent group name generation (e.g., "private_ID1_ID2")
-#             participants_ids = sorted([current_user.id, target_user.id])
-#             group_id = f"private_{participants_ids[0]}_{participants_ids[1]}"
-
-#             # Atomically create or get the chat group and add members
-#             # Using transaction.atomic with sync_to_async ensures ORM ops are safe.
-#             # get_or_create is synchronous, so it needs sync_to_async.
-#             chat_group, created_group = await sync_to_async(ChatGroup.objects.get_or_create)(
-#                 id=group_id
-#             )
-#             # Add members to the group
-#             await sync_to_async(chat_group.members.add)(current_user, target_user)
-
-#             return Response(
-#                 {'status': 'success', 'group_id': group_id},
-#                 status=status.HTTP_200_OK
-#             )
-#         except USER.DoesNotExist:
-#             return Response({'status': 'error', 'message': 'Target user not found.'}, status=status.HTTP_404_NOT_FOUND)
-#         except Exception as e:
-#             return Response(
-#                 {'status': 'error', 'message': 'Internal server error during chat group operation.'},
-#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#             )
 class blockedStatus(APIView):
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
 
@@ -973,7 +863,6 @@ class ChatMessageView(APIView):
             }
 
             # Use async_to_sync to call async channel layer from sync code
-            from asgiref.sync import async_to_sync
             async_to_sync(channel_layer.group_send)(
                 channel_group_id,
                 {

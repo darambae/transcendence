@@ -1,5 +1,5 @@
 .player-card {
-    position: relative;
+    position: fixed;
     overflow: hidden;
     background-color: transparent !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
