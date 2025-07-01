@@ -92,7 +92,9 @@ class info_link(APIView):
 
 		json_response = {
 			'uid':uid,
-			'token':token
+			'token':token,
+			'user_name': user.user_name,
+			'mail': user.mail
 		}
 
 		return JsonResponse(json_response, status=200)
@@ -887,7 +889,7 @@ class logout(APIView):
         user.online = False
         user.save()
         return Response({'message': 'User logged out successfully'}, status=200)
-
+	
 class matchHistory(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -935,3 +937,26 @@ class matchHistory(APIView):
             })
 
         return Response({'result': data})
+	
+class forgotPassword(APIView):
+	permission_classes = [AllowAny]
+
+	def patch(self, request):
+		username = request.data.get('username')
+		mail = request.data.get('mail')
+		password = request.data.get('new_password')
+
+		if not username or not mail or not password:
+			return JsonResponse({'error': 'Missing parameters'}, status=400)
+
+		try:
+			user = USER.objects.get(user_name=username, mail=mail)
+			user.password = password
+			user.save()
+
+			return JsonResponse({'success': 'Temporary password uploaded'})
+		
+		except USER.DoesNotExist:
+			return JsonResponse({'error': 'User not found'}, status=404)
+		except Exception as e:
+			return JsonResponse({'error': f'Error uploading temporary password: {str(e)}'}, status=400)

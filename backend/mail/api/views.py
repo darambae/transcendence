@@ -74,3 +74,23 @@ class send_tfa(APIView):
 			return Response({"error": "Failed to send email."}, status=500)
 	
 		return Response({"error": "Failed to send email."}, status=200)
+	
+class	send_temp_password(APIView):
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+		try:
+			data = request.data
+			subject = 'PongPong temporary password'
+			message = f"Hello {data.get('user_name')},\n\nPlease find below your temporary password : {data.get('temp_password')}\n\nYou can now use it to log in to your account and change you password in your personnal settings"
+			from_email = settings.DEFAULT_FROM_EMAIL
+			recipient_list = [data.get('mail')]
+			logger.info(f"temporary password sent to {data.get('user_name')}")
+			send_mail(subject, message, from_email, recipient_list)
+			return Response({"success": "temporary password sent"}, status=200)
+		except BadHeaderError:
+			return Response({'error': "Failed to send temporary password"}, status=500)
+		except Exception as e:
+			logger.error(f"Error sending temporary password: {str(e)}")
+			return Response({'error': "Failed to send temporary password"}, status=500)
+		
