@@ -103,9 +103,35 @@ class verifyTwofa(APIView):
 		user = request.data
 		jwtDecoded = decodeJWT(request)
 		
-		# Validate input parameters first
-		if not user.get('mail'):
-			return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+			user = request.data
+
+			json_data = {
+				'mail':user.get('mail'),
+				'tfa':user.get('code'),
+			}
+
+			jwtDecoded = decodeJWT(request)
+			main_account = jwtDecoded[0]
+				
+			# with open("log-tfa.txt", "w+") as f:
+			# 	print(f"main : {main_account}", file=f)
+
+			if main_account:
+				# with open("log-tfa.txt", "a") as f :
+				# 	print("Error 1", file=f)
+				json_data["jwt"] = main_account["payload"]
+
+			if user.get('mail') == None:
+				return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+			if user.get('code') == None:
+				return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+			if len(json_data.get('tfa')) != 19:
+				return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+
+			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
 			
 		if not user.get('code'):
 			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
@@ -218,12 +244,12 @@ class refreshToken(APIView):
 
 	def get(self, request) :
 		refresh_token = request.COOKIES.get("refresh_token", None)
-		refresh_res = request.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
+		refresh_res = requests.get('https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
 		if refresh_res.status_code == 200:
 			access = refresh_res.json().get("access", None)
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
 		else :
-			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
+			return JsonResponse({"Error" : "Refresh token expired"}, status=401)
 		
 
 class logout(APIView):

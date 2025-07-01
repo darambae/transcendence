@@ -1,5 +1,5 @@
 
-import { actualizeIndexPage, getCookie, isUserAuthenticated } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
@@ -73,7 +73,7 @@ async function loadMessageHistory(username, groupId, prepend = false) {
 
     try {
         // UPDATED URL: /chat/{group_id}/messages/
-        const response = await fetch(
+        const response = await fetchWithRefresh(
             `/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`,
             {
                 method: 'GET',
@@ -177,7 +177,8 @@ function sendMessage(username) {
 	// Clear input field immediately for better UX
 	messageInput.value = '';
 
-	fetch(`/chat/${groupId}/messages/`, {
+	fetchWithRefresh(`/chat/${groupId}/messages/`, {
+
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -323,7 +324,7 @@ async function loadChatRoomList(current_user) {
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         const csrf = getCookie('csrftoken');
         console.log('Loading chat list for user:', current_user);
-        const response = await fetch(`/chat/`, {
+        const response = await fetchWithRefresh(`/chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -410,8 +411,7 @@ async function switchChatRoom(username, newgroupId) {
     const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${newgroupId}"]`);
     if (activeChatRoomName && targetChatListItem) {
         const receiverUsername = targetChatListItem.dataset.receiver;
-        const displayName = receiverUsername.charAt(0).toUpperCase() + receiverUsername.slice(1);
-        activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${displayName}</a>`;
+        activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
 
         const profileLink = document.getElementById('receiverProfileLink');
         if (profileLink) {
@@ -483,7 +483,7 @@ async function promptPrivateChat(username, targetUsername) {
 	}
 
 	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetch('/chat/', {
+		fetchWithRefresh('/chat/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -537,7 +537,7 @@ function handleStartNewChat(username) {
 
 function setupUserSearchAutocomplete() {
 	const userInput = document.getElementById('targetUserInput');
-	const resultsBox = document.getElementById('chat-user-search');
+	const resultsBox = document.getElementById('resultsSearch');
 	if (!userInput || !resultsBox) return;
 
 	userInput.addEventListener('input', async function () {
@@ -546,7 +546,7 @@ function setupUserSearchAutocomplete() {
 			resultsBox.innerHTML = '';
 			return;
 		}
-		const response = await fetch(
+		const response = await fetchWithRefresh(
 			`user-service/searchUsers?q=${encodeURIComponent(query)}`,
 			{
 				method: 'GET',
@@ -706,7 +706,7 @@ export function chatController(username) {
 export async function renderChatButtonIfAuthenticated() {
 	let userIsAuth = await isUserAuthenticated();
 	if (userIsAuth) {
-		const username = await fetch('user-service/infoUser/', {
+		const username = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',
 			credentials: 'include',
 		})

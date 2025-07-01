@@ -1,6 +1,6 @@
 
 import { routes } from './routes.js';
-import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener } from './utils.js';
+import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener, fetchWithRefresh } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 
 window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
@@ -19,7 +19,7 @@ export async function navigate() {
 	//check if csrf present
 	const csrf = getCookie('csrftoken');
 	if (!csrf) {
-		fetch('user-service/csrf/', {
+		fetchWithRefresh('user-service/csrf/', {
 			method: 'GET',
 			credentials: 'include',
 		});

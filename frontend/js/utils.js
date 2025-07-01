@@ -1,7 +1,7 @@
 import { routes } from "./routes.js";
 
 export async function loadTemplate(viewName) {
-	const response = await fetch(`templates/${viewName}.html`);
+	const response = await fetchWithRefresh(`templates/${viewName}.html`);
 	if (!response.ok) {
 	  throw new Error(`Unable to load template ${viewName}`);
 	}
@@ -54,7 +54,7 @@ export function getCookie(name) {
 }
 
 export async function isUserAuthenticated() {
-	const response = await fetch('user-service/infoUser/', {
+	const response = await fetchWithRefresh('user-service/infoUser/', {
 		method: 'GET',
 		credentials: 'include'
 	});
@@ -79,4 +79,26 @@ export function attachLoginListener() {
 			}
 		});
 	}
+}
+
+export async function fetchWithRefresh(url, options = {}) {
+
+	let response = await fetch(url, options);
+
+	if (response.status === 401) {
+		const refreshResponse = await fetch('auth/refresh-token/', {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		if (refreshResponse.ok) {
+			response = await fetch(url, options);
+		} else {
+			window.location.href = '/#home';
+		}
+	}
+
+	return response;
 }

@@ -1,4 +1,4 @@
-import { closeModal } from "../utils.js";
+import { closeModal, fetchWithRefresh } from "../utils.js";
 
 export async function card_profileController(username) {
 
@@ -89,7 +89,7 @@ async function gestFooter(friend_status) {
 
 async function getOtherUserInfo(userName) {
 	try {
-		const response = await fetch(`user-service/infoOtherUser/${userName}`, {
+		const response = await fetchWithRefresh(`user-service/infoOtherUser/${userName}`, {
 		  method: "GET",
 		  credentials: 'include',
 		  headers: {
@@ -112,7 +112,7 @@ async function getOtherUserInfo(userName) {
 
 
 function getOtherUserAvatar(userName) {
-	fetch(`user-service/avatarOther/${userName}`, {
+	fetchWithRefresh(`user-service/avatarOther/${userName}`, {
 		method: "GET",
 		credentials: 'include',
 	})
@@ -138,7 +138,7 @@ function addFriend() {
 			addFriendsBtn.addEventListener('click', async () => {
 				const userName = addFriendsBtn.dataset.username;
 
-				const response = await fetch('user-service/add/friend/', {
+				const response = await fetchWithRefresh('user-service/add/friend/', {
 					method: 'POST',
 					credentials: 'include',
 					headers: {
