@@ -127,14 +127,55 @@ function sendMessage(username) {
 	const groupIdInput = document.getElementById('groupIdInput-active');
 
 	const content = messageInput.value.trim();
-	const groupId = groupIdInput.value;
-
+    const groupId = groupIdInput.value;
+    
+	const MIN_LENGTH = 1;
+    const MAX_LENGTH = 1000; // Set appropriate limit
+    
 	if (!content || !groupId) {
 		alert(
 			'Please ensure you are logged in, selected a chat, and typed a message.'
 		);
 		return;
+    }
+    if (content.length < MIN_LENGTH) {
+        alert(
+            `Message too short (${content.length}/${MIN_LENGTH} characters). Please type a longer message.`
+        );
+        return;
+    }
+    if (content.length > MAX_LENGTH) {
+        alert(
+            `Message too long (${content.length}/${MAX_LENGTH} characters). Please shorten your message.`
+        );
+        return;
+    }
+
+	// Create temporary message data to display immediately
+	const tempMessageData = {
+		content: content,
+		group_id: groupId,
+		sender: username,
+		sender_username: username,
+		timestamp: new Date().toISOString(),
+	};
+
+	// Add message to UI immediately
+	const chatLog = document.getElementById('chatLog-active');
+	if (chatLog) {
+		// Remove "No messages yet" if present
+		const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
+		if (noMessagesDiv) {
+			noMessagesDiv.remove();
+		}
+
+		const msgElement = createMessageElement(tempMessageData, username);
+		chatLog.appendChild(msgElement);
+		chatLog.scrollTop = chatLog.scrollHeight;
 	}
+
+	// Clear input field immediately for better UX
+	messageInput.value = '';
 
 	fetch(`/chat/${groupId}/messages/`, {
 		method: 'POST',
@@ -149,30 +190,24 @@ function sendMessage(username) {
 		}),
 	})
 		.then((response) =>
-			response
-				.json()
-				.then((data) => ({
-					data,
-					ok: response.ok,
-					status: response.status,
-					statusText: response.statusText,
-				}))
+			response.json().then((data) => ({
+				data,
+				ok: response.ok,
+				status: response.status,
+				statusText: response.statusText,
+			}))
 		)
 		.then(({ data, ok, status, statusText }) => {
-			if (ok) {
-				if (data.status === 'success') {
-					messageInput.value = '';
-				} else {
-					console.error('Server error sending message:', data.message);
-					alert('Error sending message: ' + data.message);
-				}
-			} else {
+			if (!ok) {
 				console.error(
 					'HTTP error sending message:',
 					status,
 					data.message || statusText
 				);
 				alert('HTTP Error: ' + (data.message || statusText));
+			} else if (data.status !== 'success') {
+				console.error('Server error sending message:', data.message);
+				alert('Error sending message: ' + data.message);
 			}
 		})
 		.catch((error) => {
@@ -180,65 +215,90 @@ function sendMessage(username) {
 			alert('Cannot connect to server to send message.');
 		});
 }
+
 // Function to initialize EventSource (SSE) for a group
 function initEventSource(groupId, username) {
-    // Close any other active EventSources before opening a new one
-    for (const key in eventSources) {
-        if (eventSources[key].readyState === EventSource.OPEN) {
-            eventSources[key].close();
-            delete eventSources[key];
-            console.log(`Closed SSE for group: ${key}`);
-        }
-    }
+	// Close any other active EventSources before opening a new one
+	for (const key in eventSources) {
+		if (eventSources[key].readyState === EventSource.OPEN) {
+			eventSources[key].close();
+			delete eventSources[key];
+			console.log(`Closed SSE for group: ${key}`);
+		}
+	}
 
-    const chatLog = document.getElementById('chatLog-active');
-    if (!chatLog) {
-        console.error(`chatLog-active not found for initEventSource.`);
-        return;
-    }
+	const chatLog = document.getElementById('chatLog-active');
+	if (!chatLog) {
+		console.error(`chatLog-active not found for initEventSource.`);
+		return;
+	}
 
-    // UPDATED URL: /chat/stream/{group_id}/
-    // ********* how do I get the token? *******
-    const source = new EventSource(`/chat/stream/${groupId}/`);
+	// UPDATED URL: /chat/stream/{group_id}/
+	const source = new EventSource(`/chat/stream/${groupId}/`);
 
-    eventSources[groupId] = source;
+	eventSources[groupId] = source;
+	const recentlyReceivedMessages = new Set(); // For message deduplication
+	source.onmessage = function (e) {
+		try {
+			const messageData = JSON.parse(e.data);
 
-    source.onmessage = function (e) {
-        try {
-            const messageData = JSON.parse(e.data);
-            // Only append if the message is for the currently active chat group
-            if (messageData.group_id === currentActiveChatGroup) {
-                // Remove "No messages yet" if a new message arrives
-                const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
-                if (noMessagesDiv) {
-                    noMessagesDiv.remove();
-                }
-                const msgElement = createMessageElement(messageData, username);
-                chatLog.appendChild(msgElement);
-                chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
+			// Skip if this message is from the current user (we've already displayed it)
+			if (
+				messageData.sender === username ||
+				messageData.sender_username === username
+			) {
+				console.log('Skipping own message from SSE');
+				return;
+			}
+            const messageId = `${messageData.id || ''}-${
+							messageData.timestamp
+						}-${messageData.sender}-${messageData.content}`;
+
+            // Skip if we've seen this message recently (deduplication)
+            if (recentlyReceivedMessages.has(messageId)) {
+                console.log('Skipping duplicate message:', messageId);
+                return;
             }
-        } catch (error) {
-            console.error(
-                'JSON parsing error or SSE message processing error:',
-                error,
-                e.data
-            );
-        }
-    };
 
-    source.onerror = function (err) {
-        console.error('EventSource failed for group ' + groupId + ':', err);
-        source.close();
-        delete eventSources[groupId];
-        // Only attempt reconnect if currentActiveChatGroup is still this groupId
-        // Otherwise, it means user switched chat, and we shouldn't reconnect here
-        if (currentActiveChatGroup === groupId) {
-            setTimeout(() => initEventSource(groupId), 3000); // Attempt reconnect after 3 seconds
-        }
-    };
-    console.log(`Opened SSE for group: ${groupId}`);
+            // Add to recently seen messages
+            recentlyReceivedMessages.add(messageId);
+
+            // Remove old entries after 5 seconds to prevent set from growing too large
+            setTimeout(() => {
+                recentlyReceivedMessages.delete(messageId);
+            }, 5000);
+			// Only append if the message is for the currently active chat group
+			if (messageData.group_id === currentActiveChatGroup) {
+				// Remove "No messages yet" if a new message arrives
+				const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
+				if (noMessagesDiv) {
+					noMessagesDiv.remove();
+				}
+				const msgElement = createMessageElement(messageData, username);
+				chatLog.appendChild(msgElement);
+				chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
+			}
+		} catch (error) {
+			console.error(
+				'JSON parsing error or SSE message processing error:',
+				error,
+				e.data
+			);
+		}
+	};
+
+	source.onerror = function (err) {
+		console.error('EventSource failed for group ' + groupId + ':', err);
+		source.close();
+		delete eventSources[groupId];
+		// Only attempt reconnect if currentActiveChatGroup is still this groupId
+		// Otherwise, it means user switched chat, and we shouldn't reconnect here
+		if (currentActiveChatGroup === groupId) {
+			setTimeout(() => initEventSource(groupId, username), 3000); // Attempt reconnect after 3 seconds
+		}
+	};
+	console.log(`Opened SSE for group: ${groupId}`);
 }
-
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
 async function loadChatRoomList(current_user) {
     const chatRoomListUl = document.getElementById('chatRoomList');
@@ -376,13 +436,15 @@ async function switchChatRoom(username, newgroupId) {
     const chatLog = document.getElementById('chatLog-active');
     if (chatLog) {
         chatLog.innerHTML = ''; // Clear chat log
-        chatLog.scrollTop = chatLog.scrollHeight; // Reset scroll
+        setTimeout(() => {
+					chatLog.scrollTop = chatLog.scrollHeight;
+        }, 0);
     }
 
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
     loadMessageHistory(username, newgroupId);
-    initEventSource(newgroupId);
+    initEventSource(newgroupId, username);
 
     // Focus on message input
     const messageInput = document.getElementById('messageInput-active');
@@ -390,87 +452,6 @@ async function switchChatRoom(username, newgroupId) {
         messageInput.focus();
     }
 }
-
-// Function to request creation/retrieval of a private group
-// async function promptPrivateChat(username, targetUsername) {
-//     console.log(`Requesting private chat with ${targetUsername} for user ${username}`);
-//     if (!username) {
-//         alert('Please log in to start a new chat.');
-//         return;
-//     }
-
-//     if (username === targetUsername) {
-//         alert('You cannot start a chat with yourself.');
-//         return;
-//     }
-
-//     // Check if chat with this user already exists in the list
-//     const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
-//     let existinggroupId = null;
-//     chatRooms.forEach(room => {
-//         if (room.dataset.receiver === targetUsername) {
-//             existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
-//         }
-//     });
-
-//     if (existinggroupId) {
-//         console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
-//         switchChatRoom(existinggroupId);
-//         return;
-//     }
-
-//     if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-
-//         try {
-//             // UPDATED URL: /chat/ (POST)
-//             const response = await fetch('/chat/', {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json', // Backend expects JSON now
-//                     'X-CSRFToken': getCookie('csrftoken'),
-//                 },
-//                 body: JSON.stringify({ // Send as JSON
-//                     current_username: username,
-//                     target_username: targetUsername,
-//                 }),
-//                 credentials: 'include', // Include cookies for session management
-//             });
-
-//             const data = await response.json();
-//             if (response.ok && data.status === 'success' && data.group_id) {
-//                 console.log(`Chat group ${data.group_id} created/retrieved.`);
-//                 loadChatRoomList(username).then(() => {
-//                     switchChatRoom(data.group_id);
-//                 });
-//             } else {
-//                 console.error('Server error creating chat group:', data.message);
-//                 alert('Error creating chat group: ' + data.message);
-//             }
-//         } catch (error) {
-//             console.error('Network error creating chat group:', error);
-//             alert('Cannot connect to server to create chat group.');
-//         }
-//     }
-// }
-
-// // Event handler for "Start New Chat" button in the modal
-// async function handleStartNewChat(username) {
-//     const targetUserInput = document.getElementById('targetUserInput');
-//     const targetUsername = targetUserInput.value.trim();
-
-//     if (!targetUsername) {
-//         alert('Please enter a user ID to start a new chat.');
-//         return;
-//     }
-
-//     if (targetUsername === username) {
-//         alert('You cannot start a chat with yourself.');
-//         return;
-//     }
-
-//     await promptPrivateChat(username ,targetUsername);
-//     targetUserInput.value = ''; // Clear input field
-// }
 
 async function promptPrivateChat(username, targetUsername) {
 	console.log(
@@ -597,98 +578,129 @@ function setupUserSearchAutocomplete() {
 
 // Main chat controller function, called after login
 export function chatController(username) {
-    const container = document.getElementById('chat-container');
-    if (!container) {
-        console.error('No #chat-container found in DOM.');
-        return;
-    }
+	const container = document.getElementById('chat-container');
+	if (!container) {
+		console.error('No #chat-container found in DOM.');
+		return;
+	}
 
-    const usernameInputActive = document.getElementById('usernameInput-active');
-    if (usernameInputActive) {
-        usernameInputActive.value = username;
-    }
+	const usernameInputActive = document.getElementById('usernameInput-active');
+	if (usernameInputActive) {
+		usernameInputActive.value = username;
+	}
 
-    // 1. Initialize Bootstrap Modal
-    const mainChatWindowElement = document.getElementById('mainChatWindow');
-    if (mainChatWindowElement) {
-        mainChatBootstrapModal = new bootstrap.Modal(mainChatWindowElement);
+	// 1. Initialize Bootstrap Modal
+	const mainChatWindowElement = document.getElementById('mainChatWindow');
+	if (mainChatWindowElement) {
+		mainChatBootstrapModal = new bootstrap.Modal(mainChatWindowElement);
 
-        mainChatWindowElement.addEventListener('shown.bs.modal', () => {
-            console.log('Main Chat Window is shown');
-            console.log('Logged in user:', username);
-            loadChatRoomList(username); // Load chat list dynamically
-            
-            // Set initial state for chat log
-            const chatLog = document.getElementById('chatLog-active');
-            if (chatLog && !currentActiveChatGroup) { // Only show initial message if no group is active
-                chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
-            }
-            // If a group was active before closing/reopening, switch back to it
-            if (currentActiveChatGroup) {
-                switchChatRoom(currentActiveChatGroup);
-            }
-            setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
-            // Focus on new chat user ID input initially
-            const targetUserInput = document.getElementById('targetUserInput');
-            if (targetUserInput) {
-                targetUserInput.focus();
+		mainChatWindowElement.addEventListener('shown.bs.modal', () => {
+			console.log('Main Chat Window is shown');
+			console.log('Logged in user:', username);
+			loadChatRoomList(username); // Load chat list dynamically
+
+			// Set initial state for chat log
+			const chatLog = document.getElementById('chatLog-active');
+			if (chatLog && !currentActiveChatGroup) {
+				// Only show initial message if no group is active
+				chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
+			}
+			// If a group was active before closing/reopening, switch back to it
+			if (currentActiveChatGroup) {
+				switchChatRoom(currentActiveChatGroup);
+			}
+			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
+			// Focus on new chat user ID input initially
+			const targetUserInput = document.getElementById('targetUserInput');
+			if (targetUserInput) {
+				targetUserInput.focus();
+			}
+		});
+		mainChatWindowElement.addEventListener('hidden.bs.modal', () => {
+			console.log('Main Chat Window is hidden');
+			// Close active SSE connection when modal closes
+			if (currentActiveChatGroup && eventSources[currentActiveChatGroup]) {
+				eventSources[currentActiveChatGroup].close();
+				delete eventSources[currentActiveChatGroup];
+			}
+			currentActiveChatGroup = null; // Reset active chat group when closing modal
+			// Clear chat log and reset UI state
+			const chatLog = document.getElementById('chatLog-active');
+			if (chatLog)
+				chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
+
+			document.getElementById('messageInput-active').disabled = true;
+			document.getElementById('sendMessageBtn').disabled = true;
+			document.getElementById('activeChatRoomName').textContent = ''; // Clear header
+			document.getElementById('groupIdInput-active').value = '';
+			document.getElementById('targetUserInput').value = ''; // Clear new chat input
+		});
+	} else {
+		console.error('Main chat window modal element not found!');
+		return;
+	}
+
+	// 2. Main Chat Toggle Button setup
+	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+	if (mainChatToggleButton) {
+		mainChatToggleButton.style.display = 'flex'; // Ensure button is visible
+
+		mainChatToggleButton.onclick = () => {
+			mainChatBootstrapModal.show();
+		};
+	} else {
+		console.error('Main chat toggle button not found.');
+	}
+	// 3. Attach send message event listeners
+	const sendMessageBtn = document.getElementById('sendMessageBtn');
+	if (sendMessageBtn) {
+		sendMessageBtn.addEventListener('click', () => {
+			// Always pass the logged-in user's username to sendMessage
+			sendMessage(username);
+		});
+	}
+
+	const messageInput = document.getElementById('messageInput-active');
+	if (messageInput) {
+		messageInput.addEventListener('keypress', function (e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				sendMessage(username);
+			}
+        });
+        const charCounter = document.getElementById('char-counter');
+        const MAX_LENGTH = 1000;
+
+        // Initial counter value
+        if (charCounter) {
+            charCounter.textContent = `0/${MAX_LENGTH}`;
+        }
+
+        messageInput.addEventListener('input', function () {
+            if (charCounter) {
+                const length = this.value.length;
+                charCounter.textContent = `${length}/${MAX_LENGTH}`;
+
+                // Add visual feedback based on length
+                if (length > MAX_LENGTH) {
+                    charCounter.className = 'char-counter danger';
+                } else if (length > MAX_LENGTH * 0.8) {
+                    // At 80% of limit
+                    charCounter.className = 'char-counter warning';
+                } else {
+                    charCounter.className = 'char-counter';
+                }
             }
         });
-        mainChatWindowElement.addEventListener('hidden.bs.modal', () => {
-            console.log('Main Chat Window is hidden');
-            // Close active SSE connection when modal closes
-            if (currentActiveChatGroup && eventSources[currentActiveChatGroup]) {
-                eventSources[currentActiveChatGroup].close();
-                delete eventSources[currentActiveChatGroup];
-            }
-            currentActiveChatGroup = null; // Reset active chat group when closing modal
-            // Clear chat log and reset UI state
-            const chatLog = document.getElementById('chatLog-active');
-            if (chatLog) chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
-            
-            document.getElementById('messageInput-active').disabled = true;
-            document.getElementById('sendMessageBtn').disabled = true;
-            document.getElementById('activeChatRoomName').textContent = ''; // Clear header
-            document.getElementById('groupIdInput-active').value = '';
-            document.getElementById('targetUserInput').value = ''; // Clear new chat input
-        });
-    } else {
-        console.error('Main chat window modal element not found!');
-        return;
-    }
+	}
 
-    // 2. Main Chat Toggle Button setup
-    const mainChatToggleButton = document.getElementById('mainChatToggleButton');
-    if (mainChatToggleButton) {
-        mainChatToggleButton.style.display = 'flex'; // Ensure button is visible
-
-        mainChatToggleButton.onclick = () => {
-            mainChatBootstrapModal.show();
-        };
-    } else {
-        console.error('Main chat toggle button not found.');
-    }
-
-    // 3. Attach send message event listeners
-    const sendMessageBtn = document.getElementById('sendMessageBtn');
-    if (sendMessageBtn) {
-        sendMessageBtn.addEventListener('click', sendMessage);
-    }
-    const messageInput = document.getElementById('messageInput-active');
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage(username);
-            }
-        });
-    }
-
-    // 4. Attach "Start New Chat" button event listener
-    const startNewChatBtn = document.getElementById('startNewChatBtn');
-    if (startNewChatBtn) {
-        startNewChatBtn.addEventListener('click', () => handleStartNewChat(username));
-    }
+	// 4. Attach "Start New Chat" button event listener
+	const startNewChatBtn = document.getElementById('startNewChatBtn');
+	if (startNewChatBtn) {
+		startNewChatBtn.addEventListener('click', () =>
+			handleStartNewChat(username)
+		);
+	}
 }
 
 export async function renderChatButtonIfAuthenticated() {
