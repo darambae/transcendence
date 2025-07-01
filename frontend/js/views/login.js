@@ -44,11 +44,26 @@ async function double_authenticate(data) {
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
-					const errorMsg = responseData.error;
+					let errorMsg = 'Authentication failed';
+
+					if (responseData.error) {
+						// If error is an object with nested properties
+						if (typeof responseData.error === 'object') {
+							// Try to extract meaningful message or stringify it nicely
+							errorMsg =
+								responseData.error.detail ||
+								responseData.error.message ||
+								JSON.stringify(responseData.error);
+						} else {
+							// If error is just a string
+							errorMsg = responseData.error;
+						}
+					}
+
 					errorDiv.textContent = errorMsg;
-					errorDiv.style.display = "block";
+					errorDiv.style.display = 'block';
 				}
-				reject(new Error("invalid code"));
+				reject(new Error('invalid code'));
 			}
 		});
 	});
