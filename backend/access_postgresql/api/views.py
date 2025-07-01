@@ -766,7 +766,7 @@ class refreshToken(APIView) :
 			return JsonResponse({"Error" : "Internal server error"}, status=500)
 		jwt_access = jwt.decode(refresh, settings.SECRET_KEY, algorithms=['HS256'])
 		dicoTokens = generateJwt(None, jwt_access, refresh)
-		return dicoTokens.get("access", "Error")
+		return Response({"access": dicoTokens.get("access", "Error")}, status=200)
 
 
 class listennerFriends(APIView) :

@@ -1,6 +1,6 @@
 
 import { routes } from "../routes.js";
-import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
+import { actualizeIndexPage, getCookie, loadTemplate, closeModal, fetchWithRefresh } from "../utils.js";
 import { renderChatButtonIfAuthenticated } from "./chat.js";
 
 async function double_authenticate(data) {
@@ -27,7 +27,7 @@ async function double_authenticate(data) {
 
 			const code = document.getElementById('auth-code').value;
 			console.log("mail + code: ", code, mail);
-			const response = await fetch("auth/verifyTwofa/", {
+			const response = await fetchWithRefresh("auth/verifyTwofa/", {
 				method: "POST",
 				credentials: 'include',
 				headers: {
@@ -87,7 +87,7 @@ export async function handleLoginSubmit(event) {
 		
 		const csrf = getCookie('csrftoken');
 		console.log("csrf: ", csrf);
-		const response = await fetch("/auth/login/", {
+		const response = await fetchWithRefresh("/auth/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
