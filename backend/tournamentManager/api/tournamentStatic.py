@@ -3,6 +3,7 @@ import shortuuid
 import sys
 import requests
 from django.http import JsonResponse, StreamingHttpResponse
+import asyncio
 import random
 
 
@@ -147,6 +148,9 @@ class Tournament() :
 
     def listJWT(self) :
         return [elem.jwt for elem in self.players]
+    
+    def listJWTPlayers(self) :
+        return [elem.jwt["username"] for elem in self.players]
 
     def listPlayers(self) :
         return [P.toTuple for P in self.players]
@@ -170,9 +174,14 @@ def getApiKeyTrnmt(cookies) :
 
 async def supervise_match(tkey) :
     infoResultsMatch = None
+    print(f"AAA : {infoResultsMatch} ", file=sys.stderr)
     while not infoResultsMatch :
-        res = requests.get(f"{dbUri}results?matchKey={tkey}")
+        print("BBBB", file=sys.stderr)
+        res = requests.get(f"{dbUri}api/game/{tkey}/", verify=False)
+        print(f"CCCC : {res.status_code}", file=sys.stderr)
         if res.status_code == 200 :
             infoResultsMatch = res.json()
+            print(f"DDDDD : {infoResultsMatch}", file=sys.stderr)
         await asyncio.sleep(2)
+    print("EEEEEEEE", file=sys.stderr)
     return infoResultsMatch

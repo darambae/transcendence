@@ -126,7 +126,7 @@ async def launchMatch(request) :
 		if not trStart[0] :
 			print("lm-1-end3", file=sys.stderr)
 			return JsonResponse({"Info" : trStart[1]})
-		print(f"lm-1, tkey : {tkey}", file=sys.stderr)
+		print(f"lm-1, tkey : -{tkey}-", file=sys.stderr)
 
 		await channel_layer.group_send(
 			tkey,
@@ -150,6 +150,7 @@ async def launchFinals(request) :
 		tkey = body["tKey"]
 		if tkey not in trnmtDict :
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
+		print(f"tkey Join -{tkey}-")
 		await channel_layer.group_send(
 			tkey,
 			{
@@ -227,7 +228,7 @@ async def joinTournament(request):
 			jwt_token = jwt_token["payload"]
 			print(f"334 : {jwt_token}", file=sys.stderr)
 			username = jwt_token["username"]
-			print(f"444 : {username}", file=sys.stderr)
+			print(f"444444444444444 : {username}", file=sys.stderr)
 		except Exception :
 			return JsonResponse({"Error": "Unauthorized"}, status=401)
 		tKey = body["tKey"]
@@ -250,7 +251,7 @@ async def joinTournament(request):
 		# return response
 
 	except Exception as e:
-		return JsonResponse({"error": "Internal server error"}, status=500)
+		return JsonResponse({"error": f"Internal server error {e}"}, status=500)
 
 
 async def sse(request) :
@@ -366,20 +367,42 @@ async def tournamentManager(request) :
 				return await joinTournament(request)
 		# elif request.method == "DELETE" :
 	except Exception as e :
-		return JsonResponse({"error" : "Internal server error"}, status=500)
+		return JsonResponse({"error" : f"Internal server error {e}"}, status=500)
+
+
 
 async def Supervise(request) :
 	try :
+		channel_layer = get_channel_layer()
+		print("-", file=sys.stderr)
 		tkey = request.GET.get("tkey")
+		print(f"- -{tkey}- | {tkey in trnmtDict}", file=sys.stderr)
 		mkey = request.GET.get("key")
+		print(f"- {mkey}", file=sys.stderr)
 
 		await channel_layer.group_send(
 			tkey,
 			{
 				"type": "tempReceived",
-				"text_data": {"action" : "supervise", "round" : 1, "mKey" : mkey}
+				"text_data": {"action" : "supervise", "round" : 1, "mKey" : mkey, "tkey" : tkey}
 			}
 		)
-		return HttpResponseNoContent()
+		print("-", file=sys.stderr)
+		return JsonResponse({"Success" : "Done"})
 	except Exception as e :
+		print("-_____----___--_-_-__---___", file=sys.stderr)
 		return HttpResponseNoContent()
+
+async def amIinTournament(request) :
+	try :
+		jwt = await decodeJWT(request)
+
+		jwt = jwt[0]['payload']
+		for elem in trnmtDict : 
+			lsJwt = trnmtDict[elem].listJWTPlayers()
+			if (jwt["username"] in lsJwt) :
+				return JsonResponse({"Tournament" : elem})
+		return JsonResponse({"Tournament" : "None"})
+	except Exception as e :
+		return JsonResponse({"Error" : "Unauthorized"}, status=401)
+	

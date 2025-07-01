@@ -64,19 +64,21 @@ class GameConsumer(AsyncWebsocketConsumer):
 		if not self.room_group_name:
 			await self.close()
 			return
+		
+		await self.accept()
 
 		await self.channel_layer.group_add(
 			self.room_group_name,
 			self.channel_name
 		)
 
-		await self.accept()
+		print(f"ChanelLayer : {self.channel_layer}", file=sys.stderr)
 
 		await self.send(text_data=json.dumps({
 			't_state': "Succefully joined tournament"
 		}))
 
-		user_ws_connections[self.myJWT] = self
+		# user_ws_connections[self.myJWT] = self
 	
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(
@@ -126,15 +128,15 @@ class GameConsumer(AsyncWebsocketConsumer):
 			if trnmtDict[self.room_group_name].match1.launchable :
 				await self.launchGame(trnmtDict[self.room_group_name].match1)
 			else :
-				while trnmtDict[self.room_group_name].final == [] :
-					await asyncio.sleep(1)
+				# while trnmtDict[self.room_group_name].final == [] :
+				# 	await asyncio.sleep(1)
 				await self.launchGame(trnmtDict[self.room_group_name].match1)
 			# elif self.name == trnmtDict[self.room_group_name].match2.p1.username or self.name == trnmtDict[self.room_group_name].match2.p2.username  : 
 			if trnmtDict[self.room_group_name].match2.launchable :
 				await self.launchGame(trnmtDict[self.room_group_name].match2)
 			else :
-				while trnmtDict[self.room_group_name].final == [] :
-					await asyncio.sleep(1)
+				# while trnmtDict[self.room_group_name].final == [] :
+				# 	await asyncio.sleep(1)
 				await self.launchGame(trnmtDict[self.room_group_name].match2)
 		
 		elif action == "final-matches" :
@@ -154,18 +156,30 @@ class GameConsumer(AsyncWebsocketConsumer):
 					await self.launchGame(trnmtDict[self.room_group_name].matchLoserBracket)
 		
 		elif action == "supervise" :
+			print(f"A0 - {action}", file=sys.stderr)
 			roundMatch = data.get("round", 1)
+			print(f"A1 - {roundMatch}", file=sys.stderr)
 			mKey = data.get("mKey", None)
+			tkey = data.get("tkey", None)
+			print(f"A2 - {mKey}", file=sys.stderr)
 			if not mKey:
+				print(f"A3 - END", file=sys.stderr)
 				return 
-			trnmt = trnmtDict[tKey]
+			print(f"A4 - ", file=sys.stderr)
+
+			trnmt = trnmtDict[tkey]
+			print(f"A5 - {trnmt}", file=sys.stderr)
 			task = asyncio.create_task(supervise_match(mKey))
 			results = await task
+			print(f"A6 - {results}", file=sys.stderr)
 			if results["score1"] == 200 : ########################################################################################################################################################################################################################################################################################################################################################################
+				print(f"A7 - res1", file=sys.stderr)
 				await setResults(trnmt, results["username1"])
 			else :
+				print(f"A8 - res2", file=sys.stderr)
 				await setResults(trnmt, results["username2"])
 			
+			print("TOURNAMENT MATCH FINISHED !!!!!!!!!!!!!!!!!!!!!!!!!!!", file=sys.stderr)
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-finished"
 			}))

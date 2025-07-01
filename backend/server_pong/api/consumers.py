@@ -144,6 +144,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			# 	print(f"ERROR : {e}")
 
 	async def tempReceived(self, event) :
+		print(f"tempReiceived server_pong : {event}", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	async def disconnectUser(self, event) :

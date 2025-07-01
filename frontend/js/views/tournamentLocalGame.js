@@ -4,7 +4,12 @@ import { adress } from "./utils/commonFunctions.js";
 import { drawMap } from "./utils/commonFunctions.js";
 import { setCanvasAndContext, setSSE, getSSE } from "./utils/commonFunctions.js";
 
-export async function localGameTr(id1, id2, key, tkey) {
+export async function localGameTr() {
+  let id1 = localStorage.getItem("p1");
+  let id2 = localStorage.getItem("p2");
+  let key = localStorage.getItem("key");
+  let tkey = localStorage.getItem("tkey");
+  console.log(id1, id2, key, tkey);
     let url_post = `server-pong/send-message`;
     let started = false;
     let game_stats;
@@ -15,21 +20,22 @@ export async function localGameTr(id1, id2, key, tkey) {
     let b;
     let c;
 
-    // console.log("aaa")
-    // sseTournament.onmessage = function(event) {
-    //   try {
-    //     console.log(event.data);
-    //     const data = JSON.parse(event.data);
-    //     console.log(data);
-    //     if (data.t_state == "game-finished") {
-    //       return ;
-    //     }
-    //   }
-    //   catch(error) {
-    //     console.log(error)
-    //   }
-    // }
-    // console.log("bbb")
+    console.log("aaa");
+    sseTournament.onmessage = function(event) {
+      try {
+        console.log(event.data);
+        const data = JSON.parse(event.data);
+        console.log(data);
+        if (data.t_state == "game-finished") {
+          console.log("data.t_state : ", data.t_state);
+          return ;
+        }
+      }
+      catch(error) {
+        console.log("Error sseTournament :", error);
+      }
+    }
+    console.log("bbb")
 
     await fetch('tournament/id-players', {
         method : "POST",
@@ -83,7 +89,7 @@ export async function localGameTr(id1, id2, key, tkey) {
   
       console.log("url_sse ->->-> ", url_sse);
       
-      await setCanvasAndContext();
+      setCanvasAndContext();
       const SSEStream = new EventSource(url_sse);
     SSEStream.onmessage = function(event) {
       try {
@@ -147,7 +153,6 @@ export async function localGameTr(id1, id2, key, tkey) {
                             },
                             body: JSON.stringify({"apiKey": key, "message": '{"action": "start"}'})
                           });
-                        fetch(`tournament/supervise?key=${key}&tkey=${tkey}`);
                     };
                     break;
                 case "q" :
