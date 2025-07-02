@@ -1,7 +1,7 @@
 import { routes } from "./routes.js";
 
 export async function loadTemplate(viewName) {
-	const response = await fetchWithRefresh(`templates/${viewName}.html`);
+	const response = await fetch(`templates/${viewName}.html`);
 	if (!response.ok) {
 	  throw new Error(`Unable to load template ${viewName}`);
 	}

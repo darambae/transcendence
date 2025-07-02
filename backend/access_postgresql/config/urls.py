@@ -21,10 +21,9 @@ from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshToken
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
 from api.views import ChatGroupListCreateView, ChatMessageView
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite, logout
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, InfoUser, declineInvite, acceptInvite, logout, disconnected
 from api.views import ChatGroupListCreateView
 #, ChatMessageHistoryView, ChatMessageSendView
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite
 from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
@@ -39,6 +38,7 @@ urlpatterns = [
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/token/refresh/', refreshToken.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
+	path('api/disconnected/<str:token>/', disconnected.as_view(), name='DecodeJwtExpired'),
 	path('api/InfoUser/', InfoUser.as_view(), name='InfoUser'),
 	path('api/infoOtherUser/<str:username>/', infoOtherUser.as_view(), name='infoOtherUser'),
 	path('api/uploadImgAvatar/', uploadImgAvatar.as_view(), name='uploadImgAvatar'),

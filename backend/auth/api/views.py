@@ -103,9 +103,35 @@ class verifyTwofa(APIView):
 		user = request.data
 		jwtDecoded = decodeJWT(request)
 		
-		# Validate input parameters first
-		if not user.get('mail'):
+		user = request.data
+
+		json_data = {
+			'mail':user.get('mail'),
+			'tfa':user.get('code'),
+		}
+
+		jwtDecoded = decodeJWT(request)
+		main_account = jwtDecoded[0]
+				
+		# with open("log-tfa.txt", "w+") as f:
+		# 	print(f"main : {main_account}", file=f)
+
+		if main_account:
+			# with open("log-tfa.txt", "a") as f :
+			# 	print("Error 1", file=f)
+			json_data["jwt"] = main_account["payload"]
+
+		if user.get('mail') == None:
 			return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+		if user.get('code') == None:
+			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+		if len(json_data.get('tfa')) != 19:
+			return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+
+		response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
 			
 		if not user.get('code'):
 			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
@@ -142,7 +168,7 @@ class verifyTwofa(APIView):
 			# Handle error responses
 			if not response.ok:
 				error_detail = response_data if response.content else response.text
-    
+	
 				# If error_detail is a dict with an 'error' key, extract it directly
 				if isinstance(error_detail, dict) and 'error' in error_detail:
 					return setTheCookie(JsonResponse({'error': error_detail['error']}, status=response.status_code), 
@@ -222,8 +248,16 @@ class refreshToken(APIView):
 		if refresh_res.status_code == 200:
 			access = refresh_res.json().get("access", None)
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
-		else :
-			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
+		elif refresh_token:
+			url = f'https://access_postgresql:4000/api/disconnected/{refresh_token}/'
+			requests.get(url, headers={'Host': 'localhost'}, verify=False)
+			res = JsonResponse({"Error" : "Refresh token expired"}, status=401)
+			res.delete_cookie('access_token')
+			res.delete_cookie('refresh_token')
+
+			return res
+		else:
+			return JsonResponse({'error': "refresh token"}, status=200)
 		
 
 class logout(APIView):
