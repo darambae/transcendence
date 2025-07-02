@@ -103,35 +103,35 @@ class verifyTwofa(APIView):
 		user = request.data
 		jwtDecoded = decodeJWT(request)
 		
-			user = request.data
+		user = request.data
 
-			json_data = {
-				'mail':user.get('mail'),
-				'tfa':user.get('code'),
-			}
+		json_data = {
+			'mail':user.get('mail'),
+			'tfa':user.get('code'),
+		}
 
-			jwtDecoded = decodeJWT(request)
-			main_account = jwtDecoded[0]
+		jwtDecoded = decodeJWT(request)
+		main_account = jwtDecoded[0]
 				
-			# with open("log-tfa.txt", "w+") as f:
-			# 	print(f"main : {main_account}", file=f)
+		# with open("log-tfa.txt", "w+") as f:
+		# 	print(f"main : {main_account}", file=f)
 
-			if main_account:
-				# with open("log-tfa.txt", "a") as f :
-				# 	print("Error 1", file=f)
-				json_data["jwt"] = main_account["payload"]
+		if main_account:
+			# with open("log-tfa.txt", "a") as f :
+			# 	print("Error 1", file=f)
+			json_data["jwt"] = main_account["payload"]
 
-			if user.get('mail') == None:
-				return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+		if user.get('mail') == None:
+			return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
-			if user.get('code') == None:
-				return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+		if user.get('code') == None:
+			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
-			if len(json_data.get('tfa')) != 19:
-				return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+		if len(json_data.get('tfa')) != 19:
+			return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
 
-			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
+		response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
 			
 		if not user.get('code'):
 			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
@@ -168,7 +168,7 @@ class verifyTwofa(APIView):
 			# Handle error responses
 			if not response.ok:
 				error_detail = response_data if response.content else response.text
-    
+	
 				# If error_detail is a dict with an 'error' key, extract it directly
 				if isinstance(error_detail, dict) and 'error' in error_detail:
 					return setTheCookie(JsonResponse({'error': error_detail['error']}, status=response.status_code), 
