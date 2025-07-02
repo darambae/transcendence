@@ -245,10 +245,22 @@ class DecodeJwt(APIView):
 			data_jwt = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
 			return Response({'payload': data_jwt}, status=200)
 		except jwt.ExpiredSignatureError:
-			return Response({'error': 'Token expired'}, status=401)
+			return Response({'error token expired': data_jwt}, status=401)
 		except jwt.InvalidTokenError:
 			return Response({'error': 'Invalid token'}, status=401)
 
+
+class disconnected(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request, token):
+		decoded = jwt.decode(token, options={"verify_signature": False})
+        
+		user = get_object_or_404(USER, user_name=decoded.get('username'))
+		user.online = False
+		user.save()
+
+		return Response({'succes': 'testetstest'}, status=200)
 
 
 class InfoUser(APIView):

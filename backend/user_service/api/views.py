@@ -59,7 +59,7 @@ def signup(request):
     creat_user_status = False
     response_mail_status = False
 
-    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'}) #Testing
+    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'})
     try:
         data_response_create_user = response_creat_user.json()
     except ValueError:

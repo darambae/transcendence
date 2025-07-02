@@ -176,7 +176,7 @@ def activate_account(request, uidb64, token):
 
 
 class refreshToken(APIView):
-	permission_class = [AllowAny]
+	permission_classes = [AllowAny]
 
 	def get(self, request) :
 		refresh_token = request.COOKIES.get("refresh_token", None)
@@ -185,6 +185,11 @@ class refreshToken(APIView):
 			access = refresh_res.json().get("access", None)
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
 		else :
+			url = f'https://access_postgresql:4000/api/disconnected/{refresh_token}/'
+			res = requests.get(url, headers={'Host': 'localhost'}, verify=False)
+			res.delete_cookie('access_token')
+			res.delete_cookie('refresh_token')
+
 			return JsonResponse({"Error" : "Refresh token expired"}, status=401)
 		
 
