@@ -59,7 +59,7 @@ def signup(request):
     creat_user_status = False
     response_mail_status = False
 
-    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'}) #Testing
+    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'})
     try:
         data_response_create_user = response_creat_user.json()
     except ValueError:
@@ -155,17 +155,18 @@ class avatar(APIView):
                     'Host': 'localhost'
                 }
             )
-            # with open("log.txt", "w+") as f:
-            #     print(f"status_code : {response.status_code}\nbody : {response.json()}\ntoken : {token}", file=f)
-            data = response.json()
-            path = data['avatar']
+            path = None
+            
+            if response.status_code == 200:
+                data = response.json()
+                path = data['avatar']
             if path:
                 full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
                 return FileResponse(open(full_path, 'rb'), content_type='image/png')
             else:
                 return JsonResponse({'error': 'not authorized'}, status=401)
         except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=500)
+            return Response({'error': 'Access to access_postgres failed'}, status=401)
 
 class avatarOther(APIView):
     permission_classes = [AllowAny]
@@ -182,15 +183,18 @@ class avatarOther(APIView):
                     'Host': 'localhost'
                 }
             )
-            data = response.json()
-            path = data['avatar']
+            path = None
+
+            if response.status_code == 200:
+                data = response.json()
+                path = data['avatar']
             if path:
                 full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
                 return FileResponse(open(full_path, 'rb'), content_type='image/png')
             else:
                 return JsonResponse({'error': 'not authorized'}, status=401)
         except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=500)
+            return Response({'error': 'Access to access_postgres failed'}, status=401)
 
 
 

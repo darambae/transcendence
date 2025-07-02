@@ -1,6 +1,5 @@
-
 import { routes } from "../routes.js";
-import { actualizeIndexPage, getCookie, loadTemplate, closeModal, fetchWithRefresh } from "../utils.js";
+import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 import { renderChatButtonIfAuthenticated } from "./chat.js";
 
 
@@ -38,7 +37,7 @@ export function setupDoubleAuthHandler(mail, username) {
 		const code = document.getElementById('auth-code').value;
 
 		try {
-			const response = await fetchWithRefresh("auth/verifyTwofa/", {
+			const response = await fetch("auth/verifyTwofa/", {
 				method: "POST",
 				credentials: 'include',
 				headers: {
@@ -97,7 +96,7 @@ export async function handleLoginSubmit(event) {
 		if (loadingMessage) loadingMessage.style.display = "inline";
 
 		const csrf = getCookie('csrftoken');
-		const response = await fetchWithRefresh("/auth/login/", {
+		const response = await fetch("/auth/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
