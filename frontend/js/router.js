@@ -19,7 +19,7 @@ export async function navigate() {
 	//check if csrf present
 	const csrf = getCookie('csrftoken');
 	if (!csrf) {
-		fetchWithRefresh('user-service/csrf/', {
+		fetch('user-service/csrf/', {
 			method: 'GET',
 			credentials: 'include',
 		});

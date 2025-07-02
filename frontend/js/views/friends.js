@@ -21,7 +21,7 @@ export function searchFriends() {
 		const users = data.results ?? [];
 		
 		resultsBox.innerHTML = users
-		.map(user => `<li class="list-group-item user-link"> <button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
+		.map(user => `<li class="list-group-item user-link"><button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
 			.join('');
 
 		document.querySelectorAll('.profile-btn').forEach(btn => {
