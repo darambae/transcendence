@@ -74,8 +74,8 @@ class api_signup(APIView):
 
 		return JsonResponse({'success': 'User successfully created', 'user_id': user.id}, status=200)
 
-
-
+# url: /api/info_link/
+# This view generates uid and token for the user to activate their account
 class info_link(APIView):
 	permission_classes = [AllowAny]
 
@@ -102,6 +102,8 @@ class info_link(APIView):
 
 logger = logging.getLogger(__name__)
 
+# url: /api/activate_account/
+# This view activates the user account using the uid and token generated in info_link
 class activate_account(APIView):
 	permission_classes = [AllowAny]
 
@@ -132,6 +134,8 @@ class activate_account(APIView):
 			logger.warning("Activation link invalid or expired.")
 			return JsonResponse({'html': 'token_expired.html'}, status=200)
 
+# url: /api/checkPassword/
+# This view checks the password of the user and sends a 2FA code if the password is correct
 class checkPassword(APIView):
 	permission_classes = [AllowAny]
 
@@ -159,6 +163,7 @@ class checkPassword(APIView):
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 
+# url: /api/checkCurrentPassword/
 
 class checkCurrentPassword(APIView):
 	permission_classes = [IsAuthenticated]
@@ -180,67 +185,130 @@ class checkCurrentPassword(APIView):
 
 
 
+# class checkTfa(APIView):
+# 	permission_classes = [AllowAny]
+
+# 	def post(self, request):
+
+# 		data = request.data
+# 		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
+
+# 		try:
+# 			if "jwt" in data :
+# 				print("JWT IN DATA !", file=sys.stderr)
+# 				print(f"invites : {data['jwt']}", file=sys.stderr)
+# 				user = USER.objects.get(mail=data.get('mail'))
+# 				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+# 				print("user.activated", user.activated, file=sys.stderr)
+# 				if user.activated and user.two_factor_auth:
+# 					print("here in 2FA checking with JWT", file=sys.stderr)
+# 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+# 						print("checkPassword ok !", file=sys.stderr)
+# 						data["jwt"]["invites"].append(user.user_name)
+# 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
+# 						print("JWT generated !", file=sys.stderr)
+# 						user.two_factor_auth = False
+# 						user.save()
+# 						return JsonResponse({'success': 'authentication code send',
+# 							  				 'refresh': str(data_generate_jwt['refresh']),
+# 											 'access': str(data_generate_jwt['access'])},
+# 											 status=200)
+# 					else :
+# 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+# 				else:
+# 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
+# 			else :
+# 				user = USER.objects.get(mail=data.get('mail'))
+# 				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+# 				print("user.activated", user.activated, file=sys.stderr)
+# 				if user.activated and user.two_factor_auth:
+# 					print("here in 2FA checking with no JWT", file=sys.stderr)
+# 					if check_password(data.get('tfa'), user.two_factor_auth):
+# 						print("checkPassword ok !", file=sys.stderr)
+# 						user.two_factor_auth = False
+# 						user.online = True
+# 						user.last_login = datetime.now()
+# 						user.save()
+
+# 						data_generate_jwt = generateJwt(user, user.toJson())
+# 						print("JWT generated !", file=sys.stderr)
+
+# 						return JsonResponse({'success': 'authentication code send',
+# 							  				 'refresh': str(data_generate_jwt['refresh']),
+# 											 'access': str(data_generate_jwt['access'])},
+# 											 status=200)
+# 					else:
+# 						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
+# 				else:
+# 					return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+# 		except USER.DoesNotExist:
+# 			return JsonResponse({'error': 'User not found'}, status=404)
+
+# url: /api/checkTfa/
+# 2FA validation for normal login or invitation 
 
 class checkTfa(APIView):
-	permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
-	def post(self, request):
+    def post(self, request):
+        data = request.data
+        logger.debug(f"2FA validation attempt for: {data.get('mail')}")
+        
+        # Step 1: Extract and validate basic data
+        mail = data.get('mail')
+        tfa_code = data.get('tfa')
+        
+        if not mail or not tfa_code:
+            return JsonResponse({'error': 'Email and 2FA code are required'}, status=400)
+            
+        # Step 2: Get user and check prerequisites
+        try:
+            user = USER.objects.get(mail=mail)
+            
+            if not user.activated or not user.two_factor_auth:
+                return JsonResponse({'error': 'Account not activated or 2FA not enabled'}, status=401)
+                
+            # Step 3: Validate the 2FA code
+            if not check_password(tfa_code, user.two_factor_auth):
+                return JsonResponse({'error': 'Invalid two factor auth code'}, status=401)
+                
+            # Step 4: Handle based on flow type (with or without JWT)
+            is_invitation = "jwt" in data
+            
+            if is_invitation:
+                # Invitation flow - validate invitation count
+                if len(data["jwt"]["invites"]) >= 3:
+                    return JsonResponse({'error': 'Maximum invitation limit reached'}, status=400)
+                    
+                # Add user to invites and generate JWT for original user
+                data["jwt"]["invites"].append(user.user_name)
+                main_user = USER.objects.get(user_name=data["jwt"]["username"])
+                jwt_data = generateJwt(main_user, data["jwt"])
+            else:
+                # Normal login flow - update user status
+                user.online = True
+                user.last_login = datetime.now()
+                jwt_data = generateJwt(user, user.toJson())
+            
+            # Step 5: Clear 2FA code and save user
+            user.two_factor_auth = False
+            user.save()
+            
+            # Step 6: Return success response
+            return JsonResponse({
+                'success': 'Authentication successful',
+                'refresh': str(jwt_data['refresh']),
+                'access': str(jwt_data['access'])
+            }, status=200)
+                
+        except USER.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Exception as e:
+            logger.error(f"2FA verification error: {str(e)}")
+            return JsonResponse({'error': f'Internal error during 2FA verification'}, status=500)
 
-		data = request.data
-		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
-
-		try:
-			if "jwt" in data :
-				print("JWT IN DATA !", file=sys.stderr)
-				print(f"invites : {data['jwt']}", file=sys.stderr)
-				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
-				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
-						print("checkPassword ok !", file=sys.stderr)
-						data["jwt"]["invites"].append(user.user_name)
-						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-						print("JWT generated !", file=sys.stderr)
-						user.two_factor_auth = False
-						user.save()
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
-					else :
-						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-				else:
-					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
-			else :
-				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
-				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with no JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth):
-						print("checkPassword ok !", file=sys.stderr)
-						user.two_factor_auth = False
-						user.online = True
-						user.last_login = datetime.now()
-						user.save()
-
-						data_generate_jwt = generateJwt(user, user.toJson())
-						print("JWT generated !", file=sys.stderr)
-
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
-					else:
-						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
-				else:
-					return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-		except USER.DoesNotExist:
-			return JsonResponse({'error': 'User not found'}, status=404)
-
-
+# url: /api/DecodeJwt/
+# This view decodes the JWT token and returns the payload
 class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
@@ -282,7 +350,6 @@ class InfoUser(APIView):
 			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
 			"avatar": user.avatar,
         })
-
 
 class infoOtherUser(APIView):
     permission_classes = [IsAuthenticated]
@@ -768,7 +835,9 @@ class ChatMessageView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-class refreshToken(APIView) :
+# url: api/token/refresh/
+
+class refreshAccessToken(APIView) :
 	permission_classes = [AllowAny]
 
 	def get(self, request) :
