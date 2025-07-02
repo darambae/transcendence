@@ -3,6 +3,8 @@ import { getPlayersLocalName } from "./utils/commonFunctions.js"
 import { adress } from "./utils/commonFunctions.js";
 import { drawMap } from "./utils/commonFunctions.js";
 import { setCanvasAndContext, setSSE, getSSE } from "./utils/commonFunctions.js";
+import { actualizeIndexPage } from "../utils.js";
+import { routesTr } from "./tournament.js";
 
 export async function localGameTr() {
   let id1 = localStorage.getItem("p1");
@@ -27,8 +29,30 @@ export async function localGameTr() {
         const data = JSON.parse(event.data);
         console.log(data);
         if (data.t_state == "game-finished") {
-          console.log("data.t_state : ", data.t_state);
-          return ;
+          actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+          // console.log("sse data: ", data.next)
+          // if (data.next == "final-rounds") {
+          //   fetch("tournament/finals", {
+          //     method: "POST",
+          //     headers: {
+          //       'X-CSRFToken': csrf, 
+          //       'Content-Type': 'application/json', 
+          //     },
+          //     credentials: 'include',
+          //     body: JSON.stringify({"tKey" : data.tkey})
+          //   })
+          // }
+          // else {
+          //   fetch("tournament/next", {
+          //     method: "POST",
+          //     headers: {
+          //       'X-CSRFToken': csrf, 
+          //       'Content-Type': 'application/json', 
+          //     },
+          //     credentials: 'include',
+          //     body: JSON.stringify({"tKey" : data.tkey})
+          //   })
+          // }
         }
       }
       catch(error) {

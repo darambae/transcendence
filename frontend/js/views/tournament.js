@@ -4,10 +4,14 @@ import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
 import { localGameTr } from "./tournamentLocalGame.js";
 
-let routesTr = {
+export let routesTr = {
   matchSp : {
     template : "tournamentMatch",
     controller : localGameTr
+  },
+  tournament : { 
+    template : "tournament",
+    controller : tournamentController
   }
 }
 
@@ -140,13 +144,18 @@ export async function tournamentController() {
             .then(async data => {
               console.log("Données reçues Join:", trId);
               const url_sse = `tournament/events?tKey=${trId}&name=${usernameJwt}&guests=${guestJwt}`;
-              SSEStream = new EventSource(url_sse);
-              setSSE(SSEStream);
+              SSEStream = getSSE();
+              console.log(SSEStream);
+              if (SSEStream === undefined) {
+                SSEStream = new EventSource(url_sse);
+                setSSE(SSEStream);
+              }
               SSEStream.onmessage = function(event) {
                 try {
-                  console.log(event.data);
+                  console.log("ggg", event.data);
                   const data = JSON.parse(event.data);
-                  console.log(data);
+                  console.log("eee", data);
+                  console.log("fff", data.t_state);
                   if (data.t_state == "game-start") {
                     console.log("SSE 1")
                     const buttonGame =  document.createElement("button");
@@ -168,11 +177,37 @@ export async function tournamentController() {
                     }
                     console.log("SSE 8")
                     buttonGame.dataset.key = data.key;
-                    buttonGame.dataset.tkey = data.tkey;
+                    buttonGame.dataset.tkey = data.tkey
                     console.log("SSE 9")
                     tournamentGame.innerHTML = "";
                     console.log("SSE 10")
                     tournamentGame.appendChild(buttonGame);
+                  }
+                  else if (data.t_state == "game-finished") {
+                    actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+                    console.log("sse data: ", data.next)
+                    if (data.next == "final-rounds") {
+                      fetch("tournament/finals", {
+                        method: "POST",
+                        headers: {
+                          'X-CSRFToken': csrf, 
+                          'Content-Type': 'application/json', 
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({"tKey" : data.tkey})
+                      })
+                    }
+                    else {
+                      fetch("tournament/next", {
+                        method: "POST",
+                        headers: {
+                          'X-CSRFToken': csrf, 
+                          'Content-Type': 'application/json', 
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({"tKey" : data.tkey})
+                      })
+                    }
                   }
                 }
                 catch (error) {
@@ -197,6 +232,16 @@ export async function tournamentController() {
               console.log(text);
               text = await text.text()
               divGuest.innerHTML = text
+              await fetch("tournament/next", {
+                method: "POST",
+                headers: {
+                  'X-CSRFToken': csrf, 
+                  'Content-Type': 'application/json', 
+                },
+                credentials: 'include',
+                body: JSON.stringify({"tKey" : trId})
+              });
+
               return invitsController()
             })
             .catch(error => {
@@ -249,7 +294,7 @@ export async function tournamentController() {
           method : 'POST',
           headers : {
             'X-CSRFToken': csrf,
-                'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
           },
           credentials : "include",
           body: JSON.stringify({"action" : "join", "tKey" : view})
@@ -265,9 +310,10 @@ export async function tournamentController() {
             setSSE(SSEStream);
             SSEStream.onmessage = function(event) {
               try {
-                console.log(event.data);
+                console.log("iii", event.data);
                 const data = JSON.parse(event.data);
-                console.log(data);
+                console.log("jjj", data);
+                console.log("kkk",data.t_state);
                 if (data.t_state == "game-start") {
                   console.log("SSE 1")
                   const buttonGame =  document.createElement("button");
@@ -294,6 +340,32 @@ export async function tournamentController() {
                   tournamentGame.innerHTML = "";
                   console.log("SSE 10")
                   tournamentGame.appendChild(buttonGame);
+                }
+                else if (data.t_state == "game-finished") {
+                  actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+                  console.log("sse data: ", data.next)
+                  if (data.next == "final-rounds") {
+                    fetch("tournament/finals", {
+                      method: "POST",
+                      headers: {
+                        'X-CSRFToken': csrf, 
+                        'Content-Type': 'application/json', 
+                      },
+                      credentials: 'include',
+                      body: JSON.stringify({"tKey" : data.tkey})
+                    })
+                  }
+                  else {
+                    fetch("tournament/match", {
+                      method: "POST",
+                      headers: {
+                        'X-CSRFToken': csrf, 
+                        'Content-Type': 'application/json', 
+                      },
+                      credentials: 'include',
+                      body: JSON.stringify({"tKey" : data.tkey})
+                    })
+                  }
                 }
               }
               catch (error) {
@@ -413,11 +485,7 @@ export async function tournamentController() {
           console.log(data);
         })
 
-
-        // return actualizeIndexPage("Tournament-Lobby", routesTr['matchSp']);
+        return actualizeIndexPage("Tournament-Lobby", routesTr['matchSp']);
       }
     })
-
-    window.onbeforeunload(event)
-    SSEStream.close()
 }

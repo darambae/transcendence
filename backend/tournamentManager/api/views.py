@@ -145,22 +145,72 @@ async def launchMatch(request) :
 
 # @csrf_exempt
 async def launchFinals(request) :
-	try :
+	try:
+		print("lf-1", file=sys.stderr)
 		body = json.loads(request.body)
+		print("lf-1", file=sys.stderr)
 		tkey = body["tKey"]
-		if tkey not in trnmtDict :
+		print(f"tkey : {tkey}, tr : {trnmtDict[tkey]}", file=sys.stderr)
+		print("lf-1", file=sys.stderr)
+		if tkey not in trnmtDict:
+			print("lf-1-end", file=sys.stderr)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
-		print(f"tkey Join -{tkey}-")
+		print("lf-1", file=sys.stderr)
+		print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
+
 		await channel_layer.group_send(
 			tkey,
 			{
-				"type" : "tempReceived",
-				"text_data" : "final-matches"
+				"type": "tempReceived",
+				"text_data": {"action" : "final-matches"}
 			}
 		)
-	
+		print("lf-1", file=sys.stderr)
+		return JsonResponse({"Info" : "Ready to start"})
+	except TournamentError as e:
+		print("lf-2-end", file=sys.stderr)
+		return JsonResponse({"Error": str(e)}, status=401)
 	except Exception as e:
-		return JsonResponse({"error": "Internal server error"}, status=500)
+		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
+
+async def launchNextMatch(request) :
+	try:
+		print("lf-1", file=sys.stderr)
+		body = json.loads(request.body)
+		print("lf-1", file=sys.stderr)
+		tkey = body["tKey"]
+		print(f"tkey : {tkey}, tr : {trnmtDict[tkey]}", file=sys.stderr)
+		print("lf-1", file=sys.stderr)
+		if tkey not in trnmtDict:
+			print("lf-1-end", file=sys.stderr)
+			return JsonResponse({"Error": "Tournament not found"}, status=404)
+		print("lf-1", file=sys.stderr)
+		if trnmtDict[tkey].nbPl != 4 :
+			return JsonResponse({"Error": "Forbidden"}, status=403)
+		print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
+		if not trnmtDict[tkey].match1.played or not trnmtDict[tkey].match2.played :
+			await channel_layer.group_send(
+				tkey,
+				{
+					"type": "tempReceived",
+					"text_data": {"action" : "create-bracket"}
+				}
+			)
+		else :
+			await channel_layer.group_send(
+				tkey,
+				{
+					"type": "tempReceived",
+					"text_data": {"action" : "final-matches"}
+				}
+			)
+		print("lf-1", file=sys.stderr)
+		return JsonResponse({"Info" : "Ready to start"})
+	except TournamentError as e:
+		print("lf-2-end", file=sys.stderr)
+		return JsonResponse({"Error": str(e)}, status=401)
+	except Exception as e:
+		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
 async def checkSSE(request) :
 	try:
