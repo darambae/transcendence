@@ -1,6 +1,6 @@
 
 import { routes } from './routes.js';
-import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener } from './utils.js';
+import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener, fetchWithRefresh } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 
 window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);

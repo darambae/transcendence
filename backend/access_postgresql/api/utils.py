@@ -16,15 +16,29 @@ def generate_otp_send_mail(user):
 
 def generateJwt(user, jsonJwt:dict, refresh=None):
 
-	if user :
+	if user:
 		refresh = RefreshToken.for_user(user)
-	access = refresh.access_token
+		refresh['user_id'] = jsonJwt['user_id']
+		refresh['username'] = jsonJwt['username']
+		refresh['invites'] = jsonJwt['invites']
 
-	access['user_id'] = jsonJwt["user_id"]
-	access['username'] = jsonJwt["username"]
-	access['invites'] = jsonJwt["invites"]
-	
-	return {
-		'refresh': str(refresh),
-		'access': str(access)
-	}
+
+		access = refresh.access_token
+		access['user_id'] = jsonJwt['user_id']
+		access['username'] = jsonJwt['username']
+		access['invites'] = jsonJwt['invites']
+		return {
+			'refresh': str(refresh),
+			'access': str(access)
+		}
+	else:
+		refreshh = RefreshToken(refresh)
+		access = refreshh.access_token
+
+		access['user_id'] = refreshh.get('user_id')
+		access['username'] = refreshh.get('username')
+		access['invites'] = refreshh.get('invites', [])
+		return {
+			'refresh': str(refreshh),
+			'access': str(access)
+		}

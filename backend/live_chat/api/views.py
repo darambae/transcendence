@@ -146,9 +146,19 @@ class ChatMessageView(View):
         try:
             data = json.loads(request.body)
             content = data.get('content')
+            MIN_LENGTH = 1
+            MAX_LENGTH = 1000
+            
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
-
+            if not content or len(content) < MIN_LENGTH:
+                return JsonResponse({'status': 'error', 'message': 'Message is empty'}, status=400)
+                
+            if len(content) > MAX_LENGTH:
+                return JsonResponse(
+                    {'status': 'error', 'message': f'Message exceeds maximum length of {MAX_LENGTH} characters'}, 
+                    status=400
+                )
             access_token = request.COOKIES.get('access_token')
             if not access_token:
                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)

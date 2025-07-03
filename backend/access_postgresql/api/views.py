@@ -191,12 +191,18 @@ class checkTfa(APIView):
 
 		try:
 			if "jwt" in data :
+				print("JWT IN DATA !", file=sys.stderr)
 				print(f"invites : {data['jwt']}", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				if user.activated and user.two_factor_auth != None:
+				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+				print("user.activated", user.activated, file=sys.stderr)
+				if user.activated and user.two_factor_auth:
+					print("here in 2FA checking with JWT", file=sys.stderr)
 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+						print("checkPassword ok !", file=sys.stderr)
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
+						print("JWT generated !", file=sys.stderr)
 						user.two_factor_auth = False
 						user.save()
 						return JsonResponse({'success': 'authentication code send',
@@ -205,17 +211,23 @@ class checkTfa(APIView):
 											 status=200)
 					else :
 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+				else:
+					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
 			else :
-				print(f"main : ", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				if user.activated and user.two_factor_auth != None:
+				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+				print("user.activated", user.activated, file=sys.stderr)
+				if user.activated and user.two_factor_auth:
+					print("here in 2FA checking with no JWT", file=sys.stderr)
 					if check_password(data.get('tfa'), user.two_factor_auth):
-						user.two_factor_auth = False
+						print("checkPassword ok !", file=sys.stderr)
+						#user.two_factor_auth = False
 						user.online = True
 						user.last_login = datetime.now()
 						user.save()
 
 						data_generate_jwt = generateJwt(user, user.toJson())
+						print("JWT generated !", file=sys.stderr)
 
 						return JsonResponse({'success': 'authentication code send',
 							  				 'refresh': str(data_generate_jwt['refresh']),
@@ -247,10 +259,22 @@ class DecodeJwt(APIView):
 			data_jwt = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
 			return Response({'payload': data_jwt}, status=200)
 		except jwt.ExpiredSignatureError:
-			return Response({'error': 'Token expired'}, status=401)
+			return Response({'error token expired': data_jwt}, status=401)
 		except jwt.InvalidTokenError:
 			return Response({'error': 'Invalid token'}, status=401)
 
+
+class disconnected(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request, token):
+		decoded = jwt.decode(token, options={"verify_signature": False})
+        
+		user = get_object_or_404(USER, user_name=decoded.get('username'))
+		user.online = False
+		user.save()
+
+		return Response({'succes': 'testetstest'}, status=200)
 
 
 class InfoUser(APIView):
@@ -901,7 +925,7 @@ class refreshToken(APIView) :
 			return JsonResponse({"Error" : "Internal server error"}, status=500)
 		jwt_access = jwt.decode(refresh, settings.SECRET_KEY, algorithms=['HS256'])
 		dicoTokens = generateJwt(None, jwt_access, refresh)
-		return dicoTokens.get("access", "Error")
+		return Response({"access": dicoTokens.get("access", "Error")}, status=200)
 
 
 class listennerFriends(APIView) :

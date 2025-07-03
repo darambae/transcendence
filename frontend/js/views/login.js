@@ -1,32 +1,42 @@
-
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 import { renderChatButtonIfAuthenticated } from "./chat.js";
 
-async function double_authenticate(data) {
+
+export async function showDoubleAuthForm(data) {
 	const html = await loadTemplate('doubleAuth');
 	const content = document.getElementById("login-form");
-	if (html) {
+	if (html && content) {
 		content.innerHTML = html;
 	}
+
 	const mail = data.mail;
 	if (!mail) {
 		throw new Error("No mail address provided for double authentication");
 	}
+
 	const mailDiv = document.querySelector('.login-form .double-auth .user-mail');
 	if (mailDiv) {
 		mailDiv.textContent = mail;
 	}
-	
-	return new Promise((resolve, reject) => {
-		const form = document.getElementById('double-auth-form');
-		const csrf = getCookie('csrftoken');
-		console.log("csrf:", csrf);
-		form.addEventListener("submit", async (e) => {
-			e.preventDefault();
 
-			const code = document.getElementById('auth-code').value;
-			console.log("mail + code: ", code, mail);
+	return mail;
+}
+
+
+export function setupDoubleAuthHandler(mail, username) {
+	const form = document.getElementById('double-auth-form');
+	if (!form || form.dataset.listenerAttached === "true") return;
+
+	form.dataset.listenerAttached = "true";
+	const csrf = getCookie('csrftoken');
+
+	form.addEventListener("submit", async (e) => {
+		e.preventDefault();
+
+		const code = document.getElementById('auth-code').value;
+
+		try {
 			const response = await fetch("auth/verifyTwofa/", {
 				method: "POST",
 				credentials: 'include',
@@ -40,24 +50,40 @@ async function double_authenticate(data) {
 			const responseData = await response.json();
 
 			if (response.ok) {
-				resolve(true);
+				closeModal();
+				actualizeIndexPage('toggle-login', routes['user']);
+				const hash = location.hash.slice(1);
+				if (hash === 'signup') {
+					actualizeIndexPage('main-content', routes.home);
+				}
+				console.log(`User ${username} successfully connected`);
+				window.loggedInUser = username;
+				await renderChatButtonIfAuthenticated();
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
-				if (errorDiv) {
-					const errorMsg = responseData.error;
-					errorDiv.textContent = errorMsg;
-					errorDiv.style.display = "block";
+				let errorMsg = 'Authentication failed';
+
+				if (responseData.error) {
+					errorMsg = typeof responseData.error === 'object'
+						? responseData.error.detail || responseData.error.message || JSON.stringify(responseData.error)
+						: responseData.error;
 				}
-				reject(new Error("invalid code"));
+
+				if (errorDiv) {
+					errorDiv.textContent = errorMsg;
+					errorDiv.style.display = 'block';
+				}
 			}
-		});
+		} catch (error) {
+			console.error("2FA error: ", error);
+		}
 	});
 }
 
+// Handle main login form
 export async function handleLoginSubmit(event) {
-
 	event.preventDefault();
-	
+
 	const form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
 	const loadingMessage = form.querySelector("#loading-message");
@@ -67,11 +93,9 @@ export async function handleLoginSubmit(event) {
 
 	try {
 		submitButton.disabled = true;
-		if (loadingMessage) 
-			loadingMessage.style.display = "inline";
-		
+		if (loadingMessage) loadingMessage.style.display = "inline";
+
 		const csrf = getCookie('csrftoken');
-		console.log("csrf: ", csrf);
 		const response = await fetch("/auth/login/", {
 			method: "POST",
 			headers: {
@@ -83,39 +107,20 @@ export async function handleLoginSubmit(event) {
 		});
 
 		const data = await response.json();
-		console.log("response data: ", data);
+
 		if (response.ok) {
 			try {
-				await double_authenticate(dataForm);
-				closeModal();
-				actualizeIndexPage('toggle-login', routes['user']);
-				const hash = location.hash.slice(1);
-				if (hash === 'signup') {
-					actualizeIndexPage('main-content', routes.home);
-				}
-				const username = data.user_name || dataForm.username || dataForm.mail; // fallback if needed
-				console.log(`User ${username} successfully connected`);
-				window.loggedInUser = username;
-				await renderChatButtonIfAuthenticated();
-				// After successful login, initialize chat system
-				// if (!window.chatInitialized) {
-				// 	console.log('Login successful, initializing chat system.');
-					
-				// 	loadChatUI(chatController(username));
-				// 	window.chatInitialized = true;
-				// }
-				//
+				const mail = await showDoubleAuthForm(dataForm);
+				const username = data.user_name || dataForm.username || dataForm.mail;
+				setupDoubleAuthHandler(mail, username);
 			} catch (error) {
-				console.log("Double auth error: ", error);
+				console.error("Error setting up double authentication:", error);
 			}
 		} else {
-			console.log("Couldn't connect");
-			//Error handling (wrong password, mail address not known, etc...)
 			const errorDiv = document.querySelector('.login-form .error-msg');
 			const errorMsg = data.error;
-			if (errorMsg) {
+			if (errorMsg && errorDiv) {
 				errorDiv.textContent = "ERROR: " + errorMsg.toUpperCase();
-				//shaking animation
 				errorDiv.classList.remove("shake");
 				void errorDiv.offsetWidth;
 				errorDiv.classList.add("shake");
@@ -125,8 +130,7 @@ export async function handleLoginSubmit(event) {
 		console.error("Connection error: ", error);
 	} finally {
 		submitButton.disabled = false;
-		if (loadingMessage)
-			loadingMessage.style.display = "none";
+		if (loadingMessage) loadingMessage.style.display = "none";
 	}
 }
 
@@ -135,22 +139,25 @@ export function loginController() {
 	const modalContainer = document.getElementById("modal-container");
 	const closeBtn = document.getElementById("close-login-form");
 
-	closeBtn.addEventListener("click", () => {
-		closeModal();
-	});
+	if (closeBtn) {
+		closeBtn.addEventListener("click", () => closeModal());
+	}
 
-	modalContainer.addEventListener("click", (event) => {
-		if(event.target.id === "modal-container") {
-			closeModal();
-		}
-	});
+	if (modalContainer) {
+		modalContainer.addEventListener("click", (event) => {
+			if (event.target.id === "modal-container") {
+				closeModal();
+			}
+		});
+	}
 
-	document.getElementById('forgotten-password').onclick = async function(event) {
-		actualizeIndexPage('modal-container', routes.forgotPassword);
+	const forgotten = document.getElementById('forgotten-password');
+	if (forgotten) {
+		forgotten.onclick = () => actualizeIndexPage('modal-container', routes.forgotPassword);
 	}
 
 	const form = document.getElementById("log-form");
 	if (form) {
-	  form.addEventListener("submit", handleLoginSubmit);
+		form.addEventListener("submit", handleLoginSubmit);
 	}
 }

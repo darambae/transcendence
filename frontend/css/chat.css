@@ -142,7 +142,24 @@
     white-space: nowrap;
 }
 
+/* Character counter styling */
+.char-counter {
+    position: absolute;
+    bottom: 5px;
+    right: 80px; /* Leave space for the Send button */
+    font-size: 12px;
+    color: #6c757d;
+    pointer-events: none; /* Don't interfere with input */
+    z-index: 5;
+}
 
+.char-counter.warning {
+    color: #fd7e14; /* Orange for getting close to limit */
+}
+
+.char-counter.danger {
+    color: #dc3545; /* Red for exceeding limit */
+}
 /* --- User Search Dropdown (Always absolute, all screens) --- */
 
 #chat-user-search {
@@ -182,7 +199,6 @@
 #chat-user-search .list-group-item:focus {
     background: #f8f9fa;
 }
-
 /* --- Chat Display Header --- */
 .chat-display-header {
     flex-shrink: 0;

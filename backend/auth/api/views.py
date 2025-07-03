@@ -100,64 +100,126 @@ class verifyTwofa(APIView):
 	permission_classes = [AllowAny]
 
 	def post(self, request):
-		if (request.method == 'POST'):
+		user = request.data
+		jwtDecoded = decodeJWT(request)
 		
-			user = request.data
+		user = request.data
 
-			json_data = {
-				'mail':user.get('mail'),
-				'tfa':user.get('code'),
-			}
+		json_data = {
+			'mail':user.get('mail'),
+			'tfa':user.get('code'),
+		}
 
-			jwtDecoded = decodeJWT(request)
-			main_account = jwtDecoded[0]
+		jwtDecoded = decodeJWT(request)
+		main_account = jwtDecoded[0]
 				
-			# with open("log-tfa.txt", "w+") as f:
-			# 	print(f"main : {main_account}", file=f)
+		# with open("log-tfa.txt", "w+") as f:
+		# 	print(f"main : {main_account}", file=f)
 
-			if main_account:
-				# with open("log-tfa.txt", "a") as f :
-				# 	print("Error 1", file=f)
-				json_data["jwt"] = main_account["payload"]
-
-			if user.get('mail') == None:
-				return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
-
-			if user.get('code') == None:
-				return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
-
-			if len(json_data.get('tfa')) != 19:
-				return setTheCookie(JsonRespo0nse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
-
-
-			response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
-			
+		if main_account:
 			# with open("log-tfa.txt", "a") as f :
-			# 	print(f"response json : {response.data}\nstatusCode : {response.status_code}", file=f)
-			jwtDecoded[1] = response.json().get("access")
-			jwtDecoded[2] = response.json().get("refresh")
+			# 	print("Error 1", file=f)
+			json_data["jwt"] = main_account["payload"]
 
-			data_response = None
-			try:
-				if not response.ok:
-					error_detail = response.json() if response.content else response.text
-					if response.status_code in [400, 401, 403, 404]:
-						return setTheCookie(JsonResponse({'error': error_detail}, status=400), jwtDecoded[1], jwtDecoded[2])
-			except ValueError:
-				data_response = {
-					'error': 'Invalid response from mail service',
-					'detail': response.text
-				}
+		if user.get('mail') == None:
+			return setTheCookie(JsonResponse({'error':'mail is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
 
-			if response.status_code == 200:
-				data_response = {
-					'success':'authentication successfull, you are connected',
-				}
-			else:
-				data_response = {
-					'error':response.text
-				}
-			return setTheCookie(JsonResponse(data_response, status=response.status_code), jwtDecoded[1], jwtDecoded[2])
+		if user.get('code') == None:
+			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+		if len(json_data.get('tfa')) != 19:
+			return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+
+
+		response = requests.post("https://access_postgresql:4000/api/checkTfa/", json=json_data, verify=False, headers={'Host': 'localhost'})
+			
+		if not user.get('code'):
+			return setTheCookie(JsonResponse({'error':'code is empty'}, status=400), jwtDecoded[1], jwtDecoded[2])
+			
+		if len(user.get('code')) != 19:
+			return setTheCookie(JsonResponse({'error':'text size is different from 19 characters'}, status=400), jwtDecoded[1], jwtDecoded[2])
+		
+		# Build request data
+		json_data = {
+			'mail': user.get('mail'),
+			'tfa': user.get('code'),
+		}
+		
+		main_account = jwtDecoded[0]
+		if main_account:
+			json_data["jwt"] = main_account["payload"]
+		
+		# Make API request and handle exceptions
+		try:
+			response = requests.post(
+				"https://access_postgresql:4000/api/checkTfa/", 
+				json=json_data, 
+				verify=False, 
+				headers={'Host': 'localhost'}
+			)
+			
+			# Parse JSON response safely
+			response_data = response.json() if response.content else {}
+			
+			# Update tokens if available
+			access_token = response_data.get("access", jwtDecoded[1])
+			refresh_token = response_data.get("refresh", jwtDecoded[2])
+			
+			# Handle error responses
+			if not response.ok:
+				error_detail = response_data if response.content else response.text
+	
+				# If error_detail is a dict with an 'error' key, extract it directly
+				if isinstance(error_detail, dict) and 'error' in error_detail:
+					return setTheCookie(JsonResponse({'error': error_detail['error']}, status=response.status_code), 
+									access_token, refresh_token)
+				else:
+					return setTheCookie(JsonResponse({'error': error_detail}, status=response.status_code), 
+									access_token, refresh_token)
+			
+			# Success response
+			return setTheCookie(
+				JsonResponse({'success':'authentication successful, you are connected'}, status=200),
+				access_token, refresh_token)
+				
+		except ValueError:
+			# JSON parsing error
+			return setTheCookie(
+				JsonResponse({'error': 'Invalid response format', 'detail': response.text}, status=500),
+				jwtDecoded[1], jwtDecoded[2])
+		except requests.exceptions.RequestException as e:
+			# Network/connection error
+			return setTheCookie(
+				JsonResponse({'error': f'Connection error: {str(e)}'}, status=500),
+				jwtDecoded[1], jwtDecoded[2])
+		
+		# with open("log-tfa.txt", "a") as f :
+		# 	print(f"response json : {response.data}\nstatusCode : {response.status_code}", file=f)
+		# if response.ok:
+		# 	jwtDecoded[1] = response.json().get("access")
+		# 	jwtDecoded[2] = response.json().get("refresh")
+
+		# data_response = None
+		# try:
+		# 	if not response.ok:
+		# 		error_detail = response.json() if response.content else response.text
+		# 		if response.status_code in [400, 401, 403, 404]:
+		# 			return setTheCookie(JsonResponse({'error': error_detail}, status=400), jwtDecoded[1], jwtDecoded[2])
+		# except ValueError:
+		# 	data_response = {
+		# 		'error': 'Invalid response from mail service',
+		# 		'detail': response.text
+		# 	}
+
+		# if response.status_code == 200:
+		# 	data_response = {
+		# 		'success':'authentication successfull, you are connected',
+		# 	}
+		# else:
+		# 	data_response = {
+		# 		'error':response.text
+		# 	}
+		# return setTheCookie(JsonResponse(data_response, status=response.status_code), jwtDecoded[1], jwtDecoded[2])
 
 
 def activate_account(request, uidb64, token):
@@ -178,16 +240,24 @@ def activate_account(request, uidb64, token):
 
 
 class refreshToken(APIView):
-	permission_class = [AllowAny]
+	permission_classes = [AllowAny]
 
 	def get(self, request) :
 		refresh_token = request.COOKIES.get("refresh_token", None)
-		refresh_res = request.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
+		refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
 		if refresh_res.status_code == 200:
 			access = refresh_res.json().get("access", None)
 			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
-		else :
-			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
+		elif refresh_token:
+			url = f'https://access_postgresql:4000/api/disconnected/{refresh_token}/'
+			requests.get(url, headers={'Host': 'localhost'}, verify=False)
+			res = JsonResponse({"Error" : "Refresh token expired"}, status=401)
+			res.delete_cookie('access_token')
+			res.delete_cookie('refresh_token')
+
+			return res
+		else:
+			return JsonResponse({'error': "refresh token"}, status=200)
 		
 
 class logout(APIView):
