@@ -36,8 +36,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
-ALLOWED_HOSTS = ['server_pong']
+ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
+#ALLOWED_HOSTS = ['server_pong']
 # Application definition
 
 INSTALLED_APPS = [
@@ -155,39 +155,39 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import logging
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '[{levelname}] {asctime} {name}: {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-            'level': 'DEBUG',  # Show all logs
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',  # Show all logs
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Show all logs from Django
-            'propagate': False,
-        },
-        'api': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Show all logs from your app
-            'propagate': False,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'simple': {
+#             'format': '[{levelname}] {asctime} {name}: {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple',
+#             'level': 'DEBUG',  # Show all logs
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'DEBUG',  # Show all logs
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from Django
+#             'propagate': False,
+#         },
+#         'api': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from your app
+#             'propagate': False,
+#         },
+#     },
+# }
 
 # Remove the comment below so that you can run without elk
 # class AddAppNameFilter(logging.Filter):

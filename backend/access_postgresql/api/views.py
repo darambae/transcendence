@@ -29,22 +29,22 @@ from django.conf import settings
 
 
 try:
-    from .models import USER, ChatGroup, Message, MATCHTABLE
+	from .models import USER, ChatGroup, Message, MATCHTABLE
 except ImportError:
-    # Fallback/Error handling if models are not correctly configured
-    # In a real application, you'd want to ensure models are correctly imported.
-    logging.error("Failed to import models (USER, ChatGroup, Message) in access_postgresql/views.py. "
-                  "Please ensure your models are defined and accessible.")
-    # You might want to raise an exception or handle this more gracefully
-    # depending on your application's setup.
-    class USER: # Dummy classes to prevent NameError if import fails
-        objects = None
-    class ChatGroup:
-        objects = None
-    class Message:
-        objects = None
-    class MATCHTABLE:
-        objects = None
+	# Fallback/Error handling if models are not correctly configured
+	# In a real application, you'd want to ensure models are correctly imported.
+	logging.error("Failed to import models (USER, ChatGroup, Message) in access_postgresql/views.py. "
+				  "Please ensure your models are defined and accessible.")
+	# You might want to raise an exception or handle this more gracefully
+	# depending on your application's setup.
+	class USER: # Dummy classes to prevent NameError if import fails
+		objects = None
+	class ChatGroup:
+		objects = None
+	class Message:
+		objects = None
+	class MATCHTABLE:
+		objects = None
 		
 
 class api_signup(APIView):
@@ -62,7 +62,7 @@ class api_signup(APIView):
 				last_name=data['last_name'],
 				mail=data['mail'],
 				password=data['password']
-            )
+			)
 		except IntegrityError as e:
 			err_msg = str(e)
 			if 'mail' in err_msg:
@@ -204,7 +204,9 @@ class checkTfa(APIView):
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
 						print("JWT generated !", file=sys.stderr)
 						user.two_factor_auth = False
+						print(666, file=sys.stderr)
 						user.save()
+						print(7777, file=sys.stderr)
 						return JsonResponse({'success': 'authentication code send',
 							  				 'refresh': str(data_generate_jwt['refresh']),
 											 'access': str(data_generate_jwt['access'])},
@@ -269,7 +271,7 @@ class disconnected(APIView):
 
 	def get(self, request, token):
 		decoded = jwt.decode(token, options={"verify_signature": False})
-        
+		
 		user = get_object_or_404(USER, user_name=decoded.get('username'))
 		user.online = False
 		user.save()
@@ -278,80 +280,80 @@ class disconnected(APIView):
 
 
 class InfoUser(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
+	def get(self, request):
+		user = request.user
 
-        return Response({
-            "id": user.id,
-            "user_name": user.user_name,
+		return Response({
+			"id": user.id,
+			"user_name": user.user_name,
 			"first_name": user.first_name,
 			"last_name": user.last_name,
-            "mail": user.mail,
+			"mail": user.mail,
 			"online": user.online,
 			"created_at": format(user.created_at, 'Y-m-d  H:i'),
 			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
 			"avatar": user.avatar,
-        })
+		})
 
 
 class infoOtherUser(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request, username):
-        user = get_object_or_404(USER, user_name=username)
-        me = request.user
+	def get(self, request, username):
+		user = get_object_or_404(USER, user_name=username)
+		me = request.user
 
-        friend_relation = FRIEND.objects.filter(
-            (Q(from_user=me) & Q(to_user=user)) | (Q(from_user=user) & Q(to_user=me)),
-            status__in=['pending', 'accepted']
-        ).first()
+		friend_relation = FRIEND.objects.filter(
+			(Q(from_user=me) & Q(to_user=user)) | (Q(from_user=user) & Q(to_user=me)),
+			status__in=['pending', 'accepted']
+		).first()
 
-        if friend_relation:
-            friend_status = friend_relation.status
-        else:
-            friend_status = None
+		if friend_relation:
+			friend_status = friend_relation.status
+		else:
+			friend_status = None
 
-        user_matches = MATCHTABLE.objects.filter(
-            Q(username1=user.user_name) | Q(username2=user.user_name)
-        )
+		user_matches = MATCHTABLE.objects.filter(
+			Q(username1=user.user_name) | Q(username2=user.user_name)
+		)
 
-        total_matches = user_matches.count()
+		total_matches = user_matches.count()
 
-        wins = 0
-        losses = 0
+		wins = 0
+		losses = 0
 
-        for match in user_matches:
-            if match.username1 == user.user_name:
-                if match.score1 > match.score2:
-                    wins += 1
-                elif match.score1 < match.score2:
-                    losses += 1
-            elif match.username2 == user.user_name:
-                if match.score2 > match.score1:
-                    wins += 1
-                elif match.score2 < match.score1:
-                    losses += 1
+		for match in user_matches:
+			if match.username1 == user.user_name:
+				if match.score1 > match.score2:
+					wins += 1
+				elif match.score1 < match.score2:
+					losses += 1
+			elif match.username2 == user.user_name:
+				if match.score2 > match.score1:
+					wins += 1
+				elif match.score2 < match.score1:
+					losses += 1
 
 
-        data = {
-            "id": user.id,
-            "user_name": user.user_name,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "mail": user.mail,
-            "online": user.online,
-            "created_at": format(user.created_at, 'Y-m-d  H:i'),
-            "last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
-            "avatar": user.avatar,
-            "friend_status": friend_status,
+		data = {
+			"id": user.id,
+			"user_name": user.user_name,
+			"first_name": user.first_name,
+			"last_name": user.last_name,
+			"mail": user.mail,
+			"online": user.online,
+			"created_at": format(user.created_at, 'Y-m-d  H:i'),
+			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
+			"avatar": user.avatar,
+			"friend_status": friend_status,
 			"total_games": total_matches,
 			"game_wins": wins,
 			"game_losses": losses
-        }
+		}
 
-        return Response(data, status=200)
+		return Response(data, status=200)
 
 
 
@@ -403,27 +405,27 @@ class keyGame(APIView):
 			return JsonResponse({'error': 'Key Math not found'}, status=404)
 
 class uploadImgAvatar(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        try:
-            user = request.user
-            data = request.data
+	def post(self, request):
+		try:
+			user = request.user
+			data = request.data
 
-            new_avatar = data.get('new_path')
-            if not new_avatar:
-                return JsonResponse({'error': 'Missing new_path in request'}, status=400)
+			new_avatar = data.get('new_path')
+			if not new_avatar:
+				return JsonResponse({'error': 'Missing new_path in request'}, status=400)
 
-            user.avatar = new_avatar
-            user.save()
+			user.avatar = new_avatar
+			user.save()
 
-            return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
-        except Exception as e:
-            return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+		except Exception as e:
+			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
 		
 class uploadPrivateInfoUser(APIView):
 	permission_classes = [IsAuthenticated]
-    
+	
 	def patch(self, request):
 
 		try:
@@ -495,290 +497,318 @@ class searchUsers(APIView):
 				'username': user.user_name,
 			})
 		return JsonResponse({'results': results}, status=200)
+
+
+class DeleteGuest(APIView) : 
+	permission_classes = [IsAuthenticated]
+
+	def delete(self, request) :
+		print("d-1", file=sys.stderr)
+		user = request.user
+		print("d-2", file=sys.stderr)
+		token = request.headers.get("Authorization", "Error Unknown").split(" ")[1]
+		print("d-3", file=sys.stderr)
+
+		jwt_access = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+		print("d-4", file=sys.stderr)
+		jwt_access["invites"] = []
+		print("d-5", file=sys.stderr)
+		data_generate_jwt = generateJwt(user, jwt_access)
+		print("d-6", file=sys.stderr)
+
+		return JsonResponse({'success': 'authentication code send',
+							 'refresh': str(data_generate_jwt['refresh']),
+							 'access': str(data_generate_jwt['access'])},
+							 status=200)
+
+
+
+
+
 # --- Chat-Related Views (Directly interacting with DB and Channels) ---
 
 class ChatGroupListCreateView(APIView):
-    """
-    API endpoint to list existing chat groups for the authenticated user (GET)
-    and to create or retrieve new 1-to-1 chat groups (POST).
-    """
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
+	"""
+	API endpoint to list existing chat groups for the authenticated user (GET)
+	and to create or retrieve new 1-to-1 chat groups (POST).
+	"""
+	permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
 
-    def get(self, request) -> Response:
-        """
-        Lists chat groups for the currently authenticated user.
-        """
-        current_user = request.user
-        logger.info(f"Retrieving chat groups for user {current_user.user_name}")
-        
-        try:
-            # Get chat groups where the current user is a member
-            chat_groups_qs = ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
+	def get(self, request) -> Response:
+		"""
+		Lists chat groups for the currently authenticated user.
+		"""
+		current_user = request.user
+		logger.info(f"Retrieving chat groups for user {current_user.user_name}")
+		
+		try:
+			# Get chat groups where the current user is a member
+			chat_groups_qs = ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
 
-            chat_list_data = []
-            if chat_groups_qs.exists():
-                for group in chat_groups_qs:
-                    # For 1-to-1 chats, find the other participant
-                    other_members = group.members.exclude(id=current_user.id)
-                    other_username = None
+			chat_list_data = []
+			if chat_groups_qs.exists():
+				for group in chat_groups_qs:
+					# For 1-to-1 chats, find the other participant
+					other_members = group.members.exclude(id=current_user.id)
+					other_username = None
 
-                    if group.members.count() == 2 and other_members.exists():
-                        # True 1-to-1 chat
-                        other_username = other_members.first().user_name
-                    elif group.members.count() > 2:
-                        # Group chat: show group name or a comma-separated list of members (excluding self)
-                        other_username = ", ".join(m.user_name for m in other_members)
-                    else:
-                        # Only self in group (should not happen)
-                        other_username = "Unknown User"
-                        logger.warning(f"Chat group {group.id} for user {current_user.user_name} has no other members.")
+					if group.members.count() == 2 and other_members.exists():
+						# True 1-to-1 chat
+						other_username = other_members.first().user_name
+					elif group.members.count() > 2:
+						# Group chat: show group name or a comma-separated list of members (excluding self)
+						other_username = ", ".join(m.user_name for m in other_members)
+					else:
+						# Only self in group (should not happen)
+						other_username = "Unknown User"
+						logger.warning(f"Chat group {group.id} for user {current_user.user_name} has no other members.")
 
-                    chat_list_data.append({
-                        'group_id': group.id,
-                        'receiver': other_username,
+					chat_list_data.append({
+						'group_id': group.id,
+						'receiver': other_username,
 						'group_name': group.name,  # Include group name for clarity
-                    })
-            else:
-                logger.info(f"No chat groups found for user {current_user.user_name}.")
-            return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
+					})
+			else:
+				logger.info(f"No chat groups found for user {current_user.user_name}.")
+			return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
 
-        except Exception as e:
-            logger.exception("Internal server error during chat list retrieval.")
-            return Response(
-                {'status': 'error', 'message': 'Internal server error during chat list retrieval.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    def post(self, request) -> Response:
-        """
-        Creates or retrieves a private chat group between the authenticated user
-        and a target user.
-        """
-        current_user = request.user  # Authenticated user
-        data = request.data
-        target_username = data.get('target_username')
+		except Exception as e:
+			logger.exception("Internal server error during chat list retrieval.")
+			return Response(
+				{'status': 'error', 'message': 'Internal server error during chat list retrieval.'},
+				status=status.HTTP_500_INTERNAL_SERVER_ERROR
+			)
+	def post(self, request) -> Response:
+		"""
+		Creates or retrieves a private chat group between the authenticated user
+		and a target user.
+		"""
+		current_user = request.user  # Authenticated user
+		data = request.data
+		target_username = data.get('target_username')
 
-        if not target_username:
-            return Response({'status': 'error', 'message': 'Target username is required.'}, status=status.HTTP_400_BAD_REQUEST)
+		if not target_username:
+			return Response({'status': 'error', 'message': 'Target username is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if current_user.user_name == target_username:
-            return Response(
-                {'status': 'error', 'message': 'Cannot create a chat with yourself.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+		if current_user.user_name == target_username:
+			return Response(
+				{'status': 'error', 'message': 'Cannot create a chat with yourself.'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
 
-        try:
-            # Get the target user (must exist)
-            target_user = USER.objects.get(user_name=target_username)
+		try:
+			# Get the target user (must exist)
+			target_user = USER.objects.get(user_name=target_username)
 
-            # Ensure consistent group name generation (e.g., "private_ID1_ID2")
-            participants_usernames = sorted([current_user.user_name, target_user.user_name])
-            group_name = f"chat_{participants_usernames[0]}&{participants_usernames[1]}"
+			# Ensure consistent group name generation (e.g., "private_ID1_ID2")
+			participants_usernames = sorted([current_user.user_name, target_user.user_name])
+			group_name = f"chat_{participants_usernames[0]}&{participants_usernames[1]}"
 
-            # Atomically create or get the chat group and add members
-            chat_group, created_group = ChatGroup.objects.get_or_create(
-                name=group_name,
-            )
-            # If the group was just created, log and add members
-            if created_group:
-                logger.info(f"Created new chat group '{group_name}' for users {current_user.user_name} and {target_user.user_name}.")
-                chat_group.members.add(current_user, target_user)
-            # chat_group.members.add(current_user, target_user)
+			# Atomically create or get the chat group and add members
+			chat_group, created_group = ChatGroup.objects.get_or_create(
+				name=group_name,
+			)
+			# If the group was just created, log and add members
+			if created_group:
+				logger.info(f"Created new chat group '{group_name}' for users {current_user.user_name} and {target_user.user_name}.")
+				chat_group.members.add(current_user, target_user)
+			# chat_group.members.add(current_user, target_user)
 
-            return Response(
-                {'status': 'success', 'group_id': chat_group.id, 'group_name': chat_group.name},
-                status=status.HTTP_200_OK
-            )
-        except USER.DoesNotExist:
-            return Response({'status': 'error', 'message': 'Target user not found.'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            logger.exception("Internal server error during chat group operation.")
-            return Response(
-                {'status': 'error', 'message': 'Internal server error during chat group operation.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+			return Response(
+				{'status': 'success', 'group_id': chat_group.id, 'group_name': chat_group.name},
+				status=status.HTTP_200_OK
+			)
+		except USER.DoesNotExist:
+			return Response({'status': 'error', 'message': 'Target user not found.'}, status=status.HTTP_404_NOT_FOUND)
+		except Exception as e:
+			logger.exception("Internal server error during chat group operation.")
+			return Response(
+				{'status': 'error', 'message': 'Internal server error during chat group operation.'},
+				status=status.HTTP_500_INTERNAL_SERVER_ERROR
+			)
 
 # ===============================================================
 # 3. Chat Message Send & History View
 # Handles: GET & POST /api/chat/<int:group_id>/messages/
 # ===============================================================
 class ChatMessageView(APIView):
-    """
-    API endpoint to retrieve chat message history for a specific group.
-    Supports pagination using offset and limit.
-    """
-    permission_classes = [IsAuthenticated]  # Only authenticated users can access history
+	"""
+	API endpoint to retrieve chat message history for a specific group.
+	Supports pagination using offset and limit.
+	"""
+	permission_classes = [IsAuthenticated]  # Only authenticated users can access history
 
-    def get(self, request, group_id: int) -> Response:
-        """
-        Retrieves a paginated list of messages for a given chat group.
-        Ensures the requesting user is a member of the group.
-        """
-        current_user = request.user  # Authenticated user
-        offset_str = request.query_params.get('offset', '0')
-        limit_str = request.query_params.get('limit', '20')
+	def get(self, request, group_id: int) -> Response:
+		"""
+		Retrieves a paginated list of messages for a given chat group.
+		Ensures the requesting user is a member of the group.
+		"""
+		current_user = request.user  # Authenticated user
+		offset_str = request.query_params.get('offset', '0')
+		limit_str = request.query_params.get('limit', '20')
 
-        try:
-            offset = int(offset_str)
-            limit = int(limit_str)
-            if offset < 0 or limit <= 0:
-                return Response(
-                    {'status': 'error', 'message': 'Offset must be non-negative and limit must be positive.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        except ValueError:
-            return Response(
-                {'status': 'error', 'message': 'Invalid offset or limit. Must be integers.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+		try:
+			offset = int(offset_str)
+			limit = int(limit_str)
+			if offset < 0 or limit <= 0:
+				return Response(
+					{'status': 'error', 'message': 'Offset must be non-negative and limit must be positive.'},
+					status=status.HTTP_400_BAD_REQUEST
+				)
+		except ValueError:
+			return Response(
+				{'status': 'error', 'message': 'Invalid offset or limit. Must be integers.'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
 
-        try:
-            # Retrieve the chat group. Check if current_user is a member.
-            chat_group = ChatGroup.objects.get(id=group_id)
+		try:
+			# Retrieve the chat group. Check if current_user is a member.
+			chat_group = ChatGroup.objects.get(id=group_id)
 
-            # Check if the requesting user is a member of this chat group
-            is_member = chat_group.members.filter(id=current_user.id).exists()
-            if not is_member:
-                logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Access denied.")
-                return Response(
-                    {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+			# Check if the requesting user is a member of this chat group
+			is_member = chat_group.members.filter(id=current_user.id).exists()
+			if not is_member:
+				logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Access denied.")
+				return Response(
+					{'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
+					status=status.HTTP_403_FORBIDDEN
+				)
 
-            # Filter messages by group and order by timestamp for consistent pagination
-            messages_queryset = Message.objects.filter(group=chat_group).order_by('timestamp')
+			# Filter messages by group and order by timestamp for consistent pagination
+			messages_queryset = Message.objects.filter(group=chat_group).order_by('timestamp')
 
-            # Initialize Paginator
-            paginator = Paginator(messages_queryset, limit)
-            page_number = (offset // limit) + 1
+			# Initialize Paginator
+			paginator = Paginator(messages_queryset, limit)
+			page_number = (offset // limit) + 1
 
-            try:
-                page_obj = paginator.get_page(page_number)
-            except EmptyPage:
-                logger.info(f"No messages found for group '{group_id}' at offset {offset}.")
-                return Response(
-                    {
-                        'status': 'success',
-                        'messages': [],
-                        'next_offset': None,
-                        'has_next_page': False
-                    },
-                    status=status.HTTP_200_OK
-                )
+			try:
+				page_obj = paginator.get_page(page_number)
+			except EmptyPage:
+				logger.info(f"No messages found for group '{group_id}' at offset {offset}.")
+				return Response(
+					{
+						'status': 'success',
+						'messages': [],
+						'next_offset': None,
+						'has_next_page': False
+					},
+					status=status.HTTP_200_OK
+				)
 
-            # Serialize message data
-            messages_data = [
-                {
-                    'id': msg.id,
-                    'sender_username': msg.sender.user_name,
-                    'group_id': msg.group.id,
-                    'content': msg.content,
-                    'timestamp': msg.timestamp.isoformat(),
-                } for msg in page_obj.object_list
-            ]
+			# Serialize message data
+			messages_data = [
+				{
+					'id': msg.id,
+					'sender_username': msg.sender.user_name,
+					'group_id': msg.group.id,
+					'content': msg.content,
+					'timestamp': msg.timestamp.isoformat(),
+				} for msg in page_obj.object_list
+			]
 
-            next_offset = offset + len(messages_data) if page_obj.has_next() else None
+			next_offset = offset + len(messages_data) if page_obj.has_next() else None
 
-            logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_id}' for user {current_user.user_name}.")
-            return Response({
-                'status': 'success',
-                'messages': messages_data,
-                'next_offset': next_offset,
-                'has_next_page': page_obj.has_next()
-            }, status=status.HTTP_200_OK)
+			logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_id}' for user {current_user.user_name}.")
+			return Response({
+				'status': 'success',
+				'messages': messages_data,
+				'next_offset': next_offset,
+				'has_next_page': page_obj.has_next()
+			}, status=status.HTTP_200_OK)
 
-        except ChatGroup.DoesNotExist:
-            logger.warning(f"Chat group '{group_id}' not found for message history.")
-            return Response(
-                {'status': 'error', 'message': 'Chat group not found.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            logger.exception(f"Error in ChatMessageHistoryView for group '{group_id}': {e}")
-            return Response(
-                {'status': 'error', 'message': 'Internal server error during message history retrieval.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    """
-    API endpoint to send a chat message to a specific group.
-    This view saves the message to the database and broadcasts it via Channel Layers.
-    """
-    def post(self, request, group_id) -> Response:
-        current_user = request.user
-        data = request.data
-        content = data.get('content')
-        # group_id = data.get('group_id')
-        if not content:
-            logger.warning("Message content is empty for sending message.")
-            return Response(
-                {'status': 'error', 'message': 'Message content cannot be empty.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+		except ChatGroup.DoesNotExist:
+			logger.warning(f"Chat group '{group_id}' not found for message history.")
+			return Response(
+				{'status': 'error', 'message': 'Chat group not found.'},
+				status=status.HTTP_404_NOT_FOUND
+			)
+		except Exception as e:
+			logger.exception(f"Error in ChatMessageHistoryView for group '{group_id}': {e}")
+			return Response(
+				{'status': 'error', 'message': 'Internal server error during message history retrieval.'},
+				status=status.HTTP_500_INTERNAL_SERVER_ERROR
+			)
+	"""
+	API endpoint to send a chat message to a specific group.
+	This view saves the message to the database and broadcasts it via Channel Layers.
+	"""
+	def post(self, request, group_id) -> Response:
+		current_user = request.user
+		data = request.data
+		content = data.get('content')
+		# group_id = data.get('group_id')
+		if not content:
+			logger.warning("Message content is empty for sending message.")
+			return Response(
+				{'status': 'error', 'message': 'Message content cannot be empty.'},
+				status=status.HTTP_400_BAD_REQUEST
+			)
 
-        try:
-            chat_group = ChatGroup.objects.get(id=group_id)
-            is_member = chat_group.members.filter(id=current_user.id).exists()
-            if not is_member:
-                logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Cannot send message.")
-                return Response(
-                    {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+		try:
+			chat_group = ChatGroup.objects.get(id=group_id)
+			is_member = chat_group.members.filter(id=current_user.id).exists()
+			if not is_member:
+				logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Cannot send message.")
+				return Response(
+					{'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
+					status=status.HTTP_403_FORBIDDEN
+				)
 
-            message = Message.objects.create(
-                sender=current_user,
-                content=content,
-                group=chat_group
-            )
-            logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_id}.")
+			message = Message.objects.create(
+				sender=current_user,
+				content=content,
+				group=chat_group
+			)
+			logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_id}.")
 
-            channel_layer = get_channel_layer()
-            if channel_layer is None:
-                logger.critical("Channel Layer not configured. Real-time features will not work.")
-                return Response(
-                    {'status': 'error', 'message': 'Server not configured for real-time communication.'},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+			channel_layer = get_channel_layer()
+			if channel_layer is None:
+				logger.critical("Channel Layer not configured. Real-time features will not work.")
+				return Response(
+					{'status': 'error', 'message': 'Server not configured for real-time communication.'},
+					status=status.HTTP_500_INTERNAL_SERVER_ERROR
+				)
 
-            channel_group_id = f"chat_{group_id}"
+			channel_group_id = f"chat_{group_id}"
 
-            message_data = {
-                "id": message.id,
-                "sender": current_user.user_name,
-                "sender_username": current_user.user_name,
-                "sender_id": current_user.id,
-                "content": content,
-                "timestamp": message.timestamp.isoformat(),
-                "group_id": group_id
-            }
+			message_data = {
+				"id": message.id,
+				"sender": current_user.user_name,
+				"sender_username": current_user.user_name,
+				"sender_id": current_user.id,
+				"content": content,
+				"timestamp": message.timestamp.isoformat(),
+				"group_id": group_id
+			}
 
-            # Use async_to_sync to call async channel layer from sync code
-            async_to_sync(channel_layer.group_send)(
-                channel_group_id,
-                {
-                    "type": "chat_message",
-                    "message": message_data
-                }
-            )
-            logger.info(f"Message broadcasted to group '{channel_group_id}'.")
+			# Use async_to_sync to call async channel layer from sync code
+			async_to_sync(channel_layer.group_send)(
+				channel_group_id,
+				{
+					"type": "chat_message",
+					"message": message_data
+				}
+			)
+			logger.info(f"Message broadcasted to group '{channel_group_id}'.")
 
-            return Response({
-                'status': 'success',
-                'message': 'Message sent and broadcasted.',
-                'message_data': message_data
-            }, status=status.HTTP_200_OK)
+			return Response({
+				'status': 'success',
+				'message': 'Message sent and broadcasted.',
+				'message_data': message_data
+			}, status=status.HTTP_200_OK)
 
-        except ChatGroup.DoesNotExist:
-            logger.warning(f"Chat group '{group_id}' not found for sending message.")
-            return Response(
-                {'status': 'error', 'message': 'Chat group not found.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            logger.exception(f"Error in ChatMessageSendView: {e}")
-            return Response(
-                {'status': 'error', 'message': f'Internal server error: {e}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+		except ChatGroup.DoesNotExist:
+			logger.warning(f"Chat group '{group_id}' not found for sending message.")
+			return Response(
+				{'status': 'error', 'message': 'Chat group not found.'},
+				status=status.HTTP_404_NOT_FOUND
+			)
+		except Exception as e:
+			logger.exception(f"Error in ChatMessageSendView: {e}")
+			return Response(
+				{'status': 'error', 'message': f'Internal server error: {e}'},
+				status=status.HTTP_500_INTERNAL_SERVER_ERROR
+			)
 
 class refreshToken(APIView) :
 	permission_classes = [AllowAny]
@@ -794,173 +824,173 @@ class refreshToken(APIView) :
 
 
 class listennerFriends(APIView) :
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request) :
-        user = request.user
+	def get(self, request) :
+		user = request.user
 
-        friends = FRIEND.objects.filter(
-            Q(from_user=user) | Q(to_user=user),
-            status__in=["pending", "accepted"]
-        )
+		friends = FRIEND.objects.filter(
+			Q(from_user=user) | Q(to_user=user),
+			status__in=["pending", "accepted"]
+		)
 
-        results = []
-        for f in friends:
-            if f.from_user == user:
-                other = f.to_user
-                direction = "sent"
-            else:
-                other = f.from_user
-                direction = "received"
+		results = []
+		for f in friends:
+			if f.from_user == user:
+				other = f.to_user
+				direction = "sent"
+			else:
+				other = f.from_user
+				direction = "received"
 
-            results.append({
-                "username": other.user_name,
-                "status": f.status,
-                "direction": direction,
+			results.append({
+				"username": other.user_name,
+				"status": f.status,
+				"direction": direction,
 				"online": other.online,
-            })
+			})
 
-        return Response({"results": results})
+		return Response({"results": results})
 
 
 class addFriend(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        from_user = request.user
-        username = request.data.get("userName")
-    
-        try:
-            to_user = USER.objects.get(user_name=username)
-        except USER.DoesNotExist:
-            return Response({"error": "User friend not found"}, status=404)
-    
-        if to_user == from_user:
-            return Response({"error": "You cannot add yourself as a friend"}, status=400)
+	def post(self, request):
+		from_user = request.user
+		username = request.data.get("userName")
+	
+		try:
+			to_user = USER.objects.get(user_name=username)
+		except USER.DoesNotExist:
+			return Response({"error": "User friend not found"}, status=404)
+	
+		if to_user == from_user:
+			return Response({"error": "You cannot add yourself as a friend"}, status=400)
 
-        inverse_request_exists = FRIEND.objects.filter(
-            from_user=to_user,
-            to_user=from_user,
-            status="pending"
-        ).exists()
+		inverse_request_exists = FRIEND.objects.filter(
+			from_user=to_user,
+			to_user=from_user,
+			status="pending"
+		).exists()
 
-        if inverse_request_exists:
-            return Response({"error": "This user has already sent you a friend request"}, status=400)
+		if inverse_request_exists:
+			return Response({"error": "This user has already sent you a friend request"}, status=400)
 
-        friend, created = FRIEND.objects.get_or_create(
-            from_user=from_user,
-            to_user=to_user,
-            defaults={"status": "pending"}
-        )
+		friend, created = FRIEND.objects.get_or_create(
+			from_user=from_user,
+			to_user=to_user,
+			defaults={"status": "pending"}
+		)
 
-        if not created:
-            return Response({"error": "Friend request already sent or exists"}, status=400)
+		if not created:
+			return Response({"error": "Friend request already sent or exists"}, status=400)
 
-        return Response({"message": "Friend request sent successfully"}, status=201)
+		return Response({"message": "Friend request sent successfully"}, status=201)
 
 
 class declineInvite(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def patch(self, request):
-        from_user = request.user
-        to_username = request.data.get("username")
-            
-        to_user = get_object_or_404(USER, user_name=to_username)
-		
-        friend_req = get_object_or_404(
-            FRIEND,
-            from_user=to_user,
-            to_user=from_user,
-            status="pending")
+	def patch(self, request):
+		from_user = request.user
+		to_username = request.data.get("username")
 			
-        friend_req.delete()
+		to_user = get_object_or_404(USER, user_name=to_username)
 		
-        return Response(
-            {"message": f"Friend request from {to_user.user_name} declined"},
-            status=200
-        )
+		friend_req = get_object_or_404(
+			FRIEND,
+			from_user=to_user,
+			to_user=from_user,
+			status="pending")
+			
+		friend_req.delete()
+		
+		return Response(
+			{"message": f"Friend request from {to_user.user_name} declined"},
+			status=200
+		)
 
 
 class acceptInvite(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def patch(self, request):
-        from_user = request.user
-        to_username = request.data.get("username")
+	def patch(self, request):
+		from_user = request.user
+		to_username = request.data.get("username")
 	
-        to_user = get_object_or_404(USER, user_name=to_username)
+		to_user = get_object_or_404(USER, user_name=to_username)
 	
-        friend_req = get_object_or_404(
-            FRIEND,
-            from_user=to_user,
-            to_user=from_user,
-            status="pending")
+		friend_req = get_object_or_404(
+			FRIEND,
+			from_user=to_user,
+			to_user=from_user,
+			status="pending")
 		
-        friend_req.status = "accepted"
-        friend_req.save()
+		friend_req.status = "accepted"
+		friend_req.save()
 		
-        return Response(
-            {"message": f"Friend request from {to_user.user_name} accepted"},
-            status=200
-        )
+		return Response(
+			{"message": f"Friend request from {to_user.user_name} accepted"},
+			status=200
+		)
 
 class logout(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def patch(self, request):
-        user = request.user
-        user.online = False
-        user.save()
-        return Response({'message': 'User logged out successfully'}, status=200)
+	def patch(self, request):
+		user = request.user
+		user.online = False
+		user.save()
+		return Response({'message': 'User logged out successfully'}, status=200)
 	
 class matchHistory(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        username = request.user.user_name
+	def get(self, request):
+		username = request.user.user_name
 		
-        matches = MATCHTABLE.objects.filter(
-            Q(username1=username) | Q(username2=username)
-        ).order_by('-dateMatch')
+		matches = MATCHTABLE.objects.filter(
+			Q(username1=username) | Q(username2=username)
+		).order_by('-dateMatch')
 
-        total_matches = matches.count()
+		total_matches = matches.count()
 
-        wins = 0
-        losses = 0
+		wins = 0
+		losses = 0
 
-        for match in matches:
-            if match.username1 == username:
-                if match.score1 > match.score2:
-                    wins += 1
-                elif match.score1 < match.score2:
-                    losses += 1
-            elif match.username2 == username:
-                if match.score2 > match.score1:
-                    wins += 1
-                elif match.score2 < match.score1:
-                    losses += 1
+		for match in matches:
+			if match.username1 == username:
+				if match.score1 > match.score2:
+					wins += 1
+				elif match.score1 < match.score2:
+					losses += 1
+			elif match.username2 == username:
+				if match.score2 > match.score1:
+					wins += 1
+				elif match.score2 < match.score1:
+					losses += 1
 
 
-        data = []
-        data.append({
+		data = []
+		data.append({
 			"user": username,
-            "total_games": total_matches,
+			"total_games": total_matches,
 			"game_wins": wins,
 			"game_losses": losses,
-        })
-        for match in matches:
-            data.append({
+		})
+		for match in matches:
+			data.append({
 				"user": username,
-                "date": match.dateMatch,
-                "username1": match.username1,
-                "username2": match.username2,
-                "score1": match.score1,
-                "score2": match.score2,
-                "winner": match.winner,
-            })
+				"date": match.dateMatch,
+				"username1": match.username1,
+				"username2": match.username2,
+				"score1": match.score1,
+				"score2": match.score2,
+				"winner": match.winner,
+			})
 
-        return Response({'result': data})
+		return Response({'result': data})
 	
 class forgotPassword(APIView):
 	permission_classes = [AllowAny]
