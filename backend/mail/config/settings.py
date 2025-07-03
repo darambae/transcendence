@@ -28,7 +28,8 @@ DEBUG = True
 
 APP_NAME = 'mail'
 
-ALLOWED_HOSTS = ['mail']
+#ALLOWED_HOSTS = ['mail']
+ALLOWED_HOSTS = ['*']
 
 
 # HTTP settings
@@ -145,39 +146,39 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 import logging
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '[{levelname}] {asctime} {name}: {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-            'level': 'DEBUG',  # Show all logs
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',  # Show all logs
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Show all logs from Django
-            'propagate': False,
-        },
-        'api': {
-            'handlers': ['console'],
-            'level': 'DEBUG',  # Show all logs from your app
-            'propagate': False,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'simple': {
+#             'format': '[{levelname}] {asctime} {name}: {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple',
+#             'level': 'DEBUG',  # Show all logs
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'DEBUG',  # Show all logs
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from Django
+#             'propagate': False,
+#         },
+#         'api': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from your app
+#             'propagate': False,
+#         },
+#     },
+# }
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):

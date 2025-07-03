@@ -1,0 +1,15 @@
+--------------------------
+Beginning : 9:37:25 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNTM1Njg4LCJpYXQiOjE3NTE0Njg4MzgsImp0aSI6ImVmMjgwMWQyZGM0OTQ0YTk4NTNkNDcxNTE0MGQ3MzA5IiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.rVcmotRnJXrt9GWbZ6kRLxYxGagRlH5WpmkgU2jTg2o
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1751535688, 'iat': 1751468838, 'jti': 'ef2801d2dc4944a9853d4715140d7309', 'user_id': 2, 'username': 'omar', 'invites': []}}
+--------------------------
+Beginning : 9:37:36 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNTM1Njg4LCJpYXQiOjE3NTE0Njg4MzgsImp0aSI6ImVmMjgwMWQyZGM0OTQ0YTk4NTNkNDcxNTE0MGQ3MzA5IiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.rVcmotRnJXrt9GWbZ6kRLxYxGagRlH5WpmkgU2jTg2o
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1751535688, 'iat': 1751468838, 'jti': 'ef2801d2dc4944a9853d4715140d7309', 'user_id': 2, 'username': 'omar', 'invites': []}}
+--------------------------
+Beginning : 12:52:39 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNTQ3MjI1LCJpYXQiOjE3NTE1NDY5MjUsImp0aSI6IjhiNWZlNTA2NzBkNDQ1Y2I5OGNjODE5ZDAzZWM3ZGNkIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6W119.JtqYOzomSfm44sBxEn2oD6LobkzPharHfzsjpHEQ6Jg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1751547225, 'iat': 1751546925, 'jti': '8b5fe50670d445cb98cc819d03ec7dcd', 'user_id': 3, 'username': 'gautier', 'invites': []}}
