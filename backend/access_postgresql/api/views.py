@@ -269,7 +269,7 @@ class disconnected(APIView):
 
 	def get(self, request, token):
 		decoded = jwt.decode(token, options={"verify_signature": False})
-        
+
 		user = get_object_or_404(USER, user_name=decoded.get('username'))
 		user.online = False
 		user.save()
@@ -502,25 +502,38 @@ class blockedStatus(APIView):
 
     def get(self, request, targetUser) -> Response:
         current_user = request.user
-        logger.info(f"Retrieving chat groups for user {current_user.user_name}")
+        logger.info(f"Retrieving blocked status for user {current_user.user_name} about {targetUser}")
         status = {'isBlocked':False, 'hasBlocked':False}
         try:
-            target_user = USER.objects.filter(user_name=targetUser)
-            if target_user.exists():
-                for otherUser in current_user.blocked_user:
-                    if otherUser.user_name == target_user.user_name:
-                          status['isBlocked'] = True
-                          break
-                for otherUser in target_user.blocked_user:
-                    if otherUser.user_name == current_user.user_name:
-                          status['hasBlocked'] = True
-            else:
-                logger.info(f"No data found for the user {target_user.user_name}.")
-            return Response({'status': 'success', 'blockedStatus':status}, status=status.HTTP_200_OK)
+              target_user = get_object_or_404(USER, user_name=targetUser)
+              is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
+              status['isBlocked'] = is_blocked
+              has_blocked = target_user.blocked_user.filter(id=current_user.id).exists()
+              status['hasBlocked'] = has_blocked
+              return Response({'status': 'success', 'blockedStatus':status}, status=status.HTTP_200_OK)
         except Exception as e:
             logger.exception("Internal server error during blocked status retrieval.")
             return Response(
                 {'status': 'error', 'message': 'Internal server error during blocked status retrieval.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    def post(self, request, targetUser) -> Response:
+          current_user = request.user
+          data = json.loads(request.body)
+          block_target = data.get('isBlocked')
+          logger.info(f"Retrieving blocked status for user {current_user.user_name} about {targetUser}")
+          try:
+            target_user = get_object_or_404(USER, user_name=targetUser)
+            is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
+            if (is_blocked & block_target == False):
+                  current_user.blocked_user.remove(target_user)
+            elif (not is_blocked & block_target):
+                  current_user.blocked_user.add(target_user)
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+          except Exception as e:
+            logger.exception("Internal server error changing blocked status.")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error changing blocked status.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
