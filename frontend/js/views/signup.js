@@ -1,4 +1,4 @@
-import { actualizeIndexPage, getCookie, fetchWithRefresh } from '../utils.js';
+import { actualizeIndexPage, getCookie } from '../utils.js';
 import { routes } from '../routes.js';
 
 export async function handleSignupSubmit(event) {
@@ -27,7 +27,7 @@ export async function handleSignupSubmit(event) {
 		const { username, mail, firstName, lastName, password } = data;
 		const cleanData = { username, mail, firstName, lastName, password };
 		
-		const response = await fetchWithRefresh('user-service/signup/', {
+		const response = await fetch('user-service/signup/', {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -57,6 +57,7 @@ export async function handleSignupSubmit(event) {
 			if (loginBtn) {
 				loginBtn.addEventListener('click', async () => {
 					actualizeIndexPage('modal-container', routes.login);
+					window.location.href = '/#home';
 				});
 			}
 		} else {

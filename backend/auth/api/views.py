@@ -96,7 +96,7 @@ class login(APIView):
 			return JsonResponse(data_response, status=response.status_code)
 
 
-class verifyTwofa(APIView):
+class verifyTwofa(APIView): # The initial cookie is set in this view
 	permission_classes = [AllowAny]
 
 	def post(self, request):
@@ -110,7 +110,7 @@ class verifyTwofa(APIView):
 
 		jwtDecoded = decodeJWT(request)
 		main_account = jwtDecoded[0]
-			
+				
 		# with open("log-tfa.txt", "w+") as f:
 		# 	print(f"main : {main_account}", file=f)
 
@@ -166,7 +166,7 @@ class verifyTwofa(APIView):
 			# Handle error responses
 			if not response.ok:
 				error_detail = response_data if response.content else response.text
-    
+	
 				# If error_detail is a dict with an 'error' key, extract it directly
 				if isinstance(error_detail, dict) and 'error' in error_detail:
 					return setTheCookie(JsonResponse({'error': error_detail['error']}, status=response.status_code), 
@@ -190,6 +190,35 @@ class verifyTwofa(APIView):
 			return setTheCookie(
 				JsonResponse({'error': f'Connection error: {str(e)}'}, status=500),
 				jwtDecoded[1], jwtDecoded[2])
+		
+		# with open("log-tfa.txt", "a") as f :
+		# 	print(f"response json : {response.data}\nstatusCode : {response.status_code}", file=f)
+		# if response.ok:
+		# 	jwtDecoded[1] = response.json().get("access")
+		# 	jwtDecoded[2] = response.json().get("refresh")
+
+		# data_response = None
+		# try:
+		# 	if not response.ok:
+		# 		error_detail = response.json() if response.content else response.text
+		# 		if response.status_code in [400, 401, 403, 404]:
+		# 			return setTheCookie(JsonResponse({'error': error_detail}, status=400), jwtDecoded[1], jwtDecoded[2])
+		# except ValueError:
+		# 	data_response = {
+		# 		'error': 'Invalid response from mail service',
+		# 		'detail': response.text
+		# 	}
+
+		# if response.status_code == 200:
+		# 	data_response = {
+		# 		'success':'authentication successfull, you are connected',
+		# 	}
+		# else:
+		# 	data_response = {
+		# 		'error':response.text
+		# 	}
+		# return setTheCookie(JsonResponse(data_response, status=response.status_code), jwtDecoded[1], jwtDecoded[2])
+
 
 def activate_account(request, uidb64, token):
 
@@ -208,18 +237,57 @@ def activate_account(request, uidb64, token):
 	return render(request, template_html)
 
 
-class refreshToken(APIView):
-	permission_class = [AllowAny]
+class refreshAccessToken(APIView):
+    """
+    Endpoint for refreshing an expired access token using a valid refresh token.
+    
+    This view extracts the refresh token from cookies, sends it to the authentication 
+    service, and returns a new access token if the refresh token is valid.
+    
+    GET: /auth/refresh-token/
+    """
+    permission_classes = [AllowAny]  # Fixed typo: permission_class -> permission_classes
 
-	def get(self, request) :
-		refresh_token = request.COOKIES.get("refresh_token", None)
-		refresh_res = requests.get('https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
-		if refresh_res.status_code == 200:
-			access = refresh_res.json().get("access", None)
-			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
-		else :
-			return JsonResponse({"Error" : "Refresh token expired"}, status=401)
-		
+    def get(self, request):
+        # Get refresh token from cookies
+        refresh_token = request.COOKIES.get("refresh_token")
+        
+        # If no refresh token found, return error
+        if not refresh_token:
+            return JsonResponse({"error": "No refresh token provided"}, status=400)
+            
+        try:
+            # Request new access token from authentication service
+            refresh_response = requests.get(
+                'https://access_postgresql:4000/api/token/refresh',
+                headers={
+                    "Authorization": f"bearer {refresh_token}", 
+                    'Host': 'localhost'
+                },
+                verify=False
+            )
+            
+            # Handle successful token refresh
+            if refresh_response.status_code == 200:
+                # Extract new access token
+                new_access_token = refresh_response.json().get("access")
+                
+                if not new_access_token:
+                    return JsonResponse({"error": "Invalid response from authentication service"}, status=500)
+                    
+                # Return success response with new access token in cookie
+                return setTheCookie(
+                    JsonResponse({"success": "Access token successfully refreshed"}, status=200),
+                    new_access_token, 
+                    refresh_token
+                )
+            else:
+                # Return appropriate error for invalid/expired refresh token
+                return JsonResponse({"error": "Refresh token expired or invalid"}, status=401)
+                
+        except requests.exceptions.RequestException as e:
+            # Handle connection errors to authentication service
+            return JsonResponse({"error": f"Authentication service unavailable: {str(e)}"}, status=503)
 
 class logout(APIView):
 	permission_classes = [AllowAny]
@@ -232,7 +300,9 @@ class logout(APIView):
 		# 	return JsonResponse({'error': 'User mail not found in JWT'}, status=400)
 
 		try:
-			token = request.COOKIES.get('access_token')
+			# try to get access_token, if , try to get refresh_token
+			# if both are not found, return error
+			token = request.COOKIES.get('access_token', None)
 			headers = {'Host': 'localhost'}
 			if (token): 
 				headers['Authorization'] = f'Bearer {token}'

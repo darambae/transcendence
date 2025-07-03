@@ -3,9 +3,10 @@ import { routes } from './routes.js';
 import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener, fetchWithRefresh } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 
-window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
+// window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
 	attachLoginListener();
+	renderChatButtonIfAuthenticated();
 });
 
 window.addEventListener('hashchange', navigate);
@@ -19,7 +20,7 @@ export async function navigate() {
 	//check if csrf present
 	const csrf = getCookie('csrftoken');
 	if (!csrf) {
-		fetchWithRefresh('user-service/csrf/', {
+		fetch('user-service/csrf/', {
 			method: 'GET',
 			credentials: 'include',
 		});

@@ -3,18 +3,19 @@ import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } 
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
+
 let mainChatBootstrapModal; // Bootstrap Modal instance
 let currentActiveChatGroup = null; // No default active group, will be set on selection
 const eventSources = {}; // Stores EventSource objects per groupId
 const messageOffsets = {}; // Stores the offset for message history for each group
 
 // Helper to create an HTML message element
-function createMessageElement(messageData, username) {
+function createMessageElement(messageData, currentUserId) {
     const msg = document.createElement('div');
     msg.classList.add('chat-message');
 
     // Determine if the message sender is the current logged-in user
-    const isSelf = messageData.sender === username || messageData.sender_username === username;
+	const isSelf = messageData.sender_id === currentUserId;
 
     if (isSelf) {
         msg.classList.add('self');
@@ -24,8 +25,7 @@ function createMessageElement(messageData, username) {
 
     const senderSpan = document.createElement('span');
     senderSpan.classList.add('message-sender');
-    // Prioritize sender_username from backend if available, otherwise use sender
-    senderSpan.textContent = messageData.sender_username || messageData.sender;
+	senderSpan.textContent = messageData.sender_username;
     msg.appendChild(senderSpan);
 
     const contentText = document.createTextNode(messageData.content);
@@ -47,7 +47,7 @@ function createMessageElement(messageData, username) {
 }
 
 // Function to load message history for the active group
-async function loadMessageHistory(username, groupId, prepend = false) {
+async function loadMessageHistory(currentUserId, groupId, prepend = false) {
     const chatLog = document.getElementById('chatLog-active');
     if (groupId === null || groupId === undefined) {
         console.error('No groupId provided for loading history.');
@@ -89,7 +89,7 @@ async function loadMessageHistory(username, groupId, prepend = false) {
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
                 data.messages.forEach((msgData) => {
-                    const msgElement = createMessageElement(msgData, username);
+                    const msgElement = createMessageElement(msgData, currentUserId);
                     fragment.appendChild(msgElement);
                 });
 
@@ -122,13 +122,15 @@ async function loadMessageHistory(username, groupId, prepend = false) {
     }
 }
 
-function sendMessage(username) {
+function sendMessage(currentUserId) {
 	const messageInput = document.getElementById('messageInput-active');
 	const groupIdInput = document.getElementById('groupIdInput-active');
+	const usernameInput = document.getElementById('usernameInput-active');
 
 	const content = messageInput.value.trim();
     const groupId = groupIdInput.value;
-    
+	const username = usernameInput.value;
+
 	const MIN_LENGTH = 1;
     const MAX_LENGTH = 1000; // Set appropriate limit
     
@@ -155,7 +157,7 @@ function sendMessage(username) {
 	const tempMessageData = {
 		content: content,
 		group_id: groupId,
-		sender: username,
+		sender_id: currentUserId,
 		sender_username: username,
 		timestamp: new Date().toISOString(),
 	};
@@ -169,7 +171,7 @@ function sendMessage(username) {
 			noMessagesDiv.remove();
 		}
 
-		const msgElement = createMessageElement(tempMessageData, username);
+		const msgElement = createMessageElement(tempMessageData, currentUserId);
 		chatLog.appendChild(msgElement);
 		chatLog.scrollTop = chatLog.scrollHeight;
 	}
@@ -188,6 +190,8 @@ function sendMessage(username) {
 		body: JSON.stringify({
 			content: content,
 			group_id: groupId,
+			sender_id: currentUserId,
+			sender_username: username,
 		}),
 	})
 		.then((response) =>
@@ -218,7 +222,7 @@ function sendMessage(username) {
 }
 
 // Function to initialize EventSource (SSE) for a group
-function initEventSource(groupId, username) {
+async function initEventSource(groupId, currentUserId) {
 	// Close any other active EventSources before opening a new one
 	for (const key in eventSources) {
 		if (eventSources[key].readyState === EventSource.OPEN) {
@@ -233,82 +237,112 @@ function initEventSource(groupId, username) {
 		console.error(`chatLog-active not found for initEventSource.`);
 		return;
 	}
+	try {
+		await fetchWithRefresh(`/chat/${groupId}/messages/`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
+			},
+			credentials: 'include',
+		});
+		// UPDATED URL: /chat/stream/{group_id}/
+		const source = new EventSource(`/chat/stream/${groupId}/`);
 
-	// UPDATED URL: /chat/stream/{group_id}/
-	const source = new EventSource(`/chat/stream/${groupId}/`);
+		eventSources[groupId] = source;
 
-	eventSources[groupId] = source;
-	const recentlyReceivedMessages = new Set(); // For message deduplication
-	source.onmessage = function (e) {
-		try {
-			const messageData = JSON.parse(e.data);
-
-			// Skip if this message is from the current user (we've already displayed it)
-			if (
-				messageData.sender === username ||
-				messageData.sender_username === username
-			) {
-				console.log('Skipping own message from SSE');
-				return;
+		source.addEventListener('refresh_token', async function () {
+			console.log('Token refresh requested by server');
+			// Make a request that will refresh the token
+			try {
+				await fetch('auth/refresh-token/', {
+					method: 'GET',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
+					},
+				});
+				console.log('Token refreshed successfully');
+			} catch (error) {
+				console.error('Failed to refresh token:', error);
 			}
-            const messageId = `${messageData.id || ''}-${
-							messageData.timestamp
-						}-${messageData.sender}-${messageData.content}`;
+		});
 
-            // Skip if we've seen this message recently (deduplication)
-            if (recentlyReceivedMessages.has(messageId)) {
-                console.log('Skipping duplicate message:', messageId);
-                return;
-            }
+		const recentlyReceivedMessages = new Set(); // For message deduplication
+		source.onmessage = function (e) {
+			try {
+				const messageData = JSON.parse(e.data);
 
-            // Add to recently seen messages
-            recentlyReceivedMessages.add(messageId);
-
-            // Remove old entries after 5 seconds to prevent set from growing too large
-            setTimeout(() => {
-                recentlyReceivedMessages.delete(messageId);
-            }, 5000);
-			// Only append if the message is for the currently active chat group
-			if (messageData.group_id === currentActiveChatGroup) {
-				// Remove "No messages yet" if a new message arrives
-				const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
-				if (noMessagesDiv) {
-					noMessagesDiv.remove();
+				// Skip if this message is from the current user (we've already displayed it)
+				if (messageData.sender_id === currentUserId) {
+					console.log('Skipping own message from SSE');
+					return;
 				}
-				const msgElement = createMessageElement(messageData, username);
-				chatLog.appendChild(msgElement);
-				chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
-			}
-		} catch (error) {
-			console.error(
-				'JSON parsing error or SSE message processing error:',
-				error,
-				e.data
-			);
-		}
-	};
+				const messageId = `${messageData.id || ''}-${messageData.timestamp
+					}-${messageData.sender_id}-${messageData.content}`;
 
-	source.onerror = function (err) {
-		console.error('EventSource failed for group ' + groupId + ':', err);
-		source.close();
-		delete eventSources[groupId];
-		// Only attempt reconnect if currentActiveChatGroup is still this groupId
-		// Otherwise, it means user switched chat, and we shouldn't reconnect here
-		if (currentActiveChatGroup === groupId) {
-			setTimeout(() => initEventSource(groupId, username), 3000); // Attempt reconnect after 3 seconds
-		}
-	};
-	console.log(`Opened SSE for group: ${groupId}`);
+				// Skip if we've seen this message recently (deduplication)
+				if (recentlyReceivedMessages.has(messageId)) {
+					console.log('Skipping duplicate message:', messageId);
+					return;
+				}
+
+				// Add to recently seen messages
+				recentlyReceivedMessages.add(messageId);
+
+				// Remove old entries after 5 seconds to prevent set from growing too large
+				setTimeout(() => {
+					recentlyReceivedMessages.delete(messageId);
+				}, 5000);
+				// Only append if the message is for the currently active chat group
+				if (messageData.group_id === currentActiveChatGroup) {
+					// Remove "No messages yet" if a new message arrives
+					const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
+					if (noMessagesDiv) {
+						noMessagesDiv.remove();
+					}
+					const msgElement = createMessageElement(messageData, currentUserId);
+					chatLog.appendChild(msgElement);
+					chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
+				}
+			} catch (error) {
+				console.error(
+					'JSON parsing error or SSE message processing error:',
+					error,
+					e.data
+				);
+			}
+		};
+
+		source.onerror = async function (err) {
+			console.error('EventSource failed for group ' + groupId + ':', err);
+			source.close();
+			delete eventSources[groupId];
+			await new Promise(resolve => setTimeout(resolve, 3000));
+			// Only attempt reconnect if currentActiveChatGroup is still this groupId
+			// Otherwise, it means user switched chat, and we shouldn't reconnect here
+			if (currentActiveChatGroup === groupId) {
+				console.log("Refreshing token and reconnecting SSE...");
+				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
+			}
+		};
+		console.log(`Opened SSE for group: ${groupId}`);
+	} catch (error) {
+		console.error('Error initializing EventSource:', error);
+	}
 }
+
+	
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
-async function loadChatRoomList(current_user) {
+async function loadChatRoomList(currentUserId) {
     const chatRoomListUl = document.getElementById('chatRoomList');
     if (!chatRoomListUl) {
         console.error('Chat room list element not found!');
         return;
     }
 
-    if (!current_user) {
+    if (!currentUserId) {
         console.log("Not logged in, cannot load chat list.");
         chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
         return;
@@ -322,13 +356,12 @@ async function loadChatRoomList(current_user) {
         // which implies the view itself handles the user context for listing.
         // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
-        const csrf = getCookie('csrftoken');
-        console.log('Loading chat list for user:', current_user);
+        console.log('Loading chat list for user:', currentUserId);
         const response = await fetchWithRefresh(`/chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrf, // For CSRF protection if needed
+                'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
             },
             credentials: 'include'
         });
@@ -348,25 +381,24 @@ async function loadChatRoomList(current_user) {
             console.log('Loaded chat list:', data.chats);
             data.chats.forEach((chat) => {
                 const listItem = document.createElement('li');
-                listItem.classList.add('list-group-item');
-                if (chat.group_id === currentActiveChatGroup) {
-                    listItem.classList.add('active'); // Highlight active room
-                }
-                listItem.dataset.groupId = chat.group_id;
-                listItem.dataset.receiver = chat.receiver; // Store username for this chat
-                listItem.textContent = chat.receiver; // Display receiver's username
-                listItem.style.cursor = 'pointer';
-                console.log(`Adding chat room: ${chat.group_name} (ID: ${chat.group_id})`);
-                listItem.onclick = async () => {
-                    try {
-                        await switchChatRoom(current_user, chat.group_id);
-                    } catch (e) {
-                        console.error('Error switching chat room:', e);
-                        alert('Could not switch chat room. Please try again.');
-                    }
-                }
-                // switchChatRoom(current_user, chat.group_id);
-                chatRoomListUl.appendChild(listItem);
+				listItem.classList.add('list-group-item');
+				if (chat.group_id === currentActiveChatGroup) {
+					listItem.classList.add('active');
+				}
+				listItem.dataset.groupId = chat.group_id;
+				listItem.dataset.targetUserId = chat.receiver_id; // Store ID
+				listItem.dataset.receiver = chat.receiver_name; // Store username for display
+				listItem.textContent = chat.receiver_name;
+				listItem.style.cursor = 'pointer';
+				listItem.onclick = async () => {
+					try {
+						await switchChatRoom(currentUserId, chat.group_id);
+					} catch (e) {
+						console.error('Error switching chat room:', e);
+						alert('Could not switch chat room. Please try again.');
+					}
+				}
+				chatRoomListUl.appendChild(listItem);
             });
         } else {
             console.error(
@@ -384,13 +416,13 @@ async function loadChatRoomList(current_user) {
 }
 
 // Function to switch between chat rooms
-async function switchChatRoom(username, newgroupId) {
+async function switchChatRoom(currentUserId, newgroupId) {
     if (newgroupId === null || newgroupId === undefined) {
 			console.error('No groupId provided for loading history.');
 			return;
 		}
     if (currentActiveChatGroup === newgroupId) {
-        return; // Already in this room
+        return;
     }
 
     // Update active class in the list
@@ -443,8 +475,8 @@ async function switchChatRoom(username, newgroupId) {
 
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
-    loadMessageHistory(username, newgroupId);
-    initEventSource(newgroupId, username);
+    loadMessageHistory(currentUserId, newgroupId);
+    initEventSource(newgroupId, currentUserId);
 
     // Focus on message input
     const messageInput = document.getElementById('messageInput-active');
@@ -453,16 +485,16 @@ async function switchChatRoom(username, newgroupId) {
     }
 }
 
-async function promptPrivateChat(username, targetUsername) {
+async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	console.log(
-		`Requesting private chat with ${targetUsername} for user ${username}`
+		`Requesting private chat with ${targetUsername} for user ${currentUserId}`
 	);
-	if (!username) {
+	if (!currentUserId) {
 		alert('Please log in to start a new chat.');
 		return;
 	}
 
-	if (username === targetUsername) {
+	if (currentUserId === targetUserId) {
 		alert('You cannot start a chat with yourself.');
 		return;
 	}
@@ -471,14 +503,14 @@ async function promptPrivateChat(username, targetUsername) {
 	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
 	let existinggroupId = null;
 	chatRooms.forEach((room) => {
-		if (room.dataset.receiver === targetUsername) {
+		if (room.dataset.targetUserId === targetUserId) {
 			existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
 		}
 	});
 
 	if (existinggroupId) {
 		console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
-		await switchChatRoom(username, existinggroupId);
+		await switchChatRoom(currentUserId, existinggroupId);
 		return;
 	}
 
@@ -490,8 +522,8 @@ async function promptPrivateChat(username, targetUsername) {
 				'X-CSRFToken': getCookie('csrftoken'),
 			},
 			body: JSON.stringify({
-				current_username: username,
-				target_username: targetUsername,
+				current_user_id: currentUserId,
+				target_user_id: targetUserId,
 			}),
 			credentials: 'include',
 		})
@@ -501,8 +533,10 @@ async function promptPrivateChat(username, targetUsername) {
 			.then(({ data, ok }) => {
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
-					loadChatRoomList(username).then(() => {
-						switchChatRoom(username, data.group_id);
+					loadChatRoomList(currentUserId).then(() => {
+						async () => {
+							await switchChatRoom(currentUserId, data.group_id, targetUsername);
+						}
 					});
 				} else {
 					console.error('Server error creating chat group:', data.message);
@@ -517,35 +551,44 @@ async function promptPrivateChat(username, targetUsername) {
 }
 
 // Event handler for "Start New Chat" button in the modal
-function handleStartNewChat(username) {
+function handleStartNewChat(currentUserId, currentUsername) {
 	const targetUserInput = document.getElementById('targetUserInput');
 	const targetUsername = targetUserInput.value.trim();
+	const targetUserId = targetUserInput.dataset.userId || null;
 
-	if (!targetUsername) {
-		alert('Please enter a user ID to start a new chat.');
+	if (!targetUsername || !targetUserId) {
+		alert('Please select a valid user from the search results.');
 		return;
 	}
 
-	if (targetUsername === username) {
+	if (targetUserId === currentUserId) {
 		alert('You cannot start a chat with yourself.');
 		return;
 	}
 
-	promptPrivateChat(username, targetUsername);
+	promptPrivateChat(currentUserId, targetUserId, targetUsername);
 	targetUserInput.value = ''; // Clear input field
+	targetUserInput.dataset.userId = '';
 }
 
 function setupUserSearchAutocomplete() {
 	const userInput = document.getElementById('targetUserInput');
-	const resultsBox = document.getElementById('resultsSearch');
-	if (!userInput || !resultsBox) return;
-
+	const resultsBox = document.getElementById('chat-user-search');
+	if (!userInput || !resultsBox) {
+		console.error('Could not find search elements:', {
+			userInput: !!userInput,
+			resultsBox: !!resultsBox,
+		});
+		return;
+	}
 	userInput.addEventListener('input', async function () {
 		const query = this.value.trim();
 		if (!query) {
 			resultsBox.innerHTML = '';
 			return;
 		}
+		// Add debug logging
+		console.log('Searching for users with query:', query);
 		const response = await fetchWithRefresh(
 			`user-service/searchUsers?q=${encodeURIComponent(query)}`,
 			{
@@ -561,30 +604,38 @@ function setupUserSearchAutocomplete() {
 		const users = data.results ?? [];
 		resultsBox.innerHTML = users
 			.map(
-				(user) => `<li class="list-group-item user-link">${user.username}</li>`
+				(user) =>
+					`<li class="list-group-item user-link" data-user-id="${user.id}">${user.username}</li>`
 			)
 			.join('');
 
-        // When a user is clicked, fill the input and clear the results
-        resultsBox.querySelectorAll('.user-link').forEach((item) => {
-            item.addEventListener('click', () => {
-                userInput.value = item.textContent.trim();
-                resultsBox.innerHTML = ''; // Clear results after selection
-            });
-        });
-    });
+		// When a user is clicked, fill the input and clear the results
+		resultsBox.querySelectorAll('.user-link').forEach((item) => {
+			item.addEventListener('click', () => {
+				userInput.value = item.textContent.trim();
+				// FIXED: Use getAttribute instead of dataset to get the raw value
+				userInput.dataset.userId = item.getAttribute('data-user-id');
+				console.log('Selected user ID:', item.getAttribute('data-user-id'));
+				resultsBox.innerHTML = ''; // Clear results after selection
+			});
+		});
+	});
 }
 
 
 // Main chat controller function, called after login
-export function chatController(username) {
+export function chatController(userId, username) {
 	const container = document.getElementById('chat-container');
 	if (!container) {
 		console.error('No #chat-container found in DOM.');
 		return;
 	}
-
+	const userIdInputActive = document.getElementById('userIdInput-active');
 	const usernameInputActive = document.getElementById('usernameInput-active');
+	if (userIdInputActive) {
+		userIdInputActive.value = userId;
+	}
+	// Set the username in the input field for sending messages
 	if (usernameInputActive) {
 		usernameInputActive.value = username;
 	}
@@ -594,10 +645,10 @@ export function chatController(username) {
 	if (mainChatWindowElement) {
 		mainChatBootstrapModal = new bootstrap.Modal(mainChatWindowElement);
 
-		mainChatWindowElement.addEventListener('shown.bs.modal', () => {
+		mainChatWindowElement.addEventListener('shown.bs.modal', async () => {
 			console.log('Main Chat Window is shown');
-			console.log('Logged in user:', username);
-			loadChatRoomList(username); // Load chat list dynamically
+			console.log('Logged in user ID:', userId);
+			loadChatRoomList(userId); // Load chat list dynamically
 
 			// Set initial state for chat log
 			const chatLog = document.getElementById('chatLog-active');
@@ -607,7 +658,7 @@ export function chatController(username) {
 			}
 			// If a group was active before closing/reopening, switch back to it
 			if (currentActiveChatGroup) {
-				switchChatRoom(currentActiveChatGroup);
+				await switchChatRoom(userId, currentActiveChatGroup);
 			}
 			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
 			// Focus on new chat user ID input initially
@@ -656,7 +707,7 @@ export function chatController(username) {
 	if (sendMessageBtn) {
 		sendMessageBtn.addEventListener('click', () => {
 			// Always pass the logged-in user's username to sendMessage
-			sendMessage(username);
+			sendMessage(userId);
 		});
 	}
 
@@ -665,7 +716,7 @@ export function chatController(username) {
 		messageInput.addEventListener('keypress', function (e) {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				sendMessage(username);
+				sendMessage(userId);
 			}
         });
         const charCounter = document.getElementById('char-counter');
@@ -698,7 +749,7 @@ export function chatController(username) {
 	const startNewChatBtn = document.getElementById('startNewChatBtn');
 	if (startNewChatBtn) {
 		startNewChatBtn.addEventListener('click', () =>
-			handleStartNewChat(username)
+			handleStartNewChat(userId, username)
 		);
 	}
 }
@@ -706,22 +757,27 @@ export function chatController(username) {
 export async function renderChatButtonIfAuthenticated() {
 	let userIsAuth = await isUserAuthenticated();
 	if (userIsAuth) {
-		const username = await fetchWithRefresh('user-service/infoUser/', {
+		const userData = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',
 			credentials: 'include',
 		})
-			.then((response) => response.json())
-			.then((data) => data.user_name)
-			.catch((error) => {
-				console.error('Error fetching user info:', error);
-				return null;
-			});
-		if (!username) {
-			console.error('Username not found');
+		.then((response) => response.json())
+		.then((data) => ({
+			id: data.id,
+			username: data.user_name
+		}))
+		.catch((error) => {
+			console.error('Error fetching user info:', error);
+			return null;
+		});
+		
+		if (!userData || !userData.id) {
+			console.error('User data not found');
 			return;
 		}
+		
 		try {
-			await actualizeIndexPage('chat-container', routes['chat'](username));
+			await actualizeIndexPage('chat-container', routes['chat'](userData.id, userData.username));
 		} catch (e) {
 			console.error('Could not load chat UI:', e);
 		}
