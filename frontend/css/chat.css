@@ -144,7 +144,7 @@
 
 /* Character counter styling */
 .char-counter {
-    position: absolute;
+    position: absolute; 
     bottom: 5px;
     right: 80px; /* Leave space for the Send button */
     font-size: 12px;
