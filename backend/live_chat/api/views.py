@@ -47,6 +47,37 @@ class blockedStatus(View):
         except Exception as e:
             logger.error(f"Failed to decode JSON from backend: {e}")
             return JsonResponse({'status': 'error', 'message': 'Internal server error during chat list retrieval.'}, status=500)
+    def post (self, request, targetUser):
+        try:
+            data = json.loads(request.body)
+            block_target = data.get('isBlocked')
+            if not block_target or not targetUser:
+                return JsonResponse({'status': 'error', 'message': 'block instruction and targetUser are required.'}, status=400)
+
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+            url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUser}/blockedStatus/"
+            try:
+                resp = requests.post(url, json={
+                    'isBlocked': block_target
+                }, headers=headers, timeout=10, verify=False)
+                resp.raise_for_status()
+                return JsonResponse(resp.json(), status=resp.status_code)
+            except requests.RequestException as exc:
+                logger.error(f"chat blockedStatus POST request failed: {exc}")
+                return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for blocked status.'}, status=502)
+            except Exception as e:
+                logger.error(f"Internal server error during blocked status changes: {e}")
+                return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status changes.'}, status=500)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+        except Exception as e:
+            logger.error(f"Internal server error: {e}")
+            return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
+
 
 # @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
 class ChatGroupListCreateView(View):
@@ -148,15 +179,15 @@ class ChatMessageView(View):
             content = data.get('content')
             MIN_LENGTH = 1
             MAX_LENGTH = 1000
-            
+
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
             if not content or len(content) < MIN_LENGTH:
                 return JsonResponse({'status': 'error', 'message': 'Message is empty'}, status=400)
-                
+
             if len(content) > MAX_LENGTH:
                 return JsonResponse(
-                    {'status': 'error', 'message': f'Message exceeds maximum length of {MAX_LENGTH} characters'}, 
+                    {'status': 'error', 'message': f'Message exceeds maximum length of {MAX_LENGTH} characters'},
                     status=400
                 )
             access_token = request.COOKIES.get('access_token')

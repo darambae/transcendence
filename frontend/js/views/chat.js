@@ -128,10 +128,10 @@ function sendMessage(username) {
 
 	const content = messageInput.value.trim();
     const groupId = groupIdInput.value;
-    
+
 	const MIN_LENGTH = 1;
     const MAX_LENGTH = 1000; // Set appropriate limit
-    
+
 	if (!content || !groupId) {
 		alert(
 			'Please ensure you are logged in, selected a chat, and typed a message.'
@@ -487,10 +487,6 @@ async function switchChatRoom(username, newgroupId) {
         groupIdInput.value = newgroupId;
     }
 
-    // Enable message input and send button
-    document.getElementById('messageInput-active').disabled = false;
-    document.getElementById('sendMessageBtn').disabled = false;
-
     // Clear current messages
     const chatLog = document.getElementById('chatLog-active');
     if (chatLog) {
@@ -503,12 +499,15 @@ async function switchChatRoom(username, newgroupId) {
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
     loadMessageHistory(username, newgroupId);
-    initEventSource(newgroupId, username);
 	const targetUser = targetChatListItem.dataset.receiver;
-	const blockedStatus = getBlockedStatus(targetUser)
-    if (blockedStatus.isBlocked) {
+	const targetbBlockedStatus = getBlockedStatus(targetUser)
+	let block_reason = null;
+	if (blockedStatus.hasBlocked) {
+		block_reason = 'this user blocked you';
+	} else if (targetbBlockedStatus.isBlocked) {
+		//create a pop window to ask unblock
 		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
-		if (unblockTargetUser) {
+		if (unblockTargetUser) {//if yes
 			fetch('/chat/${targetUser}/blockedStatus', {
 				method : 'POST',
 				headers: {
@@ -532,45 +531,53 @@ async function switchChatRoom(username, newgroupId) {
 			.then(({ data, ok, status, statusText }) => {
 				if (ok) {
 					if (data.status === 'success') {
-						initEventSource(newgroupId);
+						// Enable message input and send button
+						document.getElementById('messageInput-active').disabled = false;
+						document.getElementById('sendMessageBtn').disabled = false;
+						initEventSource(newgroupId, username);
+						// Focus on message input
 						const messageInput = document.getElementById('messageInput-active');
 						if (messageInput) {
 							messageInput.focus();
 						}
+						return;
 					} else {
 						console.error('Server error unblocking the user:', targetUser);
 						alert('Error unblocking the user: ' + targetUser);
 					}
 				} else {
 					console.error(
-					'HTTP error unblocking the user :',
-					status,
-					targetUser || statusText
-				);
-				alert('HTTP Error: ' + (targetUser || statusText));
-				}
-			})
-			.catch((error) => {
-			console.error('Network or JSON error:', error);
-			alert('Cannot connect to server to unblock the user.');
-		});
-		}
-		else {
-			//mettre un message "you blocked this user"
-			return;
+						'HTTP error unblocking the user :',
+						status,
+						targetUser || statusText
+						);
+						alert('HTTP Error: ' + (targetUser || statusText));
+					}
+				})
+				.catch((error) => {
+					console.error('Network or JSON error:', error);
+					alert('Cannot connect to server to unblock the user.');
+				});
+		} else {//user doesn't want to unblock
+			block_reason = "you blocked this user"
 		}
 	}
-	else if (blockedStatus.hasBlocked) {
-		//mettre un message "this user blocked you"
-		return;
+	if (block_reason != null) {
+	    // Enable message input and send button
+		document.getElementById('messageInput-active').disabled = true;
+		document.getElementById('sendMessageBtn').disabled = true;
+		alert(block_reason);
+	} else {
+	    // Enable message input and send button
+		document.getElementById('messageInput-active').disabled = false;
+		document.getElementById('sendMessageBtn').disabled = false;
+		initEventSource(newgroupId, username);
+		// Focus on message input
+		const messageInput = document.getElementById('messageInput-active');
+		if (messageInput) {
+			messageInput.focus();
+		}
 	}
-	initEventSource(newgroupId);
-
-    // Focus on message input
-    const messageInput = document.getElementById('messageInput-active');
-    if (messageInput) {
-        messageInput.focus();
-    }
 }
 
 async function promptPrivateChat(username, targetUsername) {
@@ -745,18 +752,18 @@ export function chatController(username) {
             currentActiveChatGroup = null; // Reset active chat group when closing modal
             // Clear chat log and reset UI state
             const chatLog = document.getElementById('chatLog-active');
-            if (chatLog) chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
-
+            if (chatLog) {
+			chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
             document.getElementById('messageInput-active').disabled = true;
             document.getElementById('sendMessageBtn').disabled = true;
             document.getElementById('activeChatRoomName').textContent = ''; // Clear header
             document.getElementById('groupIdInput-active').value = '';
             document.getElementById('targetUserInput').value = ''; // Clear new chat input
-        });
-    } else {
-        console.error('Main chat window modal element not found!');
-        return;
-    }
+			} else {
+				console.error('Main chat window modal element not found!');
+        		return;
+			}
+		});
 		mainChatWindowElement.addEventListener('shown.bs.modal', () => {
 			console.log('Main Chat Window is shown');
 			console.log('Logged in user:', username);
@@ -789,7 +796,7 @@ export function chatController(username) {
 			currentActiveChatGroup = null; // Reset active chat group when closing modal
 			// Clear chat log and reset UI state
 			const chatLog = document.getElementById('chatLog-active');
-			if (chatLog)
+			if (chatLog) {
 				chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
 
 			document.getElementById('messageInput-active').disabled = true;
@@ -797,10 +804,11 @@ export function chatController(username) {
 			document.getElementById('activeChatRoomName').textContent = ''; // Clear header
 			document.getElementById('groupIdInput-active').value = '';
 			document.getElementById('targetUserInput').value = ''; // Clear new chat input
+			} else {
+				console.error('Main chat window modal element not found!');
+				return;
+			}
 		});
-	} else {
-		console.error('Main chat window modal element not found!');
-		return;
 	}
 
 	// 2. Main Chat Toggle Button setup
@@ -873,12 +881,12 @@ export async function renderChatButtonIfAuthenticated() {
 			method: 'GET',
 			credentials: 'include',
 		})
-			.then((response) => response.json())
-			.then((data) => data.user_name)
-			.catch((error) => {
-				console.error('Error fetching user info:', error);
-				return null;
-			});
+		.then((response) => response.json())
+		.then((data) => data.user_name)
+		.catch((error) => {
+			console.error('Error fetching user info:', error);
+			return null;
+		});
 		if (!username) {
 			console.error('Username not found');
 			return;
