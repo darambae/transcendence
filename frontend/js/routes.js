@@ -57,9 +57,9 @@ export const routes = {
 		template: 'settings_profile',
 		controller: settingsProfileController,
 	},
-	chat: (username) => ({
+	chat: (userId ,username) => ({
 		template: 'chat',
-		controller: () => chatController(username),
+		controller: () => chatController(userId, username),
 		username: username	
 	}),
 	dashboards: {

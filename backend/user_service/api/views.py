@@ -15,7 +15,6 @@ import os
 import json
 import requests
 
-# Create your views here.
 @ensure_csrf_cookie
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
@@ -40,14 +39,14 @@ def signup(request):
         if not data[field]:
             return JsonResponse({'create_user': {'error': f'Field {field} cannot be empty'}}, status=400)
         if len(data[field]) > len_for_fields[field]:
-            return JsonResponse({'create_user': {'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
 
     try:
         validate_email(data['mail'])
     except ValidationError:
-        return JsonResponse({'error': 'Invalid e-mail address'}, status=400)
+        return JsonResponse({'create_user': {'error':'Invalid e-mail address'}}, status=400)
 
     json_data = {
         "user_name":data['username'],
@@ -278,8 +277,6 @@ class saveProfile(APIView):
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
-
-
 
 class saveNewPassword(APIView):
     permission_classes = [AllowAny]
