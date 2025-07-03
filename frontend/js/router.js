@@ -3,9 +3,10 @@ import { routes } from './routes.js';
 import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener, fetchWithRefresh } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 
-window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
+// window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
 	attachLoginListener();
+	renderChatButtonIfAuthenticated();
 });
 
 window.addEventListener('hashchange', navigate);
