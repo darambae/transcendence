@@ -40,14 +40,14 @@ def signup(request):
         if not data[field]:
             return JsonResponse({'create_user': {'error': f'Field {field} cannot be empty'}}, status=400)
         if len(data[field]) > len_for_fields[field]:
-            return JsonResponse({'create_user': {'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
 
     try:
         validate_email(data['mail'])
     except ValidationError:
-        return JsonResponse({'error': 'Invalid e-mail address'}, status=400)
+        return JsonResponse({'create_user': {'error':'Invalid e-mail address'}}, status=400)
 
     json_data = {
         "user_name":data['username'],
