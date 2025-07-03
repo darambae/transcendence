@@ -184,66 +184,6 @@ class checkCurrentPassword(APIView):
 			return JsonResponse({'error': f'Error checking current password : {str(e)}'}, status=400)
 
 
-
-# class checkTfa(APIView):
-# 	permission_classes = [AllowAny]
-
-# 	def post(self, request):
-
-# 		data = request.data
-# 		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
-
-# 		try:
-# 			if "jwt" in data :
-# 				print("JWT IN DATA !", file=sys.stderr)
-# 				print(f"invites : {data['jwt']}", file=sys.stderr)
-# 				user = USER.objects.get(mail=data.get('mail'))
-# 				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-# 				print("user.activated", user.activated, file=sys.stderr)
-# 				if user.activated and user.two_factor_auth:
-# 					print("here in 2FA checking with JWT", file=sys.stderr)
-# 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
-# 						print("checkPassword ok !", file=sys.stderr)
-# 						data["jwt"]["invites"].append(user.user_name)
-# 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-# 						print("JWT generated !", file=sys.stderr)
-# 						user.two_factor_auth = False
-# 						user.save()
-# 						return JsonResponse({'success': 'authentication code send',
-# 							  				 'refresh': str(data_generate_jwt['refresh']),
-# 											 'access': str(data_generate_jwt['access'])},
-# 											 status=200)
-# 					else :
-# 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-# 				else:
-# 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
-# 			else :
-# 				user = USER.objects.get(mail=data.get('mail'))
-# 				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-# 				print("user.activated", user.activated, file=sys.stderr)
-# 				if user.activated and user.two_factor_auth:
-# 					print("here in 2FA checking with no JWT", file=sys.stderr)
-# 					if check_password(data.get('tfa'), user.two_factor_auth):
-# 						print("checkPassword ok !", file=sys.stderr)
-# 						user.two_factor_auth = False
-# 						user.online = True
-# 						user.last_login = datetime.now()
-# 						user.save()
-
-# 						data_generate_jwt = generateJwt(user, user.toJson())
-# 						print("JWT generated !", file=sys.stderr)
-
-# 						return JsonResponse({'success': 'authentication code send',
-# 							  				 'refresh': str(data_generate_jwt['refresh']),
-# 											 'access': str(data_generate_jwt['access'])},
-# 											 status=200)
-# 					else:
-# 						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
-# 				else:
-# 					return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-# 		except USER.DoesNotExist:
-# 			return JsonResponse({'error': 'User not found'}, status=404)
-
 # url: /api/checkTfa/
 # 2FA validation for normal login or invitation 
 
