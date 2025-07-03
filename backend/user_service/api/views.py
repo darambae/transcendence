@@ -15,7 +15,6 @@ import os
 import json
 import requests
 
-# Create your views here.
 @ensure_csrf_cookie
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
@@ -278,8 +277,6 @@ class saveProfile(APIView):
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
-
-
 
 class saveNewPassword(APIView):
     permission_classes = [AllowAny]
