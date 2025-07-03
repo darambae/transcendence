@@ -50,7 +50,10 @@ class Match() :
         print(f"match-class", file=sys.stderr)
         self.matchBefore = matchBefore
 
-    def initValues(self) :
+    def initValues(self, previousM=None) :
+        if previousM :
+            self.matchBefore = previousM
+        print(f"self.p1 : {self.p1}\nself.p2 : {self.p2}", file=sys.stderr)
         if (not self.p1 or not self.p2) :
             return False
         print("match-init", file=sys.stderr)
@@ -103,6 +106,11 @@ class Tournament() :
         self.matchWinnerBracket = None
         self.matchLoserBracket = None
         self.finished = False
+        self.first = None
+        self.second = None
+        self.third = None
+        self.fourth = None
+        
 
     def addPlayers(self, playerClass) :
         if self.nbPl < 4 :

@@ -178,6 +178,7 @@ export async function tournamentController() {
                     console.log("SSE 8")
                     buttonGame.dataset.key = data.key;
                     buttonGame.dataset.tkey = data.tkey
+                    buttonGame.dataset.round = data.round;
                     console.log("SSE 9")
                     tournamentGame.innerHTML = "";
                     console.log("SSE 10")
@@ -206,6 +207,13 @@ export async function tournamentController() {
                         },
                         credentials: 'include',
                         body: JSON.stringify({"tKey" : data.tkey})
+                      })
+                      .then(response => {
+                        if (!response.ok) throw new Error("https Error: " + response.status);
+                        return response.json()
+                      })
+                      .then(data => {
+                        console.log("NEXT : ", data)
                       })
                     }
                   }
@@ -240,6 +248,13 @@ export async function tournamentController() {
                 },
                 credentials: 'include',
                 body: JSON.stringify({"tKey" : trId})
+              })
+              .then(response => {
+                if (!response.ok) throw new Error("https Error: " + response.status);
+                return response.json()
+              })
+              .then(data => {
+                console.log("NEXT : ", data)
               });
 
               return invitsController()
@@ -334,6 +349,7 @@ export async function tournamentController() {
                     console.log("To do");
                   }
                   console.log("SSE 8")
+                  buttonGame.dataset.round = data.round;
                   buttonGame.dataset.key = data.key;
                   buttonGame.dataset.tkey = data.tkey
                   console.log("SSE 9")
@@ -474,7 +490,8 @@ export async function tournamentController() {
         localStorage.setItem("p2", target.dataset.p2);
         localStorage.setItem("key", target.dataset.key);
         localStorage.setItem("tkey",  target.dataset.tkey);
-        fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}`, {
+        console.log("Target.dataset", target.dataset);
+        fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
           credentials: "include",
         })
         .then(response => {

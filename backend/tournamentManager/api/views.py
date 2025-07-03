@@ -188,6 +188,8 @@ async def launchNextMatch(request) :
 		if trnmtDict[tkey].nbPl != 4 :
 			return JsonResponse({"Error": "Forbidden"}, status=403)
 		print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
+		if (trnmtDict[tkey].first and trnmtDict[tkey].second and trnmtDict[tkey].third and trnmtDict[tkey].fourth) :
+			return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})
 		if not trnmtDict[tkey].match1.played or not trnmtDict[tkey].match2.played :
 			await channel_layer.group_send(
 				tkey,
@@ -428,13 +430,14 @@ async def Supervise(request) :
 		tkey = request.GET.get("tkey")
 		print(f"- -{tkey}- | {tkey in trnmtDict}", file=sys.stderr)
 		mkey = request.GET.get("key")
+		roundM = request.GET.get("round", 1) 
 		print(f"- {mkey}", file=sys.stderr)
 
 		await channel_layer.group_send(
 			tkey,
 			{
 				"type": "tempReceived",
-				"text_data": {"action" : "supervise", "round" : 1, "mKey" : mkey, "tkey" : tkey}
+				"text_data": {"action" : "supervise", "round" : roundM, "mKey" : mkey, "tkey" : tkey}
 			}
 		)
 		print("-", file=sys.stderr)

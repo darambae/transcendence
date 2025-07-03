@@ -224,7 +224,7 @@ class	Movement() :
 
 	async def getWallsHit(self) -> None :
 		### Determine all movement ###
-		timeLeft : float = 0.02																																			# Set default time to 5 milliseconds	
+		timeLeft : float = 0.02 ##																																			# Set default time to 5 milliseconds	
 
 		while timeLeft > 0.0:																																				# While there is time to calculate movement
 			linearMovementPoint:Point = await self.calculateLinearMovement(self.ball.spd, timeLeft)																			# Calculate linear movement (No collision)
