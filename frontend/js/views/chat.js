@@ -390,11 +390,10 @@ async function loadChatRoomList(currentUserId) {
         // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         console.log('Loading chat list for user:', currentUserId);
-        const response = await fetchWithRefresh(`/chat/`, {
+        const response = await fetchWithRefresh(`chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
             },
             credentials: 'include'
         });
@@ -618,7 +617,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	}
 
 	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetchWithRefresh('/chat/', {
+		fetchWithRefresh('chat/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

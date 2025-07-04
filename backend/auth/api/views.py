@@ -103,8 +103,6 @@ class verifyTwofa(APIView): # The initial cookie is set in this view
 		user = request.data
 		jwtDecoded = decodeJWT(request)
 		
-		user = request.data
-
 		json_data = {
 			'mail':user.get('mail'),
 			'tfa':user.get('code'),

@@ -57,47 +57,47 @@ EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 # =========================================================================
 # Simplify logging significantly for tests to avoid external dependencies (Logstash).
 # You typically only want console logging during tests.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'add_app_name': { # Keep this filter if you use APP_NAME in log records
-            '()': AddAppNameFilter, # Ensure AddAppNameFilter is still accessible (from .settings import *)
-        },
-    },
-    'formatters': {
-        'text': {
-            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-            'class': 'logging.Formatter',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'text',
-            'filters': ['add_app_name'], # Keep if you use AddAppNameFilter
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO', # Use INFO to reduce verbosity in tests
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'api': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'filters': {
+#         'add_app_name': { # Keep this filter if you use APP_NAME in log records
+#             '()': AddAppNameFilter, # Ensure AddAppNameFilter is still accessible (from .settings import *)
+#         },
+#     },
+#     'formatters': {
+#         'text': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'logging.Formatter',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'text',
+#             'filters': ['add_app_name'], # Keep if you use AddAppNameFilter
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO', # Use INFO to reduce verbosity in tests
+#             'propagate': False,
+#         },
+#         'django.request': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         },
+#         'api': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#             'propagate': False,
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'WARNING',
+#     },
+# }

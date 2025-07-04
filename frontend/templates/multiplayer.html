@@ -1,26 +1,15 @@
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h2>Game screen</h2>
-            <canvas id="gameCanvas" width="1200" height="620" style="border:6px solid black;"></canvas>
-        </div>
+<div class="containerCanvas">
+    <div class="canvasContainer">
+      <h2 class="titleGame">Game</h2>
+      <canvas id="gameCanvas" width="1100" height="650"></canvas>
     </div>
-    <div class="row" id="replace-state">
-        <div class="col">
-            <h2>Create game</h2>
-            <button id="create-game" type="button" class="btn btn-outline-primary" aria-label="Close">Create game</button>
-        </div>
-        <div class="col">
-            <h2>Informations</h2>
-            <p id="Game instructions">Waiting for a game</p>
-        </div>
-        <div class="col">
-            <h2>Join game</h2>
-            <button id="join-game" type="button" class="btn btn-outline-secondary" aria-label="Close">Join Game</button>
-        </div>
-    </div>
-    <div class="row" id="replace-state2">
+    <div id="idfooterCanvas" class="footerCanvas">
+      <div class="section">
+        <button id="create-game" type="button" class="btn btn-outline-primary">Create game</button>
+      </div>
+      <div class="section">
+        <button id="join-game" type="button" class="btn btn-outline-secondary">Join Game</button>
+      </div>
     </div>
 </div>
-
-<script src="../js/active/multiplayer.js"></script>
+  

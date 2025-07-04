@@ -24,7 +24,7 @@ export async function actualizeIndexPage(elementId, view) {
 	}
 }
 
-export async function closeModal() {
+export async function closeModal(loc = "#home") {
 	const loginForm = document.getElementById("login-form");
 	const modalContainer = document.getElementById("modal-container")
 
@@ -104,96 +104,96 @@ export async function fetchWithRefresh(url, options = {}) {
 }
 
 // export async function fetchWithRefresh(url, options = {}) {
-//  try {
-//      // Add timeout to avoid hanging requests
-//      const controller = new AbortController();
-//      let timeoutDuration = 10000; // 10 seconds default
-//      if (url.includes('/auth/')) {
-//       timeoutDuration = 30000; // 30 seconds for auth endpoints
-//      }
+// 	try {
+// 		// Add timeout to avoid hanging requests
+// 		const controller = new AbortController();
+// 		let timeoutDuration = 30000; // 10 seconds default
+// 		// if (url.includes('/auth/')) {
+// 		// 	timeoutDuration = 30000; // 30 seconds for auth endpoints
+// 		// }
 
-//      const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
+// 		const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
-//      const fetchOptions = {
-//          ...options,
-//          signal: controller.signal,
-//      };
+// 		const fetchOptions = {
+// 			...options,
+// 			signal: controller.signal,
+// 		};
 
-//      let response = await fetch(url, fetchOptions);
-//      clearTimeout(timeoutId);
+// 		let response = await fetch(url, fetchOptions);
+// 		clearTimeout(timeoutId);
 
-//      // Handle authentication errors
-//      if (response.status === 401) {
-//          console.log('Authentication failed, trying to refresh token...');
+// 		// Handle authentication errors
+// 		if (response.status === 401) {
+// 			console.log('Authentication failed, trying to refresh token...');
 
-//          try {
-//              const refreshResponse = await fetch('auth/refresh-token/', {
-//                  method: 'GET',
-//                  credentials: 'include',
-//                  headers: {
-//                      'Content-Type': 'application/json',
-//                  },
-//              });
+// 			try {
+// 				const refreshResponse = await fetch('auth/refresh-token/', {
+// 					method: 'GET',
+// 					credentials: 'include',
+// 					headers: {
+// 						'Content-Type': 'application/json',
+// 					},
+// 				});
 
-//              if (refreshResponse.ok) {
-//                  console.log(
-//                      'Token refreshed successfully, retrying original request'
-//                  );
-//                  const newResponse = await fetch(url, options);
+// 				if (refreshResponse.ok) {
+// 					console.log(
+// 						'Token refreshed successfully, retrying original request'
+// 					);
+// 					const newResponse = await fetch(url, options);
 
-//                  // If we still get 401 after refresh, something is wrong with auth
-//                  if (newResponse.status === 401) {
-//                      console.error('Authentication failed even after token refresh');
-//                      sessionStorage.setItem(
-//                          'auth_error',
-//                          'Session expired. Please log in again.'
-//                      );
-//                      window.location.href = '/#home';
-//                      return newResponse;
-//                  }
+// 					// If we still get 401 after refresh, something is wrong with auth
+// 					if (newResponse.status === 401) {
+// 						console.error('Authentication failed even after token refresh');
+// 						sessionStorage.setItem(
+// 							'auth_error',
+// 							'Session expired. Please log in again.'
+// 						);
+// 						window.location.href = '/#home';
+// 						return newResponse;
+// 					}
 
-//                  return newResponse;
-//              } else {
-//                  console.error('Token refresh failed');
-//                  sessionStorage.setItem(
-//                      'auth_error',
-//                      'Session expired. Please log in again.'
-//                  );
-//                  window.location.href = '/#home';
-//                  return response;
-//              }
-//          } catch (refreshError) {
-//              console.error('Error during token refresh:', refreshError);
-//              window.location.href = '/#home';
-//              return response;
-//          }
-//      }
+// 					return newResponse;
+// 				} else {
+// 					console.error('Token refresh failed');
+// 					sessionStorage.setItem(
+// 						'auth_error',
+// 						'Session expired. Please log in again.'
+// 					);
+// 					window.location.href = '/#home';
+// 					return response;
+// 				}
+// 			} catch (refreshError) {
+// 				console.error('Error during token refresh:', refreshError);
+// 				window.location.href = '/#home';
+// 				return response;
+// 			}
+// 		}
 
-//      // Handle server errors (like 502)
-//      if (response.status >= 500) {
-//          console.error(`Server error (${response.status}) for ${url}`);
-//      }
+// 		// Handle server errors (like 502)
+// 		if (response.status >= 500) {
+// 			console.error(`Server error (${response.status}) for ${url}`);
+// 		}
 
-//      return response;
-//  } catch (error) {
-//      // Handle network errors and timeouts
-//      console.error(`Network error with ${url}:`, error);
-//      if (error.name === 'AbortError') {
-//          return new Response(
-//              JSON.stringify({
-//                  status: 'error',
-//                  message: 'Request timed out',
-//              }),
-//              { status: 408 }
-//          );
-//      }
+// 		return response;
+// 	} catch (error) {
+// 		// Handle network errors and timeouts
+// 		console.error(`Network error with ${url}:`, error);
+// 		if (error.name === 'AbortError') {
+// 			return new Response(
+// 				JSON.stringify({
+// 					status: 'error',
+// 					message: 'Request timed out',
+// 				}),
+// 				{ status: 408 }
+// 			);
+// 		}
 
-//      return new Response(
-//          JSON.stringify({
-//              status: 'error',
-//              message: 'Network error, please check your connection',
-//          }),
-//          { status: 0 }
-//      );
-//  }
+// 		return new Response(
+// 			JSON.stringify({
+// 				status: 'error',
+// 				message: 'Network error, please check your connection',
+// 			}),
+// 			{ status: 0 }
+// 		);
+// 	}
 // }

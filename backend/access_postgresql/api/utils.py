@@ -3,7 +3,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 import random
 import string
-
+import sys
 
 def generate_otp_send_mail(user):
 	tab = []
