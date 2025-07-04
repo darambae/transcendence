@@ -217,13 +217,17 @@ function SaveImg() {
 				body: formData
 			});
 
-			if (!response.ok) {
-				errorDiv.textContent = 'Sending error.';
-				errorDiv.style.display = 'block';
-			}
 			const data = await response.json();
-			console.log(data)
-
+			//console.log(data)
+			if (data.status === 'error') {
+				console.log("Error in response:", data);
+				errorDiv.textContent = `Error: ${data.message}`;
+				errorDiv.style.display = 'block';
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
+				return;
+			}
 			if (data.success) {
 				errorDiv.textContent = data.success;
 				errorDiv.classList.remove('text-danger');

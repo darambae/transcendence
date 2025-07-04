@@ -754,7 +754,7 @@ export function chatController(userId, username) {
 }
 
 export async function renderChatButtonIfAuthenticated() {
-	let userIsAuth = await isUserAuthenticated();
+	let userIsAuth = await isUserAuthenticated('chat');
 	if (userIsAuth) {
 		const userData = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',
