@@ -2,6 +2,7 @@
 import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
+import { listennerFriends } from './friends.js';
 
 
 let mainChatBootstrapModal; // Bootstrap Modal instance
@@ -263,7 +264,7 @@ async function initEventSource(groupId, currentUserId) {
 			console.log('Token refresh requested by server');
 			// Make a request that will refresh the token
 			try {
-				await fetch('auth/refresh-token/', {
+				await fetchWithRefresh('auth/refresh-token/', {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
@@ -341,10 +342,10 @@ async function initEventSource(groupId, currentUserId) {
 	}
 }
 
-async function getBlockedStatus(targetUser) {
+async function getBlockedStatus(targetUserId) {
     //rajouter peut-être une vérif du other-user
     try {
-        const response = await fetch('/chat/${targetUser}/blockedStatus', {
+        const response = await fetchWithRefresh('/chat/${targetUserId}/blockedStatus', {
             method : 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -424,7 +425,7 @@ async function loadChatRoomList(currentUserId) {
 				listItem.style.cursor = 'pointer';
 				listItem.onclick = async () => {
 					try {
-						await switchChatRoom(currentUserId, chat.group_id);
+						await switchChatRoom(currentUserId, chat.group_id, chat.receiver_id);
 					} catch (e) {
 						console.error('Error switching chat room:', e);
 						alert('Could not switch chat room. Please try again.');
@@ -448,7 +449,7 @@ async function loadChatRoomList(currentUserId) {
 }
 
 // Function to switch between chat rooms
-async function switchChatRoom(currentUserId, newgroupId) {
+async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
     if (newgroupId === null || newgroupId === undefined) {
 			console.error('No groupId provided for loading history.');
 			return;
@@ -492,6 +493,10 @@ async function switchChatRoom(currentUserId, newgroupId) {
         groupIdInput.value = newgroupId;
     }
 
+    // Enable message input and send button
+    document.getElementById('messageInput-active').disabled = false;
+    document.getElementById('sendMessageBtn').disabled = false;
+
     // Clear current messages
     const chatLog = document.getElementById('chatLog-active');
     if (chatLog) {
@@ -503,9 +508,8 @@ async function switchChatRoom(currentUserId, newgroupId) {
 
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
-    loadMessageHistory(username, newgroupId);
-	const targetUser = targetChatListItem.dataset.receiver;
-	const targetbBlockedStatus = getBlockedStatus(targetUser)
+    loadMessageHistory(currentUserId, newgroupId);
+	const targetbBlockedStatus = getBlockedStatus(targetUserId)
 	let block_reason = null;
 	if (blockedStatus.hasBlocked) {
 		block_reason = 'this user blocked you';
@@ -513,7 +517,7 @@ async function switchChatRoom(currentUserId, newgroupId) {
 		//create a pop window to ask unblock
 		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
 		if (unblockTargetUser) {//if yes
-			fetch('/chat/${targetUser}/blockedStatus', {
+			fetchWithRefresh('/chat/${targetUserId}/blockedStatus', {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -568,7 +572,6 @@ async function switchChatRoom(currentUserId, newgroupId) {
 		}
 	}
 	if (block_reason != null) {
-	    // Enable message input and send button
 		document.getElementById('messageInput-active').disabled = true;
 		document.getElementById('sendMessageBtn').disabled = true;
 		alert(block_reason);
@@ -610,7 +613,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 
 	if (existinggroupId) {
 		console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
-		await switchChatRoom(currentUserId, existinggroupId);
+		await switchChatRoom(currentUserId, existinggroupId, targetUserId);
 		return;
 	}
 
@@ -635,7 +638,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
 					loadChatRoomList(currentUserId).then(() => {
 						async () => {
-							await switchChatRoom(currentUserId, data.group_id, targetUsername);
+							await switchChatRoom(currentUserId, data.group_id, targetUserId);
 						}
 					});
 				} else {
@@ -758,7 +761,11 @@ export function chatController(userId, username) {
 			}
 			// If a group was active before closing/reopening, switch back to it
 			if (currentActiveChatGroup) {
-				await switchChatRoom(userId, currentActiveChatGroup);
+				const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${currentActiveChatGroup}"]`);
+    			if (targetChatListItem) {
+        			const receiverId = targetChatListItem.dataset.id;
+					await switchChatRoom(userId, currentActiveChatGroup, receiverId);
+				}
 			}
 			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
 			// Focus on new chat user ID input initially

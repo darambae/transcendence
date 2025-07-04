@@ -18,12 +18,12 @@ logger = logging.getLogger(__name__)
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
 class blockedStatus(View):
-    def get(self, request, targetUser):
+    def get(self, request, targetUserId):
         access_token = request.COOKIES.get('access_token')
         if not access_token:
             return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
         headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-        url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUser}/blockedStatus/"
+        url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUserId}/blockedStatus/"
         try:
             resp = requests.get(url, headers=headers, timeout=10, verify=False)
             resp.raise_for_status()
@@ -33,19 +33,19 @@ class blockedStatus(View):
             return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
         except Exception as e:
             logger.error(f"Failed to decode JSON from backend: {e}")
-            return JsonResponse({'status': 'error', 'message': 'Internal server error during chat list retrieval.'}, status=500)
-    def post (self, request, targetUser):
+            return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
+    def post (self, request, targetUserId):
         try:
             data = json.loads(request.body)
             block_target = data.get('isBlocked')
-            if not block_target or not targetUser:
-                return JsonResponse({'status': 'error', 'message': 'block instruction and targetUser are required.'}, status=400)
+            if not block_target or not targetUserId:
+                return JsonResponse({'status': 'error', 'message': 'block instruction and targetUserId are required.'}, status=400)
 
             access_token = request.COOKIES.get('access_token')
             if not access_token:
                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
             headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-            url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUser}/blockedStatus/"
+            url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUserId}/blockedStatus/"
             try:
                 resp = requests.post(url, json={
                     'isBlocked': block_target

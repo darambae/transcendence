@@ -506,12 +506,12 @@ class searchUsers(APIView):
 class blockedStatus(APIView):
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
 
-    def get(self, request, targetUser) -> Response:
+    def get(self, request, targetUserId) -> Response:
         current_user = request.user
-        logger.info(f"Retrieving blocked status for user {current_user.user_name} about {targetUser}")
+        logger.info(f"Retrieving blocked status for user {current_user.user_name}")
         status = {'isBlocked':False, 'hasBlocked':False}
         try:
-              target_user = get_object_or_404(USER, user_name=targetUser)
+              target_user = get_object_or_404(USER, id=targetUserId)
               is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
               status['isBlocked'] = is_blocked
               has_blocked = target_user.blocked_user.filter(id=current_user.id).exists()
@@ -523,13 +523,13 @@ class blockedStatus(APIView):
                 {'status': 'error', 'message': 'Internal server error during blocked status retrieval.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-    def post(self, request, targetUser) -> Response:
+    def post(self, request, targetUserId) -> Response:
           current_user = request.user
           data = json.loads(request.body)
           block_target = data.get('isBlocked')
-          logger.info(f"Retrieving blocked status for user {current_user.user_name} about {targetUser}")
+          logger.info(f"Retrieving blocked status for user {current_user.user_name}")
           try:
-            target_user = get_object_or_404(USER, user_name=targetUser)
+            target_user = get_object_or_404(USER, id=targetUserId)
             is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
             if (is_blocked & block_target == False):
                   current_user.blocked_user.remove(target_user)
