@@ -3,6 +3,25 @@ import { routes } from './routes.js';
 import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener, fetchWithRefresh } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 
+let navigationBlocked = false;
+
+if (!location.hash) {
+	const path = location.pathname;
+	if (path === '/' || path === '') {
+		location.replace(location.origin + location.pathname + '#home');
+	} else {
+		navigationBlocked = true;
+		window.addEventListener('DOMContentLoaded', () => {
+			const mainContent = document.getElementById('main-content');
+			if (mainContent) {
+				mainContent.innerHTML = `<h2>404 Page not found</h2>`;
+			}
+			history.replaceState(null, '', '/');
+		});
+	}
+}
+
+
 // window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
 	attachLoginListener();
@@ -14,6 +33,11 @@ window.addEventListener('DOMContentLoaded', navigate);
 
 
 export async function navigate() {
+	if (navigationBlocked) {
+		navigationBlocked = false;
+		return;
+	}
+
 	const hash = location.hash.slice(1);
 	console.log('navigating to: ', hash);
 
@@ -33,34 +57,44 @@ export async function navigate() {
 		actualizeIndexPage('toggle-login', routes['user']);
 	}
 
-	//let view;
-	//if (!hash || hash === 'home' /* || (userIsAuth && (hash === 'login' || hash === 'signup'))*/) {
-	//	view = routes['home'];
-	//} else {
-	//	view = routes[hash];
-	//}
-	
 //-----------------------------
+	
 	let routeName = hash;
 	let param = null;
-
-	if (hash.includes('/')) {
-		[routeName, param] = hash.split('/');
-	}
-
-	let view;
-	if (!routeName || routeName === 'home') {
-		view = routes['home'];
-	} else if (typeof routes[routeName] === 'function') {
-		view = routes[routeName](param);
-	} else {
-		view = routes[routeName];
-	}
-//-----------------------------
-	console.log("view: ", view);
 	
-	if (!view) {
-		content.innerHTML = `<h2>404</h2><p>Page not Found</p>`;
+	if (!hash || hash === '') {
+		routeName = 'home';
+		history.replaceState(null, '', '/'); // clean URL
+	}
+
+	/* if (hash.includes('/')) {
+		[routeName, param] = hash.split('/');
+	} */
+	
+	let view;
+	/* if (typeof routes[routeName] === 'function') {
+		view = routes[routeName](param);
+	} else  */
+	if (routes[routeName]) {
+		view = routes[routeName];
+	} else {
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.innerHTML = `<h2>404 Page not found</h2>`;
+		}
+		history.replaceState(null, '', location.pathname + location.search);
+		return;
+	}
+	//-----------------------------
+
+	console.log("routeName:", routeName, "view:", view);
+	
+	//check if user is trying to access a page forbidden if not authenticated
+	if (!userIsAuth && routeName !== 'signup' && routeName !== 'home') {
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.innerHTML = `<div class='route-error-msg'>You need to be logged in to access this page.</div>`;
+		}
 		return;
 	}
 
