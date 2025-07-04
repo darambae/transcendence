@@ -464,9 +464,9 @@ class uploadProfile(APIView):
 			user.user_name = new_username
 			user.save()
 
-			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+			return JsonResponse({'success': 'Successfully changed username'}, status=200)
 		except Exception as e:
-			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+			return JsonResponse({'error': f'Error changing username: {str(e)}'}, status=400)
 
 
 class uploadNewPassword(APIView):

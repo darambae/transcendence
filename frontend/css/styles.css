@@ -99,6 +99,11 @@ h2 {
 	animation: h2-blink-outline 1s infinite;
 }
 
+.route-error-msg {
+	text-align: center;
+	text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255);
+}
+
 
 #modal-container {
 	display: none; /* hidden by default */
