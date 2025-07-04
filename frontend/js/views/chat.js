@@ -88,7 +88,8 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
         if (response.ok && data.status === 'success') {
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
-                data.messages.forEach((msgData) => {
+                const orderedMessages = [...data.messages].reverse();
+				data.messages.forEach((msgData) => {
                     const msgElement = createMessageElement(msgData, currentUserId);
                     fragment.appendChild(msgElement);
                 });
