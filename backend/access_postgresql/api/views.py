@@ -74,8 +74,8 @@ class api_signup(APIView):
 
 		return JsonResponse({'success': 'User successfully created', 'user_id': user.id}, status=200)
 
-
-
+# url: /api/info_link/
+# This view generates uid and token for the user to activate their account
 class info_link(APIView):
 	permission_classes = [AllowAny]
 
@@ -102,6 +102,8 @@ class info_link(APIView):
 
 logger = logging.getLogger(__name__)
 
+# url: /api/activate_account/
+# This view activates the user account using the uid and token generated in info_link
 class activate_account(APIView):
 	permission_classes = [AllowAny]
 
@@ -132,6 +134,8 @@ class activate_account(APIView):
 			logger.warning("Activation link invalid or expired.")
 			return JsonResponse({'html': 'token_expired.html'}, status=200)
 
+# url: /api/checkPassword/
+# This view checks the password of the user and sends a 2FA code if the password is correct
 class checkPassword(APIView):
 	permission_classes = [AllowAny]
 
@@ -159,6 +163,7 @@ class checkPassword(APIView):
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 
+# url: /api/checkCurrentPassword/
 
 class checkCurrentPassword(APIView):
 	permission_classes = [IsAuthenticated]
@@ -179,68 +184,70 @@ class checkCurrentPassword(APIView):
 			return JsonResponse({'error': f'Error checking current password : {str(e)}'}, status=400)
 
 
-
+# url: /api/checkTfa/
+# 2FA validation for normal login or invitation 
 
 class checkTfa(APIView):
-	permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
-	def post(self, request):
+    def post(self, request):
 
-		data = request.data
-		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
+        data = request.data
+        print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
-		try:
-			if "jwt" in data :
-				print("JWT IN DATA !", file=sys.stderr)
-				print(f"invites : {data['jwt']}", file=sys.stderr)
-				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
-				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
-						print("checkPassword ok !", file=sys.stderr)
-						data["jwt"]["invites"].append(user.user_name)
-						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-						print("JWT generated !", file=sys.stderr)
-						user.two_factor_auth = False
-						user.save()
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
-					else :
-						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-				else:
-					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
-			else :
-				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
-				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with no JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth):
-						print("checkPassword ok !", file=sys.stderr)
-						#user.two_factor_auth = False
-						user.online = True
-						user.last_login = datetime.now()
-						user.save()
+        try:
+            if "jwt" in data:
+                print("JWT IN DATA !", file=sys.stderr)
+                print(f"invites : {data['jwt']}", file=sys.stderr)
+                user = USER.objects.get(mail=data.get('mail'))
+                print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+                print("user.activated", user.activated, file=sys.stderr)
+                if user.activated and user.two_factor_auth:
+                    print("here in 2FA checking with JWT", file=sys.stderr)
+                    if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+                        print("checkPassword ok !", file=sys.stderr)
+                        data["jwt"]["invites"].append(user.user_name)
+                        data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
+                        print("JWT generated !", file=sys.stderr)
+                        user.two_factor_auth = False
+                        user.save()
+                        return JsonResponse({'success': 'authentication code send',
+                                             'refresh': str(data_generate_jwt['refresh']),
+                                             'access': str(data_generate_jwt['access'])},
+                                            status=200)
+                    else:
+                        return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+                else:
+                    return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
+            else:
+                user = USER.objects.get(mail=data.get('mail'))
+                print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+                print("user.activated", user.activated, file=sys.stderr)
+                if user.activated and user.two_factor_auth:
+                    print("here in 2FA checking with no JWT", file=sys.stderr)
+                    if check_password(data.get('tfa'), user.two_factor_auth):
+                        print("checkPassword ok !", file=sys.stderr)
+                        #user.two_factor_auth = False
+                        user.online = True
+                        user.last_login = datetime.now()
+                        user.save()
 
-						data_generate_jwt = generateJwt(user, user.toJson())
-						print("JWT generated !", file=sys.stderr)
+                        data_generate_jwt = generateJwt(user, user.toJson())
+                        print("JWT generated !", file=sys.stderr)
 
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
-					else:
-						return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
-				else:
-					return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-		except USER.DoesNotExist:
-			return JsonResponse({'error': 'User not found'}, status=404)
+                        return JsonResponse({'success': 'authentication code send',
+                                             'refresh': str(data_generate_jwt['refresh']),
+                                             'access': str(data_generate_jwt['access'])},
+                                            status=200)
+                    else:
+                        return JsonResponse({'error': 'Invalid two factor auth'}, status=401)
+                else:
+                    return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+        except USER.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
 
-
+# url: /api/DecodeJwt/
+# This view decodes the JWT token and returns the payload
 class DecodeJwt(APIView):
 	permission_classes = [AllowAny]
 
@@ -294,7 +301,6 @@ class InfoUser(APIView):
 			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
 			"avatar": user.avatar,
         })
-
 
 class infoOtherUser(APIView):
     permission_classes = [IsAuthenticated]
@@ -509,45 +515,36 @@ class ChatGroupListCreateView(APIView):
         Lists chat groups for the currently authenticated user.
         """
         current_user = request.user
+        chat_groups = current_user.chat_groups.all()
+    
+        chat_list = []
         logger.info(f"Retrieving chat groups for user {current_user.user_name}")
         
-        try:
-            # Get chat groups where the current user is a member
-            chat_groups_qs = ChatGroup.objects.filter(members=current_user).prefetch_related('members').order_by('-id')
-
-            chat_list_data = []
-            if chat_groups_qs.exists():
-                for group in chat_groups_qs:
-                    # For 1-to-1 chats, find the other participant
-                    other_members = group.members.exclude(id=current_user.id)
-                    other_username = None
-
-                    if group.members.count() == 2 and other_members.exists():
-                        # True 1-to-1 chat
-                        other_username = other_members.first().user_name
-                    elif group.members.count() > 2:
-                        # Group chat: show group name or a comma-separated list of members (excluding self)
-                        other_username = ", ".join(m.user_name for m in other_members)
-                    else:
-                        # Only self in group (should not happen)
-                        other_username = "Unknown User"
-                        logger.warning(f"Chat group {group.id} for user {current_user.user_name} has no other members.")
-
-                    chat_list_data.append({
-                        'group_id': group.id,
-                        'receiver': other_username,
-						'group_name': group.name,  # Include group name for clarity
-                    })
-            else:
-                logger.info(f"No chat groups found for user {current_user.user_name}.")
-            return Response({'status': 'success', 'chats': chat_list_data}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            logger.exception("Internal server error during chat list retrieval.")
-            return Response(
-                {'status': 'error', 'message': 'Internal server error during chat list retrieval.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        for group in chat_groups:
+            # For private chats (2 members), get the other user
+            other_member = None
+            other_members = group.members.exclude(id=current_user.id)
+            if other_members.exists():
+                other_member = other_members.first()
+                    
+            chat_data = {
+                'group_id': group.id,
+                'group_name': group.name,
+            }
+            
+            # For private chats, add receiver details
+            if other_member:
+                chat_data.update({
+                    'receiver_id': other_member.id,
+                    'receiver_name': other_member.user_name
+                })
+            
+            chat_list.append(chat_data)
+        
+        return Response({
+            'status': 'success',
+            'chats': chat_list
+        })
     def post(self, request) -> Response:
         """
         Creates or retrieves a private chat group between the authenticated user
@@ -555,48 +552,64 @@ class ChatGroupListCreateView(APIView):
         """
         current_user = request.user  # Authenticated user
         data = request.data
-        target_username = data.get('target_username')
+        target_user_id = data.get('target_user_id')
 
-        if not target_username:
-            return Response({'status': 'error', 'message': 'Target username is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if current_user.user_name == target_username:
-            return Response(
-                {'status': 'error', 'message': 'Cannot create a chat with yourself.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
+        if not target_user_id:
+            return Response({
+                'status': 'error', 
+                'message': 'Target user ID is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
         try:
-            # Get the target user (must exist)
-            target_user = USER.objects.get(user_name=target_username)
-
-            # Ensure consistent group name generation (e.g., "private_ID1_ID2")
-            participants_usernames = sorted([current_user.user_name, target_user.user_name])
-            group_name = f"chat_{participants_usernames[0]}&{participants_usernames[1]}"
-
-            # Atomically create or get the chat group and add members
-            chat_group, created_group = ChatGroup.objects.get_or_create(
-                name=group_name,
-            )
-            # If the group was just created, log and add members
-            if created_group:
-                logger.info(f"Created new chat group '{group_name}' for users {current_user.user_name} and {target_user.user_name}.")
+            target_user = USER.objects.get(id=target_user_id)
+            if current_user.id == target_user.id:
+                logger.warning(f"User {current_user.id} attempted to create chat with themselves")
+                return Response({
+                    'status': 'error',
+                    'message': 'Cannot create chat with yourself'
+                }, status=status.HTTP_400_BAD_REQUEST)
+             
+            # Create stable group name using IDs instead of usernames
+            user_ids = sorted([current_user.id, target_user.id])
+            chat_name = f"chat_{user_ids[0]}_{user_ids[1]}"
+            existing_chat = ChatGroup.objects.filter(
+                name=chat_name,
+                members=current_user
+            ).filter(
+                members=target_user
+            ).first()
+            
+            if existing_chat:
+                logger.info(f"Found existing chat group: {existing_chat.id} between users {current_user.id} and {target_user.id}")
+                chat_group = existing_chat
+            else:
+                # Create a new chat group
+                logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
+                chat_group = ChatGroup.objects.create(name=chat_name)
                 chat_group.members.add(current_user, target_user)
-            # chat_group.members.add(current_user, target_user)
-
-            return Response(
-                {'status': 'success', 'group_id': chat_group.id, 'group_name': chat_group.name},
-                status=status.HTTP_200_OK
-            )
+                logger.info(f"Created new chat group: {chat_group.id}")
+            
+            # Return the chat group details
+            return Response({
+                'status': 'success',
+                'group_id': chat_group.id,
+                'group_name': chat_group.name,
+                'receiver_id': target_user.id,
+                'receiver_name': target_user.user_name
+            }, status=status.HTTP_200_OK)
+            
         except USER.DoesNotExist:
-            return Response({'status': 'error', 'message': 'Target user not found.'}, status=status.HTTP_404_NOT_FOUND)
+            logger.warning(f"Target user {target_user_id} not found for chat creation")
+            return Response({
+                'status': 'error', 
+                'message': 'Target user not found'
+            }, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            logger.exception("Internal server error during chat group operation.")
-            return Response(
-                {'status': 'error', 'message': 'Internal server error during chat group operation.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+            logger.exception(f"Error creating chat group: {e}")
+            return Response({
+                'status': 'error',
+                'message': f'Internal server error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # ===============================================================
 # 3. Chat Message Send & History View
 # Handles: GET & POST /api/chat/<int:group_id>/messages/
@@ -608,96 +621,50 @@ class ChatMessageView(APIView):
     """
     permission_classes = [IsAuthenticated]  # Only authenticated users can access history
 
-    def get(self, request, group_id: int) -> Response:
-        """
-        Retrieves a paginated list of messages for a given chat group.
-        Ensures the requesting user is a member of the group.
-        """
-        current_user = request.user  # Authenticated user
-        offset_str = request.query_params.get('offset', '0')
-        limit_str = request.query_params.get('limit', '20')
-
+    def get(self, request, group_id):
+        """Get messages for a specific chat group"""
+        user = request.user
+        
         try:
-            offset = int(offset_str)
-            limit = int(limit_str)
-            if offset < 0 or limit <= 0:
-                return Response(
-                    {'status': 'error', 'message': 'Offset must be non-negative and limit must be positive.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        except ValueError:
-            return Response(
-                {'status': 'error', 'message': 'Invalid offset or limit. Must be integers.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            # Retrieve the chat group. Check if current_user is a member.
+            # First verify the user is a member of the chat group
             chat_group = ChatGroup.objects.get(id=group_id)
-
-            # Check if the requesting user is a member of this chat group
-            is_member = chat_group.members.filter(id=current_user.id).exists()
-            if not is_member:
-                logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Access denied.")
-                return Response(
-                    {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-
-            # Filter messages by group and order by timestamp for consistent pagination
-            messages_queryset = Message.objects.filter(group=chat_group).order_by('timestamp')
-
-            # Initialize Paginator
-            paginator = Paginator(messages_queryset, limit)
-            page_number = (offset // limit) + 1
-
-            try:
-                page_obj = paginator.get_page(page_number)
-            except EmptyPage:
-                logger.info(f"No messages found for group '{group_id}' at offset {offset}.")
-                return Response(
-                    {
-                        'status': 'success',
-                        'messages': [],
-                        'next_offset': None,
-                        'has_next_page': False
-                    },
-                    status=status.HTTP_200_OK
-                )
-
-            # Serialize message data
-            messages_data = [
-                {
+            
+            if not chat_group.members.filter(id=user.id).exists():
+                return Response({
+                    'status': 'error',
+                    'message': 'You are not a member of this chat group'
+                }, status=status.HTTP_403_FORBIDDEN)
+            
+            # Get messages for this group
+            messages = Message.objects.filter(group=chat_group).order_by('-timestamp')
+            
+            # Pagination
+            offset = int(request.query_params.get('offset', 0))
+            limit = int(request.query_params.get('limit', 20))
+            
+            messages = messages[offset:offset+limit]
+            
+            message_data = []
+            for msg in messages:
+                message_data.append({
                     'id': msg.id,
+                    'sender_id': msg.sender.id,
                     'sender_username': msg.sender.user_name,
-                    'group_id': msg.group.id,
                     'content': msg.content,
-                    'timestamp': msg.timestamp.isoformat(),
-                } for msg in page_obj.object_list
-            ]
-
-            next_offset = offset + len(messages_data) if page_obj.has_next() else None
-
-            logger.info(f"Successfully retrieved {len(messages_data)} messages for group '{group_id}' for user {current_user.user_name}.")
+                    'timestamp': msg.timestamp.isoformat()
+                })
+            
             return Response({
                 'status': 'success',
-                'messages': messages_data,
-                'next_offset': next_offset,
-                'has_next_page': page_obj.has_next()
-            }, status=status.HTTP_200_OK)
-
+                'messages': message_data,
+                'has_more': Message.objects.filter(group=chat_group).count() > offset + limit
+            })
+            
         except ChatGroup.DoesNotExist:
-            logger.warning(f"Chat group '{group_id}' not found for message history.")
-            return Response(
-                {'status': 'error', 'message': 'Chat group not found.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        except Exception as e:
-            logger.exception(f"Error in ChatMessageHistoryView for group '{group_id}': {e}")
-            return Response(
-                {'status': 'error', 'message': 'Internal server error during message history retrieval.'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({
+                'status': 'error',
+                'message': 'Chat group not found'
+            }, status=status.HTTP_404_NOT_FOUND)
     """
     API endpoint to send a chat message to a specific group.
     This view saves the message to the database and broadcasts it via Channel Layers.
@@ -723,6 +690,12 @@ class ChatMessageView(APIView):
                     {'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
                     status=status.HTTP_403_FORBIDDEN
                 )
+            receiver_id = None
+            receiver_username = None
+            other_member = chat_group.members.exclude(id=current_user.id).first()
+            if other_member:
+                receiver_id = other_member.id
+                receiver_username = other_member.user_name
 
             message = Message.objects.create(
                 sender=current_user,
@@ -743,13 +716,17 @@ class ChatMessageView(APIView):
 
             message_data = {
                 "id": message.id,
-                "sender": current_user.user_name,
-                "sender_username": current_user.user_name,
                 "sender_id": current_user.id,
+                "sender_username": current_user.user_name,
                 "content": content,
                 "timestamp": message.timestamp.isoformat(),
                 "group_id": group_id
             }
+            
+            # Add receiver info for private chats
+            if receiver_id:
+                message_data["receiver_id"] = receiver_id
+                message_data["receiver_username"] = receiver_username
 
             # Use async_to_sync to call async channel layer from sync code
             async_to_sync(channel_layer.group_send)(
@@ -780,7 +757,9 @@ class ChatMessageView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-class refreshToken(APIView) :
+# url: api/token/refresh/
+
+class refreshAccessToken(APIView) :
 	permission_classes = [AllowAny]
 
 	def get(self, request) :

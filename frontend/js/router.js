@@ -5,29 +5,27 @@ import { renderChatButtonIfAuthenticated } from './views/chat.js';
 
 let navigationBlocked = false;
 
-// Gestion initiale des URLs sans hash
 if (!location.hash) {
 	const path = location.pathname;
 	if (path === '/' || path === '') {
-		// cas root => rediriger vers home via hash
 		location.replace(location.origin + location.pathname + '#home');
 	} else {
-		// toute autre URL sans hash => afficher 404
 		navigationBlocked = true;
 		window.addEventListener('DOMContentLoaded', () => {
 			const mainContent = document.getElementById('main-content');
 			if (mainContent) {
 				mainContent.innerHTML = `<h2>404 Page not found</h2>`;
 			}
-			history.replaceState(null, '', '/'); // nettoie l'URL
+			history.replaceState(null, '', '/');
 		});
 	}
 }
 
 
-window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
+// window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 window.addEventListener('DOMContentLoaded', async () => {
 	attachLoginListener();
+	renderChatButtonIfAuthenticated();
 });
 
 window.addEventListener('hashchange', navigate);
@@ -76,7 +74,8 @@ export async function navigate() {
 	let view;
 	/* if (typeof routes[routeName] === 'function') {
 		view = routes[routeName](param);
-	} else  */if (routes[routeName]) {
+	} else  */
+	if (routes[routeName]) {
 		view = routes[routeName];
 	} else {
 		const mainContent = document.getElementById('main-content');
