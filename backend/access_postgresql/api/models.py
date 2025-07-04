@@ -79,6 +79,7 @@ class FRIEND(models.Model):
             ('pending', 'Pending'),
             ('accepted', 'Accepted'),
             ('rejected', 'Rejected'),
+            ('blocked', 'Blocked'),
         ],
         default='pending'
     )

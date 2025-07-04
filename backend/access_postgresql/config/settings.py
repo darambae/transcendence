@@ -44,7 +44,14 @@ CSRF_COOKIE_SECURE = True
 
 APPEND_SLASH = True
 # Application definition
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework',
     'api.apps.ApiConfig',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -86,8 +94,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
 
+WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = "config.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -142,7 +151,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.USER'
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
+	#"ACCESS_TOKEN_LIFETIME": timedelta(seconds=7),
+    #"REFRESH_TOKEN_LIFETIME": timedelta(minutes=2),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
 	'SIGNING_KEY':config('DJANGO_SECRET_KEY'),
@@ -162,39 +173,39 @@ REST_FRAMEWORK = {
 
 import logging
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'simple': {
-#             'format': '[{levelname}] {asctime} {name}: {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple',
-#             'level': 'DEBUG',  # Show all logs
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG',  # Show all logs
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from Django
-#             'propagate': False,
-#         },
-#         'api': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from your app
-#             'propagate': False,
-#         },
-#     },
-# }
+#LOGGING = {
+#    'version': 1,
+#    'disable_existing_loggers': False,
+#    'formatters': {
+#        'simple': {
+#            'format': '[{levelname}] {asctime} {name}: {message}',
+#            'style': '{',
+#        },
+#    },
+#    'handlers': {
+#        'console': {
+#            'class': 'logging.StreamHandler',
+#            'formatter': 'simple',
+#            'level': 'DEBUG',  # Show all logs
+#        },
+#    },
+#    'root': {
+#        'handlers': ['console'],
+#        'level': 'DEBUG',  # Show all logs
+#    },
+#    'loggers': {
+#        'django': {
+#            'handlers': ['console'],
+#            'level': 'DEBUG',  # Show all logs from Django
+#            'propagate': False,
+#        },
+#        'api': {
+#            'handlers': ['console'],
+#            'level': 'DEBUG',  # Show all logs from your app
+#            'propagate': False,
+#        },
+#    },
+#}
 
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'

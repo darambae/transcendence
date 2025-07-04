@@ -7,6 +7,8 @@
 @import url('./card_profile.css');
 @import url('./settings_profile.css');
 @import url('./friends.css');
+@import url('./dashboards.css');
+@import url('./forgotPassword.css');
 
 
 h1 {
@@ -64,14 +66,20 @@ main {
 .login {
 	position: absolute;
 	font-family: 'Sankyu', sans-serif;
-	text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255);
 	margin-top: 20px;
 	right: 20px;
 }
 
 .login-link {
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+	color: inherit;
 	text-decoration: none !important;
-	color: black !important;
+	cursor: pointer;
+	text-shadow: 0 0 5px rgb(255, 255, 255), 0 0 10px rgb(255, 255, 255), 0 0 15px rgb(255, 255, 255);
 }
 
 .header-image {
@@ -98,7 +106,13 @@ h2 {
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.5); 
-	z-index: 999;
+	z-index: 2000;
+}
+
+#chat-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
   }
 
 @font-face {

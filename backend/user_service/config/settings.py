@@ -190,7 +190,7 @@ import logging
 #     },
 # }
 
-import logging
+#import logging
 
 # LOGGING = {
 #     'version': 1,

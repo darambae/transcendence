@@ -52,6 +52,14 @@ export async function handleSignupSubmit(event) {
 			if (mailDiv){
 				mailDiv.textContent = mail;
 			}
+
+			const loginBtn = document.getElementById("signupSuccess-login");
+			if (loginBtn) {
+				loginBtn.addEventListener('click', async () => {
+					actualizeIndexPage('modal-container', routes.login);
+					window.location.href = '/#home';
+				});
+			}
 		} else {
 			console.log("signup form couldn't connect")
 			const errorMsg = responseData.create_user.error;

@@ -15,7 +15,6 @@ import os
 import json
 import requests
 
-# Create your views here.
 @ensure_csrf_cookie
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
@@ -40,14 +39,14 @@ def signup(request):
         if not data[field]:
             return JsonResponse({'create_user': {'error': f'Field {field} cannot be empty'}}, status=400)
         if len(data[field]) > len_for_fields[field]:
-            return JsonResponse({'create_user': {'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
 
     try:
         validate_email(data['mail'])
     except ValidationError:
-        return JsonResponse({'error': 'Invalid e-mail address'}, status=400)
+        return JsonResponse({'create_user': {'error':'Invalid e-mail address'}}, status=400)
 
     json_data = {
         "user_name":data['username'],
@@ -59,7 +58,7 @@ def signup(request):
     creat_user_status = False
     response_mail_status = False
 
-    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'}) #Testing
+    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'})
     try:
         data_response_create_user = response_creat_user.json()
     except ValueError:
@@ -155,17 +154,18 @@ class avatar(APIView):
                     'Host': 'localhost'
                 }
             )
-            # with open("log.txt", "w+") as f:
-            #     print(f"status_code : {response.status_code}\nbody : {response.json()}\ntoken : {token}", file=f)
-            data = response.json()
-            path = data['avatar']
+            path = None
+            
+            if response.status_code == 200:
+                data = response.json()
+                path = data['avatar']
             if path:
                 full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
                 return FileResponse(open(full_path, 'rb'), content_type='image/png')
             else:
                 return JsonResponse({'error': 'not authorized'}, status=401)
         except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=500)
+            return Response({'error': 'Access to access_postgres failed'}, status=401)
 
 class avatarOther(APIView):
     permission_classes = [AllowAny]
@@ -182,15 +182,18 @@ class avatarOther(APIView):
                     'Host': 'localhost'
                 }
             )
-            data = response.json()
-            path = data['avatar']
+            path = None
+
+            if response.status_code == 200:
+                data = response.json()
+                path = data['avatar']
             if path:
                 full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
                 return FileResponse(open(full_path, 'rb'), content_type='image/png')
             else:
                 return JsonResponse({'error': 'not authorized'}, status=401)
         except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=500)
+            return Response({'error': 'Access to access_postgres failed'}, status=401)
 
 
 
@@ -275,8 +278,6 @@ class saveProfile(APIView):
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
 
-
-
 class saveNewPassword(APIView):
     permission_classes = [AllowAny]
 
@@ -344,4 +345,144 @@ class searchUsers(APIView):
         except requests.exceptions.RequestException:
             return Response({'error': 'Access to access_postgres for search users failed'}, status=500)
 
+
+class listennerFriends(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.COOKIES.get('access_token')
+
+        try:
+            response = requests.get(
+                'https://access_postgresql:4000/api/listennerFriends/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                }
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+
+
+class addFriend(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.COOKIES.get('access_token')
+        data = request.data
+
+        username = data.get('userName')
+
+        if not username:
+            return JsonResponse({'error': "username is empty"}, status=400)
+
+        json_data = {
+            'userName':username,
+		}
+
+        try:
+            response = requests.post(
+                'https://access_postgresql:4000/api/add/friend/',
+                json=json_data,
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                }
+            )
+            return JsonResponse(response.json(), status=response.status_code)
+        except requests.exceptions.RequestException:
+            return Response({'error': 'Access to access_postgres add friend'}, status=500)
+
+
+class declineInvite(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.COOKIES.get('access_token')
+        username = request.data.get('username')
+
+        json_data = {
+            'username':username
+        }
+
+        try:
+            response = requests.patch(
+                'https://access_postgresql:4000/api/declineInvite/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+                json=json_data,
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+
+class acceptInvite(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.COOKIES.get('access_token')
+        username = request.data.get('username')
+
+        json_data = {
+            'username':username
+        }
+
+        try:
+            response = requests.patch(
+                'https://access_postgresql:4000/api/acceptInvite/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+                json=json_data,
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+class matchHistory(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        token = request.COOKIES.get('access_token')
     
+        try:
+            response = requests.get(
+                'https://access_postgresql:4000/api/matchHistory/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+            )
+            res = requests.get('https://access_postgresql:4000/api/DecodeJwt/', headers={"Authorization" : f"bearer {token}", 'Host': 'localhost'}, verify=False)
+            print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
+
+            return Response(response.json().get("result"), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for matchHistory: {str(e)}'},
+                status=500
+            )

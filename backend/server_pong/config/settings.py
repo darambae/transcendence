@@ -37,7 +37,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
-
+# ALLOWED_HOSTS = ['server_pong']
 # Application definition
 
 INSTALLED_APPS = [
@@ -71,6 +71,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://localhost:8443",
     "http://127.0.0.1:3000",
     "https://server-pong:8030",
+
     "https://10.18.161.147:8443",
 ]
 

@@ -18,14 +18,16 @@ from django.contrib import admin
 from django.urls import path
 from api import views
 from api.views import data_link
-from api.views import login
-from api.views import verifyTwofa, refreshToken
+from api.views import login, logout, forgotPassword
+from api.views import verifyTwofa, refreshAccessToken
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('auth_api/data_link/', data_link.as_view(), name='data_link'),
     path('auth/login/', login.as_view(), name='login'),
+	path('auth/logout/', logout.as_view(), name='logout'),
     path('auth/verifyTwofa/', verifyTwofa.as_view(), name='verifyTwofa'),
 	path('auth/activate_account/<uidb64>/<token>/', views.activate_account, name='activate_account'),
-    path('auth/refresh-token/', refreshToken.as_view(), name='refreshToken')
+    path('auth/refresh-token/', refreshAccessToken.as_view(), name='refreshAccessToken'),
+	path('auth/forgotPassword/', forgotPassword.as_view(), name='forgotPassword')
 ] 

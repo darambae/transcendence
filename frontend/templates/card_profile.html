@@ -3,19 +3,19 @@
 
 <div>
   <div class="container py-4">
-    <article class="card player-card mx-auto" style="max-width: 600px;">
-      <div class="row g-0">
-        
-        <section class="col-md-4 p-4 text-center">
-          <img id="avatarother" alt="Avatar User" src="/assets/img/default.png" class="rounded-circle img-responsive mt-2" width="128" height="128" />
-          <div class="row text-start text-white mt-3">
-            <span id="statusOtherUser" class="">Status</span>
-            <div class="col-12 mb-2">
-              <strong></strong> <span id="lastActiveOther"></span>
-            </div>
+	  <article class="card player-card mx-auto" style="max-width: 600px;">
+		  <button id="close-card-btn" type="button" class="btn-close" aria-label="Close"></button>
+		  <div class="row g-0">
+			<section class="col-md-4 p-4 text-center">		  
+			<img id="avatarother" alt="Avatar User" src="/assets/img/default.png" class="rounded-circle img-responsive mt-2" width="128" height="128" />
+			<div class="row text-start text-white mt-3">
+				<span id="statusOtherUser" class="">Status</span>
+				<div class="col-12 mb-2">
+				<strong></strong> <span id="lastActiveOther"></span>
+				</div>
           </div>
         </section>
-        
+
         <section class="col-md-8">
           <div class="card-body">
             <h4 id="otherUser" class="card-title">👤 USER</h4>
@@ -34,20 +34,20 @@
                 <strong>📅 Created on : </strong> <span id="createdAtOther"></span>
               </div>
             </div>
-            
+
             <div class="border-top pt-3">
               <div class="row text-center">
                 <div class="col">
                     <h6>🎮 Games</h6>
-                    <strong>XXX</strong>
+                    <strong id="idTotalGames" >XXX</strong>
                   </div>
                   <div class="col border-start">
                     <h6>🏆 Wins</h6>
-                    <strong>XXX</strong>
+                    <strong id="idGameWin" >XXX</strong>
                   </div>
                   <div class="col border-start">
                     <h6>😵 Losses</h6>
-                    <strong>XXX</strong>
+                    <strong id="idGameLosses" >XXX</strong>
                   </div>
                 </div>
               </div>
@@ -56,16 +56,15 @@
         </div>
         <footer class="card-footer text-center py-3">
           <div class="d-flex justify-content-center align-items-center gap-3">
-            <button class="footer-btn" type="button">
-              <i class="fas fa-user-plus"></i> Add Friend
+            <button id="addFriendsid" class="footer-btn" type="button" data-username="" style="display: none;">
+              <i  class="fas fa-user-plus"></i> Add Friend
             </button>
-            <div class="vr-footer"></div>
+            <div id="separation" class="vr-footer" style="display: none;"></div>
             <button class="footer-btn" type="button">
-              <i class="fas fa-envelope"></i> Message
+              <i class="fa-solid fa-skull-crossbones"></i> Block
             </button>
           </div>
         </footer>      
       </article>
     </div>
   </div>
-    

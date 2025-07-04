@@ -1,13 +1,27 @@
 .player-card {
-    position: relative;
+    position: fixed;
     overflow: hidden;
-    background-color: rgba(139, 0, 0, 0.767)  !important;
+    background-color: transparent !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 0,5rem !important;
     padding: 0;
     max-width: 600px;
     margin: 1rem auto;
+    z-index: 1400;
 }
+
+.card-default {
+  background-color: rgba(105, 0, 0, 0.918) !important;
+}
+
+.card-pending {
+  background-color: rgba(240, 103, 11, 0.918) !important;
+}
+
+.card-accepted {
+  background-color: rgba(77, 180, 8, 0.8) !important;
+}
+
 
 .player-card::after {
     content: "";
@@ -19,13 +33,13 @@
     background-repeat: no-repeat;
     opacity: 0.9;
     pointer-events: none;
-    z-index: 0;
+    z-index: 1200;
     border-radius: 1rem;
 }
 
 .player-card > * {
     position: relative;
-    z-index: 1;
+    z-index: 1300;
     background-color: rgba(0, 0, 0, 0.4);
     padding: 1rem;
 }
@@ -142,3 +156,14 @@
     background-color: rgba(255, 255, 255, 0.3);
   }
   
+ #close-card-btn {
+  color: #fff !important;
+  background-color: transparent !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+#close-card-btn:hover, #close-card-btn:focus {
+  color: #fff !important;
+  background-color: rgba(255,255,255,0.15) !important;
+  opacity: 1 !important;
+}

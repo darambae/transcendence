@@ -107,7 +107,7 @@ export async function localGameController() {
                 case "p" :
                     if (started == false) {
                         started = true;
-                        fetch(url_post, {
+                        await fetch(url_post, {
                             method: 'POST',
                             headers: {
                               'Content-Type': 'application/json'

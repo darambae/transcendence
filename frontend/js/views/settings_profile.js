@@ -1,5 +1,6 @@
 
 import { userInfo } from './user.js';
+import { fetchWithRefresh } from  "../utils.js"
 import * as Friends from './friends.js';
 
 export function settingsProfileController() {
@@ -13,11 +14,12 @@ export function settingsProfileController() {
 	changePassword()
 	animationPassword()
 	Friends.searchFriends()
+	Friends.listennerFriends()
 }
 
 //  get user info end affich
 function displayUserInfo(data) {
-	console.log(data);
+	console.log(data)
 	document.getElementById('usernameLabel').textContent = data.user_name;
 	document.getElementById('mailLabel').textContent = data.mail;
 	document.getElementById('firstNameLabel').textContent = data.first_name;
@@ -124,7 +126,7 @@ function animationPassword() {
 
 async function getUserInfo() {
 	try {
-	  const response = await fetch("user-service/infoUser/", {
+	  const response = await fetchWithRefresh("user-service/infoUser/", {
 		method: "GET",
 		credentials: 'include',
 	  });
@@ -148,7 +150,7 @@ function handleResponse(response) {
 
 //  get avatar end affich
 function getUserAvatar() {
-	fetch("user-service/avatar/", {
+	fetchWithRefresh("user-service/avatar/", {
 		method: "GET",
 		credentials: 'include',
 	})
@@ -209,7 +211,7 @@ function SaveImg() {
 		formData.append('image', fileInput.files[0]);
 
 		try {
-			const response = await fetch("user-service/saveImg/", {
+			const response = await fetchWithRefresh("user-service/saveImg/", {
 				method: 'PATCH',
 				credentials: 'include',
 				body: formData
@@ -266,7 +268,7 @@ function SavePrivateInfo() {
 		}
 
 		try {
-			const response = await fetch("user-service/savePrivateInfo/", {
+			const response = await fetchWithRefresh("user-service/savePrivateInfo/", {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: {
@@ -316,7 +318,7 @@ function SavePrivateProfile() {
 		}
 
 		try {
-			const response = await fetch("user-service/saveProfile/", {
+			const response = await fetchWithRefresh("user-service/saveProfile/", {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: {
@@ -373,7 +375,7 @@ function changePassword() {
 			data.inputPasswordNew.length >= 8
 		) {
 			try {
-				const response = await fetch("user-service/saveNewPassword/", {
+				const response = await fetchWithRefresh("user-service/saveNewPassword/", {
 					method: 'PATCH',
 					credentials: 'include',
 					headers: {

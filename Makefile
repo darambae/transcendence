@@ -8,10 +8,10 @@ MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redi
 ELK_CONTAINERS=elasticsearch kibana logstash
 
 # POUR GAUTIER & OMAR
-USER_CONTAINER=nginx_modsecurity postgres access_postgresql auth user_service mail
+USER_CONTAINER=nginx_modsecurity postgres access_postgresql auth user_service mail live_chat
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access_postgresql auth mail tournament
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access_postgresql auth mail tournament live_chat
 
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access_postgresql server_pong ai_pong user_service tournament
