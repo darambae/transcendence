@@ -21,7 +21,6 @@ from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvit
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
 from api.views import ChatGroupListCreateView, ChatMessageView
-#, ChatMessageHistoryView, ChatMessageSendView
 from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
