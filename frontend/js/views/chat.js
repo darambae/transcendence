@@ -2,7 +2,6 @@
 import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
-import { listennerFriends } from './friends.js';
 
 
 let mainChatBootstrapModal; // Bootstrap Modal instance
@@ -89,7 +88,8 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
         if (response.ok && data.status === 'success') {
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
-                data.messages.forEach((msgData) => {
+                const orderedMessages = [...data.messages].reverse();
+				data.messages.forEach((msgData) => {
                     const msgElement = createMessageElement(msgData, currentUserId);
                     fragment.appendChild(msgElement);
                 });
@@ -130,7 +130,6 @@ function sendMessage(currentUserId) {
 
 	const content = messageInput.value.trim();
     const groupId = groupIdInput.value;
-
 	const username = usernameInput.value;
 
 	const MIN_LENGTH = 1;
@@ -186,6 +185,7 @@ function sendMessage(currentUserId) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
+			'X-CSRFToken': getCookie('csrftoken'),
 		},
 		credentials: 'include',
 		body: JSON.stringify({
@@ -222,6 +222,7 @@ function sendMessage(currentUserId) {
 		});
 }
 
+
 // Function to initialize EventSource (SSE) for a group
 async function initEventSource(groupId, currentUserId) {
 	// Close any other active EventSources before opening a new one
@@ -232,14 +233,6 @@ async function initEventSource(groupId, currentUserId) {
 			console.log(`Closed SSE for group: ${key}`);
 		}
 	}
-    // // Close any other active EventSources before opening a new one
-    // for (const key in eventSources) {
-    //     if (eventSources[key].readyState === EventSource.OPEN) {
-    //         eventSources[key].close();
-    //         delete eventSources[key];
-    //         console.log(`Closed SSE for group: ${key}`);
-    //     }
-    // }
 
 	const chatLog = document.getElementById('chatLog-active');
 	if (!chatLog) {
@@ -264,7 +257,7 @@ async function initEventSource(groupId, currentUserId) {
 			console.log('Token refresh requested by server');
 			// Make a request that will refresh the token
 			try {
-				await fetchWithRefresh('auth/refresh-token/', {
+				await fetch('auth/refresh-token/', {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
@@ -366,7 +359,6 @@ async function getBlockedStatus(targetUserId) {
 	}
 }
 
-
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
 async function loadChatRoomList(currentUserId) {
     const chatRoomListUl = document.getElementById('chatRoomList');
@@ -390,11 +382,10 @@ async function loadChatRoomList(currentUserId) {
         // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         console.log('Loading chat list for user:', currentUserId);
-        const response = await fetchWithRefresh(`/chat/`, {
+        const response = await fetchWithRefresh(`chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
             },
             credentials: 'include'
         });
@@ -493,10 +484,6 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
         groupIdInput.value = newgroupId;
     }
 
-    // Enable message input and send button
-    document.getElementById('messageInput-active').disabled = false;
-    document.getElementById('sendMessageBtn').disabled = false;
-
     // Clear current messages
     const chatLog = document.getElementById('chatLog-active');
     if (chatLog) {
@@ -511,7 +498,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
     loadMessageHistory(currentUserId, newgroupId);
 	const targetbBlockedStatus = getBlockedStatus(targetUserId)
 	let block_reason = null;
-	if (blockedStatus.hasBlocked) {
+	if (targetbBlockedStatus.hasBlocked) {
 		block_reason = 'this user blocked you';
 	} else if (targetbBlockedStatus.isBlocked) {
 		//create a pop window to ask unblock
@@ -543,7 +530,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 						// Enable message input and send button
 						document.getElementById('messageInput-active').disabled = false;
 						document.getElementById('sendMessageBtn').disabled = false;
-						initEventSource(newgroupId, username);
+						initEventSource(newgroupId, currentUserId);
 						// Focus on message input
 						const messageInput = document.getElementById('messageInput-active');
 						if (messageInput) {
@@ -558,9 +545,9 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 					console.error(
 						'HTTP error unblocking the user :',
 						status,
-						targetUser || statusText
+						targetUserId || statusText
 						);
-						alert('HTTP Error: ' + (targetUser || statusText));
+						alert('HTTP Error: ' + (targetUserId || statusText));
 					}
 				})
 				.catch((error) => {
@@ -579,7 +566,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	    // Enable message input and send button
 		document.getElementById('messageInput-active').disabled = false;
 		document.getElementById('sendMessageBtn').disabled = false;
-		initEventSource(newgroupId, username);
+		initEventSource(newgroupId, currentUserId);
 		// Focus on message input
 		const messageInput = document.getElementById('messageInput-active');
 		if (messageInput) {
@@ -618,7 +605,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	}
 
 	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetchWithRefresh('/chat/', {
+		fetchWithRefresh('chat/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -761,11 +748,7 @@ export function chatController(userId, username) {
 			}
 			// If a group was active before closing/reopening, switch back to it
 			if (currentActiveChatGroup) {
-				const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${currentActiveChatGroup}"]`);
-    			if (targetChatListItem) {
-        			const receiverId = targetChatListItem.dataset.id;
-					await switchChatRoom(userId, currentActiveChatGroup, receiverId);
-				}
+				await switchChatRoom(userId, currentActiveChatGroup, receiverId);
 			}
 			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
 			// Focus on new chat user ID input initially
@@ -784,7 +767,7 @@ export function chatController(userId, username) {
 			currentActiveChatGroup = null; // Reset active chat group when closing modal
 			// Clear chat log and reset UI state
 			const chatLog = document.getElementById('chatLog-active');
-			if (chatLog) {
+			if (chatLog)
 				chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
 
 			document.getElementById('messageInput-active').disabled = true;
@@ -792,11 +775,10 @@ export function chatController(userId, username) {
 			document.getElementById('activeChatRoomName').textContent = ''; // Clear header
 			document.getElementById('groupIdInput-active').value = '';
 			document.getElementById('targetUserInput').value = ''; // Clear new chat input
-			} else {
-				console.error('Main chat window modal element not found!');
-				return;
-			}
 		});
+	} else {
+		console.error('Main chat window modal element not found!');
+		return;
 	}
 
 	// 2. Main Chat Toggle Button setup
@@ -863,7 +845,7 @@ export function chatController(userId, username) {
 }
 
 export async function renderChatButtonIfAuthenticated() {
-	let userIsAuth = await isUserAuthenticated();
+	let userIsAuth = await isUserAuthenticated('chat');
 	if (userIsAuth) {
 		const userData = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',

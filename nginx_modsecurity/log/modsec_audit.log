@@ -24838,3 +24838,173 @@ ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-
 
 ---y32ulr5r---Z--
 
+---l38pAaN4---A--
+[05/Jul/2025:17:18:30 +0000] 175173591060.524338 172.19.0.1 46018 172.19.0.10 443
+---l38pAaN4---B--
+GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "Windows"
+Referer: https://transcendence.42.fr:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: transcendence.42.fr:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=9Nn8gRUdS8l19PGpOwRSnyRs8A25deCj; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM1NzE2LCJpYXQiOjE3NTE3MzU0MTYsImp0aSI6ImFlNTdmNjM5NjcyMTRhNjZhYjEzOGIwNGQzZGQwZGVkIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.qmsrOQ1xEAaDP9tZbmVQmKXjpbS7BCoV03rOGCF2K1g; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MDIxNiwiaWF0IjoxNzUxNzM1NDE2LCJqdGkiOiI0ODc5MzhmMGE1MDI0ZjFkYTU2MjJlZGI1YmM0MjM1MyIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0._va4AxnNzT3qViuwjw34izb9HA952ZELUmWd-WGQYPg
+Accept-Language: fr
+
+---l38pAaN4---F--
+HTTP/1.1 403
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 17:18:30 GMT
+Content-Length: 555
+Content-Type: text/html
+Connection: keep-alive
+
+---l38pAaN4---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173591060.524338"] [ref "o6,15v4,39"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173591060.524338"] [ref ""]
+
+---l38pAaN4---Z--
+
+---PxJVX2bp---A--
+[05/Jul/2025:17:20:10 +0000] 175173601033.468245 172.19.0.1 49682 172.19.0.10 443
+---PxJVX2bp---B--
+GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "Windows"
+Referer: https://transcendence.42.fr:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: transcendence.42.fr:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=9Nn8gRUdS8l19PGpOwRSnyRs8A25deCj; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MDIxNiwiaWF0IjoxNzUxNzM1NDE2LCJqdGkiOiI0ODc5MzhmMGE1MDI0ZjFkYTU2MjJlZGI1YmM0MjM1MyIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0._va4AxnNzT3qViuwjw34izb9HA952ZELUmWd-WGQYPg; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM2MjMyLCJpYXQiOjE3NTE3MzU0MTYsImp0aSI6ImY2MjAyOGE0NDkwZTRmM2E5ZDkxZWNkOTczYTEwZWI0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.ip97cIv7Su8ys9Ni__FYIYNACukm2b9t2XVA_6hxxOE
+Accept-Language: fr
+
+---PxJVX2bp---F--
+HTTP/1.1 403
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 17:20:10 GMT
+Content-Length: 555
+Content-Type: text/html
+Connection: keep-alive
+
+---PxJVX2bp---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173601033.468245"] [ref "o6,15v4,39"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173601033.468245"] [ref ""]
+
+---PxJVX2bp---Z--
+
+---JdImEFUz---A--
+[05/Jul/2025:17:27:54 +0000] 175173647452.570699 172.19.0.1 60172 172.19.0.10 443
+---JdImEFUz---B--
+GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "Windows"
+Referer: https://transcendence.42.fr:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: transcendence.42.fr:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=qEb4FKOoyCppex2B0TvlAEqHpCa0bf9I; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM2NzYzLCJpYXQiOjE3NTE3MzY0NjMsImp0aSI6IjI5MDc1MzU5YjgyNzRlOTJhZjJiMmZmYjA3Y2Q0YmRiIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.7riUJPjXnmQrNlGtHpcuJjOYvTt5GFdcEdvCJkQPvQ0; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MTI2MywiaWF0IjoxNzUxNzM2NDYzLCJqdGkiOiI2ZmI2NjI5NjQ1OGY0ODMyOGNjNjA0OWZlY2MxOGViNiIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.4F6dasx0iHEtubapl2Afh3M4wickmaNkyn-oKRmNZBM
+Accept-Language: fr
+
+---JdImEFUz---F--
+HTTP/1.1 403
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 17:27:54 GMT
+Content-Length: 555
+Content-Type: text/html
+Connection: keep-alive
+
+---JdImEFUz---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173647452.570699"] [ref "o6,15v4,39"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173647452.570699"] [ref ""]
+
+---JdImEFUz---Z--
+
+---Pckn3BZc---A--
+[05/Jul/2025:17:36:50 +0000] 175173701038.189127 172.19.0.1 41580 172.19.0.10 443
+---Pckn3BZc---B--
+GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "Windows"
+Referer: https://transcendence.42.fr:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: transcendence.42.fr:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=13SJdQeIADvLrS0ryaYcDrr1LFle54db; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM3Mjk5LCJpYXQiOjE3NTE3MzY5OTksImp0aSI6IjMyNmU1MWYwMjE1MjRjMzc5ODE4NDc5YTczMWJjNjkxIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.q2FhI1fprD-npwx2JRgTUMs8_knB4UUtQwHCeBbVR1Q; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MTc5OSwiaWF0IjoxNzUxNzM2OTk5LCJqdGkiOiIwMzIyMDU2ZTIzODI0YmMyODJjODBiNmViOGQwNGE3ZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.I81HW-tw9WecYYs_gd8L9zVp64qMIQxlpLoq5sFlYZk
+Accept-Language: fr
+
+---Pckn3BZc---F--
+HTTP/1.1 403
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 17:36:50 GMT
+Content-Length: 555
+Content-Type: text/html
+Connection: keep-alive
+
+---Pckn3BZc---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173701038.189127"] [ref "o6,15v4,39"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173701038.189127"] [ref ""]
+
+---Pckn3BZc---Z--
+
+---OGKgyqVN---A--
+[05/Jul/2025:17:37:38 +0000] 175173705873.371260 172.19.0.1 35070 172.19.0.10 443
+---OGKgyqVN---B--
+GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Content-Type: application/json
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "Windows"
+Referer: https://transcendence.42.fr:8443/
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Host: transcendence.42.fr:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=13SJdQeIADvLrS0ryaYcDrr1LFle54db; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM3Mjk5LCJpYXQiOjE3NTE3MzY5OTksImp0aSI6IjMyNmU1MWYwMjE1MjRjMzc5ODE4NDc5YTczMWJjNjkxIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.q2FhI1fprD-npwx2JRgTUMs8_knB4UUtQwHCeBbVR1Q; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MTc5OSwiaWF0IjoxNzUxNzM2OTk5LCJqdGkiOiIwMzIyMDU2ZTIzODI0YmMyODJjODBiNmViOGQwNGE3ZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.I81HW-tw9WecYYs_gd8L9zVp64qMIQxlpLoq5sFlYZk
+Accept-Language: fr
+
+---OGKgyqVN---F--
+HTTP/1.1 403
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 17:37:38 GMT
+Content-Length: 555
+Content-Type: text/html
+Connection: keep-alive
+
+---OGKgyqVN---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173705873.371260"] [ref "o6,15v4,39"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173705873.371260"] [ref ""]
+
+---OGKgyqVN---Z--
+

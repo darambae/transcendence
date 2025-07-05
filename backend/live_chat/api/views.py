@@ -65,8 +65,6 @@ class blockedStatus(View):
             logger.error(f"Internal server error: {e}")
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
-
-# @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
 class ChatGroupListCreateView(View):
     def get(self, request, *args, **kwargs):
         """
@@ -97,13 +95,6 @@ class ChatGroupListCreateView(View):
         """
         try:
             data = json.loads(request.body)
-            current_username = data.get('current_username')
-            target_username = data.get('target_username')
-
-            if not current_username or not target_username:
-                return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
-
-
             target_user_id = data.get('target_user_id')
             current_user_id = data.get('current_user_id')
             if not target_user_id or not current_user_id:
@@ -254,20 +245,26 @@ async def _generate_events(request, group_id):
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
 
-        # --- SSE Token Authentication ---
-    # Get access token from cookies (consistent with other views)
-    access_token = request.COOKIES.get('access_token')
-    if not access_token:
-        await channel_layer.group_discard(channel_group_name, client_channel_name)
-        return StreamingHttpResponse("Unauthorized: No access token", status=401, content_type="text/plain")
-
-    # Validate the token by making a request to access_postgresql
-    # This matches the pattern used in other views
+    # --- SSE Token Authentication ---
     try:
-        # We need to use httpx which supports async requests
+        # Your token expiration check code
+        access_token = request.COOKIES.get('access_token')
+
+        token_data = jwt.decode(access_token, verify=False)
+        expiry_time = token_data.get('exp')
+
+        current_time = time.time()
+        if expiry_time and (expiry_time - current_time < 300):
+            yield f"event: refresh_token\ndata: {{}}\n\n"
+
+    except Exception as e:
+        logger.error(f"Error checking token expiration: {e}")
+
+    # Validate token
+    try:
         async with httpx.AsyncClient(verify=False) as client:
             resp = await client.get(
-                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/",  # Adjust endpoint as needed
+                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/",
                 headers={
                     'Authorization': f'Bearer {access_token}',
                     'Host': 'localhost'
@@ -278,18 +275,18 @@ async def _generate_events(request, group_id):
         if resp.status_code != 200:
             logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}'")
             await channel_layer.group_discard(channel_group_name, client_channel_name)
-            return StreamingHttpResponse("Unauthorized: Invalid token", status=401, content_type="text/plain")
+            yield f"event: error\ndata: {json.dumps({'message': 'Unauthorized'})}\n\n"
+            return
 
-        # Optional: Check if user has access to this specific group
-        # You might need another endpoint or include group_id in verification
         user_data = resp.json()
-        logger.info(f"live_chat (SSE): Authenticated user '{user_data.get('user_name')}' for group '{group_id}'")
+        logger.info(f"live_chat (SSE): Validated token for group '{group_id}' - user data: {user_data}")
 
     except httpx.RequestError as e:
-        logger.exception(f"live_chat (SSE): Error validating token for group '{group_id}': {e}")
+        logger.exception(f"live_chat (SSE): Error validating token: {e}")
         await channel_layer.group_discard(channel_group_name, client_channel_name)
-        return StreamingHttpResponse("Internal Server Error during authentication", status=500, content_type="text/plain")
-    # --- END SSE Token Authentication ---
+        yield f"event: error\ndata: {json.dumps({'message': 'Authentication error'})}\n\n"
+        return
+
     try:
         while True:
             try:
@@ -303,23 +300,6 @@ async def _generate_events(request, group_id):
                     yield f"data: {sse_data}\n\n"
                 else:
                     yield ":heartbeat\n\n"
-
-        except asyncio.TimeoutError:
-            # Timeout is normal, just a heartbeat, the loop continues
-            pass # Explicit heartbeat already yielded by the else block
-        except asyncio.CancelledError:
-            print(f"SSE stream for group '{group_id}' (channel {client_channel_name}) cancelled.")
-        except Exception as e:
-            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
-        finally:
-            # Ensure the channel is discarded when the generator exits
-            await channel_layer.group_discard(channel_group_name, client_channel_name)
-
-    response = StreamingHttpResponse(event_generator(), content_type="text/event-stream")
-    response['Cache-Control'] = 'no-cache'
-    response['X-Accel-Buffering'] = 'no' # Essential for SSE to ensure events are sent immediately
-    return response
-
 
             except asyncio.TimeoutError:
                 yield ":heartbeat\n\n"
