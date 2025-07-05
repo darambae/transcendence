@@ -1,9 +1,10 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 
+
 async function double_authenticate(data) {
-	const html = await loadTemplate('double_auth');
-	const content = document.getElementById("login-form");
+	const html = await loadTemplate('doubleAuth');
+	const content = document.getElementById("invits-form");
 	if (html) {
 		content.innerHTML = html;
 	}
@@ -25,12 +26,13 @@ async function double_authenticate(data) {
 
 			const code = document.getElementById('auth-code').value;
 			console.log("mail + code: ", code, mail);
-			const response = await fetch("auth/invits/verifyTwofa/", {
+			const response = await fetch("auth/verifyTwofa/", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 					'X-CSRFToken': csrf,
 				},
+				credentials: 'include',
 				body: JSON.stringify({ mail, code })
 			});
 
@@ -38,16 +40,6 @@ async function double_authenticate(data) {
 
 			if (response.ok) {
 				resolve(true);
-				let	accessToken = responseData.access; //Token to put in the authorization header of request trying to access protected roads
-				let	refreshToken = responseData.refresh; // Token to get a new acccess token if needed without having to reconnect		
-
-
-				console.log(accessToken)
-				console.log(refreshToken)
-
-
-				sessionStorage.setItem('accessToken', responseData.access);
-				sessionStorage.setItem('refreshToken', responseData.refresh);
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
@@ -61,11 +53,11 @@ async function double_authenticate(data) {
 	});
 }
 
-export async function handleLoginSubmit(event) {
+export async function handleInvitSubmit(event) {
 
 	event.preventDefault();
 	
-	const form = event.target;
+	let form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
 	const loadingMessage = form.querySelector("#loading-message");
 
@@ -79,12 +71,13 @@ export async function handleLoginSubmit(event) {
 		
 		const csrf = getCookie('csrftoken');
 		console.log("csrf: ", csrf);
-		const response = await fetch("/auth/invits/login/", {
+		const response = await fetch("/auth/login/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				'X-CSRFToken': csrf,
 			},
+			credentials: 'include',
 			body: JSON.stringify(dataForm)
 		});
 
@@ -93,15 +86,14 @@ export async function handleLoginSubmit(event) {
 		if (response.ok) {
 			try {
 				await double_authenticate(dataForm)
-				//tokens returned in the JWT to communicate with protected roads
-				//let	accessToken = data.access; //Token to put in the authorization header of request trying to access protected roads
-				//let	refreshToken = data.refreshToken; // Token to get a new acccess token if needed without having to reconnect		
+				await fetch("tournament/guest", {
+					headers : {
+						'X-CSRFToken': csrf,
+					},
+					credentials: 'include',
+				})
 
-				//localStorage.setItem('accessToken', accessToken);
-				//localStorage.setItem('refreshToken', refreshToken);
-
-				closeModal();
-				actualizeIndexPage('toggle-login', routes['user']);
+				actualizeIndexPage('guest-add', routes['guest']);
 				console.log("User successfully connected");
 			} catch (error) {
 				console.log("Double auth error: ", error);
@@ -125,27 +117,5 @@ export async function handleLoginSubmit(event) {
 		submitButton.disabled = false;
 		if (loadingMessage)
 			loadingMessage.style.display = "none";
-	}
-}
-
-
-
-export function invitController() {
-	const modalContainer = document.getElementById("modal-container");
-	const closeBtn = document.getElementById("close-login-form");
-
-	closeBtn.addEventListener("click", (event) => {
-		closeModal();
-	});
-
-	modalContainer.addEventListener("click", (event) => {
-		if(event.target.id === "modal-container") {
-			closeModal();
-		}
-	});
-
-	const form = document.getElementById("log-form");
-	if (form) {
-	  form.addEventListener("submit", handleLoginSubmit);
 	}
 }
