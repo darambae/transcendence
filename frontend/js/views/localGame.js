@@ -2,6 +2,7 @@ import { fetchWithRefresh, getCookie } from "../utils.js";
 import { getPlayersLocalName } from "./utils/commonFunctions.js"
 import { adress } from "./utils/commonFunctions.js";
 import { drawMap } from "./utils/commonFunctions.js";
+import { drawCenterText } from "./multiplayer.js"
 
 
 function drawRoundedRect(x, y, width, height, radius) {
@@ -40,6 +41,9 @@ export function drawCenterTextP() {
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
 	ctx.fillText("P", x, y);
+
+	ctx.font = "16px Arial";
+	ctx.fillText("keyboard", x, y + 32);
 	
 	ctx.fillStyle = "white";
 	ctx.font = "20px Arial";
@@ -54,6 +58,8 @@ export function guideTouch() {
 	const roundStade = document.getElementById("roundStade")
 	const verticalStadeDown = document.getElementById("verticalStadeDown")
 	const roundStadePongCenter = document.getElementById("roundStadePongCenter")
+	const SinglePlayerGameInfo1 = document.getElementById("SinglePlayerGameInfo1")
+	const SinglePlayerGameInfo2 = document.getElementById("SinglePlayerGameInfo2")
 
 	if (idEEndD) {
 		idEEndD.style.display = "block";
@@ -78,6 +84,12 @@ export function guideTouch() {
 	}
 	if (roundStadePongCenter) {
 		roundStadePongCenter.style.display = "block";
+	}
+	if (SinglePlayerGameInfo1) {
+		SinglePlayerGameInfo1.style.display = "flex";
+	}
+	if (SinglePlayerGameInfo2) {
+		SinglePlayerGameInfo2.style.display = "flex";
 	}
 }
 
@@ -141,7 +153,7 @@ export async function localGameController() {
 			const data = JSON.parse(event.data);
 
 			let sc1 = document.getElementById("player1score");
-			let sc2 = document.getElementById("player1score");
+			let sc2 = document.getElementById("player2score");
 
 			// console.log(data);
 			game_stats = data["game_stats"]
@@ -162,7 +174,6 @@ export async function localGameController() {
 
 					p1.innerHTML = game_stats["p1"][0]
 					p2.innerHTML = game_stats["p2"][0]
-
 				}
 			}
 		} catch (error) {

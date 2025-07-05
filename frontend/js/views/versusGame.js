@@ -5,6 +5,7 @@ import { actualizeIndexPage, fetchWithRefresh } from "../utils.js";
 import { drawCenterText } from "./multiplayer.js"
 
 export async function versusController() {
+  
     drawCenterText("click \"GO\"")
     let startButton = document.getElementById("getTextBtn");
     let apiKey;

@@ -58,7 +58,7 @@ export function getCookie(name) {
 }
 
 export async function isUserAuthenticated() {
-	const response = await fetchWithRefresh('user-service/infoUser/', {
+	const response = await fetch('user-service/infoUser/', {
 		method: 'GET',
 		credentials: 'include'
 	});
