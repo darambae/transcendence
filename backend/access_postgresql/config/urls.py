@@ -18,13 +18,11 @@ Including another URLconf
 from django.urls import path
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword, forgotPassword
 from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvite, acceptInvite, logout, disconnected
-from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
-from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken
+from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
 from api.views import ChatGroupListCreateView, ChatMessageView
 #, ChatMessageHistoryView, ChatMessageSendView
 from api.views import matchHistory
-from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, DeleteGuest
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
 
@@ -35,7 +33,6 @@ urlpatterns = [
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
 	path('api/checkCurrentPassword/', checkCurrentPassword.as_view(), name='checkCurrentPassword'),
-	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
 	path('api/guest/', DeleteGuest.as_view(), name='DeleteGuest'),
 	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'), # the initial token is generated in this view
 	path('api/token/refresh/', refreshAccessToken.as_view(), name='token_refresh'),
