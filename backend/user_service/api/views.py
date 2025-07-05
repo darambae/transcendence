@@ -208,6 +208,10 @@ class saveImg(APIView):
         if not image:
             return JsonResponse({'error': 'Save image.'}, status=400)
         
+        max_size = 2 * 1024 * 1024
+        if image.size > max_size:
+            return JsonResponse({'error': 'Image file is too large (max 2MB)'}, status=413)
+        
         upload_dir = os.path.join(settings.MEDIA_ROOT, 'imgs')
         image_path = os.path.join(upload_dir, image.name)
 
