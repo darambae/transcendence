@@ -102,21 +102,16 @@ export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const wallThickness = 15;
-  const wallOffsetUp = 20;
-  const wallOffsetDown = 20;
-  const wallRadius = 10;
-
   const dx1 = Racket1Pos[1][0] - Racket1Pos[0][0];
   const dy1 = Racket1Pos[1][1] - Racket1Pos[0][1];
   const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
-  ctx.fillStyle = "blue";
+  ctx.fillStyle = "white";
   roundRect(ctx, Racket1Pos[0][0] + offsetX, Racket1Pos[0][1] + offsetY, 5, d1, 3);
   
   const dx2 = Racket2Pos[1][0] - Racket2Pos[0][0];
   const dy2 = Racket2Pos[1][1] - Racket2Pos[0][1];
   const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-  ctx.fillStyle = "red";
+  ctx.fillStyle = "white";
   roundRect(ctx, Racket2Pos[0][0] + offsetX, Racket2Pos[0][1] + offsetY, 5, d2, 3);
 
   let ballX = Math.min(Math.max(ballPos[0], 10), fieldWidth - 10);
@@ -216,7 +211,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
         const data = JSON.parse(event.data);
 
         let sc1 = document.getElementById("player1score");
-        let sc2 = document.getElementById("player1score");
+        let sc2 = document.getElementById("player2score");
 
         // console.log(data);
         game_stats = data["game_stats"]
