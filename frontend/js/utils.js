@@ -28,7 +28,7 @@ export async function actualizeIndexPage(elementId, view) {
 	}
 }
 
-export async function closeModal() {
+export async function closeModal(loc = "#home") {
 	const loginForm = document.getElementById("login-form");
 	const modalContainer = document.getElementById("modal-container")
 

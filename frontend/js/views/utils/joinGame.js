@@ -4,7 +4,7 @@ export async function sendGameJoining() {
     const mul = await fetch('./js/views/utils/MatchJoining.html')
     const mulTxt = await mul.text()
     // // console.log(mulTxt)
-    let gameState  = document.getElementById("replace-state");
+    let gameState  = document.getElementById("idfooterCanvas");
     gameState.innerHTML = mulTxt;
 
     let btnJoin = document.getElementById("getTextBtn");
