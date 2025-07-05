@@ -1,14 +1,28 @@
 <div class="containerCanvas">
+  <div class="footerCanvas">
+    <h2 id="titleGameSinglePlay" class="titleGame section">Game</h2>
+    <div id="idUpendDown" class="section">
+        <div>⬆️ = up</div>
+        <div>⬇️ = down</div>
+    </div>
+  </div>
     <div class="canvasContainer">
-      <h2 class="titleGame">Game</h2>
-      <canvas id="gameCanvas" width="1100" height="650"></canvas>
+      <div class="stade">
+        <div id="wallUp" class="decorative-box"></div>
+        <div id="verticalStadeUp" class="verticalStadeUp"></div>
+        <div id="roundStade" class="roundStadePong"></div>
+        <!--<div class="roundStadePongCenter"></div>-->
+        <div id="verticalStadeDown" class="verticalStadeDown"></div>
+        <canvas id="gameCanvas" width="1100" height="650"></canvas>
+        <div id="wallDown" class="decorative-box"></div>
+    </div>
     </div>
     <div id="idfooterCanvas" class="footerCanvas">
       <div class="section">
-        <button id="create-game" type="button" class="btn btn-outline-primary">Create game</button>
+        <button id="create-game" type="button" class="btn btn-primary">Create game</button>
       </div>
       <div class="section">
-        <button id="join-game" type="button" class="btn btn-outline-secondary">Join Game</button>
+        <button id="join-game" type="button" class="btn btn-primary">Join Game</button>
       </div>
     </div>
 </div>
