@@ -72,7 +72,6 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
     const limit = 20;
 
     try {
-        // UPDATED URL: /chat/{group_id}/messages/
         const response = await fetchWithRefresh(
             `/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`,
             {
@@ -89,7 +88,7 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
                 const orderedMessages = [...data.messages].reverse();
-				data.messages.forEach((msgData) => {
+				orderedMessages.forEach((msgData) => {
                     const msgElement = createMessageElement(msgData, currentUserId);
                     fragment.appendChild(msgElement);
                 });

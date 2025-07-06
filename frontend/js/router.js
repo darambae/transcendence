@@ -93,6 +93,7 @@ export async function navigate() {
 		const mainContent = document.getElementById('main-content');
 		if (mainContent) {
 			mainContent.innerHTML = `<div class='route-error-msg'>You need to be logged in to access this page.</div>`;
+			history.replaceState(null, '', '/'); // clean URL
 		}
 		return;
 	}
