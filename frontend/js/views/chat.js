@@ -753,32 +753,50 @@ export function chatController(userId, username) {
 	}
 }
 
-export async function renderChatButtonIfAuthenticated() {
-	let userIsAuth = await isUserAuthenticated();
+export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
+	// Only check authentication if status wasn't provided
+	if (userIsAuth === null) {
+		console.log('Chat button - checking authentication');
+		userIsAuth = await isUserAuthenticated();
+	} else {
+		console.log('Chat button - using provided auth status:', userIsAuth);
+	}
+
 	if (userIsAuth) {
 		const userData = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',
 			credentials: 'include',
 		})
-		.then((response) => response.json())
-		.then((data) => ({
-			id: data.id,
-			username: data.user_name
-		}))
-		.catch((error) => {
-			console.error('Error fetching user info:', error);
-			return null;
-		});
-		
+			.then((response) => response.json())
+			.then((data) => ({
+				id: data.id,
+				username: data.user_name,
+			}))
+			.catch((error) => {
+				console.error('Error fetching user info:', error);
+				return null;
+			});
+
 		if (!userData || !userData.id) {
 			console.error('User data not found');
 			return;
 		}
-		
+
 		try {
-			await actualizeIndexPage('chat-container', routes['chat'](userData.id, userData.username));
+			await actualizeIndexPage(
+				'chat-container',
+				routes['chat'](userData.id, userData.username)
+			);
 		} catch (e) {
 			console.error('Could not load chat UI:', e);
+		}
+	} else {
+		// Hide chat button when not authenticated
+		const mainChatToggleButton = document.getElementById(
+			'mainChatToggleButton'
+		);
+		if (mainChatToggleButton) {
+			mainChatToggleButton.style.display = 'none';
 		}
 	}
 }
