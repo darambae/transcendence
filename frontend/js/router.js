@@ -51,12 +51,6 @@ export async function navigate() {
 	}
 	console.log("csrf home: ", csrf);
 
-	let userIsAuth = await isUserAuthenticated();
-	console.log("is User Auth : ", userIsAuth);
-	if (userIsAuth) {
-		actualizeIndexPage('toggle-login', routes['user']);
-	}
-
 //-----------------------------
 	
 	let routeName = hash;
@@ -72,6 +66,11 @@ export async function navigate() {
 	} */
 	
 	let view;
+	let userIsAuth = await isUserAuthenticated();
+	console.log('is User Auth : ', userIsAuth);
+	if (userIsAuth) {
+		actualizeIndexPage('toggle-login', routes['user']);
+	}
 	/* if (typeof routes[routeName] === 'function') {
 		view = routes[routeName](param);
 	} else  */

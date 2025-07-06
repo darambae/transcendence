@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 import json
 import requests
 import sys
@@ -103,8 +103,6 @@ class verifyTwofa(APIView): # The initial cookie is set in this view
 		user = request.data
 		jwtDecoded = decodeJWT(request)
 		
-		user = request.data
-
 		json_data = {
 			'mail':user.get('mail'),
 			'tfa':user.get('code'),
