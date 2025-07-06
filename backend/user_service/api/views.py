@@ -313,7 +313,6 @@ class saveNewPassword(APIView):
 
         if (uploadResponse.status_code != 200):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
-        
         return JsonResponse({'success': 'Successfully saved new password'}, status=200)
 
 

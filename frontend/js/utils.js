@@ -57,19 +57,11 @@ export function getCookie(name) {
 	return cookieValue;
 }
 
-export async function isUserAuthenticated(routeName) {
-    let response;
-    if (routeName === 'login' || routeName === 'signup') {
-        response = await fetch('user-service/infoUser/', {
-            method: 'GET',
-            credentials: 'include'
-        });
-    } else {
-        response = await fetchWithRefresh('user-service/infoUser/', {
-            method: 'GET',
-            credentials: 'include'
-        });
-    }
+export async function isUserAuthenticated() {
+    let response = await fetchWithRefresh('user-service/infoUser/', {
+		method: 'GET',
+		credentials: 'include',
+	});
 	if (response.ok) {
 		if (response.online)
 			console.log("online : ", response.online);

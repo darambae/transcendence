@@ -66,7 +66,7 @@ export async function navigate() {
 	} */
 	
 	let view;
-	let userIsAuth = await isUserAuthenticated(routeName);
+	let userIsAuth = await isUserAuthenticated();
 	console.log('is User Auth : ', userIsAuth);
 	if (userIsAuth) {
 		actualizeIndexPage('toggle-login', routes['user']);

@@ -1743,3 +1743,8 @@ Beginning : 12:24:24
 encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzE4NTA5LCJpYXQiOjE3NTE3MTczMDksImp0aSI6IjI3NWE4YjAwNWI0OTQzYWNhOWNhMmVhNTZiYTg5MDBlIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.G61qkqhBkK6Pxka3nuGSAwUaKlv30aW9e3mDByaANuY
 res : <Response [200]>
 res.json() : {'payload': {'token_type': 'access', 'exp': 1751718509, 'iat': 1751717309, 'jti': '275a8b005b4943aca9ca2ea56ba8900e', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+--------------------------
+Beginning : 13:37:15 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzIyODI0LCJpYXQiOjE3NTE3MjI1MjQsImp0aSI6ImQwZGI2Nzk1YzQxMTQzYzI5NjkwNzY3YjMxMjExM2Y3IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJiYWVkYXJhbSIsImludml0ZXMiOltdfQ.p4m9jcCjjgcIly7UwG0eF3yBXZhDR34Q9KYiEojzjAs
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1751722824, 'iat': 1751722524, 'jti': 'd0db6795c41143c29690767b312113f7', 'user_id': 4, 'username': 'baedaram', 'invites': []}}
