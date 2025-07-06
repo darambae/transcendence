@@ -85,7 +85,7 @@ export function attachLoginListener() {
 	const toggleLogin = document.querySelector('.login-link');
 	if (toggleLogin) {
 		toggleLogin.addEventListener('click', async (event) => {
-			let userIsAuth = await isUserAuthenticated('login');
+			let userIsAuth = await isUserAuthenticated();
 			console.log(" is user auth : ", userIsAuth);
 			if (userIsAuth == false) {
 				actualizeIndexPage('modal-container', routes.login);
