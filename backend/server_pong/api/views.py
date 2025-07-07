@@ -62,33 +62,25 @@ def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-    with open(f"{func}_decodeJWT.txt", "a+") as f :
-        tm = datetime.now()
-        print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-    with open(f"{func}_decodeJWT.txt", "a") as f : 
-        if not encodedJwt :
-            encodedJwt = request.COOKIES.get("access_token", None)
-        if not encodedJwt :
-            print("Error 1", file=f)
-            return [None] * 3
+    tm = datetime.now()
+    if not encodedJwt :
+        encodedJwt = request.COOKIES.get("access_token", None)
+    if not encodedJwt :
+        return [None] * 3
         
-        print(f"encoded: {encodedJwt}", file=f)
-        res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-        print(f"res : {res}", file=f)
-        res_json = res.json()
-        print(f"res.json() : {res_json}", file=f)
-        if res.status_code != 200 :
-            print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
-            if (res_json.get('error') == "Token expired"):
-                refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-                if refresh_res.status_code == 200:
-                    new_access_token = refresh_res.json().get('access')
-                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-                    return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-                return [None] * 3
+    res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+    res_json = res.json()
+    if res.status_code != 200 :
+        if (res_json.get('error') == "Token expired"):
+            refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+            if refresh_res.status_code == 200:
+                new_access_token = refresh_res.json().get('access')
+                res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+                res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+                return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
             return [None] * 3
-        return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
+        return [None] * 3
+    return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
@@ -231,9 +223,6 @@ def isGamePlayable(request) :
 
 def get_api_key(request):
     JWT = decodeJWT(request, "getApiKey")
-    fil = open('test.txt', 'w+')
-    print(f" Jwt : {JWT[0]}", file=fil)
-    fil.close()
     if not JWT[0] :
         return HttpResponseNoContent() # Set an error 
     api_key = str(uuid.uuid4())
