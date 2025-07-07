@@ -1,4 +1,4 @@
-import { closeModal, fetchWithRefresh } from "../utils.js";
+import { closeModal, fetchWithRefresh, getBlockedStatus } from "../utils.js";
 
 export async function card_profileController(username) {
 
@@ -10,7 +10,7 @@ export async function card_profileController(username) {
 			}
 		});
 	}
-	
+
 	const closeBtn = document.getElementById("close-card-btn");
 	if (closeBtn) {
 		closeBtn.addEventListener("click", () => {
@@ -21,7 +21,8 @@ export async function card_profileController(username) {
 	if (username) {
 		getOtherUserInfo(username);
 		getOtherUserAvatar(username);
-		addFriend()
+		addFriend();
+		changeBlockedStatus(username);
 	}
 }
 
@@ -37,14 +38,16 @@ function displayUserInfo(data) {
 	document.getElementById('createdAtOther').textContent = data.created_at;
 
 	const addFriendsBtn = document.getElementById('addFriendsid');
+	const addBlockBtn = document.getElementById('blockUserId');
 	const lastOne = document.getElementById('lastActiveOther').textContent = data.last_login;
 	const statusBadge = document.getElementById('statusOtherUser');
 	const isOnline = data.online;
-	
+
 	const card = document.querySelector('.player-card');
-	
-	
+
+
 	addFriendsBtn.dataset.username = data.user_name;
+	addBlockBtn.dataset.userId = data.id;
 
 	if (isOnline) {
 	  statusBadge.textContent = '🟢 Online';
@@ -69,20 +72,32 @@ function displayUserInfo(data) {
 }
 
 
-async function gestFooter(friend_status) {
+async function gestFooter(friend_status, blockedStatus) {
 	const btnAdd = document.getElementById('addFriendsid')
 	const sep = document.getElementById('separation')
+	const btnAddBlock = document.getElementById('blockUserId')
 
-	console.log(friend_status)
-	if (friend_status === null) {
-		btnAdd.style.display = "block"
-		sep.style.display = "block"
-		
-	}
-	else if (friend_status === "pending") {
+	console.log(blockedStatus)
+	if (blockedStatus.isBlocked) {
 		sep.style.display = "none"
 		btnAdd.style.display = "none"
-
+		btnAddBlock.textContent = "unblock"//to unblock
+		btnAddBlock.style.display = "block"
+	} else {
+		btnAddBlock.style.display = "block"
+		if (blockedStatus.hasBlocked) {
+			sep.style.display = "none"
+			btnAdd.style.display = "none"
+		} else {
+			console.log(friend_status)
+			if (friend_status === null) {
+				btnAdd.style.display = "block"
+				sep.style.display = "block"
+			} else if (friend_status === "pending") {
+				sep.style.display = "none"
+				btnAdd.style.display = "none"
+			}
+		}
 	}
 }
 
@@ -101,10 +116,11 @@ async function getOtherUserInfo(userName) {
 			return;
 		}
 		const data = await response.json();
-		gestFooter(data.friend_status)
+		let blockedStatus = await getBlockedStatus(data.id);
+		gestFooter(data.friend_status, blockedStatus)
 		displayUserInfo(data)
 		console.log(data)
-	
+
 	  } catch (error) {
 		console.error("Error otherUser info :", error);
 	  }
@@ -151,6 +167,35 @@ function addFriend() {
 
 				const data = await response.json();
 
+				console.log(data);
+				if (data.message) {
+					getOtherUserInfo(userName);
+				}
+			});
+		}
+	} catch (error) {
+		console.error("Error add friend :", error);
+	}
+}
+
+function changeBlockedStatus(userName) {
+
+	try {
+		const blockBtn = document.getElementById('blockUserId');
+		if (blockBtn) {
+			blockBtn.addEventListener('click', async () => {
+				const userId = blockBtn.dataset.userId;
+
+				const response = await fetchWithRefresh(`/chat/${userId}/blockedStatus`, {
+				method : 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+				},
+				credentials : 'include',
+				body: JSON.stringify({}),
+			})
+				const data = await response.json();
 				console.log(data);
 				if (data.message) {
 					getOtherUserInfo(userName);

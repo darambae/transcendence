@@ -13,57 +13,10 @@ import httpx
 import jwt
 import time
 
+
 logger = logging.getLogger(__name__)
 
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
-
-class blockedStatus(View):
-    def get(self, request, targetUserId):
-        access_token = request.COOKIES.get('access_token')
-        if not access_token:
-            return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
-        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-        url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUserId}/blockedStatus/"
-        try:
-            resp = requests.get(url, headers=headers, timeout=10, verify=False)
-            resp.raise_for_status()
-            return JsonResponse(resp.json(), status=resp.status_code)
-        except requests.RequestException as exc:
-            logger.error(f"blocked Status GET request failed: {exc}")
-            return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
-        except Exception as e:
-            logger.error(f"Failed to decode JSON from backend: {e}")
-            return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
-    def post (self, request, targetUserId):
-        try:
-            data = json.loads(request.body)
-            block_target = data.get('isBlocked')
-            if not block_target or not targetUserId:
-                return JsonResponse({'status': 'error', 'message': 'block instruction and targetUserId are required.'}, status=400)
-
-            access_token = request.COOKIES.get('access_token')
-            if not access_token:
-                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
-            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-            url = f"{ACCESS_PG_BASE_URL}api/chat/{targetUserId}/blockedStatus/"
-            try:
-                resp = requests.post(url, json={
-                    'isBlocked': block_target
-                }, headers=headers, timeout=10, verify=False)
-                resp.raise_for_status()
-                return JsonResponse(resp.json(), status=resp.status_code)
-            except requests.RequestException as exc:
-                logger.error(f"chat blockedStatus POST request failed: {exc}")
-                return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for blocked status.'}, status=502)
-            except Exception as e:
-                logger.error(f"Internal server error during blocked status changes: {e}")
-                return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status changes.'}, status=500)
-
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
-        except Exception as e:
-            logger.error(f"Internal server error: {e}")
-            return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
 class ChatGroupListCreateView(View):
     def get(self, request, *args, **kwargs):
@@ -308,3 +261,44 @@ async def _generate_events(request, group_id):
         yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
     finally:
         await channel_layer.group_discard(channel_group_name, client_channel_name)
+
+class blockedStatus(View):
+    def get(self, request, targetUserId):
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+            return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+        url = f"{ACCESS_PG_BASE_URL}/api/chat/{targetUserId}/blockedStatus/"
+        try:
+            resp = requests.get(url, headers=headers, timeout=10, verify=False)
+            resp.raise_for_status()
+            return JsonResponse(resp.json(), status=resp.status_code)
+        except requests.RequestException as exc:
+            logger.error(f"blocked Status GET request failed: {exc}")
+            return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
+        except Exception as e:
+            logger.error(f"Failed to decode JSON from backend: {e}")
+            return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
+    def post (self, targetUserId):
+        try:
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+            url = f"{ACCESS_PG_BASE_URL}/api/chat/{targetUserId}/blockedStatus/"
+            try:
+                resp = requests.post(url, json={}, headers=headers, timeout=10, verify=False)
+                resp.raise_for_status()
+                return JsonResponse(resp.json(), status=resp.status_code)
+            except requests.RequestException as exc:
+                logger.error(f"chat blockedStatus POST request failed: {exc}")
+                return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for blocked status.'}, status=502)
+            except Exception as e:
+                logger.error(f"Internal server error during blocked status changes: {e}")
+                return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status changes.'}, status=500)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+        except Exception as e:
+            logger.error(f"Internal server error: {e}")
+            return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)

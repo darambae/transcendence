@@ -1,5 +1,5 @@
 
-import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh, getBlockedStatus } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
@@ -335,30 +335,6 @@ async function initEventSource(groupId, currentUserId) {
 	}
 }
 
-async function getBlockedStatus(targetUserId) {
-    //rajouter peut-être une vérif du other-user
-    try {
-        const response = await fetchWithRefresh('/chat/${targetUserId}/blockedStatus', {
-            method : 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-			credentials: 'include'
-        });
-		if (!response.ok) {
-			const errorData = await response.json();
-			console.error('error loading blocked status', errorData.message || 'unknown error');
-			alert('error loading blocked status' + (errorData.message || 'unknown error'));
-			return;
-		}
-		const data = response.json();
-		return (data);
-    } catch (error) {
-		console.error('Network error loading blocked status :', error);
-		alert('network error: could not load blocked status');
-	}
-}
-
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
 async function loadChatRoomList(currentUserId) {
     const chatRoomListUl = document.getElementById('chatRoomList');
@@ -504,15 +480,14 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		//create a pop window to ask unblock
 		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
 		if (unblockTargetUser) {//if yes
-			fetchWithRefresh('/chat/${targetUserId}/blockedStatus', {
+			fetchWithRefresh(`/chat/${targetUserId}/blockedStatus`, {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
+					'X-CSRFToken': getCookie('csrftoken'),
 				},
 				credentials : 'include',
-				body: JSON.stringify({
-					isBlocked: False,
-				}),
+				body: JSON.stringify({}),
 			})
 				.then((response) =>
 					response
