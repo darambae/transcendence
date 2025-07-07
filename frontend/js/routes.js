@@ -12,9 +12,6 @@ import { invitsController } from './views/tournament.js';
 
 import { dashboardsController } from './views/dashboards.js';
 import { forgotPasswordController } from './views/forgotPassword.js';
-import { dashboardsController } from './views/dashboards.js';
-import { forgotPasswordController } from './views/forgotPassword.js';
-import { invitsController } from './views/tournament.js';
 
 
 export const routes = {

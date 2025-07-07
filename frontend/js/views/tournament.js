@@ -1,14 +1,19 @@
 import { actualizeIndexPage, loadTemplate } from "../utils.js"
-import { setSSE, getSSE } from "./utils/commonFunctions.js"
+import { setSSE, getSSE, handleGame2Players } from "./utils/commonFunctions.js"
 import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
 import { localGameTr } from "./tournamentLocalGame.js";
+import { onlineGameTr } from "./tournamentOnlineGaame.js";
 
 export let routesTr = {
   matchSp : {
     template : "tournamentMatch",
     controller : localGameTr
   },
+  matchOnline : (key, playerID, isAiGame, JWTid, tkey) => ({
+    template : "tournamentMatch",
+    controller : () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey)
+  }),
   tournament : { 
     template : "tournament",
     controller : tournamentController
@@ -173,7 +178,9 @@ export async function tournamentController() {
                       buttonGame.dataset.p2 = data.player2;
                     }
                     else {
-                      console.log("To do");
+                      buttonGame.dataset.player = data.player;
+                      buttonGame.dataset.playerId = data.playerId;
+                      console.log("done");
                     }
                     console.log("SSE 8")
                     buttonGame.dataset.key = data.key;
@@ -346,7 +353,9 @@ export async function tournamentController() {
                     buttonGame.dataset.p2 = data.player2;
                   }
                   else {
-                    console.log("To do");
+                      buttonGame.dataset.player = data.player;
+                      buttonGame.dataset.playerId = data.playerId;
+                      console.log("done");
                   }
                   console.log("SSE 8")
                   buttonGame.dataset.round = data.round;
@@ -486,11 +495,26 @@ export async function tournamentController() {
         const KeepInfo = document.getElementById("Tournament-Lobby");
         // const contentInfo = KeepInfo.innerHTML;
         
-        localStorage.setItem("p1", target.dataset.p1);
-        localStorage.setItem("p2", target.dataset.p2);
-        localStorage.setItem("key", target.dataset.key);
-        localStorage.setItem("tkey",  target.dataset.tkey);
-        console.log("Target.dataset", target.dataset);
+        if (target.dataset.type == "local") {
+          localStorage.setItem("p1", target.dataset.p1);
+          localStorage.setItem("p2", target.dataset.p2);
+          localStorage.setItem("key", target.dataset.key);
+          localStorage.setItem("tkey",  target.dataset.tkey);
+          console.log("Target.dataset", target.dataset);
+          fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
+            credentials: "include",
+          })
+          .then(response => {
+            if (!response.ok) throw new Error("https Error: " + response.status);
+            return response.json();
+          })
+          .then(data => {
+            console.log(data);
+          })
+          
+          return actualizeIndexPage("Tournament-Lobby", routesTr['matchSp']);
+      }
+      else {
         fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
           credentials: "include",
         })
@@ -502,7 +526,8 @@ export async function tournamentController() {
           console.log(data);
         })
 
-        return actualizeIndexPage("Tournament-Lobby", routesTr['matchSp']);
+        return actualizeIndexPage("Tournament-Lobby", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, ?, target.dataset.tkey));
       }
-    })
+    }
+  })
 }

@@ -210,7 +210,7 @@ class checkTfa(APIView):
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
 						print("JWT generated !", file=sys.stderr)
-						user.two_factor_auth = False
+						# user.two_factor_auth = False
 						user.save()
 						return JsonResponse({'success': 'authentication code send',
 											 'refresh': str(data_generate_jwt['refresh']),
@@ -581,8 +581,9 @@ class ChatGroupListCreateView(APIView):
 		})
 	def post(self, request) -> Response:
 		"""
-		Creates or retrieves a private chat group between the authenticated user
-		and a target user.
+		Creates or retrieves a private chat group between 
+		- the authenticated user
+		- and a target user.
 		"""
 		current_user = request.user  # Authenticated user
 		data = request.data
