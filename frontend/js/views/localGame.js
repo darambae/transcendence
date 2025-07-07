@@ -241,7 +241,7 @@ export async function localGameController() {
 				case "q":
 					// console.log("Started : ", started);
 					if (started == true) {
-						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`, {
+						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`, {
 							headers: {
 								"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
 							}
@@ -251,7 +251,7 @@ export async function localGameController() {
 				case "l":
 					// console.log("Started : ", started);
 					if (started == true) {
-						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`, {
+						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`, {
 							headers: {
 								"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
 							}
