@@ -60,6 +60,7 @@ export function guideTouch() {
 	const roundStadePongCenter = document.getElementById("roundStadePongCenter")
 	const SinglePlayerGameInfo1 = document.getElementById("SinglePlayerGameInfo1")
 	const SinglePlayerGameInfo2 = document.getElementById("SinglePlayerGameInfo2")
+	const dataScore = document.getElementById("data-score")
 
 	if (idEEndD) {
 		idEEndD.style.display = "block";
@@ -91,7 +92,34 @@ export function guideTouch() {
 	if (SinglePlayerGameInfo2) {
 		SinglePlayerGameInfo2.style.display = "flex";
 	}
+	if (dataScore) {
+		dataScore.style.display = "block";
+	}
 }
+
+
+export function checkwin() {
+	const player1Score = document.getElementById("player1score");
+	const player1Name = document.getElementById("player1Username");
+	const player2Score = document.getElementById("player2score");
+	const player2Name = document.getElementById("player2Username");
+
+	if (player2Score.getAttribute("data-score") == 5) {
+		player1Score.style.color = "red";
+		player1Name.style.color = "red";
+		player2Score.style.color = "green";
+		player2Name.style.color = "green";
+	}
+
+	if (player1Score.getAttribute("data-score") == 5) {
+		player2Score.style.color = "red";
+		player2Name.style.color = "red";
+		player1Score.style.color = "green";
+		player1Name.style.color = "green";
+	}
+}
+
+
 
 export async function localGameController() {
 	guideTouch()
@@ -155,7 +183,7 @@ export async function localGameController() {
 			let sc1 = document.getElementById("player1score");
 			let sc2 = document.getElementById("player2score");
 
-			// console.log(data);
+			 console.log(data);
 			game_stats = data["game_stats"]
 			if (game_stats["State"] != "Waiting for start") {
 				if (started == false) {
@@ -164,8 +192,8 @@ export async function localGameController() {
 				if (game_stats["State"] != "playersInfo") {
 					// console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 					drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
-					sc1.innerHTML = game_stats["team1Score"];
-					sc2.innerHTML = game_stats["team2Score"];
+					sc1.setAttribute("data-score", game_stats["team1Score"]);
+					sc2.setAttribute("data-score", game_stats["team2Score"]);
 				}
 				else {
 					// console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
@@ -176,6 +204,7 @@ export async function localGameController() {
 					p2.innerHTML = game_stats["p2"][0]
 				}
 			}
+
 		} catch (error) {
 			// console.log("ParsingError: ", error)
 		}
@@ -218,6 +247,7 @@ export async function localGameController() {
 
 
 	setInterval(async () => {
+		checkwin()
 		const now = Date.now();
 
 		if (now - lastSent < intervalDelay) return;
@@ -241,7 +271,7 @@ export async function localGameController() {
 				case "q":
 					// console.log("Started : ", started);
 					if (started == true) {
-						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`, {
+						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`, {
 							headers: {
 								"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
 							}
@@ -251,7 +281,7 @@ export async function localGameController() {
 				case "l":
 					// console.log("Started : ", started);
 					if (started == true) {
-						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`, {
+						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`, {
 							headers: {
 								"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
 							}

@@ -19,3 +19,22 @@ def decodeJWT(request, encodedJwt=None) :
         print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]
     return [res.json()]
+
+def setTheCookie(response, access=None, refresh=None) :
+	if access :
+		response.set_cookie(
+			key="access_token",
+			value=access,
+			httponly=True,
+			samesite='Lax'
+		)
+	if refresh :
+		response.set_cookie(
+			key="refresh_token",
+			value=refresh,
+			httponly=True,
+			samesite='Lax'
+		)
+	# with open("log-auth-cookie.txt", "w+") as f :
+	# 	print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
+	return response
