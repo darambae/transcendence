@@ -26,7 +26,7 @@ if (!location.hash) {
 window.addEventListener('DOMContentLoaded', async () => {
 	const userIsAuth = await isUserAuthenticated();
 	attachLoginListener(userIsAuth);
-	renderChatButtonIfAuthenticated(userIsAuth);
+	await renderChatButtonIfAuthenticated(userIsAuth);
 });
 
 window.addEventListener('hashchange', navigate);
