@@ -17,7 +17,7 @@ def determineRandomStart() :
 	startingAngle = random.choice([-90, -60, -30, -10, 10, 30, 60, 90])
 	angle = math.atan2(startingAngle, 90)
 
-	magnitude = math.hypot(90, startingAngle)
+	magnitude = math.hypot(170, startingAngle)
 
 	new_vx = magnitude * math.cos(angle)
 	new_vy = magnitude * math.sin(angle)

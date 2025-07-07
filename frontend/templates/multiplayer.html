@@ -1,26 +1,40 @@
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h2>Game screen</h2>
-            <canvas id="gameCanvas" width="1200" height="620" style="border:6px solid black;"></canvas>
+<div class="containerCanvas">
+  <div class="footerCanvas">
+      <div  class="section">
+        <div class="section" id="player1Username"></div>
+        <div class="section" id="player1score"></div>
+      </div>
+      <div>
+        <h2 id="titleGameSinglePlay" class="titleGame">Game</h2>
+        <div id="idUpendDown" class="section">
+          <div>⬆️ = up</div>
+          <div>⬇️ = down</div>
+          <div>🅠 = give up</div>
         </div>
+      </div>
+      <div class="section">
+        <div class="section" id="player2Username"></div>
+        <div class="section" id="player2score"></div>
+      </div>
+  </div>
+    <div class="canvasContainer">
+      <div class="stade">
+        <div id="wallUp" class="decorative-box"></div>
+        <div id="verticalStadeUp" class="verticalStadeUp"></div>
+        <div id="roundStade" class="roundStadePong"></div>
+        <!--<div class="roundStadePongCenter"></div>-->
+        <div id="verticalStadeDown" class="verticalStadeDown"></div>
+        <canvas id="gameCanvas" width="1100" height="650"></canvas>
+        <div id="wallDown" class="decorative-box"></div>
     </div>
-    <div class="row" id="replace-state">
-        <div class="col">
-            <h2>Create game</h2>
-            <button id="create-game" type="button" class="btn btn-outline-primary" aria-label="Close">Create game</button>
-        </div>
-        <div class="col">
-            <h2>Informations</h2>
-            <p id="Game instructions">Waiting for a game</p>
-        </div>
-        <div class="col">
-            <h2>Join game</h2>
-            <button id="join-game" type="button" class="btn btn-outline-secondary" aria-label="Close">Join Game</button>
-        </div>
     </div>
-    <div class="row" id="replace-state2">
+    <div id="idfooterCanvas" class="footerCanvas">
+      <div class="section">
+        <button id="create-game" type="button" class="btn btn-primary">Create game</button>
+      </div>
+      <div class="section">
+        <button id="join-game" type="button" class="btn btn-primary">Join Game</button>
+      </div>
     </div>
 </div>
-
-<script src="../js/active/multiplayer.js"></script>
+  

@@ -1,8 +1,13 @@
 import {setCanvasAndContext} from './utils/commonFunctions.js'
 import { routesSp } from './utils/commonFunctions.js';
 import { actualizeIndexPage } from '../utils.js';
+import { drawCenterText } from "./multiplayer.js"
+
 
 export function singlePlayController() {
+
+	drawCenterText("Select a mode")
+
 	setCanvasAndContext();
 	const aiButton = document.getElementById("AI-game")
 	const versusButton = document.getElementById("versus-game")
@@ -12,7 +17,8 @@ export function singlePlayController() {
 	});
 
 	versusButton.addEventListener("click", (event) => {
-    	actualizeIndexPage("replace-state", routesSp["playerSelection"]);
+    	actualizeIndexPage("idfooterCanvas", routesSp["playerSelection"]);
 	})
 	console.log("here in single Play");
 }
+

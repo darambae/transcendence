@@ -14,7 +14,11 @@ export async function actualizeIndexPage(elementId, view) {
 
 	if (html) {
 		content.innerHTML = html;
+	} else {
+		content.innerHTML = '<h2>404 Page not found</h2>';
+		return;
 	}
+	
 	if (view.isModal) {
 		content.style.display = 'block';
 	}
@@ -24,7 +28,7 @@ export async function actualizeIndexPage(elementId, view) {
 	}
 }
 
-export async function closeModal(loc = "#home") {
+export async function closeModal() {
 	const loginForm = document.getElementById("login-form");
 	const modalContainer = document.getElementById("modal-container")
 
@@ -54,16 +58,25 @@ export function getCookie(name) {
 }
 
 export async function isUserAuthenticated() {
-	const response = await fetchWithRefresh('user-service/infoUser/', {
+    const response = await fetch('user-service/infoUser/', {
 		method: 'GET',
-		credentials: 'include'
+		credentials: 'include',
 	});
 	if (response.ok) {
 		if (response.online)
 			console.log("online : ", response.online);
 		return true;
 	} else {
-		console.log("is auth error : ", response.error, response.status);
+		let errorMsg = `Status: ${response.status}`;
+        try {
+            const data = await response.json();
+            if (data && data.error) {
+                errorMsg = data.error + " (status " + response.status + ")";
+            }
+        } catch (e) {
+            // ignore JSON parse error
+        }
+		console.log("is auth error : ", errorMsg);
 		return false;
 	}
 }
@@ -98,8 +111,15 @@ export async function fetchWithRefresh(url, options = {}) {
 		} else {
 			window.location.href = '/#home';
 		}
+	} else if (response.status === 413) {
+		return new Response(
+			JSON.stringify({
+				status: 'error',
+				message: 'The image file is too large',
+			}),
+			{ status: 413 }
+		);
 	}
-
 	return response;
 }
 

@@ -72,7 +72,6 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
     const limit = 20;
 
     try {
-        // UPDATED URL: /chat/{group_id}/messages/
         const response = await fetchWithRefresh(
             `/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`,
             {
@@ -88,7 +87,8 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
         if (response.ok && data.status === 'success') {
             if (data.messages.length > 0) {
                 const fragment = document.createDocumentFragment();
-                data.messages.forEach((msgData) => {
+                const orderedMessages = [...data.messages].reverse();
+				orderedMessages.forEach((msgData) => {
                     const msgElement = createMessageElement(msgData, currentUserId);
                     fragment.appendChild(msgElement);
                 });
@@ -357,11 +357,10 @@ async function loadChatRoomList(currentUserId) {
         // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         console.log('Loading chat list for user:', currentUserId);
-        const response = await fetchWithRefresh(`/chat/`, {
+        const response = await fetchWithRefresh(`chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
             },
             credentials: 'include'
         });
@@ -515,7 +514,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	}
 
 	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetchWithRefresh('/chat/', {
+		fetchWithRefresh('chat/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 import json
 import requests
 import sys
@@ -103,8 +103,6 @@ class verifyTwofa(APIView): # The initial cookie is set in this view
 		user = request.data
 		jwtDecoded = decodeJWT(request)
 		
-		user = request.data
-
 		json_data = {
 			'mail':user.get('mail'),
 			'tfa':user.get('code'),
@@ -366,16 +364,6 @@ class	forgotPassword(APIView):
 				return JsonResponse({'error': 'Failed to update password in database'}, status=500)
 		except Exception as e:
 			return JsonResponse({'error': f'Exception: {str(e)}'}, status=500)
-
-	def get(self, request) :
-		refresh_token = request.COOKIES.get("refresh_token", None)
-		refresh_res = request.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {refresh_token}", 'Host': 'localhost'}, verify=False)
-		if refresh_res.status_code == 200:
-			access = refresh_res.json().get("access", None)
-			return setTheCookie(JsonResponse({"Success" : "Token refreshed"}, status=200), access, refresh_token)
-		else :
-			return JsonResponse({"Error" : "Refresh token expired"}, status=401) # A CAHNGER POUR UNLOG
-
 
 class ClearGuest(APIView) :
 	permission_class = [AllowAny]

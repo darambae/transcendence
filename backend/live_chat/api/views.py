@@ -27,7 +27,7 @@ class ChatGroupListCreateView(View):
         if not access_token:
             return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
         # Forward the access token in the request headers to access_postgresql
-        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost','Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
         try:
             resp = requests.get(url, headers=headers, timeout=10, verify=False)

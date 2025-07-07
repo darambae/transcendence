@@ -28,7 +28,8 @@ DEBUG = True
 
 APP_NAME = 'mail'
 
-ALLOWED_HOSTS = ['mail']
+#ALLOWED_HOSTS = ['mail']
+ALLOWED_HOSTS = ['*']
 
 
 # HTTP settings

@@ -183,7 +183,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				self.t2 = asyncio.create_task(self.run_simulation())
 
 				while self.game_running:
-					await asyncio.sleep(0.05) # maybe here
+					await asyncio.sleep(0.033)
 					try:
 						stats = cache.get(f"simulation_state_{self.room_group_name}")
 						#print(f"self.ai : {self.AI}", file=sys.stderr)

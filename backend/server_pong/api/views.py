@@ -256,22 +256,23 @@ async def sendNewJSON(request):
     # Obtenir ou créer un lock pour cette apiKey
 
     # print(f"message : {message}", file=sys.stderr)
+    speed = 15
     if m2["action"] == 'move' :
         try :
-            if m2["player1"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] - 5] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] - 5], wall1[0], wall1[1]) == (None, None): 
-                dictInfoRackets[api_key]["racket1"][0][1] -= 5
-                dictInfoRackets[api_key]["racket1"][1][1] -= 5
-            elif m2["player1"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] + 5] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] + 5], wall2[0], wall2[1]) == (None, None): 
-                dictInfoRackets[api_key]["racket1"][0][1] += 5
-                dictInfoRackets[api_key]["racket1"][1][1] += 5
+            if m2["player1"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] - speed] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] - speed], wall1[0], wall1[1]) == (None, None): 
+                dictInfoRackets[api_key]["racket1"][0][1] -= speed
+                dictInfoRackets[api_key]["racket1"][1][1] -= speed
+            elif m2["player1"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] + speed] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] + speed], wall2[0], wall2[1]) == (None, None): 
+                dictInfoRackets[api_key]["racket1"][0][1] += speed
+                dictInfoRackets[api_key]["racket1"][1][1] += speed
         except KeyError :
             try :
-                if m2["player2"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] - 5] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] - 5], wall1[0], wall1[1]) == (None, None): 
-                    dictInfoRackets[api_key]["racket2"][0][1] -= 5
-                    dictInfoRackets[api_key]["racket2"][1][1] -= 5
-                elif m2["player2"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] + 5] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] + 5], wall2[0], wall2[1]) == (None, None): 
-                    dictInfoRackets[api_key]["racket2"][0][1] += 5
-                    dictInfoRackets[api_key]["racket2"][1][1] += 5
+                if m2["player2"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] - speed] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] - speed], wall1[0], wall1[1]) == (None, None): 
+                    dictInfoRackets[api_key]["racket2"][0][1] -= speed
+                    dictInfoRackets[api_key]["racket2"][1][1] -= speed
+                elif m2["player2"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] + speed] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] + speed], wall2[0], wall2[1]) == (None, None): 
+                    dictInfoRackets[api_key]["racket2"][0][1] += speed
+                    dictInfoRackets[api_key]["racket2"][1][1] += speed
             except Exception :
                 return HttpResponse(status=500)
 

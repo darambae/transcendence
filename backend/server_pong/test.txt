@@ -1,1 +1,1 @@
- Jwt : {'payload': {'token_type': 'access', 'exp': 1750098724, 'iat': 1750080724, 'jti': '4a17188ead5f474a9db85a1a57e48801', 'user_id': 1, 'username': 'rmichel', 'avatar': 'imgs/default.png', 'invites': ['Bob-rmichel']}}
+ Jwt : {'payload': {'token_type': 'access', 'exp': 1751810416, 'iat': 1751810116, 'jti': '9aec36fe61fc490e8cc89135c080275f', 'user_id': 1, 'username': 'kelly', 'invites': []}}

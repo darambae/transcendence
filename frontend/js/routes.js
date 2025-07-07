@@ -12,6 +12,10 @@ import { invitsController } from './views/tournament.js';
 
 import { dashboardsController } from './views/dashboards.js';
 import { forgotPasswordController } from './views/forgotPassword.js';
+import { dashboardsController } from './views/dashboards.js';
+import { forgotPasswordController } from './views/forgotPassword.js';
+import { invitsController } from './views/tournament.js';
+
 
 export const routes = {
 
@@ -57,10 +61,6 @@ export const routes = {
 		template: 'settings_profile',
 		controller: settingsProfileController,
 	},
-	guest: {
-		template: 'invits',
-		controller: invitsController,
-	},
 	chat: (userId ,username) => ({
 		template: 'chat',
 		controller: () => chatController(userId, username),
@@ -73,6 +73,10 @@ export const routes = {
 	forgotPassword: {
 		template: 'forgotPassword',
 		controller: forgotPasswordController
-	}
+	},
+	guest: {
+		template: 'invits',
+		controller: invitsController,
+	},
 };
 		

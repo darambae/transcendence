@@ -30,7 +30,7 @@ from django.conf import settings
 
 
 try:
-	from .models import USER, ChatGroup, Message
+	from .models import USER, ChatGroup, Message, MATCHTABLE
 except ImportError:
 	# Fallback/Error handling if models are not correctly configured
 	# In a real application, you'd want to ensure models are correctly imported.
@@ -43,6 +43,8 @@ except ImportError:
 	class ChatGroup:
 		objects = None
 	class Message:
+		objects = None
+	class MATCHTABLE:
 		objects = None
 		
 
@@ -195,7 +197,7 @@ class checkTfa(APIView):
 		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
 		try:
-			if "jwt" in data:
+			if "jwt" in data :
 				print("JWT IN DATA !", file=sys.stderr)
 				print(f"invites : {data['jwt']}", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
@@ -218,7 +220,7 @@ class checkTfa(APIView):
 						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
 				else:
 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
-			else:
+			else :
 				user = USER.objects.get(mail=data.get('mail'))
 				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
 				print("user.activated", user.activated, file=sys.stderr)
@@ -293,6 +295,7 @@ class InfoUser(APIView):
 
 	def get(self, request):
 		user = request.user
+
 		return Response({
 			"id": user.id,
 			"user_name": user.user_name,
@@ -302,7 +305,7 @@ class InfoUser(APIView):
 			"online": user.online,
 			"created_at": format(user.created_at, 'Y-m-d  H:i'),
 			"last_login": format(user.last_login, 'Y-m-d  H:i') if user.last_login else None,
-			"avatar": user.avatar
+			"avatar": user.avatar,
 		})
 
 class infoOtherUser(APIView):
@@ -465,9 +468,9 @@ class uploadProfile(APIView):
 			user.user_name = new_username
 			user.save()
 
-			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+			return JsonResponse({'success': 'Successfully changed username'}, status=200)
 		except Exception as e:
-			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+			return JsonResponse({'error': f'Error changing username: {str(e)}'}, status=400)
 
 
 class uploadNewPassword(APIView):
