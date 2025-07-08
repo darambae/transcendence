@@ -103,7 +103,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		elif action == "forfait" :
 			plId = data.get("player")
 			stats = cache.get(f'simulation_state_{self.room_group_name}')
-			stats[f"team{2 - (plId != 1)}Score"] = 200 ##########################################################################################################____________________________________
+			stats[f"team{2 - (plId != 1)}Score"] = 5 ##########################################################################################################____________________________________
 			cache.set(f'simulation_state_{self.room_group_name}', stats, timeout=None)
 			# print(f"cache : {cache.get(f'simulation_state_{self.room_group_name}')}", file=sys.stderr)
 		elif action == "start":
@@ -183,7 +183,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				self.t2 = asyncio.create_task(self.run_simulation())
 
 				while self.game_running:
-					await asyncio.sleep(0.033)
+					await asyncio.sleep(0.016)
 					try:
 						stats = cache.get(f"simulation_state_{self.room_group_name}")
 						#print(f"self.ai : {self.AI}", file=sys.stderr)
@@ -194,7 +194,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 							self.AI = False
 							#print("Self.ai put to false", file=sys.stderr)
 						# #print(f"statissssss : {stats}", file=sys.stderr)
-						if (stats.get("team1Score", 0) >= 200 or stats.get("team2Score", 0) >= 200) and self.usrID <= 1: ##########################################################################################################____________________________________
+						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID <= 1: ##########################################################################################################____________________________________
 							#print("Yaaaaay stoping game", file=sys.stderr)
 							await self.channel_layer.group_send(
 								self.room_group_name,
@@ -203,7 +203,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 									"game_stats" : stats
 								}
 							)
-							if stats['team1Score'] == 200 :
+							if stats['team1Score'] == 5 :
 								winnerTeam = 0
 							else :
 								winnerTeam = 1
