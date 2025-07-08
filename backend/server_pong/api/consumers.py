@@ -195,6 +195,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 							#print("Self.ai put to false", file=sys.stderr)
 						#print(f"11111111 : {stats}", file=sys.stderr)
 						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID <= 1: ##########################################################################################################____________________________________
+						#print("Yaaaaay stoping game", file=sys.stderr)
 							await self.channel_layer.group_send(
 								self.room_group_name,
 								{
