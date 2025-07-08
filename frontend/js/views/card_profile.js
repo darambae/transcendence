@@ -89,13 +89,18 @@ async function gestFooter(friend_status) {
 
 async function getOtherUserInfo(userName) {
 	try {
-		const response = await fetchWithRefresh(`user-service/infoOtherUser/${userName}`, {
-		  method: "GET",
-		  credentials: 'include',
-		  headers: {
-			"Content-Type": "application/json",
-		  },
-		});
+		const timestamp = Date.now();
+		const response = await fetchWithRefresh(
+			`user-service/infoOtherUser/${userName}?t=${timestamp}`,
+			{
+				method: 'GET',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache',
+				},
+			}
+		);
 		if (!response.ok) {
 			console.log(`Erreur HTTP ! status: ${response.status}`);
 			return;

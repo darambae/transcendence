@@ -135,9 +135,15 @@ down:
 	@cat << EOF > ./backend/access_postgresql/api/migrations/__init__.py
 	@cat << EOF > ./backend/user_service/api/migrations/__init__.py
 	@echo "Migrations directories recreated."
+	@echo "Deleting uploaded images except default.png..."
+	@find ./backend/user_service/api/media/imgs/ -type f -not -name "default.png" -delete
+	@echo "Uploaded images deleted."
 	@echo "Deleting pycache directories..."
 	@find ./backend -type d -name "__pycache__" -exec rm -rf {} +
 	@echo "Pycache directories deleted."
+	@echo "Deleting server_pong log files..."
+	@rm -f ./backend/server_pong/*_decodeJWT.txt ./backend/server_pong/test.txt
+	@echo "Server pong log files deleted."
 
 destroy:
 	@echo "Destroying Transcendence..."

@@ -51,10 +51,10 @@ export function setupDoubleAuthHandler(mail, username) {
 
 			if (response.ok) {
 				closeModal();
-				actualizeIndexPage('toggle-login', routes['user']);
+				await actualizeIndexPage('toggle-login', routes['user']);
 				const hash = location.hash.slice(1);
 				if (hash === 'signup') {
-					actualizeIndexPage('main-content', routes.home);
+					await actualizeIndexPage('main-content', routes.home);
 				}
 				console.log(`User ${username} successfully connected`);
 				window.loggedInUser = username;
@@ -153,7 +153,7 @@ export function loginController() {
 
 	const forgotten = document.getElementById('forgotten-password');
 	if (forgotten) {
-		forgotten.onclick = () => actualizeIndexPage('modal-container', routes.forgotPassword);
+		forgotten.onclick = async () => await actualizeIndexPage('modal-container', routes.forgotPassword);
 	}
 
 	const form = document.getElementById("log-form");

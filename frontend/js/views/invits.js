@@ -93,7 +93,7 @@ export async function handleInvitSubmit(event) {
 					credentials: 'include',
 				})
 
-				actualizeIndexPage('guest-add', routes['guest']);
+				await actualizeIndexPage('guest-add', routes['guest']);
 				console.log("User successfully connected");
 			} catch (error) {
 				console.log("Double auth error: ", error);

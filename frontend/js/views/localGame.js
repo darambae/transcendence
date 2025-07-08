@@ -140,24 +140,27 @@ export async function localGameController() {
 
 	let score1 = document.getElementById("player1score")
 	let score2 = document.getElementById("player2score")
-	await fetchWithRefresh(`server-pong/check-sse`, {
-		headers: {
-			'X-CSRFToken': csrf,
-		},
-		credentials: 'include',
-	})
-		.then(response => {
-			if (!response.ok) throw new Error("https Error: " + response.status);
-			return response.json();
-		})
-		.then(data => {
-			console.log("data", data);
-			([a, b, c] = data["guest"])
-			username = data["username"]
-		})
-		.catch(error => {
-			console.error("Erreur de requête :", error);
-		})
+	try {
+		const response = await fetchWithRefresh('server-pong/check-sse', {
+			headers: { 'X-CSRFToken': csrf },
+			credentials: 'include',
+		});
+
+		if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+
+		const data = await response.json();
+		console.log('data', data);
+
+		// Safely extract values with defaults
+		const guestArray = Array.isArray(data.guest) ? data.guest : [];
+		[a, b, c] = guestArray;
+		username = data.username || 'anonymous';
+	} catch (error) {
+		console.error('Request error:', error);
+		// Set default values to prevent undefined issues
+		username = 'anonymous';
+		// Could set default values for a, b, c if needed
+	}
 	console.log("results: ", username, a, b, c)
 	let url_sse = `server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
 	if (a !== undefined) {
@@ -259,7 +262,7 @@ export async function localGameController() {
 				case "p":
 					if (started == false) {
 						started = true;
-						fetchWithRefresh(url_post, {
+						fetch(url_post, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json'
@@ -289,7 +292,7 @@ export async function localGameController() {
 					}
 					break;
 				case "ArrowUp":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -298,7 +301,7 @@ export async function localGameController() {
 					});
 					break;
 				case "e":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -307,7 +310,7 @@ export async function localGameController() {
 					});
 					break;
 				case "ArrowDown":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -316,7 +319,7 @@ export async function localGameController() {
 					});
 					break;
 				case "d":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'

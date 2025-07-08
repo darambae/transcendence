@@ -580,44 +580,50 @@ function setupUserSearchAutocomplete() {
 		});
 		return;
 	}
-	userInput.addEventListener('input', async function () {
-		const query = this.value.trim();
+	userInput.addEventListener('input', async (event) => {
+		const query = event.target.value.trim();
 		if (!query) {
 			resultsBox.innerHTML = '';
 			return;
 		}
 		// Add debug logging
 		console.log('Searching for users with query:', query);
-		const response = await fetchWithRefresh(
-			`user-service/searchUsers?q=${encodeURIComponent(query)}`,
-			{
-				method: 'GET',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}
-		);
+		
+		try {
+			const response = await fetch(
+				`user-service/searchUsers?t=${Date.now()}&q=${encodeURIComponent(query)}`,
+				{
+					method: 'GET',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'Cache-Control': 'no-cache', // Disable caching
+					},
+				}
+			);
 
-		const data = await response.json();
-		const users = data.results ?? [];
-		resultsBox.innerHTML = users
-			.map(
-				(user) =>
-					`<li class="list-group-item user-link" data-user-id="${user.id}">${user.username}</li>`
-			)
-			.join('');
+			const data = await response.json();
+			const users = data.results ?? [];
+			resultsBox.innerHTML = users
+				.map(
+					(user) =>
+						`<li class="list-group-item user-link" data-user-id="${user.id}">${user.username}</li>`
+				)
+				.join('');
 
-		// When a user is clicked, fill the input and clear the results
-		resultsBox.querySelectorAll('.user-link').forEach((item) => {
-			item.addEventListener('click', () => {
-				userInput.value = item.textContent.trim();
-				// FIXED: Use getAttribute instead of dataset to get the raw value
-				userInput.dataset.userId = item.getAttribute('data-user-id');
-				console.log('Selected user ID:', item.getAttribute('data-user-id'));
-				resultsBox.innerHTML = ''; // Clear results after selection
+			// When a user is clicked, fill the input and clear the results
+			resultsBox.querySelectorAll('.user-link').forEach((item) => {
+				item.addEventListener('click', () => {
+					userInput.value = item.textContent.trim();
+					userInput.dataset.userId = item.getAttribute('data-user-id');
+					console.log('Selected user ID:', item.getAttribute('data-user-id'));
+					resultsBox.innerHTML = ''; // Clear results after selection
+				});
 			});
-		});
+		} catch (error) {
+			console.error('Error fetching user search results:', error);
+			resultsBox.innerHTML = `<li class="list-group-item text-danger">Error loading users</li>`;
+		}
 	});
 }
 
@@ -753,32 +759,50 @@ export function chatController(userId, username) {
 	}
 }
 
-export async function renderChatButtonIfAuthenticated() {
-	let userIsAuth = await isUserAuthenticated();
+export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
+	// Only check authentication if status wasn't provided
+	if (userIsAuth === null) {
+		console.log('Chat button - checking authentication');
+		userIsAuth = await isUserAuthenticated();
+	} else {
+		console.log('Chat button - using provided auth status:', userIsAuth);
+	}
+
 	if (userIsAuth) {
 		const userData = await fetchWithRefresh('user-service/infoUser/', {
 			method: 'GET',
 			credentials: 'include',
 		})
-		.then((response) => response.json())
-		.then((data) => ({
-			id: data.id,
-			username: data.user_name
-		}))
-		.catch((error) => {
-			console.error('Error fetching user info:', error);
-			return null;
-		});
-		
+			.then((response) => response.json())
+			.then((data) => ({
+				id: data.id,
+				username: data.user_name,
+			}))
+			.catch((error) => {
+				console.error('Error fetching user info:', error);
+				return null;
+			});
+
 		if (!userData || !userData.id) {
 			console.error('User data not found');
 			return;
 		}
-		
+
 		try {
-			await actualizeIndexPage('chat-container', routes['chat'](userData.id, userData.username));
+			await actualizeIndexPage(
+				'chat-container',
+				routes['chat'](userData.id, userData.username)
+			);
 		} catch (e) {
 			console.error('Could not load chat UI:', e);
+		}
+	} else {
+		// Hide chat button when not authenticated
+		const mainChatToggleButton = document.getElementById(
+			'mainChatToggleButton'
+		);
+		if (mainChatToggleButton) {
+			mainChatToggleButton.style.display = 'none';
 		}
 	}
 }
