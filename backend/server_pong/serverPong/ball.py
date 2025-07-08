@@ -14,7 +14,7 @@ def convertToJsonList(elem) :
 	return [[elem[0].x, elem[0].y], [elem[1].x, elem[1].y]]
 
 def determineRandomStart() :
-	startingAngle = random.choice([-90, -60, -30, -10, 10, 30, 60, 90])
+	startingAngle = random.choice([-95, -65, -35, -15, 5, 25, 55, 85])
 	angle = math.atan2(startingAngle, 90)
 
 	magnitude = math.hypot(170, startingAngle)
@@ -113,21 +113,21 @@ def calcBouncePlayer(wallHit, hitPoint : Point, vectorMovement : Vector) -> Vect
 	ratio = vecAM.norm / vecAB.norm 
 	# #print(f"ratio : {ratio}", file=sys.stderr)
 	if (ratio < 0.125) : 
-		return addSpeed(-90, vectorMovement)
+		return addSpeed(-95 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.250) :
-		return addSpeed(-60, vectorMovement)
+		return addSpeed(-65 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.375) :
-		return addSpeed(-30, vectorMovement)
+		return addSpeed(-35 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.500) :
-		return addSpeed(-10, vectorMovement)
+		return addSpeed(-15 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.625) :
-		return addSpeed(10, vectorMovement)
+		return addSpeed(5 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.750) :
-		return addSpeed(30, vectorMovement)
+		return addSpeed(25 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.875) :
-		return addSpeed(60, vectorMovement)
+		return addSpeed(55 + random.randint(-5, 5), vectorMovement)
 	else :
-		return addSpeed(90, vectorMovement)
+		return addSpeed(85 + random.randint(-5, 5), vectorMovement)
 
 
 class	BallData() :
