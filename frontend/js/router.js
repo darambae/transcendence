@@ -96,6 +96,13 @@ export async function navigate() {
 			history.replaceState(null, '', '/'); // clean URL
 		}
 		return;
+	} else if (userIsAuth && routeName === 'signup') {
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.innerHTML = `<div class='route-error-msg'>You cannot access this page while logged in. Please log out first</div>`;
+			history.replaceState(null, '', '/'); // clean URL
+		}
+		return;
 	}
 
 //-------------------------------

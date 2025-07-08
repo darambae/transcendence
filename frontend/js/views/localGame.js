@@ -93,6 +93,20 @@ export function guideTouch() {
 	}
 }
 
+const keysPressed = new Set();
+
+function keydownHandler(event) {
+	const key = event.key;
+	const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
+	if (keysToPrevent.includes(key)) {
+		event.preventDefault();
+		keysPressed.add(key);
+	}
+}
+
+function	keyupHandler(event) {
+	keysPressed.delete(event.key);
+}
 export async function localGameController() {
 	guideTouch()
 	drawCenterTextP();
@@ -107,6 +121,9 @@ export async function localGameController() {
 	let a;
 	let b;
 	let c;
+
+	document.addEventListener('keydown', keydownHandler);
+	document.addEventListener('keyup', keyupHandler);
 
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -181,40 +198,52 @@ export async function localGameController() {
 		}
 	}
 
-	window.onbeforeunload = function (event) {
-		// console.log("Détection du rechargement ou fermeture de la page");
-		if (SSEStream.readyState !== EventSource.CLOSED) {
-			// console.log("La connexion SSE va être fermée lors du rechargement.");
-			logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
+	window.addEventListener('hashchange', () => {
+		//if (SSEStream.readyState !== EventSource.CLOSED) {
+			console.log("La connexion SSE va être fermée lors du rechargement.");
+			//logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
 			// Tu peux aussi essayer de fermer proprement la connexion ici si tu veux
 			SSEStream.close();
-		}
-		else {
-			// console.log("Yes");
-		}
-	};
+			keysPressed.clear();
+			document.removeEventListener('keydown', keydownHandler);
+			document.removeEventListener('keyup', keyupHandler);
+		//}
+	});
+
+	// window.onbeforeunload = function (event) {
+	// 	// console.log("Détection du rechargement ou fermeture de la page");
+	// 	if (SSEStream.readyState !== EventSource.CLOSED) {
+	// 		console.log("La connexion SSE va être fermée lors du rechargement.");
+	// 		logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
+	// 		// Tu peux aussi essayer de fermer proprement la connexion ici si tu veux
+	// 		SSEStream.close();
+	// 		keysPressed.clear();
+	// 		document.removeEventListener('keydown', keydownHandler);
+	// 		document.removeEventListener('keyup', keyupHandler);
+	// 	}
+	// 	else {
+	// 		// console.log("Yes");
+	// 	}
+	// };
 
 
-
-
-
-	const keysPressed = new Set();
 	const intervalDelay = 33;
 	let lastSent = 0;
 
-	document.addEventListener('keydown', (event) => {
-		const key = event.key;
-		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
-		if (keysToPrevent.includes(key)) {
-			event.preventDefault();
-			keysPressed.add(key);
-		}
-	});
+
+	// document.addEventListener('keydown', (event) => {
+	// 	const key = event.key;
+	// 	const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
+	// 	if (keysToPrevent.includes(key)) {
+	// 		event.preventDefault();
+	// 		keysPressed.add(key);
+	// 	}
+	// });
 
 
-	document.addEventListener('keyup', (event) => {
-		keysPressed.delete(event.key);
-	});
+	// document.addEventListener('keyup', (event) => {
+	// 	keysPressed.delete(event.key);
+	// });
 
 
 	setInterval(async () => {
@@ -242,9 +271,10 @@ export async function localGameController() {
 					// console.log("Started : ", started);
 					if (started == true) {
 						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`, {
-							headers: {
-								"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
-							}
+							// headers: {
+							// 	"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
+							// },
+							credentials: 'include'
 						});
 					}
 					break;
@@ -252,9 +282,10 @@ export async function localGameController() {
 					// console.log("Started : ", started);
 					if (started == true) {
 						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`, {
-							headers: {
-								"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
-							}
+							// headers: {
+							// 	"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
+							// }
+							credentials: 'include'
 						});
 					}
 					break;

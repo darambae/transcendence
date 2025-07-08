@@ -180,7 +180,7 @@ class	Movement() :
 		else :
 			self.scorePlayer2 += 1
 		self.ball.pos = self.map.center 																																	# Place it on center
-		if (self.usrID == 1) :
+		if (self.usrID <= 1) :
 			self.ball.spd = determineRandomStart()
 
 	async def isWallIntersection(self, pointTrajectory: Point, timeLeft : float) -> float:
