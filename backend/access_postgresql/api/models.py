@@ -61,7 +61,7 @@ class MATCHTABLE(models.Model):
     score1 = models.IntegerField()
     score2 = models.IntegerField()
     username2 = models.ForeignKey(USER, related_name='match_as_user2', on_delete=models.CASCADE)
-    winner = models.ForeignKey(USER, related_name='matches_won', on_delete=models.SET_NULL, null=True, blank=True)
+    winner = models.ForeignKey(USER, related_name='matches_won', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user1.username} {self.score1} - {self.score2} {self.user2.username}"

@@ -28,12 +28,8 @@ body {
 
 
 
-
-
-
-
 .stade {
-  background-color: #000e5c;
+  background-color: #3ca396;
   border-radius: 50px;
   display: block;
   position: relative;
@@ -126,11 +122,25 @@ canvas#gameCanvas {
   border-radius: 50px;
   margin: 70;
   padding: 70;
-  box-shadow: 0 0 40px #000e5c;
+  box-shadow: 0 0 40px #ff0000;
   z-index: 3;
   display: block;
 }
 
+#replaySinglePlayer {
+    position: absolute;
+    top: 46%;
+    right: 43.5%;
+    z-index: 4;
+    padding: 10px 20px;
+    font-size: 25px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    display: none;
+}
 
 .footerCanvas {
   display: flex;
@@ -178,12 +188,10 @@ canvas#gameCanvas {
 .player-score .score::before {
   content: attr(data-score);
   font-size: 200px;
-  color: rgba(255, 255, 255, 0.486);
+  color: var(--score-color, rgba(255, 255, 255, 0.486));
   display: block;
   z-index: 1;
 }
-
-
 
 
 .section {
