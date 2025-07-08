@@ -42,6 +42,8 @@ body {
   z-index: 1;
 }
 
+
+
 .roundStadePong {
   width: 250px;
   height: 250px;
@@ -119,6 +121,7 @@ body {
 
 
 canvas#gameCanvas {
+  position: relative;
   background-color: #000e5c00;
   border-radius: 50px;
   margin: 70;
@@ -139,6 +142,48 @@ canvas#gameCanvas {
   margin: 30px auto;
   margin-bottom: 50px;
 }
+
+
+
+.player-score {
+  position: absolute;
+  top: 60px;
+  width: 150px;
+  text-align: center;
+  color: white;
+  font-family: sans-serif;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.player-score.left {
+  left: 20%;
+  top: 100px;
+  z-index: 1;
+}
+
+.player-score.right {
+  right: 20%;
+  top: 15%;
+  z-index: 1;
+}
+
+.player-score .username {
+  font-size: 40px;
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.486);
+  z-index: 1;
+}
+
+.player-score .score::before {
+  content: attr(data-score);
+  font-size: 200px;
+  color: rgba(255, 255, 255, 0.486);
+  display: block;
+  z-index: 1;
+}
+
+
 
 
 .section {
@@ -180,5 +225,9 @@ canvas#gameCanvas {
 }
 
 #SinglePlayerGameInfo2 {
+  display: none;
+}
+
+#data-score {
   display: none;
 }
