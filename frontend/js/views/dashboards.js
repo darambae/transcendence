@@ -55,9 +55,9 @@ export async function dashboardsController() {
 			matchBody.innerHTML += html;
 		}
 		document.querySelectorAll('.profile-btn').forEach(btn => {
-			btn.addEventListener('click', function() {
+			btn.addEventListener('click',async function() {
 				const username = btn.dataset.username;
-				actualizeIndexPage('modal-container', routes.card_profile(username))
+				await actualizeIndexPage('modal-container', routes.card_profile(username))
 			})
 		})
 

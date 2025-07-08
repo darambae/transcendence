@@ -18,7 +18,7 @@ export function userController() {
 					if (toggleLogin) {
 						toggleLogin.innerHTML = '<button type="button" class="login-link"><i class="bi bi-person fs-5"></i> Log In </button>'
 					}
-					attachLoginListener();
+					attachLoginListener(false);
 					const chatContainer = document.getElementById('chat-container');
 					if (chatContainer){
 						chatContainer.innerHTML = "";

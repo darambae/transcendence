@@ -3,7 +3,7 @@ import { homeController } from "../home.js";
 import { localGameController } from "../localGame.js";
 import { loginController } from "../login.js";
 import { getCookie, fetchWithRefresh } from "../../utils.js";
-import { guideTouch, drawCenterTextP } from "../localGame.js";
+import { guideTouch, drawCenterTextP, checkwin } from "../localGame.js";
 import { drawCenterText } from "../multiplayer.js"
 
 let sseTournament;
@@ -106,13 +106,13 @@ export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
   const dy1 = Racket1Pos[1][1] - Racket1Pos[0][1];
   const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
   ctx.fillStyle = "white";
-  roundRect(ctx, Racket1Pos[0][0] + offsetX, Racket1Pos[0][1] + offsetY, 5, d1, 3);
+  roundRect(ctx, Racket1Pos[0][0] + offsetX, Racket1Pos[0][1] + offsetY, 4, d1, 3);
   
   const dx2 = Racket2Pos[1][0] - Racket2Pos[0][0];
   const dy2 = Racket2Pos[1][1] - Racket2Pos[0][1];
   const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
   ctx.fillStyle = "white";
-  roundRect(ctx, Racket2Pos[0][0] + offsetX, Racket2Pos[0][1] + offsetY, 5, d2, 3);
+  roundRect(ctx, Racket2Pos[0][0] + offsetX, Racket2Pos[0][1] + offsetY, 4, d2, 3);
 
   let ballX = Math.min(Math.max(ballPos[0], 10), fieldWidth - 10);
   let ballY = Math.min(Math.max(ballPos[1], 10), fieldHeight - 10);
@@ -203,7 +203,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     }
 };
 
-  SSEStream.onmessage = function(event) {
+  SSEStream.onmessage = function (event) {
+      checkwin()
       try {
         // const data = JSON.parse(event.data);
         // // console.log("Received data: ", data);
@@ -222,8 +223,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
           if (game_stats["State"] != "playersInfo") {
             // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
-            sc1.innerHTML = game_stats["team1Score"];
-            sc2.innerHTML = game_stats["team2Score"];
+            sc1.setAttribute("data-score", game_stats["team1Score"]);
+            sc2.setAttribute("data-score", game_stats["team2Score"]);
           }
           else if (game_stats["State"] == "final-message") {
             sleep(500);

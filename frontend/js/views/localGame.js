@@ -60,6 +60,7 @@ export function guideTouch() {
 	const roundStadePongCenter = document.getElementById("roundStadePongCenter")
 	const SinglePlayerGameInfo1 = document.getElementById("SinglePlayerGameInfo1")
 	const SinglePlayerGameInfo2 = document.getElementById("SinglePlayerGameInfo2")
+	const dataScore = document.getElementById("data-score")
 
 	if (idEEndD) {
 		idEEndD.style.display = "block";
@@ -91,7 +92,34 @@ export function guideTouch() {
 	if (SinglePlayerGameInfo2) {
 		SinglePlayerGameInfo2.style.display = "flex";
 	}
+	if (dataScore) {
+		dataScore.style.display = "block";
+	}
 }
+
+
+export function checkwin() {
+	const player1Score = document.getElementById("player1score");
+	const player1Name = document.getElementById("player1Username");
+	const player2Score = document.getElementById("player2score");
+	const player2Name = document.getElementById("player2Username");
+
+	if (player2Score.getAttribute("data-score") == 5) {
+		player1Score.style.color = "red";
+		player1Name.style.color = "red";
+		player2Score.style.color = "green";
+		player2Name.style.color = "green";
+	}
+
+	if (player1Score.getAttribute("data-score") == 5) {
+		player2Score.style.color = "red";
+		player2Name.style.color = "red";
+		player1Score.style.color = "green";
+		player1Name.style.color = "green";
+	}
+}
+
+
 
 export async function localGameController() {
 	guideTouch()
@@ -112,24 +140,27 @@ export async function localGameController() {
 
 	let score1 = document.getElementById("player1score")
 	let score2 = document.getElementById("player2score")
-	await fetchWithRefresh(`server-pong/check-sse`, {
-		headers: {
-			'X-CSRFToken': csrf,
-		},
-		credentials: 'include',
-	})
-		.then(response => {
-			if (!response.ok) throw new Error("https Error: " + response.status);
-			return response.json();
-		})
-		.then(data => {
-			console.log("data", data);
-			([a, b, c] = data["guest"])
-			username = data["username"]
-		})
-		.catch(error => {
-			console.error("Erreur de requête :", error);
-		})
+	try {
+		const response = await fetchWithRefresh('server-pong/check-sse', {
+			headers: { 'X-CSRFToken': csrf },
+			credentials: 'include',
+		});
+
+		if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+
+		const data = await response.json();
+		console.log('data', data);
+
+		// Safely extract values with defaults
+		const guestArray = Array.isArray(data.guest) ? data.guest : [];
+		[a, b, c] = guestArray;
+		username = data.username || 'anonymous';
+	} catch (error) {
+		console.error('Request error:', error);
+		// Set default values to prevent undefined issues
+		username = 'anonymous';
+		// Could set default values for a, b, c if needed
+	}
 	console.log("results: ", username, a, b, c)
 	let url_sse = `server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
 	if (a !== undefined) {
@@ -155,8 +186,14 @@ export async function localGameController() {
 			let sc1 = document.getElementById("player1score");
 			let sc2 = document.getElementById("player2score");
 
-			// console.log(data);
+			 console.log(data);
 			game_stats = data["game_stats"]
+			console.log("game_stats : ", game_stats);
+			if (game_stats == "final-message") {
+				console.log("Gonna close SSE");
+				SSEStream.close();
+				console.log("SSE closed");
+			}
 			if (game_stats["State"] != "Waiting for start") {
 				if (started == false) {
 					started = true;
@@ -164,14 +201,8 @@ export async function localGameController() {
 				if (game_stats["State"] != "playersInfo") {
 					// console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 					drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
-					sc1.innerHTML = game_stats["team1Score"];
-					sc2.innerHTML = game_stats["team2Score"];
-				}
-				else if (game_stats["State"] == "final-message") {
-					sleep(500);
-					console.log("Gonna close SSE");
-					SSEStream.close();
-					console.log("SSE closed");
+					sc1.setAttribute("data-score", game_stats["team1Score"]);
+					sc2.setAttribute("data-score", game_stats["team2Score"]);
 				}
 				else {
 					// console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
@@ -182,6 +213,7 @@ export async function localGameController() {
 					p2.innerHTML = game_stats["p2"][0]
 				}
 			}
+
 		} catch (error) {
 			// console.log("ParsingError: ", error)
 		}
@@ -224,6 +256,7 @@ export async function localGameController() {
 
 
 	setInterval(async () => {
+		checkwin()
 		const now = Date.now();
 
 		if (now - lastSent < intervalDelay) return;
@@ -235,7 +268,7 @@ export async function localGameController() {
 				case "p":
 					if (started == false) {
 						started = true;
-						fetchWithRefresh(url_post, {
+						fetch(url_post, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json'
@@ -265,7 +298,7 @@ export async function localGameController() {
 					}
 					break;
 				case "ArrowUp":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -274,7 +307,7 @@ export async function localGameController() {
 					});
 					break;
 				case "e":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -283,7 +316,7 @@ export async function localGameController() {
 					});
 					break;
 				case "ArrowDown":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
@@ -292,7 +325,7 @@ export async function localGameController() {
 					});
 					break;
 				case "d":
-					fetchWithRefresh(url_post, {
+					fetch(url_post, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'

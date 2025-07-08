@@ -203,17 +203,27 @@ class GameConsumer(AsyncWebsocketConsumer):
 									"game_stats" : stats
 								}
 							)
+
+							await self.channel_layer.group_send(
+								self.room_group_name,
+								{
+									"type": "game_update",
+									"game_stats": "final-message",
+								}
+							)
+
 							if stats['team1Score'] == 200 :
 								winnerTeam = 0
 							else :
 								winnerTeam = 1
+							print(f'A : {dictInfoRackets[self.room_group_name]["playersUsernames"][0][0]}\nB: {dictInfoRackets[self.room_group_name]["playersUsernames"][1][0]}\nC: {dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam][0]}', file=sys.stderr)
 							json_data = {
 								"matchKey" : self.room_group_name,
-								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0],
+								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0][0],
 								"score1" : stats['team1Score'],
 								"score2" : stats['team2Score'],
-								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1],
-								"winner" : dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam],
+								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1][0],
+								"winner" : dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam][0],
 							}
 							requests.post("https://access_postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'localhost'})
 							if self.t2 is not None :
@@ -227,10 +237,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 								self.room_group_name,
 								{
 									"type": "game_update",
-									"game_stats": "final-message",
+									"game_stats": stats,
 								}
 							)
-							
 					except Exception as e:
 						print(f"!!! Failed to send update: {e}", file=sys.stderr)
 		except asyncio.CancelledError:

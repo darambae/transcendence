@@ -268,7 +268,6 @@ export async function tournamentController() {
             })
             .catch(error => {
               console.error("Erreur de requête :", error);
-              throw error;
             });
         };
       })

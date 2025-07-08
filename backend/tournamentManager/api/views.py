@@ -186,7 +186,7 @@ async def launchNextMatch(request) :
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		print("lf-1", file=sys.stderr)
 		if trnmtDict[tkey].nbPl != 4 :
-			return JsonResponse({"Error": "Forbidden"}, status=403)
+			return JsonResponse({"Error": "Forbidden"}, status=200)
 		print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
 		if (trnmtDict[tkey].first and trnmtDict[tkey].second and trnmtDict[tkey].third and trnmtDict[tkey].fourth) :
 			return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})

@@ -234,13 +234,17 @@ class ApiConfig(AppConfig):
             for m in test_matches:
                 if not MATCHTABLE.objects.filter(matchKey=m["matchKey"]).exists():
                     try:
+                        user1 = USER.objects.get(user_name=m["username1"])
+                        user2 = USER.objects.get(user_name=m["username2"])
+                        winner = USER.objects.get(user_name=m["winner"])
+
                         match = MATCHTABLE(
                             matchKey=m["matchKey"],
-                            username1=m["username1"],
+                            username1=user1,
                             score1=m["score1"],
                             score2=m["score2"],
-                            username2=m["username2"],
-                            winner=m["winner"]
+                            username2=user2,
+                            winner=winner
                         )
                         match.save()
                         print(f"Created test match: {m['matchKey']}")
