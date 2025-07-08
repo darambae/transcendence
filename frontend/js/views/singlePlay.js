@@ -2,7 +2,7 @@ import {setCanvasAndContext} from './utils/commonFunctions.js'
 import { routesSp } from './utils/commonFunctions.js';
 import { actualizeIndexPage } from '../utils.js';
 import { drawCenterText } from "./multiplayer.js"
-
+// import { sendGameCreation } from './utils/createGame.js';
 
 export function singlePlayController() {
 

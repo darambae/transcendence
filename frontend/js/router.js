@@ -164,7 +164,7 @@ if (!location.hash) {
 			document.getElementById(
 				'main-content'
 			).innerHTML = `<h2>404 Page not found</h2>`;
-			history.replaceState(null, '', '/');
+			history.replaceState(null, '', '/'); //Clean URL
 		});
 	}
 }
