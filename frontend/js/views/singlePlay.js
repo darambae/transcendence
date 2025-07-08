@@ -16,8 +16,8 @@ export function singlePlayController() {
 		sendGameCreation();
 	});
 
-	versusButton.addEventListener("click", (event) => {
-    	actualizeIndexPage("idfooterCanvas", routesSp["playerSelection"]);
+	versusButton.addEventListener("click", async (event) => {
+    	await actualizeIndexPage("idfooterCanvas", routesSp["playerSelection"]);
 	})
 	console.log("here in single Play");
 }

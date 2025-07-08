@@ -24,7 +24,12 @@ export async function actualizeIndexPage(elementId, view) {
 	}
 
 	if (typeof view.controller === 'function') {
-		view.controller();
+		try {
+			// This will work for both async and regular functions
+			await Promise.resolve(view.controller());
+		} catch (error) {
+			console.error(`Error executing controller for ${view.template}:`, error);
+		}
 	}
 }
 
@@ -100,9 +105,9 @@ export function attachLoginListener(userIsAuth = null) {
 
 // Helper function to keep code DRY
 function setupLoginClick(toggleLogin, isAuth) {
-	toggleLogin.addEventListener('click', () => {
+	toggleLogin.addEventListener('click',async () => {
 		if (isAuth === false) {
-			actualizeIndexPage('modal-container', routes.login);
+			await actualizeIndexPage('modal-container', routes.login);
 		} else {
 			console.log('User is already authenticated, not showing login modal');
 		}
@@ -137,9 +142,9 @@ function setupLoginClick(toggleLogin, isAuth) {
 // 	}
 // 	return response;
 // }
-const requestCache = new Map();
-const inFlightRequests = new Map();
-let refreshPromise = null;
+const requestCache = new Map();         // Stores cached responses
+const inFlightRequests = new Map();     // Tracks pending requests
+let refreshPromise = null;              // Holds the single refresh token operation
 
 export async function fetchWithRefresh(url, options = {}) {
 	const cacheKey = `${url}-${JSON.stringify(options.body || {})}`;
@@ -159,7 +164,7 @@ export async function fetchWithRefresh(url, options = {}) {
 		let response = await fetch(url, options);
 		// Clone the response immediately to preserve its body
 		let responseToReturn = response.clone();
-
+		// Handle authentication and refresh logic
 		if (response.status === 401) {
 			// Use a single shared refresh promise
 			if (!refreshPromise) {
