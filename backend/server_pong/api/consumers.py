@@ -227,9 +227,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 								self.room_group_name,
 								{
 									"type": "game_update",
-									"game_stats": stats,
+									"game_stats": "final-message",
 								}
 							)
+							
 					except Exception as e:
 						print(f"!!! Failed to send update: {e}", file=sys.stderr)
 		except asyncio.CancelledError:
