@@ -1,26 +1,45 @@
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h2>Game screen</h2>
-            <canvas id="gameCanvas" width="1200" height="620" style="border:6px solid black;"></canvas>
+<div class="containerCanvas">
+    <div class="canvasContainer">
+
+        <div class="footerCanvas">
+            <div id="idEEndD" class="section">
+                <div>🅔 = up</div>
+                <div>🅓 = down</div>
+                <div>🅠 = give up</div>
+            </div>
+            <h2 id="titleGameSinglePlay" class="titleGame">Game</h2>
+            <div id="idUpendDown" class="section">
+                    <div>⬆️ = up</div>
+                    <div>⬇️ = down</div>
+                    <div>🅛 = give up</div>
+            </div>
+        </div>
+        <div class="stade">
+            <div id="wallUp" class="decorative-box"></div>
+            <div id="verticalStadeUp" class="verticalStadeUp"></div>
+            <div id="roundStade" class="roundStadePong"></div>
+
+            <div id="data-score" class="section">
+                <div class="player-score left">
+                    <div id="player1Username" class="username"></div>
+                    <div id="player1score" class="score" data-score=""></div>
+                </div>
+                <div class="player-score right">
+                    <div id="player2Username" class="username"></div>
+                    <div id="player2score" class="score" data-score=""></div>
+                </div>
+            </div>
+            <div id="verticalStadeDown" class="verticalStadeDown"></div>
+            <canvas id="gameCanvas" width="1100" height="650"></canvas>
+            <div id="wallDown" class="decorative-box"></div>
         </div>
     </div>
-    <div class="row" id="replace-state">
-        <div class="col">
-            <h2>A.I game</h2>
-            <button id="AI-game" type="button" class="btn btn-outline-primary" aria-label="Close">A.I</button>
+    <div class="footerCanvas" id="idfooterCanvas">
+        <div class="section">
+            <button id="AI-game" type="button" class="btn btn-primary" aria-label="Close">A.I game</button>
         </div>
-        <div class="col">
-            <h2>Informations</h2>
-            <p id="Game instructions">Waiting for a game</p>
+        <div class="section">
+            <button id="versus-game" type="button" class="btn btn-primary" aria-label="Close">Versus game</button>
         </div>
-        <div class="col">
-            <h2>Versus game</h2>
-            <button id="versus-game" type="button" class="btn btn-outline-secondary" aria-label="Close">Versus</button>
-        </div>
-    </div>
-    <div class="row" id="replace-state2">
     </div>
 </div>
-
-<script src="../js/active/singlePlay.js"></script>

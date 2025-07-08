@@ -17,7 +17,7 @@ def determineRandomStart() :
 	startingAngle = random.choice([-90, -60, -30, -10, 10, 30, 60, 90])
 	angle = math.atan2(startingAngle, 90)
 
-	magnitude = math.hypot(90, startingAngle)
+	magnitude = math.hypot(170, startingAngle)
 
 	new_vx = magnitude * math.cos(angle)
 	new_vy = magnitude * math.sin(angle)
@@ -98,7 +98,7 @@ def addSpeed(ori : int, incidentVector : Vector) :
 	else :
 		m = -1
 	angle = math.atan2(90 * m, ori)
-	magnitude = math.hypot(90 * m, ori) + 30 * incidentVector.addedSpeed
+	magnitude = math.hypot(170 * m, ori) + 30 * incidentVector.addedSpeed
 	# #print("------------------------------->>> magnitude :", magnitude, file=sys.stderr)
 	return Vector(magnitude * math.sin(angle), magnitude * math.cos(angle), spdMultiplier=incidentVector.addedSpeed+1)
 
@@ -180,7 +180,7 @@ class	Movement() :
 		else :
 			self.scorePlayer2 += 1
 		self.ball.pos = self.map.center 																																	# Place it on center
-		if (self.usrID == 1) :
+		if (self.usrID <= 1) :
 			self.ball.spd = determineRandomStart()
 
 	async def isWallIntersection(self, pointTrajectory: Point, timeLeft : float) -> float:
@@ -207,16 +207,16 @@ class	Movement() :
 		else :
 			valueIntersectionsWinning = calcIntersections(self.map.winningTeam1[0], self.map.winningTeam1[1], self.ball.pos, pointTrajectory)								# Determine if 1st player won a round   
 			if valueIntersectionsWinning[1] != None :																														# If ball trajectory go through winning zone 
-				await self.setWinPlayer(1)																																	# Make 1st player win a point
+				await self.setWinPlayer(2)																																	# Make 1st player win a point
 				dictInfoRackets[self.roomName]["scoring"] = True
-				await asyncio.sleep(3)																																		# Sleeping to let players react
+				#await asyncio.sleep(3)																																		# Sleeping to let players react
 				dictInfoRackets[self.roomName]["scoring"] = False
 			else :
 				valueIntersectionsWinning = calcIntersections(self.map.winningTeam2[0], self.map.winningTeam2[1], self.ball.pos, pointTrajectory)							# Determine if 2nd player won a round
 				if valueIntersectionsWinning[1] != None :																													# If ball trajectory go through winning zone
-					await self.setWinPlayer(2)																																# Make 2nd player win a point
+					await self.setWinPlayer(1)																																# Make 2nd player win a point
 					dictInfoRackets[self.roomName]["scoring"] = True
-					await asyncio.sleep(3)																																	# Sleeping to let players react
+					#await asyncio.sleep(3)																																	# Sleeping to let players react
 					dictInfoRackets[self.roomName]["scoring"] = False
 				else :
 					self.ball.pos = pointTrajectory																															# No collision + No winning round --> Keep same vector and update value

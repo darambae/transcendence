@@ -5,6 +5,7 @@
 		<div class="mb-3">
 			<label for="username" class="form-label">Username</label>
 			<input type="text" class="form-control" id="username" name="username" placeholder="username" required>
+			<span class="form-text text-muted">Max 15 characters</span>
 		</div>
 		<div class="mb-3">
 			<label for="mail" class="form-label">Mail</label>
@@ -13,10 +14,12 @@
 		<div class="mb-3">
 			<label for="first-name" class="form-label">First name</label>
 			<input type="text" class="form-control" id="first-name" name="firstName" placeholder="first name" required>
+			<span class="form-text text-muted">Max 15 characters</span>
 		</div>
 		<div class="mb-3">
 			<label for="last-name" class="form-label">Last name</label>
 			<input type="text" class="form-control" id="last-name" name="lastName" placeholder="last name" required>
+			<span class="form-text text-muted">Max 15 characters</span>
 		</div>
 		<div class="mb-3">
 			<label for="inputPassword" class="form-label">Password</label>
@@ -33,11 +36,10 @@
 		<div class="mb-3">
 			<label for="password-confirmation" class="form-label">Password Confirmation</label>
 			<input type="password" class="form-control" id="password-confirmation" name="password_confirmation" placeholder="password confirmation" required>
-			<div id="passwordConfirmationCheck" class="form-text">
-				<span id="invalid"></span>
-			</div>
 		</div>
-		<div class="error-msg"></div>
-		<button type="submit" class="btn btn-primary">Submit</button>
+		<div id="passwordConfirmationError" class="form-text">
+			<span id="invalid"></span>
+		</div>
+		<button type="submit" class="signup-submit-btn btn btn-primary">Submit</button>
 	</form>
 </div>

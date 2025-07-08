@@ -3,6 +3,8 @@ import { homeController } from "../home.js";
 import { localGameController } from "../localGame.js";
 import { loginController } from "../login.js";
 import { getCookie, fetchWithRefresh } from "../../utils.js";
+import { guideTouch, drawCenterTextP, checkwin } from "../localGame.js";
+import { drawCenterText } from "../multiplayer.js"
 
 let sseTournament;
 export let adress = "10.18.161"
@@ -49,6 +51,7 @@ export function getPlayersLocalName() {
 }
 
 export function setCanvasAndContext() {
+
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
   ctx.font = "20px Arial";
@@ -91,43 +94,25 @@ function fillCircle(ctx, x, y, r) {
 export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
-
+  
   const fieldWidth = 1000;
   const fieldHeight = 600;
   const offsetX = (canvas.width - fieldWidth) / 2;
   const offsetY = (canvas.height - fieldHeight) / 2;
-
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const wallThickness = 15;
-  const wallOffsetUp = 20;
-  const wallOffsetDown = 20;
-  const wallRadius = 10;
-
-  const gradientTop = ctx.createLinearGradient(offsetX, 0, offsetX + fieldWidth, 0);
-  gradientTop.addColorStop(0, "#ffffff");
-  gradientTop.addColorStop(1, "#bbbbbb");
-
-  const gradientBottom = ctx.createLinearGradient(offsetX, 0, offsetX + fieldWidth, 0);
-  gradientBottom.addColorStop(0, "#bbbbbb");
-  gradientBottom.addColorStop(1, "#ffffff");
-
-  ctx.fillStyle = gradientTop;
-  roundRect(ctx, offsetX, offsetY - wallOffsetUp, fieldWidth, wallThickness, wallRadius);
-
-  ctx.fillStyle = gradientBottom;
-  roundRect(ctx, offsetX, offsetY + fieldHeight - wallThickness + wallOffsetDown, fieldWidth, wallThickness, wallRadius);
 
   const dx1 = Racket1Pos[1][0] - Racket1Pos[0][0];
   const dy1 = Racket1Pos[1][1] - Racket1Pos[0][1];
   const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
   ctx.fillStyle = "white";
-  roundRect(ctx, Racket1Pos[0][0] + offsetX, Racket1Pos[0][1] + offsetY, 5, d1, 3);
-
+  roundRect(ctx, Racket1Pos[0][0] + offsetX, Racket1Pos[0][1] + offsetY, 4, d1, 3);
+  
   const dx2 = Racket2Pos[1][0] - Racket2Pos[0][0];
   const dy2 = Racket2Pos[1][1] - Racket2Pos[0][1];
   const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-  roundRect(ctx, Racket2Pos[0][0] + offsetX, Racket2Pos[0][1] + offsetY, 5, d2, 3);
+  ctx.fillStyle = "white";
+  roundRect(ctx, Racket2Pos[0][0] + offsetX, Racket2Pos[0][1] + offsetY, 4, d2, 3);
 
   let ballX = Math.min(Math.max(ballPos[0], 10), fieldWidth - 10);
   let ballY = Math.min(Math.max(ballPos[1], 10), fieldHeight - 10);
@@ -141,6 +126,7 @@ export function sleep(ms) {
 }
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
+
   // console.log(adress);
   let url_post = `server-pong/send-message`;
   let started = false;
@@ -152,7 +138,17 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   const csrf = getCookie('csrftoken');
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-  let mul = await fetch('./templates/localGame.html')
+  if (playerID === 2) {
+    drawCenterText("waiting for the player  to start the match");
+    guideTouch()
+  } else 
+  {
+    guideTouch()
+    drawCenterTextP()
+  }
+
+
+  let mul = await fetchWithRefresh('./templates/localGame.html')
   let mulTxt = await mul.text()
 
   let gameState  = document.getElementById("idfooterCanvas");
@@ -207,7 +203,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     }
 };
 
-  SSEStream.onmessage = function(event) {
+  SSEStream.onmessage = function (event) {
+      checkwin()
       try {
         // const data = JSON.parse(event.data);
         // // console.log("Received data: ", data);
@@ -215,7 +212,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
         const data = JSON.parse(event.data);
 
         let sc1 = document.getElementById("player1score");
-        let sc2 = document.getElementById("player1score");
+        let sc2 = document.getElementById("player2score");
 
         // console.log(data);
         game_stats = data["game_stats"]
@@ -226,8 +223,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
           if (game_stats["State"] != "playersInfo") {
             // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
-            sc1.innerHTML = game_stats["team1Score"];
-            sc2.innerHTML = game_stats["team2Score"];
+            sc1.setAttribute("data-score", game_stats["team1Score"]);
+            sc2.setAttribute("data-score", game_stats["team2Score"]);
           }
           else {
             // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")

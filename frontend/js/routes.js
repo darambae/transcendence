@@ -74,9 +74,5 @@ export const routes = {
 		template: 'invits',
 		controller: invitsController,
 	},
-	// chat: {
-	// 	template: 'chat',
-	// 	controller: chatController
-	// },
 };
 		

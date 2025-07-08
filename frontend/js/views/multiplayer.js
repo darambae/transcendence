@@ -8,7 +8,10 @@ import {setCanvasAndContext} from './utils/commonFunctions.js'
 // }
 
 
-function drawCenterText(text) {
+
+
+
+export function drawCenterText(text) {
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, canvas.width, canvas.height);

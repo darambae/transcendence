@@ -3,9 +3,9 @@ import { userInfo } from './user.js';
 import { fetchWithRefresh } from  "../utils.js"
 import * as Friends from './friends.js';
 
-export function settingsProfileController() {
+export async function settingsProfileController() {
 	
-	getUserInfo();
+	await getUserInfo();
 	getUserAvatar();
 	setupAvatarUpload();
 	SaveImg()
@@ -124,22 +124,41 @@ function animationPassword() {
 }
 
 
+let userInfoCache = null;
+let userInfoCacheTime = 0;
+const USER_INFO_CACHE_DURATION = 60000; // 60 seconds
+
 async function getUserInfo() {
 	try {
-	  const response = await fetchWithRefresh("user-service/infoUser/", {
-		method: "GET",
-		credentials: 'include',
-	  });
-	  if (!response.ok) {
-		throw new Error(`Erreur HTTP ! status: ${response.status}`);
-	  }
-	  const data = await response.json();
-	  displayUserInfo(data);
-  
+		const timestamp = Date.now();
+		const response = await fetch(
+			`user-service/infoUser/?t=${timestamp}`,
+			{
+				method: 'GET',
+				credentials: 'include',
+				headers: {
+					'Cache-Control': 'no-cache',
+					'Content-Type': 'application/json',
+				},
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(`Erreur HTTP ! status: ${response.status}`);
+		}
+		// Cache the response
+		const clonedResponse = response.clone();
+		const data = await clonedResponse.json();
+
+		displayUserInfo(data);
+		return data;
 	} catch (error) {
-	  console.error("Erreur lors de la récupération des infos utilisateur :", error);
+		console.error(
+			'Erreur lors de la récupération des infos utilisateur:',
+			error
+		);
 	}
-  }
+}
 
 function handleResponse(response) {
 	if (!response.ok) {
@@ -149,22 +168,23 @@ function handleResponse(response) {
 }
 
 //  get avatar end affich
-function getUserAvatar() {
-	fetchWithRefresh("user-service/avatar/", {
-		method: "GET",
-		credentials: 'include',
-	})
-		.then(res => {
-			if (!res.ok) throw new Error("Error retrieving avatar");
-			return res.blob();
-		})
-		.then(blob => {
-			const imgUrl = URL.createObjectURL(blob);
-			document.getElementById("avatar").src = imgUrl;
-		})
-		.catch(err => {
-			console.error("Error loading avatar :", err);
+async function getUserAvatar() {
+	try {
+		const timestamp = Date.now();
+		const res = await fetch(`user-service/avatar/?t=${timestamp}`, {
+			method: 'GET',
+			credentials: 'include',
 		});
+
+		if (!res.ok) throw new Error('Error retrieving avatar');
+
+		const blob = await res.blob();
+		const imgUrl = URL.createObjectURL(blob);
+		document.getElementById('avatar').src = imgUrl;
+	} catch (err) {
+		console.error('Error loading avatar:', err);
+		document.getElementById('avatar').src = 'img/default.png';
+	}
 }
 
 //  modifi view frond avatar end save img
@@ -217,13 +237,17 @@ function SaveImg() {
 				body: formData
 			});
 
-			if (!response.ok) {
-				errorDiv.textContent = 'Sending error.';
-				errorDiv.style.display = 'block';
-			}
 			const data = await response.json();
-			console.log(data)
-
+			//console.log(data)
+			if (data.status === 'error') {
+				console.log("Error in response:", data);
+				errorDiv.textContent = `Error: ${data.message}`;
+				errorDiv.style.display = 'block';
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
+				return;
+			}
 			if (data.success) {
 				errorDiv.textContent = data.success;
 				errorDiv.classList.remove('text-danger');
@@ -285,16 +309,17 @@ function SavePrivateInfo() {
 				errorDiv.style.display = 'block';
 				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
 				getUserInfo()
+				userInfoCache = null;
 			} else if (result.error) {
 				errorDiv.textContent = result.error;
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
 			}
 			removElemAccount()
 		} catch (error) {
 			errorDiv.textContent = "Error network : ";
 			errorDiv.style.display = 'block';
-			setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+			setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
 			removElemAccount()
 		}
 	});
@@ -329,12 +354,19 @@ function SavePrivateProfile() {
 			const result = await response.json();
 
 			if (result.success) {
+				// Clear cache completely
+				userInfoCache = null;
+				userInfoCacheTime = 0;
+
+				// Get fresh data with a new request
+				await getUserInfo();
 				errorDiv.textContent = result.success;
 				errorDiv.classList.remove('text-danger');
 				errorDiv.classList.add('text-success');
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-				getUserInfo()
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
 			} else if (result.error) {
 				errorDiv.textContent = result.error;
 				errorDiv.style.display = 'block';

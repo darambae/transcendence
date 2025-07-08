@@ -14,6 +14,8 @@ from django.conf import settings
 import os
 import json
 import requests
+from .utils import setTheCookie
+
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
@@ -208,6 +210,10 @@ class saveImg(APIView):
         if not image:
             return JsonResponse({'error': 'Save image.'}, status=400)
         
+        max_size = 2 * 1024 * 1024
+        if image.size > max_size:
+            return JsonResponse({'error': 'Image file is too large (max 2MB)'}, status=413)
+        
         upload_dir = os.path.join(settings.MEDIA_ROOT, 'imgs')
         image_path = os.path.join(upload_dir, image.name)
 
@@ -269,12 +275,18 @@ class saveProfile(APIView):
         if not data.get('userName', '').strip():
             return JsonResponse({'error': 'userName is empty'}, status=400)
 
-        #if not data.get('mail', '').strip():
-        #    return JsonResponse({'error': 'mail is empty'}, status=400)
         try:
             response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
-            return JsonResponse(response.json(), status=response.status_code)
+            response_data = response.json()
+
+            return setTheCookie(
+                JsonResponse({'success': 'Successfully changed username'}, status=response.status_code),
+                response_data.get('access'),
+                response_data.get('refresh')
+            )
+
+        
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
 
@@ -299,7 +311,7 @@ class saveNewPassword(APIView):
         checkResponse = requests.post("https://access_postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
         if (checkResponse.status_code != 200):
-            return JsonResponse({'error': 'Current password is not valid'}, status=400)
+            return JsonResponse({'error': 'Current password is not valid'}, status=401)
         if newPassword != data.get('inputPasswordNew2'):
             return JsonResponse({'error': 'New password do not match'}, status=400)
         elif (len(newPassword) < 8):
@@ -313,7 +325,6 @@ class saveNewPassword(APIView):
 
         if (uploadResponse.status_code != 200):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
-        
         return JsonResponse({'success': 'Successfully saved new password'}, status=200)
 
 

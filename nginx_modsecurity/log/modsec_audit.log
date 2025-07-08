@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
 ---R2Ctqm4T---A--
 [03/Jul/2025:12:47:51 +0000] 175154687124.079366 10.18.163.229 40810 172.18.0.10 443
 ---R2Ctqm4T---B--
@@ -1370,10 +1372,41 @@ X-Content-Type-Options: nosniff
 Connection: keep-alive
 Vary: Cookie
 Set-Cookie: csrftoken=MoAqxtWiSZcpA9QrdWbDXbrBhxlb5uIx; expires=Thu, 02 Jul 2026 12:47:52 GMT; Max-Age=31449600; Path=/; SameSite=Lax; Secure
+=======
+---oNUOn3fG---A--
+[05/Jul/2025:15:34:07 +0000] 175172964779.705500 192.168.1.68 49640 172.23.0.10 443
+---oNUOn3fG---B--
+GET /auth/activate_account/NA/csh4ig-74f09de320d48fe6ce42e1896db16929/ HTTP/1.1
+User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36
+Sec-Fetch-Site: none
+sec-ch-ua-platform: "Android"
+Upgrade-Insecure-Requests: 1
+sec-ch-ua-mobile: ?1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Cache-Control: max-age=0
+sec-ch-ua: "Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"
+Sec-Fetch-User: ?1
+Sec-Fetch-Mode: navigate
+Connection: keep-alive
+Host: 192.168.1.51:8443
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-FR,en;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-GB;q=0.6,en-US;q=0.5
+
+---oNUOn3fG---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 15:34:07 GMT
+Content-Length: 1335
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Connection: keep-alive
+>>>>>>> main
 X-Frame-Options: DENY
 Referrer-Policy: same-origin
 Cross-Origin-Opener-Policy: same-origin
 
+<<<<<<< HEAD
 ---uUg4j43f---H--
 ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `10.18.164.106:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "10.18.164.106:8443"] [severity "4"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.10"] [uri "/user-service/csrf/"] [unique_id "175154687235.106657"] [ref "o0,18o0,13o13,5v39,18"]
 
@@ -1554,12 +1587,42 @@ Accept-Language: en-US,en;q=0.9
 HTTP/1.1 200
 Server: nginx/1.22.1
 Date: Thu, 03 Jul 2025 12:47:52 GMT
+=======
+---oNUOn3fG---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `192.168.1.51:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "192.168.1.51:8443"] [severity "4"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.23.0.10"] [uri "/auth/activate_account/NA/csh4ig-74f09de320d48fe6ce42e1896db16929/"] [unique_id "175172964779.705500"] [ref "o0,17o0,12o12,5v86,17"]
+
+---oNUOn3fG---Z--
+
+---wD6XuxQo---A--
+[05/Jul/2025:15:34:07 +0000] 175172964767.888190 192.168.1.68 49640 172.23.0.10 443
+---wD6XuxQo---B--
+GET /favicon.ico HTTP/1.1
+Referer: https://192.168.1.51:8443/auth/activate_account/NA/csh4ig-74f09de320d48fe6ce42e1896db16929/
+sec-ch-ua-platform: "Android"
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36
+sec-ch-ua-mobile: ?1
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+sec-ch-ua: "Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"
+Connection: keep-alive
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Host: 192.168.1.51:8443
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: en-FR,en;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-GB;q=0.6,en-US;q=0.5
+
+---wD6XuxQo---F--
+HTTP/1.1 200
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 15:34:07 GMT
+>>>>>>> main
 Content-Length: 166115
 Content-Type: image/x-icon
 Last-Modified: Tue, 24 Jun 2025 08:24:06 GMT
 Connection: keep-alive
 ETag: "685a60a6-288e3"
 
+<<<<<<< HEAD
 ---Vd1dBrb5---H--
 ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `10.18.164.106:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "10.18.164.106:8443"] [severity "4"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.18.0.10"] [uri "/favicon.ico"] [unique_id "175154687232.395738"] [ref "o0,18o0,13o13,5v32,18"]
 
@@ -24838,241 +24901,606 @@ ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-
 
 ---y32ulr5r---Z--
 
----l38pAaN4---A--
-[05/Jul/2025:17:18:30 +0000] 175173591060.524338 172.19.0.1 46018 172.19.0.10 443
----l38pAaN4---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
+---2bjKMyhl---A--
+[04/Jul/2025:13:58:57 +0000] 175163753760.896996 192.168.65.1 21651 172.21.0.10 443
+---2bjKMyhl---B--
+GET /user-service/saveImg/ HTTP/1.1
 Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
 sec-ch-ua-mobile: ?0
-Content-Type: application/json
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryASu8AhTUAtAQAaQ9
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 1699633
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=9Nn8gRUdS8l19PGpOwRSnyRs8A25deCj; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM1NzE2LCJpYXQiOjE3NTE3MzU0MTYsImp0aSI6ImFlNTdmNjM5NjcyMTRhNjZhYjEzOGIwNGQzZGQwZGVkIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.qmsrOQ1xEAaDP9tZbmVQmKXjpbS7BCoV03rOGCF2K1g; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MDIxNiwiaWF0IjoxNzUxNzM1NDE2LCJqdGkiOiI0ODc5MzhmMGE1MDI0ZjFkYTU2MjJlZGI1YmM0MjM1MyIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0._va4AxnNzT3qViuwjw34izb9HA952ZELUmWd-WGQYPg
+Cookie: csrftoken=3DizgWWPl3lhzfcdcTkKOb5PtWnmCsxb; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM3ODA5LCJpYXQiOjE3NTE2Mzc1MDksImp0aSI6IjIwNjcwYTU2NTllMDQwYjhhN2Q1MTg5YTBjNWE1ZDBiIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.XKib-9g-rwpr7VbuF-vW7ydctuP2_WSdpNot-LmZMnk; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MjMwOSwiaWF0IjoxNzUxNjM3NTA5LCJqdGkiOiJiYjIzNWIzOGJkZmY0MmEyOWQyOWJlZWYzMmYzOTRmYiIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.C0zR_N-voFBJoQFL__YPpt6Hg2VG4f0iPb-6d-yiufE
 Accept-Language: fr
 
----l38pAaN4---F--
-HTTP/1.1 403
+---2bjKMyhl---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Sat, 05 Jul 2025 17:18:30 GMT
-Content-Length: 555
-Content-Type: text/html
-Connection: keep-alive
-
----l38pAaN4---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173591060.524338"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173591060.524338"] [ref ""]
-
----l38pAaN4---Z--
-
----PxJVX2bp---A--
-[05/Jul/2025:17:20:10 +0000] 175173601033.468245 172.19.0.1 49682 172.19.0.10 443
----PxJVX2bp---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
-Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-sec-ch-ua-mobile: ?0
+Date: Fri, 04 Jul 2025 13:58:57 GMT
+Content-Length: 56
 Content-Type: application/json
+Connection: close
+
+---2bjKMyhl---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `1699633' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "1699633"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.21.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163753760.896996"] [ref "o0,3v0,3v106,7"]
+
+---2bjKMyhl---Z--
+
+---qOc2uxbM---A--
+[04/Jul/2025:14:13:43 +0000] 175163842316.654411 192.168.65.1 39063 172.20.0.10 443
+---qOc2uxbM---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary3ZBq1AcOl0l4aZpd
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=9Nn8gRUdS8l19PGpOwRSnyRs8A25deCj; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MDIxNiwiaWF0IjoxNzUxNzM1NDE2LCJqdGkiOiI0ODc5MzhmMGE1MDI0ZjFkYTU2MjJlZGI1YmM0MjM1MyIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0._va4AxnNzT3qViuwjw34izb9HA952ZELUmWd-WGQYPg; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM2MjMyLCJpYXQiOjE3NTE3MzU0MTYsImp0aSI6ImY2MjAyOGE0NDkwZTRmM2E5ZDkxZWNkOTczYTEwZWI0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.ip97cIv7Su8ys9Ni__FYIYNACukm2b9t2XVA_6hxxOE
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM4NjczLCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6Ijk5MTE1OWQ2OGRiYzRkYWU4MTFhN2I2NDQ2YjZhMWVmIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.U1swbZWzF-ekPAX5feKwsGzSZmiig0Koj9ipu0ly9jc; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y
 Accept-Language: fr
 
----PxJVX2bp---F--
-HTTP/1.1 403
+---qOc2uxbM---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Sat, 05 Jul 2025 17:20:10 GMT
-Content-Length: 555
-Content-Type: text/html
-Connection: keep-alive
-
----PxJVX2bp---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173601033.468245"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173601033.468245"] [ref ""]
-
----PxJVX2bp---Z--
-
----JdImEFUz---A--
-[05/Jul/2025:17:27:54 +0000] 175173647452.570699 172.19.0.1 60172 172.19.0.10 443
----JdImEFUz---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
-Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-sec-ch-ua-mobile: ?0
+Date: Fri, 04 Jul 2025 14:13:43 GMT
+Content-Length: 56
 Content-Type: application/json
+Connection: close
+
+---qOc2uxbM---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163842316.654411"] [ref "o0,3v0,3v106,7"]
+
+---qOc2uxbM---Z--
+
+---1rDDCuao---A--
+[04/Jul/2025:14:16:21 +0000] 175163858177.557100 192.168.65.1 16483 172.20.0.10 443
+---1rDDCuao---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryZAbhFFcslmmkAzrG
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=qEb4FKOoyCppex2B0TvlAEqHpCa0bf9I; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM2NzYzLCJpYXQiOjE3NTE3MzY0NjMsImp0aSI6IjI5MDc1MzU5YjgyNzRlOTJhZjJiMmZmYjA3Y2Q0YmRiIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.7riUJPjXnmQrNlGtHpcuJjOYvTt5GFdcEdvCJkQPvQ0; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MTI2MywiaWF0IjoxNzUxNzM2NDYzLCJqdGkiOiI2ZmI2NjI5NjQ1OGY0ODMyOGNjNjA0OWZlY2MxOGViNiIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.4F6dasx0iHEtubapl2Afh3M4wickmaNkyn-oKRmNZBM
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM4NjczLCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6Ijk5MTE1OWQ2OGRiYzRkYWU4MTFhN2I2NDQ2YjZhMWVmIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.U1swbZWzF-ekPAX5feKwsGzSZmiig0Koj9ipu0ly9jc; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y
 Accept-Language: fr
 
----JdImEFUz---F--
-HTTP/1.1 403
+---1rDDCuao---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Sat, 05 Jul 2025 17:27:54 GMT
-Content-Length: 555
-Content-Type: text/html
-Connection: keep-alive
-
----JdImEFUz---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173647452.570699"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173647452.570699"] [ref ""]
-
----JdImEFUz---Z--
-
----Pckn3BZc---A--
-[05/Jul/2025:17:36:50 +0000] 175173701038.189127 172.19.0.1 41580 172.19.0.10 443
----Pckn3BZc---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
-Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-sec-ch-ua-mobile: ?0
+Date: Fri, 04 Jul 2025 14:16:21 GMT
+Content-Length: 56
 Content-Type: application/json
+Connection: close
+
+---1rDDCuao---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163858177.557100"] [ref "o0,3v0,3v106,7"]
+
+---1rDDCuao---Z--
+
+---OeMTOK1E---A--
+[04/Jul/2025:14:19:47 +0000] 175163878724.539386 192.168.65.1 61272 172.20.0.10 443
+---OeMTOK1E---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryQAWkz8GxYTsTjXMd
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=13SJdQeIADvLrS0ryaYcDrr1LFle54db; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM3Mjk5LCJpYXQiOjE3NTE3MzY5OTksImp0aSI6IjMyNmU1MWYwMjE1MjRjMzc5ODE4NDc5YTczMWJjNjkxIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.q2FhI1fprD-npwx2JRgTUMs8_knB4UUtQwHCeBbVR1Q; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MTc5OSwiaWF0IjoxNzUxNzM2OTk5LCJqdGkiOiIwMzIyMDU2ZTIzODI0YmMyODJjODBiNmViOGQwNGE3ZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.I81HW-tw9WecYYs_gd8L9zVp64qMIQxlpLoq5sFlYZk
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5MDc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjI4MjU2Mzg1OTcxMDQxZTI5YjA1NDZiOTc2MGQzZjA4IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.-BXX8ZtaceXgu3UJWtmtedkV2CHywjaO2HwVewlplhU
 Accept-Language: fr
 
----Pckn3BZc---F--
-HTTP/1.1 403
+---OeMTOK1E---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Sat, 05 Jul 2025 17:36:50 GMT
-Content-Length: 555
-Content-Type: text/html
-Connection: keep-alive
-
----Pckn3BZc---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173701038.189127"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173701038.189127"] [ref ""]
-
----Pckn3BZc---Z--
-
----OGKgyqVN---A--
-[05/Jul/2025:17:37:38 +0000] 175173705873.371260 172.19.0.1 35070 172.19.0.10 443
----OGKgyqVN---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
-Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-sec-ch-ua-mobile: ?0
+Date: Fri, 04 Jul 2025 14:19:47 GMT
+Content-Length: 56
 Content-Type: application/json
+Connection: close
+
+---OeMTOK1E---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163878724.539386"] [ref "o0,3v0,3v106,7"]
+
+---OeMTOK1E---Z--
+
+---KLpsZewj---A--
+[04/Jul/2025:14:20:26 +0000] 175163882676.911648 192.168.65.1 47603 172.20.0.10 443
+---KLpsZewj---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundarygYNgNo2orV9BICew
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=13SJdQeIADvLrS0ryaYcDrr1LFle54db; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzM3Mjk5LCJpYXQiOjE3NTE3MzY5OTksImp0aSI6IjMyNmU1MWYwMjE1MjRjMzc5ODE4NDc5YTczMWJjNjkxIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.q2FhI1fprD-npwx2JRgTUMs8_knB4UUtQwHCeBbVR1Q; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjM0MTc5OSwiaWF0IjoxNzUxNzM2OTk5LCJqdGkiOiIwMzIyMDU2ZTIzODI0YmMyODJjODBiNmViOGQwNGE3ZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.I81HW-tw9WecYYs_gd8L9zVp64qMIQxlpLoq5sFlYZk
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5MDc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjI4MjU2Mzg1OTcxMDQxZTI5YjA1NDZiOTc2MGQzZjA4IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.-BXX8ZtaceXgu3UJWtmtedkV2CHywjaO2HwVewlplhU
 Accept-Language: fr
 
----OGKgyqVN---F--
-HTTP/1.1 403
+---KLpsZewj---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Sat, 05 Jul 2025 17:37:38 GMT
-Content-Length: 555
-Content-Type: text/html
-Connection: keep-alive
-
----OGKgyqVN---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173705873.371260"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175173705873.371260"] [ref ""]
-
----OGKgyqVN---Z--
-
----fkIy8IUx---A--
-[07/Jul/2025:09:00:59 +0000] 175187885952.000151 172.19.0.1 53780 172.19.0.10 443
----fkIy8IUx---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
-Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-sec-ch-ua-mobile: ?0
+Date: Fri, 04 Jul 2025 14:20:26 GMT
+Content-Length: 56
 Content-Type: application/json
+Connection: close
+
+---KLpsZewj---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163882676.911648"] [ref "o0,3v0,3v106,7"]
+
+---KLpsZewj---Z--
+
+---f8RRYvt7---A--
+[04/Jul/2025:14:21:18 +0000] 175163887891.676214 192.168.65.1 47854 172.20.0.10 443
+---f8RRYvt7---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryuPtp1pNoO2JmYRcT
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=MTnKaDDlEZaZsC5q3isGntnOZo9ZEux0; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxODc5MTQ4LCJpYXQiOjE3NTE4Nzg4NDgsImp0aSI6IjE5MThlZmY1N2I0YTRjYWJhYzI2MmUyOWMwZTE3MWJmIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.i4I2Kth7BAToaiwCHur_YF_CI384WK3eRvb26pptEaE; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjQ4MzY0OCwiaWF0IjoxNzUxODc4ODQ4LCJqdGkiOiJlMzlmODk1MjA0MTg0ZDEyYWUzYTFhZTQyZDM2ZTJlMSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.6dxZDQf8SKTdCvPtLxf9KXumTYN2gxkIeuv9PSELXKQ
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5MDc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjI4MjU2Mzg1OTcxMDQxZTI5YjA1NDZiOTc2MGQzZjA4IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.-BXX8ZtaceXgu3UJWtmtedkV2CHywjaO2HwVewlplhU
 Accept-Language: fr
 
----fkIy8IUx---F--
-HTTP/1.1 403
+---f8RRYvt7---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Mon, 07 Jul 2025 09:00:59 GMT
-Content-Length: 555
-Content-Type: text/html
-Connection: keep-alive
-
----fkIy8IUx---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175187885952.000151"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175187885952.000151"] [ref ""]
-
----fkIy8IUx---Z--
-
----cTEN8eR0---A--
-[07/Jul/2025:09:15:47 +0000] 175187974781.046403 172.19.0.1 48814 172.19.0.10 443
----cTEN8eR0---B--
-GET /chat/$%7BtargetUserId%7D/blockedStatus HTTP/1.1
-Sec-Fetch-Site: same-origin
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
-sec-ch-ua-mobile: ?0
+Date: Fri, 04 Jul 2025 14:21:18 GMT
+Content-Length: 56
 Content-Type: application/json
+Connection: close
+
+---f8RRYvt7---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163887891.676214"] [ref "o0,3v0,3v106,7"]
+
+---f8RRYvt7---Z--
+
+---e4TvKUrx---A--
+[04/Jul/2025:14:22:56 +0000] 175163897629.281981 192.168.65.1 20402 172.20.0.10 443
+---e4TvKUrx---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryzXUBd7SEBYbWl994
 Accept: */*
 sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
-sec-ch-ua-platform: "Windows"
+sec-ch-ua-platform: "macOS"
 Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
 Sec-Fetch-Mode: cors
-Sec-Fetch-Dest: empty
 Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
 Accept-Encoding: gzip, deflate, br, zstd
-Cookie: csrftoken=SGGCVX8n4rqjs7JTzc8feA6PleN3Z8sH; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxODgwMDM4LCJpYXQiOjE3NTE4Nzk3MzgsImp0aSI6ImJhZjEwMTA1ZmFiMzRmODc5YjhhMmFjMWQ5MDc1MDFjIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.sig-Kfa-LAmgQ7GC8efaQwUULh03H1FjjzFVZifynoE; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjQ4NDUzOCwiaWF0IjoxNzUxODc5NzM4LCJqdGkiOiI2YjkxMDAwODg1Njk0OTJhYmU1OWQ4YmYyNDk1YmI4YSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.I6DKdpprMAyboaJT9W-kTbXRtTzewJi8Juydyc9fgSE
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5MDc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjI4MjU2Mzg1OTcxMDQxZTI5YjA1NDZiOTc2MGQzZjA4IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.-BXX8ZtaceXgu3UJWtmtedkV2CHywjaO2HwVewlplhU
 Accept-Language: fr
 
----cTEN8eR0---F--
-HTTP/1.1 403
+---e4TvKUrx---F--
+HTTP/1.1 413
 Server: nginx/1.22.1
-Date: Mon, 07 Jul 2025 09:15:47 GMT
-Content-Length: 555
-Content-Type: text/html
+Date: Fri, 04 Jul 2025 14:22:56 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---e4TvKUrx---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163897629.281981"] [ref "o0,3v0,3v106,7"]
+
+---e4TvKUrx---Z--
+
+---scr2PelM---A--
+[04/Jul/2025:14:24:46 +0000] 175163908636.759242 192.168.65.1 36106 172.20.0.10 443
+---scr2PelM---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryCcmO31yYzQmuUPDD
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
 Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5Mzc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjYzODQ5Y2E4OGQwNzQ4MTk4Mzk5N2NhMGEyOTgxMzk0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.zmVRiDXeUhi9coI9mlqhwemqQk-fUZZiRVjb6rNyfCY
+Accept-Language: fr
 
----cTEN8eR0---H--
-ModSecurity: Warning. Matched "Operator `Rx' with parameter `\$\s*\{\s*\S[^\{\}]*\}' against variable `REQUEST_FILENAME' (Value: `/chat/${targetUserId}/blockedStatus' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf"] [line "178"] [id "933135"] [rev ""] [msg "PHP Injection Attack: Variable Access Found"] [data "Matched Data: ${targetUserId} found within REQUEST_FILENAME: /chat/${targetUserId}/blockedStatus"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-php"] [tag "platform-multi"] [tag "attack-injection-php"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-PHP"] [tag "capec/1000/152/242"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175187974781.046403"] [ref "o6,15v4,39"]
-ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "172.19.0.10"] [uri "/chat/${targetUserId}/blockedStatus"] [unique_id "175187974781.046403"] [ref ""]
+---scr2PelM---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Fri, 04 Jul 2025 14:24:46 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
 
----cTEN8eR0---Z--
+---scr2PelM---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163908636.759242"] [ref "o0,3v0,3v106,7"]
 
+---scr2PelM---Z--
+
+---23ywim5v---A--
+[04/Jul/2025:14:28:20 +0000] 175163930097.111334 192.168.65.1 24392 172.20.0.10 443
+---23ywim5v---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryZsPPPmy9BevDhT6R
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5Mzc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjYzODQ5Y2E4OGQwNzQ4MTk4Mzk5N2NhMGEyOTgxMzk0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.zmVRiDXeUhi9coI9mlqhwemqQk-fUZZiRVjb6rNyfCY
+Accept-Language: fr
+
+---23ywim5v---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Fri, 04 Jul 2025 14:28:20 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---23ywim5v---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163930097.111334"] [ref "o0,3v0,3v106,7"]
+
+---23ywim5v---Z--
+
+---3zKblJNT---A--
+[04/Jul/2025:14:29:34 +0000] 17516393747.640029 192.168.65.1 32033 172.20.0.10 443
+---3zKblJNT---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary80msLBJLOw3qTRPA
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5Mzc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjYzODQ5Y2E4OGQwNzQ4MTk4Mzk5N2NhMGEyOTgxMzk0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.zmVRiDXeUhi9coI9mlqhwemqQk-fUZZiRVjb6rNyfCY
+Accept-Language: fr
+
+---3zKblJNT---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Fri, 04 Jul 2025 14:29:34 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---3zKblJNT---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "17516393747.640029"] [ref "o0,3v0,3v106,7"]
+
+---3zKblJNT---Z--
+
+---4TEUyFfi---A--
+[04/Jul/2025:14:29:39 +0000] 175163937936.354922 192.168.65.1 45564 172.20.0.10 443
+---4TEUyFfi---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundarytnwC83Yz5rH6pDiP
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=I6eclnE10KIoVovpBNss4OADzdeUXaPd; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjI0MzE3MywiaWF0IjoxNzUxNjM4MzczLCJqdGkiOiI2ODgzNWIzZThhNGY0ZWY2YjIyNmNmY2E3ZTdhYmFjZSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.dhf90A-FVlio5_cpDXcnYnwu3HZ8hBTT7F8sJuzga3Y; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNjM5Mzc0LCJpYXQiOjE3NTE2MzgzNzMsImp0aSI6IjYzODQ5Y2E4OGQwNzQ4MTk4Mzk5N2NhMGEyOTgxMzk0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.zmVRiDXeUhi9coI9mlqhwemqQk-fUZZiRVjb6rNyfCY
+Accept-Language: fr
+
+---4TEUyFfi---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Fri, 04 Jul 2025 14:29:39 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---4TEUyFfi---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.20.0.10"] [uri "/user-service/saveImg/"] [unique_id "175163937936.354922"] [ref "o0,3v0,3v106,7"]
+
+---4TEUyFfi---Z--
+
+---CngQpUq8---A--
+[05/Jul/2025:13:36:30 +0000] 175172259023.133442 142.251.173.108 46097 172.21.0.10 443
+---CngQpUq8---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundarydzsTEx4ADzLWHs2G
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=pfB9B07ipeWhsDtOR6p3glovP7iY5PLv; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzIyODI0LCJpYXQiOjE3NTE3MjI1MjQsImp0aSI6ImQwZGI2Nzk1YzQxMTQzYzI5NjkwNzY3YjMxMjExM2Y3IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJiYWVkYXJhbSIsImludml0ZXMiOltdfQ.p4m9jcCjjgcIly7UwG0eF3yBXZhDR34Q9KYiEojzjAs; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjMyNzMyNCwiaWF0IjoxNzUxNzIyNTI0LCJqdGkiOiJlNzAyZWQ4NDYzM2M0NDY4OGRlOTc3ZGZlZGZiNzk5OSIsInVzZXJfaWQiOjQsInVzZXJuYW1lIjoiYmFlZGFyYW0iLCJpbnZpdGVzIjpbXX0.I9wPJ-Y61iYV-Gi9j8vAsESctZX5BkgKJTW6O97nyyI
+Accept-Language: fr
+
+---CngQpUq8---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 13:36:30 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---CngQpUq8---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.21.0.10"] [uri "/user-service/saveImg/"] [unique_id "175172259023.133442"] [ref "o0,3v0,3v106,7"]
+
+---CngQpUq8---Z--
+
+---5iZFNrQm---A--
+[05/Jul/2025:13:36:36 +0000] 17517225968.145454 142.251.173.108 63871 172.21.0.10 443
+---5iZFNrQm---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryRsAUCe1EDf1HgdiC
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=pfB9B07ipeWhsDtOR6p3glovP7iY5PLv; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxNzIyODI0LCJpYXQiOjE3NTE3MjI1MjQsImp0aSI6ImQwZGI2Nzk1YzQxMTQzYzI5NjkwNzY3YjMxMjExM2Y3IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJiYWVkYXJhbSIsImludml0ZXMiOltdfQ.p4m9jcCjjgcIly7UwG0eF3yBXZhDR34Q9KYiEojzjAs; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjMyNzMyNCwiaWF0IjoxNzUxNzIyNTI0LCJqdGkiOiJlNzAyZWQ4NDYzM2M0NDY4OGRlOTc3ZGZlZGZiNzk5OSIsInVzZXJfaWQiOjQsInVzZXJuYW1lIjoiYmFlZGFyYW0iLCJpbnZpdGVzIjpbXX0.I9wPJ-Y61iYV-Gi9j8vAsESctZX5BkgKJTW6O97nyyI
+Accept-Language: fr
+
+---5iZFNrQm---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Sat, 05 Jul 2025 13:36:36 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---5iZFNrQm---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.21.0.10"] [uri "/user-service/saveImg/"] [unique_id "17517225968.145454"] [ref "o0,3v0,3v106,7"]
+
+---5iZFNrQm---Z--
+=======
+---wD6XuxQo---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?:^([\d.]+|\[[\da-f:]+\]|[\da-f:]+)(:[\d]+)?$)' against variable `REQUEST_HEADERS:Host' (Value: `192.168.1.51:8443' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "712"] [id "920350"] [rev ""] [msg "Host header is a numeric IP address"] [data "192.168.1.51:8443"] [severity "4"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [tag "PCI/6.5.10"] [hostname "172.23.0.10"] [uri "/favicon.ico"] [unique_id "175172964767.888190"] [ref "o0,17o0,12o12,5v32,17"]
+
+---wD6XuxQo---Z--
+>>>>>>> main
+
+---Jt1T25Cz---A--
+[07/Jul/2025:11:34:31 +0000] 175188807127.477027 192.168.65.1 18275 172.19.0.10 443
+---Jt1T25Cz---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryNNAYUUKsyEGG4jLX
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=nJnQO9b4G0ZIc0kMf4nxbWEKzOKdcs5q; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxODg4Mjk3LCJpYXQiOjE3NTE4ODc5OTcsImp0aSI6IjQxZmZhNWQzMDVjNTQwYzk5NjQ1YzNiMzliMDg5MmRhIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseV9uZXciLCJpbnZpdGVzIjpbXX0.lEQHSEYUZTX3UD2usV_TfHDwzIRCiDBF6Z4Fw9n8JU4; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjQ5Mjc5NywiaWF0IjoxNzUxODg3OTk3LCJqdGkiOiI4NmI2Njg3OTFjMTM0Y2E0OWM0Yzc3OWFmZGY3YWI3YSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHlfbmV3IiwiaW52aXRlcyI6W119._xWq13_hQ2UPB6huZ-_vs7Y5eHY3kXCz_eKXwrQa6G4
+Accept-Language: fr
+
+---Jt1T25Cz---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Mon, 07 Jul 2025 11:34:31 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---Jt1T25Cz---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.19.0.10"] [uri "/user-service/saveImg/"] [unique_id "175188807127.477027"] [ref "o0,3v0,3v106,7"]
+
+---Jt1T25Cz---Z--
+
+---U0tNX3kD---A--
+[07/Jul/2025:15:05:45 +0000] 175190074539.345878 192.168.65.1 52684 172.21.0.10 443
+---U0tNX3kD---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryjZePfSRPPVIPASG4
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=fRo8aNg9v5M91QayMN2IbIQoAwP4iTIa; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxOTAwOTk3LCJpYXQiOjE3NTE5MDA2OTcsImp0aSI6IjNhMDg0NjU0YjI0ODQ3OTE4N2I3ZWUwMzg5ZTA3ODQ0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.utalRUHaTLMU8zgUEM1B3ixw_2Zdg4UBOHzhQZWc11k; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjUwNTQ5NywiaWF0IjoxNzUxOTAwNjk3LCJqdGkiOiI5YzViZjJlMDFjYjE0Y2ZhODBiZDcwN2M4NDBlNDE4NSIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.mEBufpoWd8QPepcplH6d-dhTGwX3qFUyozUjyj8uKrM
+Accept-Language: fr
+
+---U0tNX3kD---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Mon, 07 Jul 2025 15:05:45 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---U0tNX3kD---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.21.0.10"] [uri "/user-service/saveImg/"] [unique_id "175190074539.345878"] [ref "o0,3v0,3v106,7"]
+
+---U0tNX3kD---Z--
+
+---Qji8V9mJ---A--
+[08/Jul/2025:07:54:15 +0000] 17519612557.023000 192.168.65.1 26149 172.21.0.10 443
+---Qji8V9mJ---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryWXiLPwPLsyTZ4BI6
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=B5kVj9vrA1TrbCVqwauD8jHLpboeNpbh; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxOTYyMzU4LCJpYXQiOjE3NTE5NjExNTgsImp0aSI6IjNkNGQ1NTQ0ODk0NjRmNWJhZWY2ZWM0MGUwYWNjZTM3IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.aB-NYxQojDyskkRT3_p_09FKi-AMrOKUYUeXao-tPws; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjU2NTk1OCwiaWF0IjoxNzUxOTYxMTU4LCJqdGkiOiJlMmU5YzhmNjI1NmE0ZmQwODRkOWI1ZDg1NmJkYmNmNCIsInVzZXJfaWQiOjEsInVzZXJuYW1lIjoia2VsbHkiLCJpbnZpdGVzIjpbXX0.RLYxvPpftpUBmViLGY-vW-0uWw65_0V2rWHMg-DJT0g
+Accept-Language: fr
+
+---Qji8V9mJ---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Tue, 08 Jul 2025 07:54:15 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---Qji8V9mJ---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.21.0.10"] [uri "/user-service/saveImg/"] [unique_id "17519612557.023000"] [ref "o0,3v0,3v106,7"]
+
+---Qji8V9mJ---Z--
+
+---38ZvitUL---A--
+[08/Jul/2025:08:12:16 +0000] 175196233634.860717 192.168.65.1 17944 172.22.0.10 443
+---38ZvitUL---B--
+GET /user-service/saveImg/ HTTP/1.1
+Sec-Fetch-Site: same-origin
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Origin: https://transcendence.42.fr:8443
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryJq1tVkAGInp81eAU
+Accept: */*
+sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"
+sec-ch-ua-platform: "macOS"
+Referer: https://transcendence.42.fr:8443/
+Content-Length: 5714724
+Connection: keep-alive
+Sec-Fetch-Mode: cors
+Host: transcendence.42.fr:8443
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br, zstd
+Cookie: csrftoken=WApDGpFcLWTi2R3LaxZfhLeAb7PhhYT6; access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUxOTYzNDY1LCJpYXQiOjE3NTE5NjIyNjUsImp0aSI6ImJjMDQwY2JiYWQyZjQ2ZmE4YzgwNmRhMzE0NWQwZmVjIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJiYWVkYXJhbSIsImludml0ZXMiOltdfQ.81Blt0RZUKhUWiubVZqrX_rqzrtr9txRlPamn4gqsuM; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1MjU2NzA2NSwiaWF0IjoxNzUxOTYyMjY1LCJqdGkiOiJiMjNhOWQ5MDgzYTA0ZmYzOTI2MWE2MjhkZmZjOTJhMCIsInVzZXJfaWQiOjQsInVzZXJuYW1lIjoiYmFlZGFyYW0iLCJpbnZpdGVzIjpbXX0.sxdjdbS8NXEYazSGeUfHVkgNcCqenywOhVGCYL0MhO4
+Accept-Language: fr
+
+---38ZvitUL---F--
+HTTP/1.1 413
+Server: nginx/1.22.1
+Date: Tue, 08 Jul 2025 08:12:16 GMT
+Content-Length: 56
+Content-Type: application/json
+Connection: close
+
+---38ZvitUL---H--
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `^0?$' against variable `REQUEST_HEADERS:Content-Length' (Value: `5714724' ) [file "/etc/nginx/modsec/crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf"] [line "174"] [id "920170"] [rev ""] [msg "GET or HEAD Request with Body Content"] [data "5714724"] [severity "2"] [ver "OWASP_CRS/4.17.0-dev"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-protocol"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/PROTOCOL-ENFORCEMENT"] [tag "capec/1000/210/272"] [hostname "172.22.0.10"] [uri "/user-service/saveImg/"] [unique_id "175196233634.860717"] [ref "o0,3v0,3v106,7"]
+
+---38ZvitUL---Z--
+
+=======
+>>>>>>> main

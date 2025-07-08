@@ -21,7 +21,7 @@
 
 .signup-form button[type="submit"] {
 	display: block;
-	margin: 30px auto 0 auto;
+	margin: 10px auto 0 auto;
 }
 
 .signup-form .form-text {
@@ -53,6 +53,17 @@
 	background-color: rgb(255, 255, 255);
 	border-radius: 20px;
 	text-shadow: none;
+}
+
+#passwordConfirmationError { 
+    min-height: 30px;  
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
+
+.signup-form .signup-submit-btn.btn.btn-primary {
+	padding-top: 5px !important;
 }
 
 .shake {
