@@ -48,7 +48,16 @@ class ApiConfig(AppConfig):
                     "password" : "bobby1234",
                     "activated" : True,
                     "avatar": "default.png"
-                }
+                },
+                {
+                    "user_name": "Guest",
+                    "first_name": "guest",
+                    "last_name": "guest",
+                    "mail": "guest@example.com",
+                    "password": "Guest1234",
+                    "activated": True,
+                    "avatar": "default.png"
+                },
             ]
 
             for u in test_users:

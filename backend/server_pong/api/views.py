@@ -135,14 +135,14 @@ async def sse(request):
         idp1 = int(request.GET.get("JWTidP1"))
         idp2 = int(request.GET.get("JWTidP2"))
         if idp1 < 0 :
-            username1 = request.GET.get("username", "Default")
+            username1 = request.GET.get("username", "Guest")
         else :
-            username1 = request.GET.get(f"guest{idp1 + 1}", "Default")
+            username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
 
         if idp2 < 0 :
-            username2 = request.GET.get("username", "Default")
+            username2 = request.GET.get("username", "Guest")
         else :
-            username2 = request.GET.get(f"guest{idp2 + 1}", "Default")
+            username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
         
         if (rq.apiKey) :
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}", rq.apiKey), content_type="text/event-stream")
@@ -150,9 +150,9 @@ async def sse(request):
     elif idplayer == 1 :
         idp1 = int(request.GET.get("JWTid"))
         if idp1 < 0 :
-            username1 = request.GET.get("username", "Default")
+            username1 = request.GET.get("username", "Guest")
         else :
-            username1 = request.GET.get(f"guest{idp1 + 1}", "Default")
+            username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
 
         if (rq.apiKey) :
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}", rq.apiKey), content_type="text/event-stream")
@@ -160,9 +160,9 @@ async def sse(request):
     else :
         idp2 = int(request.GET.get("JWTid"))
         if idp2 < 0 :
-            username2 = request.GET.get("username", "Default")
+            username2 = request.GET.get("username", "Guest")
         else :
-            username2 = request.GET.get(f"guest{idp2 + 1}", "Default")
+            username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
 
         if (rq.apiKey) :
             return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")

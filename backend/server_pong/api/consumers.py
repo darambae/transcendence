@@ -60,16 +60,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
 		
 		if self.usrID == 0 :
-			u1 = params.get("u1", "Default")
-			u2 = params.get("u2", "Default")
+			u1 = params.get("u1", "Guest")
+			u2 = params.get("u2", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u1
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u2
 		
 		elif self.usrID == 1 :
-			u = params.get("name", "Default")
+			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u
 		else :
-			u = params.get("name", "Default")
+			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u
 
 		# print(dictInfoRackets, file=sys.stderr)
@@ -193,9 +193,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 							#print("Task created, setting AI to false", file=sys.stderr)
 							self.AI = False
 							#print("Self.ai put to false", file=sys.stderr)
-						# #print(f"statissssss : {stats}", file=sys.stderr)
-						if (stats.get("team1Score", 0) >= 200 or stats.get("team2Score", 0) >= 200) and self.usrID <= 1: ##########################################################################################################____________________________________
-							#print("Yaaaaay stoping game", file=sys.stderr)
+						#print(f"11111111 : {stats}", file=sys.stderr)
+						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID <= 1: ##########################################################################################################____________________________________
 							await self.channel_layer.group_send(
 								self.room_group_name,
 								{
@@ -230,6 +229,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 								self.task.cancel()
 								await self.task
 							self.gameSimulation.stopSimulation()
+						#print(f"22222222 : {stats}", file=sys.stderr)
 						if self.usrID <= 1 :
 							await self.gameSimulation.setRedisCache(self.room_group_name)
 							stats = cache.get(f'simulation_state_{self.room_group_name}')

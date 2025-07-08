@@ -85,7 +85,7 @@ function roundRect(ctx, x, y, width, height, radius) {
 function fillCircle(ctx, x, y, r) {
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "white";
   ctx.fill();
   ctx.closePath();
 }
@@ -204,7 +204,6 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 };
 
   SSEStream.onmessage = function (event) {
-      checkwin()
       try {
         // const data = JSON.parse(event.data);
         // // console.log("Received data: ", data);
@@ -225,6 +224,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
             drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
             sc1.setAttribute("data-score", game_stats["team1Score"]);
             sc2.setAttribute("data-score", game_stats["team2Score"]);
+            checkwin()
           }
           else if (game_stats["State"] == "final-message") {
             sleep(500);
