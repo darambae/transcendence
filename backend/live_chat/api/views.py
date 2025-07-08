@@ -279,7 +279,7 @@ class blockedStatus(View):
         except Exception as e:
             logger.error(f"Failed to decode JSON from backend: {e}")
             return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
-    def post (self, targetUserId):
+    def post (self, request, targetUserId):
         try:
             access_token = request.COOKIES.get('access_token')
             if not access_token:
