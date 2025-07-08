@@ -2,7 +2,7 @@ import {setCanvasAndContext} from './utils/commonFunctions.js'
 import { routesSp } from './utils/commonFunctions.js';
 import { actualizeIndexPage } from '../utils.js';
 import { drawCenterText } from "./multiplayer.js"
-
+// import { sendGameCreation } from './utils/createGame.js';
 
 export function singlePlayController() {
 
@@ -16,8 +16,8 @@ export function singlePlayController() {
 		sendGameCreation();
 	});
 
-	versusButton.addEventListener("click", (event) => {
-    	actualizeIndexPage("idfooterCanvas", routesSp["playerSelection"]);
+	versusButton.addEventListener("click", async (event) => {
+    	await actualizeIndexPage("idfooterCanvas", routesSp["playerSelection"]);
 	})
 	console.log("here in single Play");
 }

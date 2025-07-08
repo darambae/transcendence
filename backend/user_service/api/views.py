@@ -311,7 +311,7 @@ class saveNewPassword(APIView):
         checkResponse = requests.post("https://access_postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
         if (checkResponse.status_code != 200):
-            return JsonResponse({'error': 'Current password is not valid'}, status=400)
+            return JsonResponse({'error': 'Current password is not valid'}, status=401)
         if newPassword != data.get('inputPasswordNew2'):
             return JsonResponse({'error': 'New password do not match'}, status=400)
         elif (len(newPassword) < 8):

@@ -11,6 +11,7 @@ export async function versusController() {
   const replayBtnSinglePlayer = document.getElementById("replaySinglePlayer");
   let apiKey;
 
+<<<<<<< HEAD
   startButton.addEventListener("click", async (event) => {
       await fetchWithRefresh(`server-pong/api-key`, {
         headers: {
@@ -65,4 +66,26 @@ export async function versusController() {
     setPlayersLocalName(apiKey);
     actualizeIndexPage("idfooterCanvas", routesSp["game"])
 });
+=======
+    startButton.addEventListener("click", async (event) => {
+        await fetchWithRefresh(`server-pong/api-key`, {
+          headers: {
+            "Authorization" : `bearer ${sessionStorage.getItem("accessToken")}`
+          }
+        })
+              .then(response => {
+                if (!response.ok) throw new Error("https Error: " + response.status);
+                return response.json();
+              })
+              .then(data => {
+                apiKey = data["api_key"]
+              })
+              .catch(error => {
+                console.error("Erreur de requête :", error);
+              });
+        await setApiKeyWebSP(apiKey);
+        setPlayersLocalName(apiKey);
+        await actualizeIndexPage("idfooterCanvas", routesSp["game"])
+    });
+>>>>>>> origin/main
 }

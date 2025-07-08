@@ -450,9 +450,9 @@ class uploadPrivateInfoUser(APIView):
 			user.last_name = data.get('lastName')
 			user.save()
 
-			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
+			return JsonResponse({'success': 'Successfully saved new first name and last name'}, status=200)
 		except Exception as e:
-			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
+			return JsonResponse({'error': f'Error saving new first name and last name: {str(e)}'}, status=400)
 
 
 class uploadProfile(APIView):

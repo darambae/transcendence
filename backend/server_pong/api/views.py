@@ -62,10 +62,10 @@ def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-    with open(f"{func}_decodeJWT.txt", "a+") as f :
+    with open(f"/app/{func}_decodeJWT.txt", "a+") as f :
         tm = datetime.now()
         print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-    with open(f"{func}_decodeJWT.txt", "a") as f : 
+    with open(f"/app/{func}_decodeJWT.txt", "a+") as f : 
         if not encodedJwt :
             encodedJwt = request.COOKIES.get("access_token", None)
         if not encodedJwt :
@@ -231,7 +231,8 @@ def isGamePlayable(request) :
 
 def get_api_key(request):
     JWT = decodeJWT(request, "getApiKey")
-    fil = open('test.txt', 'w+')
+    # fil = open('test.txt', 'w+')
+    fil = open('/app/test.txt', 'a+')
     print(f" Jwt : {JWT[0]}", file=fil)
     fil.close()
     if not JWT[0] :

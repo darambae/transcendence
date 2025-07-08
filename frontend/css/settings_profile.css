@@ -11,3 +11,14 @@
 .card-header {
 	color: black !important;
 }
+
+.form-text {
+	font-size: 0.75rem;       /* Smaller text */
+	margin-top: 0.25rem;      /* Space between input and hint */
+	display: block;           /* Full width block */
+	line-height: 1.2;         /* Tighter line height */
+}
+
+#errorMessagePrivateInfo {
+	color: red;
+}
