@@ -54,31 +54,26 @@ class GameConsumer(AsyncWebsocketConsumer):
 		params = parse_qs(query_string)
 
 		self.room_group_name = params.get('tkey', [None])[0]
-		print(f"self.room_group_name : {self.room_group_name}", file=sys.stderr)
 		self.myJWT = params.get("jwt", [None])[0] #Encoded 
-		self.name = params.get("name", [None])[0]
-		self.guests = (params.get("guests", ["Nan"])[0]).split(',')
-		print(f"self.name : {self.name}\nguests : {self.guests}", file=sys.stderr)
-
 
 		if not self.room_group_name:
 			await self.close()
 			return
-		
-		await self.accept()
 
 		await self.channel_layer.group_add(
 			self.room_group_name,
 			self.channel_name
 		)
 
-		print(f"ChanelLayer : {self.channel_layer}", file=sys.stderr)
+		await self.accept()
 
 		await self.send(text_data=json.dumps({
 			't_state': "Succefully joined tournament"
 		}))
 
-		# user_ws_connections[self.myJWT] = self
+		decoded = (requests.get(f'https://access-postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {self.myJWT}", 'Host': 'access-postgresql'}, verify=False)).json()
+		print(f"decoded : {decoded}", file=sys.stderr)
+		user_ws_connections[decoded['payload']["username"]] = self
 	
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(
@@ -89,28 +84,20 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def launchGame(self, match) :
 		if match.gameMode == REMOTE :
-			userLst = sorted([match.p1.username, match.p2.username])
-
-			if self.name == match.p1.username or match.p1.username in self.guests:
+			if self.myJWT == match.p1.jwt :
 				user = match.p1.username
-				playerId = 1
 			else :
 				user = match.p2.username
-				playerId = 2
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-start",
-				"mode" : "remote",
-				"tkey" : self.room_group_name,
-				"playerId" : playerId,
+				"mode" : "remote", 
 				"player" : user,
 				"key" : match.key
 			}))
 		else :
-			print(f"match.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}", file=sys.stderr)
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-start",
 				"mode" : "local",
-				"tkey" : self.room_group_name,
 				"player1" : match.p1.username,
 				"player2" : match.p2.username,
 				"key" : match.key
@@ -118,37 +105,34 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 							
 	async def receive(self, text_data):
-		print(f"data : {text_data}", file=sys.stderr)
-		data = text_data # json.loads(text_data)
+		data = json.loads(text_data)
 		action = data.get("action")
-		print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
-			print(f"self.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=sys.stderr)
-			# if self.name == trnmtDict[self.room_group_name].match1.p1.username or self.name == trnmtDict[self.room_group_name].match1.p2.username :
-			if trnmtDict[self.room_group_name].match1.launchable :
-				await self.launchGame(trnmtDict[self.room_group_name].match1)
-			else :
-				# while trnmtDict[self.room_group_name].final == [] :
-				# 	await asyncio.sleep(1)
-				await self.launchGame(trnmtDict[self.room_group_name].match1)
-			# elif self.name == trnmtDict[self.room_group_name].match2.p1.username or self.name == trnmtDict[self.room_group_name].match2.p2.username  : 
-			if trnmtDict[self.room_group_name].match2.launchable :
-				await self.launchGame(trnmtDict[self.room_group_name].match2)
-			else :
-				# while trnmtDict[self.room_group_name].final == [] :
-				# 	await asyncio.sleep(1)
-				await self.launchGame(trnmtDict[self.room_group_name].match2)
+			if self.myJWT == trnmtDict[self.room_group_name].match1.p1.jwt or self.myJWT == trnmtDict[self.room_group_name].match1.p2.jwt :
+				if trnmtDict[self.room_group_name].match1.lauchable :
+					await self.launchGame(trnmtDict[self.room_group_name].match1)
+				else :
+					while trnmtDict[self.room_group_name].final == [] :
+						await asyncio.sleep(1)
+					await self.launchGame(trnmtDict[self.room_group_name].match1)
+			elif self.myJWT == trnmtDict[self.room_group_name].match2.p1.jwt or self.myJWT == trnmtDict[self.room_group_name].match2.p2.jwt  : 
+				if trnmtDict[self.room_group_name].match2.lauchable :
+					await self.launchGame(trnmtDict[self.room_group_name].match2)
+				else :
+					while trnmtDict[self.room_group_name].final == [] :
+						await asyncio.sleep(1)
+					await self.launchGame(trnmtDict[self.room_group_name].match2)
 		
 		elif action == "final-matches" :
 			if self.myJWT == trnmtDict[self.room_group_name].matchWinnerBracket.p1.jwt or self.myJWT == trnmtDict[self.room_group_name].matchWinnerBracket.p2.jwt :
-				if trnmtDict[self.room_group_name].matchWinnerBracket.launchable :
+				if trnmtDict[self.room_group_name].matchWinnerBracket.lauchable :
 					await self.launchGame(trnmtDict[self.room_group_name].matchWinnerBracket)
 				else :
 					while not trnmtDict[self.room_group_name].finished :
 						await asyncio.sleep(1)
 					await self.launchGame(trnmtDict[self.room_group_name].matchWinnerBracket)
 			elif self.myJWT == trnmtDict[self.room_group_name].matchLoserBracket.p1.jwt or self.myJWT == trnmtDict[self.room_group_name].matchLoserBracket.p2.jwt :
-				if trnmtDict[self.room_group_name].matchLoserBracket.launchable :
+				if trnmtDict[self.room_group_name].matchLoserBracket.lauchable :
 					await self.launchGame(trnmtDict[self.room_group_name].matchLoserBracket)
 				else :
 					while not trnmtDict[self.room_group_name].finished :
@@ -156,33 +140,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 					await self.launchGame(trnmtDict[self.room_group_name].matchLoserBracket)
 		
 		elif action == "supervise" :
-			print(f"A0 - {action}", file=sys.stderr)
+			tKey = data.get("tKey", None) 
 			roundMatch = data.get("round", 1)
-			print(f"A1 - {roundMatch}", file=sys.stderr)
 			mKey = data.get("mKey", None)
-			tkey = data.get("tkey", None)
-			print(f"A2 - {mKey}", file=sys.stderr)
-			if not mKey:
-				print(f"A3 - END", file=sys.stderr)
+			if not tKey or not mKey:
 				return 
-			print(f"A4 - ", file=sys.stderr)
-
-			trnmt = trnmtDict[tkey]
-			print(f"A5 - {trnmt}", file=sys.stderr)
+			trnmt = trnmtDict[tKey]
 			task = asyncio.create_task(supervise_match(mKey))
 			results = await task
-			print(f"A6 - {results}", file=sys.stderr)
-			if results["score1"] == 200 : ########################################################################################################################################################################################################################################################################################################################################################################
-				print(f"A7 - res1", file=sys.stderr)
-				await setResults(trnmt, results["username1"])
+			if results["score1"] == 5 :
+				await setResults(trnmt, "username1")
 			else :
-				print(f"A8 - res2", file=sys.stderr)
-				await setResults(trnmt, results["username2"])
-			
-			print("TOURNAMENT MATCH FINISHED !!!!!!!!!!!!!!!!!!!!!!!!!!!", file=sys.stderr)
-			await self.send(text_data=json.dumps({
-				"t_state" : "game-finished"
-			}))
+				await setResults(trnmt, "username2")
 		
 		# elif action == "leave" :
 		# 	await self.disconnect(200)
@@ -207,7 +176,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 	async def tempReceived(self, event) :
-		print(f"tempReceived : {event}", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	

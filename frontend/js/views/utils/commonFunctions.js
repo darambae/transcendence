@@ -261,7 +261,7 @@ document.addEventListener('keydown', function (event) {
         case "p" :
           if (playerID == 1 && started == false) {
             started = true;
-            fetchWithRefresh(url_post, {
+            fetch(url_post, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -275,7 +275,7 @@ document.addEventListener('keydown', function (event) {
               case "q" :
                 // console.log("Started : ", started);
                 if (started == true) {
-                  fetchWithRefresh(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
+                  fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
                   headers: {
                     'X-CSRFToken': csrf,
                   },
@@ -285,7 +285,7 @@ document.addEventListener('keydown', function (event) {
               break;
               case "ArrowUp" : 
               if (playerID == 1) { 
-                fetchWithRefresh(url_post, {
+                fetch(url_post, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -296,7 +296,7 @@ document.addEventListener('keydown', function (event) {
                 });
               }
               else {
-                fetchWithRefresh(url_post, {
+                fetch(url_post, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -309,7 +309,7 @@ document.addEventListener('keydown', function (event) {
               break;
               case "ArrowDown" :
               if (playerID == 1) { 
-                  fetchWithRefresh(url_post, {
+                  fetch(url_post, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ document.addEventListener('keydown', function (event) {
                 });
               }
               else {
-                fetchWithRefresh(url_post, {
+                fetch(url_post, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',

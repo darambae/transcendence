@@ -39,7 +39,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator: add-ca
+certs_generator:
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
