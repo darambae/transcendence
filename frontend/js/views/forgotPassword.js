@@ -39,8 +39,8 @@ async function sendTemporaryPassword(event) {
 
             const loginBtn = document.getElementById('login-forgot-password');
             if (loginBtn) {
-                loginBtn.addEventListener('click', () => {
-                    actualizeIndexPage('modal-container', routes.login);
+                loginBtn.addEventListener('click', async () => {
+                    await actualizeIndexPage('modal-container', routes.login);
                 });
             }
         } else {

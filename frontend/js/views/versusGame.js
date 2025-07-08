@@ -28,6 +28,6 @@ export async function versusController() {
               });
         await setApiKeyWebSP(apiKey);
         setPlayersLocalName(apiKey);
-        actualizeIndexPage("idfooterCanvas", routesSp["game"])
+        await actualizeIndexPage("idfooterCanvas", routesSp["game"])
     });
 }

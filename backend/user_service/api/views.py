@@ -14,6 +14,8 @@ from django.conf import settings
 import os
 import json
 import requests
+from .utils import setTheCookie
+
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
@@ -273,12 +275,18 @@ class saveProfile(APIView):
         if not data.get('userName', '').strip():
             return JsonResponse({'error': 'userName is empty'}, status=400)
 
-        #if not data.get('mail', '').strip():
-        #    return JsonResponse({'error': 'mail is empty'}, status=400)
         try:
             response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
-            return JsonResponse(response.json(), status=response.status_code)
+            response_data = response.json()
+
+            return setTheCookie(
+                JsonResponse({'success': 'Successfully changed username'}, status=response.status_code),
+                response_data.get('access'),
+                response_data.get('refresh')
+            )
+
+        
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
 
@@ -303,7 +311,7 @@ class saveNewPassword(APIView):
         checkResponse = requests.post("https://access_postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
         if (checkResponse.status_code != 200):
-            return JsonResponse({'error': 'Current password is not valid'}, status=400)
+            return JsonResponse({'error': 'Current password is not valid'}, status=401)
         if newPassword != data.get('inputPasswordNew2'):
             return JsonResponse({'error': 'New password do not match'}, status=400)
         elif (len(newPassword) < 8):
