@@ -167,6 +167,12 @@ export async function localGameController() {
 					sc1.innerHTML = game_stats["team1Score"];
 					sc2.innerHTML = game_stats["team2Score"];
 				}
+				else if (game_stats["State"] == "final-message") {
+					sleep(500);
+					console.log("Gonna close SSE");
+					SSEStream.close();
+					console.log("SSE closed");
+				}
 				else {
 					// console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 					let p1 = document.getElementById("player1Username");

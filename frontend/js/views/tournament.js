@@ -526,7 +526,7 @@ export async function tournamentController() {
           console.log(data);
         })
 
-        return actualizeIndexPage("Tournament-Lobby", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, ?, target.dataset.tkey));
+        return actualizeIndexPage("Tournament-Lobby", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, -1, target.dataset.tkey));
       }
     }
   })

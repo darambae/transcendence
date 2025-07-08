@@ -1,4 +1,4 @@
-import { getSSE } from "./utils/commonFunctions";
+import { getSSE } from "./utils/commonFunctions.js";
 
 export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey) {
 
