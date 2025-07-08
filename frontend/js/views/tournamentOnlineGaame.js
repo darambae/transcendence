@@ -1,133 +1,24 @@
-import { versusController } from "../versusGame.js";
-import { homeController } from "../home.js";
-import { localGameController } from "../localGame.js";
-import { loginController } from "../login.js";
-import { getCookie, fetchWithRefresh } from "../../utils.js";
-import { guideTouch, drawCenterTextP, checkwin } from "../localGame.js";
-import { drawCenterText } from "../multiplayer.js"
+import { actualizeIndexPage, getCookie } from "../utils.js";
+import { drawCenterTextP, guideTouch } from "./localGame.js";
+import { routesTr } from "./tournament.js";
+import { getSSE, handleGame2Players } from "./utils/commonFunctions.js";
 
-let sseTournament;
-export let adress = "10.18.161"
-let canvas;
-let ctx;
+export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey) {
+  let sseTournament = getSSE();
 
-export function setSSE(sseObj) {
-  sseTournament = sseObj;
-}
+  sseTournament.onmessage = function(event) {
+    try {
+      const data = JSON.parse(event.data);
 
-export function getSSE() {
-  return sseTournament;
-}
-
-export const routesSp = {
-	home: {
-		template: 'home',
-		controller: homeController,
-	},
-  playerSelection: {
-    template: 'versusGame',
-    controller: versusController,
-  },
-  game : {
-    template: 'localGame',
-    controller: localGameController,
-  },
-  multiplayerGame : {
-    template: 'localGame',
-  },
-  invit : {
-    template : 'login',
-    controller: loginController,
+      if (data.t_state == "game-finished") {
+        actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+      }
+    }
+    catch(error){
+      console.log("Error sseTournament", error);
+    }
   }
-  };
 
-let keySp;
-export function setPlayersLocalName(apikey) {
-  keySp = apikey;
-};
-
-export function getPlayersLocalName() {
-  return (keySp)
-}
-
-export function setCanvasAndContext() {
-
-  canvas = document.getElementById("gameCanvas");
-  ctx = canvas.getContext("2d");
-  ctx.font = "20px Arial";
-	ctx.fillStyle = "blue";
-}
-
-
-function updateServerPosition(newX, newY) {
-  currentPos.x = targetPos.x;
-  currentPos.y = targetPos.y;
-  targetPos.x = newX;
-  targetPos.y = newY;
-  lastUpdateTime = performance.now();
-}
-
-function roundRect(ctx, x, y, width, height, radius) {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-  ctx.fill();
-}
-
-function fillCircle(ctx, x, y, r) {
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = "white";
-  ctx.fill();
-  ctx.closePath();
-}
-
-
-export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-  
-  const fieldWidth = 1000;
-  const fieldHeight = 600;
-  const offsetX = (canvas.width - fieldWidth) / 2;
-  const offsetY = (canvas.height - fieldHeight) / 2;
-  
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const dx1 = Racket1Pos[1][0] - Racket1Pos[0][0];
-  const dy1 = Racket1Pos[1][1] - Racket1Pos[0][1];
-  const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
-  ctx.fillStyle = "white";
-  roundRect(ctx, Racket1Pos[0][0] + offsetX, Racket1Pos[0][1] + offsetY, 4, d1, 3);
-  
-  const dx2 = Racket2Pos[1][0] - Racket2Pos[0][0];
-  const dy2 = Racket2Pos[1][1] - Racket2Pos[0][1];
-  const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-  ctx.fillStyle = "white";
-  roundRect(ctx, Racket2Pos[0][0] + offsetX, Racket2Pos[0][1] + offsetY, 4, d2, 3);
-
-  let ballX = Math.min(Math.max(ballPos[0], 10), fieldWidth - 10);
-  let ballY = Math.min(Math.max(ballPos[1], 10), fieldHeight - 10);
-
-  fillCircle(ctx, ballX + offsetX, ballY + offsetY, 10);
-}
-
-
-export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
-
-  // console.log(adress);
   let url_post = `server-pong/send-message`;
   let started = false;
   let game_stats;
@@ -143,8 +34,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     guideTouch()
   } else 
   {
-    guideTouch()
-    drawCenterTextP()
+    guideTouch();
+    drawCenterTextP();
   }
 
 
@@ -203,7 +94,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     }
 };
 
-  SSEStream.onmessage = function (event) {
+  SSEStream.onmessage = function(event) {
       try {
         // const data = JSON.parse(event.data);
         // // console.log("Received data: ", data);
@@ -215,12 +106,6 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
         // console.log(data);
         game_stats = data["game_stats"]
-        if (game_stats == "final-message") {
-          sleep(500);
-          console.log("Gonna close SSE");
-          SSEStream.close();
-          console.log("SSE closed");
-        }
         if (game_stats["State"] != "Waiting for start" ) {  
           if (started == false) {
             started = true;
@@ -228,12 +113,16 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
           if (game_stats["State"] != "playersInfo") {
             // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
-            sc1.setAttribute("data-score", game_stats["team1Score"]);
-            sc2.setAttribute("data-score", game_stats["team2Score"]);
-            checkwin()
+            sc1.innerHTML = game_stats["team1Score"];
+            sc2.innerHTML = game_stats["team2Score"];
+          }
+          else if (game_stats["State"] == "final-message") {
+            sleep(500);
+            console.log("Gonna close SSE");
+            SSEStream.close();
+            console.log("SSE closed");
           }
           else {
-            // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
             let p1 = document.getElementById("player1Username");
             let p2 = document.getElementById("player2Username");
 
@@ -267,7 +156,7 @@ document.addEventListener('keydown', function (event) {
         case "p" :
           if (playerID == 1 && started == false) {
             started = true;
-            fetch(url_post, {
+            fetchWithRefresh(url_post, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -281,7 +170,7 @@ document.addEventListener('keydown', function (event) {
               case "q" :
                 // console.log("Started : ", started);
                 if (started == true) {
-                  fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
+                  fetchWithRefresh(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
                   headers: {
                     'X-CSRFToken': csrf,
                   },
@@ -291,7 +180,7 @@ document.addEventListener('keydown', function (event) {
               break;
               case "ArrowUp" : 
               if (playerID == 1) { 
-                fetch(url_post, {
+                fetchWithRefresh(url_post, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -302,7 +191,7 @@ document.addEventListener('keydown', function (event) {
                 });
               }
               else {
-                fetch(url_post, {
+                fetchWithRefresh(url_post, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
@@ -315,7 +204,7 @@ document.addEventListener('keydown', function (event) {
               break;
               case "ArrowDown" :
               if (playerID == 1) { 
-                  fetch(url_post, {
+                  fetchWithRefresh(url_post, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -326,7 +215,7 @@ document.addEventListener('keydown', function (event) {
                 });
               }
               else {
-                fetch(url_post, {
+                fetchWithRefresh(url_post, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',

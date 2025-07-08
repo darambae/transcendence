@@ -1,13 +1,22 @@
 import { actualizeIndexPage, loadTemplate } from "../utils.js"
-import { setSSE, getSSE } from "./utils/commonFunctions.js"
+import { setSSE, getSSE, handleGame2Players } from "./utils/commonFunctions.js"
 import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
 import { localGameTr } from "./tournamentLocalGame.js";
+import { onlineGameTr } from "./tournamentOnlineGaame.js";
 
-let routesTr = {
+export let routesTr = {
   matchSp : {
     template : "tournamentMatch",
     controller : localGameTr
+  },
+  matchOnline : (key, playerID, isAiGame, JWTid, tkey) => ({
+    template : "tournamentMatch",
+    controller : () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey)
+  }),
+  tournament : { 
+    template : "tournament",
+    controller : tournamentController
   }
 }
 
@@ -103,50 +112,55 @@ export async function tournamentController() {
   const ulDropdown = document.getElementById("trnmt-list-ul");
   const divGuest = document.getElementById("guest-add");
   
-    await fetch('tournament/me', {
-      headers : {
-        'X-CSRFToken': csrf,
-        },
-        credentials : "include",
-    })
-    .then( response => {
-      if (!response.ok) throw new Error("https Error: " + response.status);
-      return response.json()
-    })
-    .then(async data => {
-      console.log("dat : ", data);
-      if (data.Tournament != "None") {
-        let usernameJwt;
-        let jwtInfo;
-        let guestJwt;
-        const trId = data.Tournament;
+    try {
+      await fetch('tournament/me', {
+        headers : {
+          'X-CSRFToken': csrf,
+          },
+          credentials : "include",
+      })
+      .then( response => {
+        if (!response.ok) throw new Error("https Error: " + response.status);
+        return response.json()
+      })
+      .then(async data => {
+        console.log("dat : ", data);
+        if (data.Tournament != "None") {
+          let usernameJwt;
+          let jwtInfo;
+          let guestJwt;
+          const trId = data.Tournament;
 
 
-      // Check if the clicked element is an <a> tag
-      
-          await fetch("tournament/check-sse", {
-            headers : {
-              'X-CSRFToken': csrf,
-            },
-            credentials : "include",
-          })
-          .then(async response => {
-            if (!response.ok) throw new Error("https Error: " + response.status);
-            jwtInfo = await response.json();
-            console.log("inf : ", jwtInfo);
-            usernameJwt = jwtInfo["key"];
-            guestJwt = jwtInfo["guests"]
-          })
+        // Check if the clicked element is an <a> tag
+            await fetch("tournament/check-sse", {
+              headers : {
+                'X-CSRFToken': csrf,
+              },
+              credentials : "include",
+            })
+            .then(async response => {
+              if (!response.ok) throw new Error("https Error: " + response.status);
+              jwtInfo = await response.json();
+              console.log("inf : ", jwtInfo);
+              usernameJwt = jwtInfo["key"];
+              guestJwt = jwtInfo["guests"]
+            })
             .then(async data => {
               console.log("Données reçues Join:", trId);
               const url_sse = `tournament/events?tKey=${trId}&name=${usernameJwt}&guests=${guestJwt}`;
-              SSEStream = new EventSource(url_sse);
-              setSSE(SSEStream);
+              SSEStream = getSSE();
+              console.log(SSEStream);
+              if (SSEStream === undefined) {
+                SSEStream = new EventSource(url_sse);
+                setSSE(SSEStream);
+              }
               SSEStream.onmessage = function(event) {
                 try {
-                  console.log(event.data);
+                  console.log("ggg", event.data);
                   const data = JSON.parse(event.data);
-                  console.log(data);
+                  console.log("eee", data);
+                  console.log("fff", data.t_state);
                   if (data.t_state == "game-start") {
                     console.log("SSE 1")
                     const buttonGame =  document.createElement("button");
@@ -164,15 +178,51 @@ export async function tournamentController() {
                       buttonGame.dataset.p2 = data.player2;
                     }
                     else {
-                      console.log("To do");
+                      buttonGame.dataset.player = data.player;
+                      buttonGame.dataset.playerId = data.playerId;
+                      console.log("done");
                     }
                     console.log("SSE 8")
                     buttonGame.dataset.key = data.key;
-                    buttonGame.dataset.tkey = data.tkey;
+                    buttonGame.dataset.tkey = data.tkey
+                    buttonGame.dataset.round = data.round;
                     console.log("SSE 9")
                     tournamentGame.innerHTML = "";
                     console.log("SSE 10")
                     tournamentGame.appendChild(buttonGame);
+                  }
+                  else if (data.t_state == "game-finished") {
+                    actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+                    console.log("sse data: ", data.next)
+                    if (data.next == "final-rounds") {
+                      fetch("tournament/finals", {
+                        method: "POST",
+                        headers: {
+                          'X-CSRFToken': csrf, 
+                          'Content-Type': 'application/json', 
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({"tKey" : data.tkey})
+                      })
+                    }
+                    else {
+                      fetch("tournament/next", {
+                        method: "POST",
+                        headers: {
+                          'X-CSRFToken': csrf, 
+                          'Content-Type': 'application/json', 
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({"tKey" : data.tkey})
+                      })
+                      .then(response => {
+                        if (!response.ok) throw new Error("https Error: " + response.status);
+                        return response.json()
+                      })
+                      .then(data => {
+                        console.log("NEXT : ", data)
+                      })
+                    }
                   }
                 }
                 catch (error) {
@@ -180,31 +230,51 @@ export async function tournamentController() {
                 }
               };
 
-              leaveButton = document.createElement("button");
-              leaveButton.id = trId;
-              leaveButton.className = "btn btn-outline-secondary";
-              leaveButton.textContent = "Leave";
+                leaveButton = document.createElement("button");
+                leaveButton.id = trId;
+                leaveButton.className = "btn btn-outline-secondary";
+                leaveButton.textContent = "Leave";
 
-              launchButton = document.createElement("button");
-              launchButton.id = trId;
-              launchButton.className = "btn btn-outline-secondary";
-              launchButton.textContent = "Start";
-              tournamentInfo.innerHTML = ""
-              tournamentLeave.appendChild(leaveButton)
-              tournamentLaunch.appendChild(launchButton);
+                launchButton = document.createElement("button");
+                launchButton.id = trId;
+                launchButton.className = "btn btn-outline-secondary";
+                launchButton.textContent = "Start";
+                tournamentInfo.innerHTML = ""
+                tournamentLeave.appendChild(leaveButton)
+                tournamentLaunch.appendChild(launchButton);
 
-              let text = await fetch('./templates/invits.html')
-              console.log(text);
-              text = await text.text()
-              divGuest.innerHTML = text
-              return invitsController()
-            })
-            .catch(error => {
-              console.error("Erreur de requête :", error);
-              throw error;
-            });
-        };
-      })
+                let text = await fetch('./templates/invits.html')
+                console.log(text);
+                text = await text.text()
+                divGuest.innerHTML = text
+                await fetch("tournament/next", {
+                  method: "POST",
+                  headers: {
+                    'X-CSRFToken': csrf, 
+                    'Content-Type': 'application/json', 
+                  },
+                  credentials: 'include',
+                  body: JSON.stringify({"tKey" : trId})
+                })
+                .then(response => {
+                  if (!response.ok) throw new Error("https Error: " + response.status);
+                  return response.json()
+                })
+                .then(data => {
+                  console.log("NEXT : ", data)
+                });
+
+                return invitsController()
+              })
+              .catch(error => {
+                console.log("Erreur de requête :", error);
+              });
+          };
+        })
+    }
+    catch (error) {
+      console.log("Error : ", error);
+    }
 
     console.log("csrf:", csrf);
     console.log("HEY 1")
@@ -230,26 +300,31 @@ export async function tournamentController() {
 
         console.log(view);
 
-        await fetch("tournament/check-sse", {
-          headers : {
-            'X-CSRFToken': csrf,
-          },
-          credentials : "include",
-        })
-        .then(response => {
-          if (!response.ok) throw new Error("https Error: " + response.status);
-          jwtInfo = response.json();
-          console.log(jwtInfo);
-          usernameJwt = jwtInfo["key"];
-          guestJwt = jwtInfo["guests"]
-        })
+        try {
+          await fetch("tournament/check-sse", {
+            headers : {
+              'X-CSRFToken': csrf,
+            },
+            credentials : "include",
+          })
+          .then(response => {
+            if (!response.ok) throw new Error("https Error: " + response.status);
+            jwtInfo = response.json();
+            console.log(jwtInfo);
+            usernameJwt = jwtInfo["key"];
+            guestJwt = jwtInfo["guests"]
+          })
+        }
+        catch (error) {
+          console.log("Error : ", error);
+        }
 
 
         await fetch("tournament/tournament", {
           method : 'POST',
           headers : {
             'X-CSRFToken': csrf,
-                'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
           },
           credentials : "include",
           body: JSON.stringify({"action" : "join", "tKey" : view})
@@ -265,9 +340,10 @@ export async function tournamentController() {
             setSSE(SSEStream);
             SSEStream.onmessage = function(event) {
               try {
-                console.log(event.data);
+                console.log("iii", event.data);
                 const data = JSON.parse(event.data);
-                console.log(data);
+                console.log("jjj", data);
+                console.log("kkk",data.t_state);
                 if (data.t_state == "game-start") {
                   console.log("SSE 1")
                   const buttonGame =  document.createElement("button");
@@ -285,15 +361,44 @@ export async function tournamentController() {
                     buttonGame.dataset.p2 = data.player2;
                   }
                   else {
-                    console.log("To do");
+                      buttonGame.dataset.player = data.player;
+                      buttonGame.dataset.playerId = data.playerId;
+                      console.log("done");
                   }
                   console.log("SSE 8")
+                  buttonGame.dataset.round = data.round;
                   buttonGame.dataset.key = data.key;
                   buttonGame.dataset.tkey = data.tkey
                   console.log("SSE 9")
                   tournamentGame.innerHTML = "";
                   console.log("SSE 10")
                   tournamentGame.appendChild(buttonGame);
+                }
+                else if (data.t_state == "game-finished") {
+                  actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+                  console.log("sse data: ", data.next)
+                  if (data.next == "final-rounds") {
+                    fetch("tournament/finals", {
+                      method: "POST",
+                      headers: {
+                        'X-CSRFToken': csrf, 
+                        'Content-Type': 'application/json', 
+                      },
+                      credentials: 'include',
+                      body: JSON.stringify({"tKey" : data.tkey})
+                    })
+                  }
+                  else {
+                    fetch("tournament/match", {
+                      method: "POST",
+                      headers: {
+                        'X-CSRFToken': csrf, 
+                        'Content-Type': 'application/json', 
+                      },
+                      credentials: 'include',
+                      body: JSON.stringify({"tKey" : data.tkey})
+                    })
+                  }
                 }
               }
               catch (error) {
@@ -398,11 +503,27 @@ export async function tournamentController() {
         const KeepInfo = document.getElementById("Tournament-Lobby");
         // const contentInfo = KeepInfo.innerHTML;
         
-        localStorage.setItem("p1", target.dataset.p1);
-        localStorage.setItem("p2", target.dataset.p2);
-        localStorage.setItem("key", target.dataset.key);
-        localStorage.setItem("tkey",  target.dataset.tkey);
-        fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}`, {
+        if (target.dataset.type == "local") {
+          localStorage.setItem("p1", target.dataset.p1);
+          localStorage.setItem("p2", target.dataset.p2);
+          localStorage.setItem("key", target.dataset.key);
+          localStorage.setItem("tkey",  target.dataset.tkey);
+          console.log("Target.dataset", target.dataset);
+          fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
+            credentials: "include",
+          })
+          .then(response => {
+            if (!response.ok) throw new Error("https Error: " + response.status);
+            return response.json();
+          })
+          .then(data => {
+            console.log(data);
+          })
+          
+          return actualizeIndexPage("Tournament-Lobby", routesTr['matchSp']);
+      }
+      else {
+        fetch(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
           credentials: "include",
         })
         .then(response => {
@@ -413,11 +534,8 @@ export async function tournamentController() {
           console.log(data);
         })
 
-
-        // return actualizeIndexPage("Tournament-Lobby", routesTr['matchSp']);
+        return actualizeIndexPage("Tournament-Lobby", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, -1, target.dataset.tkey));
       }
-    })
-
-    window.onbeforeunload(event)
-    SSEStream.close()
+    }
+  })
 }

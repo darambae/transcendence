@@ -203,6 +203,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 									"game_stats" : stats
 								}
 							)
+
+							await self.channel_layer.group_send(
+								self.room_group_name,
+								{
+									"type": "game_update",
+									"game_stats": "final-message",
+								}
+							)
 							if stats['team1Score'] == 5 :
 								winnerTeam = 0
 							else :

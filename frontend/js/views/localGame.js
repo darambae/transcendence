@@ -192,6 +192,12 @@ export async function localGameController() {
 
 			 console.log(data);
 			game_stats = data["game_stats"]
+			if (game_stats == "final-message") {
+				sleep(500);
+				console.log("Gonna close SSE");
+				SSEStream.close();
+				console.log("SSE closed");
+			}
 			if (game_stats["State"] != "Waiting for start") {
 				if (started == false) {
 					started = true;
