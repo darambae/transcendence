@@ -364,36 +364,38 @@ class infoOtherUser(APIView):
 
 
 class addResultGames(APIView):
-    permission_classes = [AllowAny]
+	permission_classes = [AllowAny]
 
-    def post(self, request):
-        data = request.data
+	def post(self, request):
+		
+		data = request.data
+		#data_json = data.json()
 
-        try:
-            with transaction.atomic():
-                user1 = USER.objects.get(user_name=data['username1'])
-                user2 = USER.objects.get(user_name=data['username2'])
-                winner = USER.objects.get(user_name=data['winner'])
+		try:
+			with transaction.atomic():
+				user1 = USER.objects.get(user_name=data['username1'])
+				user2 = USER.objects.get(user_name=data['username2'])
+				winnergame = USER.objects.get(user_name=data['winner'])
 
-                match = MATCHTABLE.objects.create(
-                    matchKey=data['matchKey'],
-                    username1=user1,
-                    score1=data['score1'],
-                    score2=data['score2'],
-                    username2=user2,
-                    winner=winner
-                )
+				match = MATCHTABLE.objects.create(
+					matchKey=data['matchKey'],
+					username1=user1,
+					score1=data['score1'],
+					score2=data['score2'],
+					username2=user2,
+					winner=winnergame
+				)
 
-        except USER.DoesNotExist as e:
-            return JsonResponse({'error': 'User not found', 'details': str(e)}, status=400)
-        except IntegrityError as e:
-            err_msg = str(e)
-            if 'matchKey' in err_msg:
-                return JsonResponse({'error': 'matchKey already exists'}, status=400)
-            else:
-                return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
+		except USER.DoesNotExist as e:
+			return JsonResponse({'error': 'User not found', 'details': str(e)}, status=400)
+		except IntegrityError as e:
+			err_msg = str(e)
+			if 'matchKey' in err_msg:
+				return JsonResponse({'error': 'matchKey already exists'}, status=400)
+			else:
+				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
 
-        return JsonResponse({'success': 'Result Match created', 'matchKey': match.matchKey}, status=201)
+		return JsonResponse({'success': 'Result Match created', 'matchKey': match.matchKey}, status=201)
 
 
 class keyGame(APIView):
@@ -935,54 +937,54 @@ class logout(APIView):
 		return Response({'message': 'User logged out successfully'}, status=200)
 	
 class matchHistory(APIView):
-    permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
-        username = user.user_name
+	def get(self, request):
+		user = request.user
+		username = user.user_name
 
-        matches = MATCHTABLE.objects.filter(
-            Q(username1=user) | Q(username2=user)
-        ).order_by('-dateMatch')
+		matches = MATCHTABLE.objects.filter(
+			Q(username1=user) | Q(username2=user)
+		).order_by('-dateMatch')
 
-        total_matches = matches.count()
+		total_matches = matches.count()
 
-        wins = 0
-        losses = 0
+		wins = 0
+		losses = 0
 
-        for match in matches:
-            if match.username1 == user:
-                if match.score1 > match.score2:
-                    wins += 1
-                elif match.score1 < match.score2:
-                    losses += 1
-            elif match.username2 == user:
-                if match.score2 > match.score1:
-                    wins += 1
-                elif match.score2 < match.score1:
-                    losses += 1
+		for match in matches:
+			if match.username1 == user:
+				if match.score1 > match.score2:
+					wins += 1
+				elif match.score1 < match.score2:
+					losses += 1
+			elif match.username2 == user:
+				if match.score2 > match.score1:
+					wins += 1
+				elif match.score2 < match.score1:
+					losses += 1
 
-        data = []
+		data = []
 
-        data.append({
-            "user": username,
-            "total_games": total_matches,
-            "game_wins": wins,
-            "game_losses": losses,
-        })
+		data.append({
+			"user": username,
+			"total_games": total_matches,
+			"game_wins": wins,
+			"game_losses": losses,
+		})
 
-        for match in matches:
-            data.append({
-                "user": username,
-                "date": match.dateMatch,
-                "username1": match.username1.user_name,
-                "username2": match.username2.user_name,
-                "score1": match.score1,
-                "score2": match.score2,
-                "winner": match.winner.user_name if match.winner else None,
-            })
+		for match in matches:
+			data.append({
+				"user": username,
+				"date": format(match.dateMatch, 'Y-m-d  H:i'),
+				"username1": match.username1.user_name,
+				"username2": match.username2.user_name,
+				"score1": match.score1,
+				"score2": match.score2,
+				"winner": match.winner.user_name if match.winner else None,
+			})
 
-        return Response({'result': data})
+		return Response({'result': data})
 
 
 class forgotPassword(APIView):
