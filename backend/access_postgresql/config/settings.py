@@ -15,7 +15,6 @@ import os
 import dj_database_url
 from datetime import timedelta
 from decouple import config
-from .jsonSocketHandler import JSONSocketHandler
 
 APP_NAME = 'access-postgresql'
 

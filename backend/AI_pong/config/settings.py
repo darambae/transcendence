@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 #### Required ELK library ####
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
-from .jsonSocketHandler import JSONSocketHandler
 import logging
 
 APP_NAME = 'AI_pong'

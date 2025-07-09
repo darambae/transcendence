@@ -12,12 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import sys
 #### REQUIRED ELK LIBRARY ####
-from .jsonSocketHandler import JSONSocketHandler
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 

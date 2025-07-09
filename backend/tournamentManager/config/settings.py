@@ -12,10 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-import sys
 
 #### REQUIRED ELK LIBRARY ####
-import dj_database_url
 import logging
 
 
