@@ -357,11 +357,10 @@ async function loadChatRoomList(currentUserId) {
         // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         console.log('Loading chat list for user:', currentUserId);
-        const response = await fetch(`chat/?t=${Date.now()}`, {
+        const response = await fetchWithRefresh(`chat/?t=${Date.now()}`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
-						'Cache-Control': 'no-cache',
 					},
 					credentials: 'include',
 				});
@@ -592,7 +591,7 @@ function setupUserSearchAutocomplete() {
 		
 		try {
 			const response = await fetch(
-				`user-service/searchUsers?t=${Date.now()}&q=${encodeURIComponent(query)}`,
+				`user-service/searchUsers/?t=${Date.now()}&q=${encodeURIComponent(query)}`,
 				{
 					method: 'GET',
 					credentials: 'include',
