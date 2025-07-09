@@ -357,13 +357,14 @@ async function loadChatRoomList(currentUserId) {
         // If it requires a username in the URL, revert to `/chat/${username}/`
         // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         console.log('Loading chat list for user:', currentUserId);
-        const response = await fetchWithRefresh(`chat/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        });
+        const response = await fetch(`chat/?t=${Date.now()}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Cache-Control': 'no-cache',
+					},
+					credentials: 'include',
+				});
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Error loading chat list:', errorData.message || 'Unknown error');
