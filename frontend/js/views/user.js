@@ -1,34 +1,38 @@
-import { attachLoginListener, fetchWithRefresh } from "../utils.js";
+import { attachLoginListener, fetchWithRefresh } from '../utils.js';
 
 export function userController() {
 	userInfo();
-	document.getElementById('logout-btn').onclick = async function(event) {
+	document.getElementById('logout-btn').onclick = async function (event) {
 		if (!confirm('You are about to log out, are you sure ?')) {
 			event.preventDefault();
 		} else {
 			try {
-				const response = await fetchWithRefresh('auth/logout/', {
-					method: 'PATCH',
-					credentials: 'include'
-				});
+				const response = await fetchWithRefresh(
+					`auth/logout/?_=${Date.now()}`,
+					{
+						method: 'PATCH',
+						credentials: 'include',
+					}
+				);
 
 				const respData = await response.json();
 				if (response.ok) {
 					const toggleLogin = document.getElementById('toggle-login');
 					if (toggleLogin) {
-						toggleLogin.innerHTML = '<button type="button" class="login-link"><i class="bi bi-person fs-5"></i> Log In </button>'
+						toggleLogin.innerHTML =
+							'<button type="button" class="login-link"><i class="bi bi-person fs-5"></i> Log In </button>';
 					}
 					attachLoginListener(false);
 					const chatContainer = document.getElementById('chat-container');
-					if (chatContainer){
-						chatContainer.innerHTML = "";
+					if (chatContainer) {
+						chatContainer.innerHTML = '';
 					}
 					window.location.href = '/#home';
 				} else {
-					console.log("error: ", respData);
+					console.log('error: ', respData);
 				}
 			} catch (err) {
-				console.log('error: ', err)
+				console.log('error: ', err);
 			}
 		}
 	};

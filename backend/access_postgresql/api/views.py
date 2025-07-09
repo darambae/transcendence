@@ -1,4 +1,3 @@
-from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -19,12 +18,12 @@ from django.utils.dateformat import format
 import json
 import logging
 from datetime import datetime
-from django.core.paginator import Paginator, EmptyPage
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import sys
 import jwt
 from django.conf import settings
+import re
 # Create your views here.
 
 
@@ -53,6 +52,9 @@ class api_signup(APIView):
 	def post(self, request):
 
 		data = request.data
+		username = data.get('user_name', '')
+		if re.search(r'\s', username):
+			return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 
 		try:
 			with transaction.atomic():
@@ -464,7 +466,8 @@ class uploadProfile(APIView):
 			user = request.user
 			data = request.data
 			new_username = data.get('userName')
-
+			if re.search(r'\s', new_username):
+				return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 			User = get_user_model()
 
 			if User.objects.filter(Q(user_name=new_username) & ~Q(id=user.id)).exists():

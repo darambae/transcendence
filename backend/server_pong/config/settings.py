@@ -14,9 +14,6 @@ from pathlib import Path
 import os
 #### REQUIRED ELK LIBRARY ####
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
-from .jsonSocketHandler import JSONSocketHandler
 
 APP_NAME = 'server-pong'
 
@@ -188,69 +185,69 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # }
 
 # Remove the comment below so that you can run without elk
-class AddAppNameFilter(logging.Filter):
-    def filter(self, record):
-        if not hasattr(record, 'app_name'):
-            record.app_name = APP_NAME
-        return True
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'add_app_name': {
-            '()': AddAppNameFilter,
-        },
-    },
-    'formatters': {
-        'text': {
-            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-            'class': 'logging.Formatter',
-        },
-        'logstash': {
-            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-        },
-    },
-    'handlers': {
-        'logstash': {
-            'level': 'DEBUG',
-            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-            'host': 'logstash',
-            'port': 6006,
-            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
-            'ssl_enable': False,
-            'formatter': 'logstash',
-            'ensure_ascii': True,
-            'filters': ['add_app_name'],
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'text',
-            'filters': ['add_app_name'],
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'], # Only send Django logs to console by default
-            'level': 'DEBUG',
-            'propagate': False, # Prevent duplicate logging via root logger
-        },
-        'django.request': {
-            'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
-            'level': 'DEBUG',
-            'propagate': True, # Prevent duplicate logging via root logger
-        },
-        'api': {
-            'handlers': ['console' ,'logstash'],
-            'level': 'DEBUG',
-            'propagate': True, # Prevent duplicate logging via root logger if needed
-        },
-    },
-    'root': {
-        'handlers': ['console', 'logstash'],
-        'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
-    },
-}
+# class AddAppNameFilter(logging.Filter):
+#     def filter(self, record):
+#         if not hasattr(record, 'app_name'):
+#             record.app_name = APP_NAME
+#         return True
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'filters': {
+#         'add_app_name': {
+#             '()': AddAppNameFilter,
+#         },
+#     },
+#     'formatters': {
+#         'text': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'logging.Formatter',
+#         },
+#         'logstash': {
+#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+#         },
+#     },
+#     'handlers': {
+#         'logstash': {
+#             'level': 'DEBUG',
+#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+#             'host': 'logstash',
+#             'port': 6006,
+#             'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+#             'ssl_enable': False,
+#             'formatter': 'logstash',
+#             'ensure_ascii': True,
+#             'filters': ['add_app_name'],
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'text',
+#             'filters': ['add_app_name'],
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'], # Only send Django logs to console by default
+#             'level': 'DEBUG',
+#             'propagate': False, # Prevent duplicate logging via root logger
+#         },
+#         'django.request': {
+#             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
+#             'level': 'DEBUG',
+#             'propagate': True, # Prevent duplicate logging via root logger
+#         },
+#         'api': {
+#             'handlers': ['console' ,'logstash'],
+#             'level': 'DEBUG',
+#             'propagate': True, # Prevent duplicate logging via root logger if needed
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console', 'logstash'],
+#         'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
+#     },
+# }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
