@@ -4,6 +4,7 @@ import sys
 import requests
 from django.http import HttpResponse
 from http import HTTPStatus
+from django.views.decorators.csrf import csrf_exempt
 import uuid
 import ssl
 import websockets
@@ -97,18 +98,8 @@ async def decodeJWT(request, func=None, encodedJwt=None) :
 		return [None] * 3
 	return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
-# # @csrf_exempt
-async def launchFinals(request) :
-	try:
-		body = json.loads(request.body)
-		tkey = body["tKey"]
-		if tkey not in trnmtDict:
-			return JsonResponse({"Error": "Tournament not found"}, status=404)
-		trnmtDict[tkey].launchTournament(request.COOKIES)
-	except Exception :
-		return JsonResponse({"error": "Internal server error"}, status=500)
 
-# # @csrf_exempt
+@csrf_exempt
 async def launchMatch(request) :
 	try:
 		print("lm-1", file=sys.stderr)
@@ -143,7 +134,7 @@ async def launchMatch(request) :
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
-# @csrf_exempt
+@csrf_exempt
 async def launchFinals(request) :
 	try:
 		print("lf-1", file=sys.stderr)
@@ -165,7 +156,6 @@ async def launchFinals(request) :
 				"text_data": {"action" : "final-matches"}
 			}
 		)
-		print("lf-1", file=sys.stderr)
 		return JsonResponse({"Info" : "Ready to start"})
 	except TournamentError as e:
 		print("lf-2-end", file=sys.stderr)
@@ -173,6 +163,7 @@ async def launchFinals(request) :
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
+@csrf_exempt
 async def launchNextMatch(request) :
 	try:
 		print("lf-1", file=sys.stderr)
@@ -214,6 +205,7 @@ async def launchNextMatch(request) :
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
+@csrf_exempt
 async def checkSSE(request) :
 	try:
 		print("111", file=sys.stderr)
@@ -230,7 +222,7 @@ async def checkSSE(request) :
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
 
-
+@csrf_exempt
 async def joinGuest(request) :
 	try:
 		print(f"111", file=sys.stderr)
@@ -264,7 +256,6 @@ async def joinGuest(request) :
 	except Exception as e :
 		print(f"Error : {e}", file=sys.stderr)
 
-# @csrf_exempt
 async def joinTournament(request):
 	try:
 		print(f"111", file=sys.stderr)
@@ -305,15 +296,16 @@ async def joinTournament(request):
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error {e}"}, status=500)
 
-
+@csrf_exempt
 async def sse(request) :
 	tKey = request.GET.get("tKey", None)
 	print(f"sse - tKey : {tKey}", file=sys.stderr)
 	jwt = request.GET.get("jwt", None)
 	jwt = dictJwt.get(jwt, None)
 	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt}'), content_type='text/event-stream')
-# @csrf_exempt
 
+
+@csrf_exempt
 async def getIds(request) :
 	jwt = await decodeJWT(request)
 	jwt = jwt[0]['payload']
@@ -401,7 +393,7 @@ async def listTournament(request) :
 	except Exception as e :
 		return JsonResponse({"error" : "Internal server error"}, status=500)
 
-
+@csrf_exempt
 async def tournamentManager(request) :
 	try :
 		print(f"action : {request.method}", file=sys.stderr)
@@ -421,8 +413,7 @@ async def tournamentManager(request) :
 	except Exception as e :
 		return JsonResponse({"error" : f"Internal server error {e}"}, status=500)
 
-
-
+@csrf_exempt
 async def Supervise(request) :
 	try :
 		channel_layer = get_channel_layer()
@@ -446,6 +437,7 @@ async def Supervise(request) :
 		print("-_____----___--_-_-__---___", file=sys.stderr)
 		return HttpResponseNoContent()
 
+@csrf_exempt
 async def amIinTournament(request) :
 	try :
 		jwt = await decodeJWT(request)
@@ -459,3 +451,4 @@ async def amIinTournament(request) :
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)
 	
+

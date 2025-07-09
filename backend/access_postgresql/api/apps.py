@@ -41,6 +41,15 @@ class ApiConfig(AppConfig):
                     "avatar": "default.png"
                 },
                 {
+                    "user_name": "Bobby",
+                    "first_name": "Bobby",
+                    "last_name": "Dummy",
+                    "mail" : "bobby@dummy.com",
+                    "password": "bobby1234",
+                    "activated": True,
+                    "avatar": "default.png"
+                },
+                {
                     "user_name": "Guest",
                     "first_name": "guest",
                     "last_name": "guest",

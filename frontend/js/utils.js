@@ -114,107 +114,107 @@ function setupLoginClick(toggleLogin, isAuth) {
 	});
 }
 
-// export async function fetchWithRefresh(url, options = {}) {
+export async function fetchWithRefresh(url, options = {}) {
 
-// 	let response = await fetch(url, options);
+	let response = await fetch(url, options);
 
-// 	if (response.status === 401) {
-// 		const refreshResponse = await fetch('auth/refresh-token/', {
-// 			method: 'GET',
-// 			credentials: 'include',
-// 			headers: {
-// 				'Content-Type': 'application/json',
-// 			},
-// 		});
-// 		if (refreshResponse.ok) {
-// 			response = await fetch(url, options);
-// 		} else {
-// 			window.location.href = '/#home';
-// 		}
-// 	} else if (response.status === 413) {
-// 		return new Response(
-// 			JSON.stringify({
-// 				status: 'error',
-// 				message: 'The image file is too large',
-// 			}),
-// 			{ status: 413 }
-// 		);
-// 	}
-// 	return response;
-// }
+	if (response.status === 401) {
+		const refreshResponse = await fetch('auth/refresh-token/', {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		if (refreshResponse.ok) {
+			response = await fetch(url, options);
+		} else {
+			window.location.href = '/#home';
+		}
+	} else if (response.status === 413) {
+		return new Response(
+			JSON.stringify({
+				status: 'error',
+				message: 'The image file is too large',
+			}),
+			{ status: 413 }
+		);
+	}
+	return response;
+}
 const requestCache = new Map();         // Stores cached responses
 const inFlightRequests = new Map();     // Tracks pending requests
 let refreshPromise = null;              // Holds the single refresh token operation
 
-export async function fetchWithRefresh(url, options = {}) {
-	const cacheKey = `${url}-${JSON.stringify(options.body || {})}`;
+// export async function fetchWithRefresh(url, options = {}) {
+// 	const cacheKey = `${url}-${JSON.stringify(options.body || {})}`;
 
-	// Return cached response if available and recent (within 5 seconds)
-	const cached = requestCache.get(cacheKey);
-	if (cached && Date.now() - cached.timestamp < 5000) {
-		return cached.response.clone();
-	}
+// 	// Return cached response if available and recent (within 5 seconds)
+// 	const cached = requestCache.get(cacheKey);
+// 	if (cached && Date.now() - cached.timestamp < 5000) {
+// 		return cached.response.clone();
+// 	}
 
-	// Reuse in-flight request if one exists for this URL
-	if (inFlightRequests.has(cacheKey)) {
-		return inFlightRequests.get(cacheKey);
-	}
+// 	// Reuse in-flight request if one exists for this URL
+// 	if (inFlightRequests.has(cacheKey)) {
+// 		return inFlightRequests.get(cacheKey);
+// 	}
 
-	const fetchPromise = (async () => {
-		let response = await fetch(url, options);
-		// Clone the response immediately to preserve its body
-		let responseToReturn = response.clone();
-		// Handle authentication and refresh logic
-		if (response.status === 401) {
-			// Use a single shared refresh promise
-			if (!refreshPromise) {
-				refreshPromise = fetch('auth/refresh-token/', {
-					method: 'GET',
-					credentials: 'include',
-					headers: { 'Content-Type': 'application/json' },
-				});
-			}
+// 	const fetchPromise = (async () => {
+// 		let response = await fetch(url, options);
+// 		// Clone the response immediately to preserve its body
+// 		let responseToReturn = response.clone();
+// 		// Handle authentication and refresh logic
+// 		if (response.status === 401) {
+// 			// Use a single shared refresh promise
+// 			if (!refreshPromise) {
+// 				refreshPromise = fetch('auth/refresh-token/', {
+// 					method: 'GET',
+// 					credentials: 'include',
+// 					headers: { 'Content-Type': 'application/json' },
+// 				});
+// 			}
 
-			const refreshResponse = await refreshPromise;
-			refreshPromise = null; // Reset for next time
+// 			const refreshResponse = await refreshPromise;
+// 			refreshPromise = null; // Reset for next time
 
-			if (refreshResponse.ok) {
-				response = await fetch(url, options);
-				// Update our clone with the fresh response
-				responseToReturn = response.clone();
-			} else {
-				window.location.href = '/#home';
-			}
-		} else if (response.status === 413) {
-			// Handle "Request Entity Too Large" errors
-			return new Response(
-				JSON.stringify({
-					status: 'error',
-					message: 'The image file is too large',
-				}),
-				{ status: 413 }
-			);
-		}
+// 			if (refreshResponse.ok) {
+// 				response = await fetch(url, options);
+// 				// Update our clone with the fresh response
+// 				responseToReturn = response.clone();
+// 			} else {
+// 				window.location.href = '/#home';
+// 			}
+// 		} else if (response.status === 413) {
+// 			// Handle "Request Entity Too Large" errors
+// 			return new Response(
+// 				JSON.stringify({
+// 					status: 'error',
+// 					message: 'The image file is too large',
+// 				}),
+// 				{ status: 413 }
+// 			);
+// 		}
 
-		// Cache successful responses
-		if (response.ok) {
-			requestCache.set(cacheKey, {
-				response: response.clone(),
-				timestamp: Date.now(),
-			});
-		}
+// 		// Cache successful responses
+// 		if (response.ok) {
+// 			requestCache.set(cacheKey, {
+// 				response: response.clone(),
+// 				timestamp: Date.now(),
+// 			});
+// 		}
 
-		// Return the cloned response to ensure the body can be read multiple times
-		return responseToReturn;
-	})();
+// 		// Return the cloned response to ensure the body can be read multiple times
+// 		return responseToReturn;
+// 	})();
 
-	// Track in-flight request
-	inFlightRequests.set(cacheKey, fetchPromise);
+// 	// Track in-flight request
+// 	inFlightRequests.set(cacheKey, fetchPromise);
 
-	try {
-		return await fetchPromise;
-	} finally {
-		// Remove from in-flight tracking when done
-		inFlightRequests.delete(cacheKey);
-	}
-}
+// 	try {
+// 		return await fetchPromise;
+// 	} finally {
+// 		// Remove from in-flight tracking when done
+// 		inFlightRequests.delete(cacheKey);
+// 	}
+// }

@@ -190,7 +190,7 @@ export async function localGameController() {
 			let sc1 = document.getElementById("player1score");
 			let sc2 = document.getElementById("player2score");
 
-			 console.log(data);
+			console.log('aa', data);
 			game_stats = data["game_stats"]
 			if (game_stats == "final-message") {
 				sleep(500);
