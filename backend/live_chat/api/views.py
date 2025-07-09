@@ -13,7 +13,6 @@ import httpx
 import jwt
 import time
 
-
 logger = logging.getLogger(__name__)
 
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
@@ -261,7 +260,7 @@ async def _generate_events(request, group_id):
         yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
     finally:
         await channel_layer.group_discard(channel_group_name, client_channel_name)
-
+		
 class blockedStatus(View):
     def get(self, request, targetUserId):
         access_token = request.COOKIES.get('access_token')

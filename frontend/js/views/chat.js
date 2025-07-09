@@ -3,9 +3,10 @@ import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh, g
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
-
+let hasOverallUnreadMessages = false;
 let mainChatBootstrapModal; // Bootstrap Modal instance
 let currentActiveChatGroup = null; // No default active group, will be set on selection
+let currentTargetId = null;
 const eventSources = {}; // Stores EventSource objects per groupId
 const messageOffsets = {}; // Stores the offset for message history for each group
 
@@ -225,29 +226,28 @@ function sendMessage(currentUserId) {
 // Function to initialize EventSource (SSE) for a group
 async function initEventSource(groupId, currentUserId) {
 	// Close any other active EventSources before opening a new one
-	for (const key in eventSources) {
-		if (eventSources[key].readyState === EventSource.OPEN) {
-			eventSources[key].close();
-			delete eventSources[key];
-			console.log(`Closed SSE for group: ${key}`);
-		}
-	}
-
-	const chatLog = document.getElementById('chatLog-active');
-	if (!chatLog) {
-		console.error(`chatLog-active not found for initEventSource.`);
-		return;
-	}
+	// for (const key in eventSources) {
+	// 	if (eventSources[key].readyState === EventSource.OPEN) {
+	// 		eventSources[key].close();
+	// 		delete eventSources[key];
+	// 		console.log(`Closed SSE for group: ${key}`);
+	// 	}
+	// }
+    if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
+        console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
+        return;
+    }
 	try {
-		await fetchWithRefresh(`/chat/${groupId}/messages/`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
-			},
-			credentials: 'include',
-		});
+		// await fetchWithRefresh(`/chat/${groupId}/messages/`, {
+		// 	method: 'GET',
+		// 	headers: {
+		// 		'Content-Type': 'application/json',
+		// 		'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
+		// 	},
+		// 	credentials: 'include',
+		// });
 		// UPDATED URL: /chat/stream/{group_id}/
+		await fetchWithRefresh('auth/refresh-token/', { method: 'GET', credentials: 'include', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
 		const source = new EventSource(`/chat/stream/${groupId}/`);
 
 		eventSources[groupId] = source;
@@ -298,6 +298,11 @@ async function initEventSource(groupId, currentUserId) {
 				}, 5000);
 				// Only append if the message is for the currently active chat group
 				if (messageData.group_id === currentActiveChatGroup) {
+					const chatLog = document.getElementById('chatLog-active');
+					if (!chatLog) {
+						console.error(`chatLog-active not found for initEventSource.`);
+						return;
+					}
 					// Remove "No messages yet" if a new message arrives
 					const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
 					if (noMessagesDiv) {
@@ -306,7 +311,19 @@ async function initEventSource(groupId, currentUserId) {
 					const msgElement = createMessageElement(messageData, currentUserId);
 					chatLog.appendChild(msgElement);
 					chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
-				}
+				} else {
+                    // *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
+                    console.log(`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`);
+                    const inactiveChatListItem = document.querySelector(`#chatRoomList [data-group-id="${messageData.group_id}"]`);
+                    if (inactiveChatListItem) {
+                        inactiveChatListItem.classList.add('has-unread-messages');
+					}
+					const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+                    if (mainChatToggleButton && !hasOverallUnreadMessages) {
+                        mainChatToggleButton.classList.add('has-unread-overall');
+                        hasOverallUnreadMessages = true; // Empêche d'ajouter la classe plusieurs fois
+                    }
+                }
 			} catch (error) {
 				console.error(
 					'JSON parsing error or SSE message processing error:',
@@ -341,21 +358,12 @@ async function loadChatRoomList(currentUserId) {
         console.error('Chat room list element not found!');
         return;
     }
-
     if (!currentUserId) {
         console.log("Not logged in, cannot load chat list.");
         chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
         return;
     }
-
-
     try {
-        // UPDATED URL: /chat/ (GET)
-        // Note: Your backend ChatGroupListCreateView GET should filter by the username internally
-        // or accept a query parameter for it. Based on your urls.py, it seems it's `/chat/`
-        // which implies the view itself handles the user context for listing.
-        // If it requires a username in the URL, revert to `/chat/${username}/`
-        // or modify the backend URL pattern. Assuming it lists for the authenticated user for now.
         console.log('Loading chat list for user:', currentUserId);
         const response = await fetchWithRefresh(`chat/`, {
             method: 'GET',
@@ -392,12 +400,15 @@ async function loadChatRoomList(currentUserId) {
 				listItem.onclick = async () => {
 					try {
 						await switchChatRoom(currentUserId, chat.group_id, chat.receiver_id);
+	                    listItem.classList.remove('has-unread-messages');
+
 					} catch (e) {
 						console.error('Error switching chat room:', e);
 						alert('Could not switch chat room. Please try again.');
 					}
 				}
 				chatRoomListUl.appendChild(listItem);
+                initEventSource(chat.group_id, currentUserId);
             });
         } else {
             console.error(
@@ -433,9 +444,10 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
     if (newActiveItem) {
         newActiveItem.classList.add('active');
     }
-
+	newActiveItem.classList.remove('has-unread-messages');
     // Update current active group
     currentActiveChatGroup = newgroupId;
+	currentTargetId = targetUserId;
     console.log(`Switched to chat room: ${newgroupId}`);
     // Update header of the right column with the other user's name
     const activeChatRoomName = document.getElementById('activeChatRoomName');
@@ -471,7 +483,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
     loadMessageHistory(currentUserId, newgroupId);
-	const targetbBlockedStatus = getBlockedStatus(targetUserId)
+	const targetbBlockedStatus = await getBlockedStatus(targetUserId)
 	let block_reason = null;
 	if (targetbBlockedStatus.hasBlocked) {
 		block_reason = 'this user blocked you';
@@ -717,6 +729,11 @@ export function chatController(userId, username) {
 
 		mainChatWindowElement.addEventListener('shown.bs.modal', async () => {
 			console.log('Main Chat Window is shown');
+			hasOverallUnreadMessages = false; // Réinitialiser l'état global
+			const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+			if (mainChatToggleButton) {
+				mainChatToggleButton.classList.remove('has-unread-overall');
+			}
 			console.log('Logged in user ID:', userId);
 			loadChatRoomList(userId); // Load chat list dynamically
 
@@ -728,7 +745,7 @@ export function chatController(userId, username) {
 			}
 			// If a group was active before closing/reopening, switch back to it
 			if (currentActiveChatGroup) {
-				await switchChatRoom(userId, currentActiveChatGroup, receiverId);
+				await switchChatRoom(userId, currentActiveChatGroup, currentTargetId);
 			}
 			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
 			// Focus on new chat user ID input initially
@@ -740,11 +757,12 @@ export function chatController(userId, username) {
 		mainChatWindowElement.addEventListener('hidden.bs.modal', () => {
 			console.log('Main Chat Window is hidden');
 			// Close active SSE connection when modal closes
-			if (currentActiveChatGroup && eventSources[currentActiveChatGroup]) {
-				eventSources[currentActiveChatGroup].close();
-				delete eventSources[currentActiveChatGroup];
-			}
+			// if (currentActiveChatGroup && eventSources[currentActiveChatGroup]) {
+			// 	eventSources[currentActiveChatGroup].close();
+			// 	delete eventSources[currentActiveChatGroup];
+			// }
 			currentActiveChatGroup = null; // Reset active chat group when closing modal
+			currentTargetId = null;
 			// Clear chat log and reset UI state
 			const chatLog = document.getElementById('chatLog-active');
 			if (chatLog)

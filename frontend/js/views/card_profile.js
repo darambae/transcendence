@@ -195,7 +195,6 @@ function changeBlockedStatus(userName) {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
 				},
 				credentials : 'include',
 				body: JSON.stringify({}),
