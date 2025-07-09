@@ -8,6 +8,7 @@ import json
 import sys
 import threading
 from http import HTTPStatus
+from .logging_utils import log_ai_operation, log_game_event, log_api_request, ai_logger, performance_logger
 
 urlRequests = "https://server_pong:8030/"
 
@@ -20,24 +21,29 @@ def start_loop(loop):
 try :
     loopAi = asyncio.new_event_loop()
     threading.Thread(target=start_loop, args=(loopAi,), daemon=True).start()
-    print("Loop goes well !", file=sys.stderr)
+    ai_logger.info("AI event loop started successfully")
 except Exception as e:
-    print(f"Errrror : {e}", file=sys.stderr)
+    ai_logger.error(f"Failed to start AI event loop: {e}")
 
+@log_ai_operation('GET_POSITION')
 async def getActualPosition(apiKey) :
     try :
         res = requests.get(f"{urlRequests}server-pong/api/simulation?apikey={apiKey}")
         if res.status_code != 200 :
+            ai_logger.warning(f"Failed to get position for API key {apiKey}: Status {res.status_code}")
             return
-        else :
+        else:
             return res.json()
     except Exception as e :
-        print(f"error getActualPos : {e}", file=sys.stderr)
+        ai_logger.error(f"Error getting actual position: {e}", extra={'api_key': apiKey})
 
+@log_ai_operation('GAME_SESSION')
 async def sendInfo(apiKey) :
     try :
         position = await getActualPosition(apiKey)
         actualTime = time.time()
+        ai_logger.info(f"Starting AI game session", extra={'api_key': apiKey})
+        
         while position["team1Score"] < 5 and position["team2Score"] < 5 :
             racketY = position["player2"]
             for j in range(20) :
@@ -53,16 +59,26 @@ async def sendInfo(apiKey) :
                     racketY[1][1] += 5
                 await asyncio.sleep(0.05)
             position = await getActualPosition(apiKey)
-            print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
+            performance_logger.info(f"AI processing cycle completed", extra={
+                'api_key': apiKey,
+                'cycle_duration_ms': round((time.time() - actualTime) * 1000, 2)
+            })
             actualTime = time.time()
+            
+        log_game_event('GAME_ENDED', api_key=apiKey, 
+                      team1_score=position["team1Score"], 
+                      team2_score=position["team2Score"])
+                      
     except Exception as e:
-        print(f"error : {e}", file=sys.stderr)
+        ai_logger.error(f"Error in AI game session: {e}", extra={'api_key': apiKey})
         pass
 
+@log_api_request(action_type='AI_INIT')
 def initAI(request) :
     try :
         apikey = request.GET.get('apikey', "None")
+        ai_logger.info(f"Initializing AI for API key: {apikey}")
         asyncio.run_coroutine_threadsafe(sendInfo(apikey), loopAi)
         return HttpResponseNoContent()
     except Exception as e:
-        print(f"Error : {e}", file=sys.stderr)
+        ai_logger.error(f"Error initializing AI: {e}", extra={'api_key': apikey if 'apikey' in locals() else 'unknown'})

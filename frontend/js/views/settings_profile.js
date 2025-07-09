@@ -1,25 +1,91 @@
-
 import { userInfo } from './user.js';
-import { fetchWithRefresh } from  "../utils.js"
+import { fetchWithRefresh } from '../utils.js';
 import * as Friends from './friends.js';
 
 export async function settingsProfileController() {
-	
 	await getUserInfo();
 	getUserAvatar();
 	setupAvatarUpload();
-	SaveImg()
-	SavePrivateInfo()
-	SavePrivateProfile()
-	changePassword()
-	animationPassword()
-	Friends.searchFriends()
-	Friends.listennerFriends()
+	SaveImg();
+	SavePrivateInfo();
+	SavePrivateProfile();
+	changePassword();
+	animationPassword();
+	Friends.searchFriends();
+	Friends.listennerFriends();
+
+	// Add real-time username validation
+	setupUsernameValidation();
 }
 
-//  get user info end affich
+// Add username validation for real-time feedback
+function setupUsernameValidation() {
+	const usernameInput = document.getElementById('inputUsername');
+
+	if (usernameInput) {
+		usernameInput.addEventListener('input', function () {
+			const value = this.value;
+
+			// Check for whitespace
+			if (/\s/.test(value)) {
+				this.style.borderColor = 'red';
+				this.title = 'Username cannot contain spaces or whitespace';
+
+				// Show immediate feedback
+				const errorDiv = document.getElementById('errorMessageProfile');
+				if (errorDiv) {
+					errorDiv.textContent =
+						'Username cannot contain spaces or whitespace characters.';
+					errorDiv.classList.remove('text-success');
+					errorDiv.classList.add('text-danger');
+					errorDiv.style.display = 'block';
+
+					// Hide after 2 seconds
+					setTimeout(() => {
+						if (errorDiv.textContent.includes('whitespace')) {
+							errorDiv.style.display = 'none';
+						}
+					}, 2000);
+				}
+			} else {
+				this.style.borderColor = '';
+				this.title = '';
+
+				// Clear error if it was about whitespace
+				const errorDiv = document.getElementById('errorMessageProfile');
+				if (errorDiv && errorDiv.textContent.includes('whitespace')) {
+					errorDiv.style.display = 'none';
+				}
+			}
+		});
+
+		// Prevent pasting content with whitespace
+		usernameInput.addEventListener('paste', function (e) {
+			setTimeout(() => {
+				const value = this.value;
+				if (/\s/.test(value)) {
+					// Remove whitespace characters
+					this.value = value.replace(/\s/g, '');
+
+					const errorDiv = document.getElementById('errorMessageProfile');
+					if (errorDiv) {
+						errorDiv.textContent =
+							'Whitespace characters were removed from username.';
+						errorDiv.classList.remove('text-success');
+						errorDiv.classList.add('text-danger');
+						errorDiv.style.display = 'block';
+						setTimeout(() => {
+							errorDiv.style.display = 'none';
+						}, 2000);
+					}
+				}
+			}, 10);
+		});
+	}
+}
+
 function displayUserInfo(data) {
-	console.log(data)
+	console.log(data);
 	document.getElementById('usernameLabel').textContent = data.user_name;
 	document.getElementById('mailLabel').textContent = data.mail;
 	document.getElementById('firstNameLabel').textContent = data.first_name;
@@ -35,94 +101,91 @@ function removElemAccount() {
 }
 
 function removElemPassword() {
-	const ruleLength = document.getElementById("rule-length");
-	const ruleUppercase = document.getElementById("rule-uppercase");
-	const ruleNumber = document.getElementById("rule-number");
-	const ruleSpecial = document.getElementById("rule-special-char");
-	const matchMessage = document.getElementById("passwordMatchMessage");
+	const ruleLength = document.getElementById('rule-length');
+	const ruleUppercase = document.getElementById('rule-uppercase');
+	const ruleNumber = document.getElementById('rule-number');
+	const ruleSpecial = document.getElementById('rule-special-char');
+	const matchMessage = document.getElementById('passwordMatchMessage');
 
 	document.getElementById('inputPasswordCurrent').value = '';
 	document.getElementById('inputPasswordNew').value = '';
 	document.getElementById('inputPasswordNew2').value = '';
-	ruleLength.textContent = "❌ 8 characters minimum";
-	ruleUppercase.textContent = "❌ 1 uppercase letter";
-	ruleNumber.textContent = "❌ 1 number";
-	ruleSpecial.textContent = "❌ 1 special character";
-	matchMessage.textContent = "";
-	matchMessage.classList.remove("text-success");
-	matchMessage.classList.add("text-danger");
-
+	ruleLength.textContent = '❌ 8 characters minimum';
+	ruleUppercase.textContent = '❌ 1 uppercase letter';
+	ruleNumber.textContent = '❌ 1 number';
+	ruleSpecial.textContent = '❌ 1 special character';
+	matchMessage.textContent = '';
+	matchMessage.classList.remove('text-success');
+	matchMessage.classList.add('text-danger');
 }
-
 
 function animationPassword() {
-	const passwordInput = document.getElementById("inputPasswordNew");
-	const passwordVerify = document.getElementById("inputPasswordNew2");
-	const ruleLength = document.getElementById("rule-length");
-	const ruleUppercase = document.getElementById("rule-uppercase");
-	const ruleNumber = document.getElementById("rule-number");
-	const ruleSpecial = document.getElementById("rule-special-char");
-	const matchMessage = document.getElementById("passwordMatchMessage");
-  
+	const passwordInput = document.getElementById('inputPasswordNew');
+	const passwordVerify = document.getElementById('inputPasswordNew2');
+	const ruleLength = document.getElementById('rule-length');
+	const ruleUppercase = document.getElementById('rule-uppercase');
+	const ruleNumber = document.getElementById('rule-number');
+	const ruleSpecial = document.getElementById('rule-special-char');
+	const matchMessage = document.getElementById('passwordMatchMessage');
+
 	function validatePasswordStrength(value) {
-	  if (value.length >= 8) {
-		ruleLength.classList.replace("text-danger", "text-success");
-		ruleLength.textContent = "✅ 8 characters minimum";
-	  } else {
-		ruleLength.classList.replace("text-success", "text-danger");
-		ruleLength.textContent = "❌ 8 characters minimum";
-	  }
+		if (value.length >= 8) {
+			ruleLength.classList.replace('text-danger', 'text-success');
+			ruleLength.textContent = '✅ 8 characters minimum';
+		} else {
+			ruleLength.classList.replace('text-success', 'text-danger');
+			ruleLength.textContent = '❌ 8 characters minimum';
+		}
 
-	  if (/[A-Z]/.test(value)) {
-		ruleUppercase.classList.replace("text-danger", "text-success");
-		ruleUppercase.textContent = "✅ 1 uppercase letter";
-	  } else {
-		ruleUppercase.classList.replace("text-success", "text-danger");
-		ruleUppercase.textContent = "❌ 1 uppercase letter";
-	  }
+		if (/[A-Z]/.test(value)) {
+			ruleUppercase.classList.replace('text-danger', 'text-success');
+			ruleUppercase.textContent = '✅ 1 uppercase letter';
+		} else {
+			ruleUppercase.classList.replace('text-success', 'text-danger');
+			ruleUppercase.textContent = '❌ 1 uppercase letter';
+		}
 
-	  if (/\d/.test(value)) {
-		ruleNumber.classList.replace("text-danger", "text-success");
-		ruleNumber.textContent = "✅ 1 number";
-	  } else {
-		ruleNumber.classList.replace("text-success", "text-danger");
-		ruleNumber.textContent = "❌ 1 number";
-	  }
+		if (/\d/.test(value)) {
+			ruleNumber.classList.replace('text-danger', 'text-success');
+			ruleNumber.textContent = '✅ 1 number';
+		} else {
+			ruleNumber.classList.replace('text-success', 'text-danger');
+			ruleNumber.textContent = '❌ 1 number';
+		}
 
-	  if (/[^A-Za-z0-9]/.test(value)) {
-		ruleSpecial.classList.replace("text-danger", "text-success");
-		ruleSpecial.textContent = "✅ 1 special character";
-	  } else {
-		ruleSpecial.classList.replace("text-success", "text-danger");
-		ruleSpecial.textContent = "❌ 1 special character";
-	  }
+		if (/[^A-Za-z0-9]/.test(value)) {
+			ruleSpecial.classList.replace('text-danger', 'text-success');
+			ruleSpecial.textContent = '✅ 1 special character';
+		} else {
+			ruleSpecial.classList.replace('text-success', 'text-danger');
+			ruleSpecial.textContent = '❌ 1 special character';
+		}
 	}
-  
+
 	function checkPasswordMatch() {
-	  if (passwordVerify.value === "") {
-		matchMessage.textContent = "";
-		return;
-	  }
-  
-	  if (passwordInput.value === passwordVerify.value) {
-		matchMessage.textContent = "✔ Passwords match";
-		matchMessage.classList.remove("text-danger");
-		matchMessage.classList.add("text-success");
-	  } else {
-		matchMessage.textContent = "❌ Passwords do not match";
-		matchMessage.classList.remove("text-success");
-		matchMessage.classList.add("text-danger");
-	  }
-	}
-  
-	passwordInput.addEventListener("input", () => {
-	  validatePasswordStrength(passwordInput.value);
-	  checkPasswordMatch();
-	});
-  
-	passwordVerify.addEventListener("input", checkPasswordMatch);
-}
+		if (passwordVerify.value === '') {
+			matchMessage.textContent = '';
+			return;
+		}
 
+		if (passwordInput.value === passwordVerify.value) {
+			matchMessage.textContent = '✔ Passwords match';
+			matchMessage.classList.remove('text-danger');
+			matchMessage.classList.add('text-success');
+		} else {
+			matchMessage.textContent = '❌ Passwords do not match';
+			matchMessage.classList.remove('text-success');
+			matchMessage.classList.add('text-danger');
+		}
+	}
+
+	passwordInput.addEventListener('input', () => {
+		validatePasswordStrength(passwordInput.value);
+		checkPasswordMatch();
+	});
+
+	passwordVerify.addEventListener('input', checkPasswordMatch);
+}
 
 let userInfoCache = null;
 let userInfoCacheTime = 0;
@@ -131,17 +194,14 @@ const USER_INFO_CACHE_DURATION = 60000; // 60 seconds
 async function getUserInfo() {
 	try {
 		const timestamp = Date.now();
-		const response = await fetch(
-			`user-service/infoUser/?t=${timestamp}`,
-			{
-				method: 'GET',
-				credentials: 'include',
-				headers: {
-					'Cache-Control': 'no-cache',
-					'Content-Type': 'application/json',
-				},
-			}
-		);
+		const response = await fetch(`user-service/infoUser/?t=${timestamp}`, {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'Cache-Control': 'no-cache',
+				'Content-Type': 'application/json',
+			},
+		});
 
 		if (!response.ok) {
 			throw new Error(`Erreur HTTP ! status: ${response.status}`);
@@ -162,7 +222,7 @@ async function getUserInfo() {
 
 function handleResponse(response) {
 	if (!response.ok) {
-		throw new Error("Erreur réseau ou serveur");
+		throw new Error('Erreur réseau ou serveur');
 	}
 	return response.json();
 }
@@ -189,21 +249,21 @@ async function getUserAvatar() {
 
 //  modifi view frond avatar end save img
 function setupAvatarUpload() {
-	const uploadInput = document.getElementById("uploadImg");
-	const avatar = document.getElementById("avatar");
-	const saveBtnContainer = document.getElementById("saveImageContainer");
+	const uploadInput = document.getElementById('uploadImg');
+	const avatar = document.getElementById('avatar');
+	const saveBtnContainer = document.getElementById('saveImageContainer');
 
 	if (uploadInput && avatar) {
-		uploadInput.addEventListener("change", function (e) {
+		uploadInput.addEventListener('change', function (e) {
 			const file = e.target.files[0];
 			if (file) {
 				avatar.src = URL.createObjectURL(file);
 				if (saveBtnContainer) {
-					saveBtnContainer.style.display = "block";
+					saveBtnContainer.style.display = 'block';
 				}
 			} else {
 				if (saveBtnContainer) {
-					saveBtnContainer.style.display = "none";
+					saveBtnContainer.style.display = 'none';
 				}
 			}
 		});
@@ -213,7 +273,7 @@ function setupAvatarUpload() {
 function SaveImg() {
 	const form = document.getElementById('uploadForm');
 	const errorDiv = document.getElementById('errorMessageImgAvatar');
-	const saveBtnContainer = document.getElementById("saveImageContainer")
+	const saveBtnContainer = document.getElementById('saveImageContainer');
 
 	if (!form || !errorDiv) return;
 
@@ -231,16 +291,16 @@ function SaveImg() {
 		formData.append('image', fileInput.files[0]);
 
 		try {
-			const response = await fetchWithRefresh("user-service/saveImg/", {
+			const response = await fetchWithRefresh('user-service/saveImg/', {
 				method: 'PATCH',
 				credentials: 'include',
-				body: formData
+				body: formData,
 			});
 
 			const data = await response.json();
 			//console.log(data)
 			if (data.status === 'error') {
-				console.log("Error in response:", data);
+				console.log('Error in response:', data);
 				errorDiv.textContent = `Error: ${data.message}`;
 				errorDiv.style.display = 'block';
 				setTimeout(() => {
@@ -253,7 +313,7 @@ function SaveImg() {
 				errorDiv.classList.remove('text-danger');
 				errorDiv.classList.add('text-success');
 				errorDiv.style.display = 'block';
-				userInfo()
+				userInfo();
 				setTimeout(() => {
 					errorDiv.style.display = 'none';
 					errorDiv.classList.remove('text-success');
@@ -262,10 +322,11 @@ function SaveImg() {
 			} else {
 				errorDiv.textContent = data.error;
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
 			}
-			saveBtnContainer.style.display = "none";
-
+			saveBtnContainer.style.display = 'none';
 		} catch (err) {
 			errorDiv.classList.remove('text-success');
 			errorDiv.classList.add('text-danger');
@@ -280,25 +341,25 @@ function SavePrivateInfo() {
 	const errorDiv = document.getElementById('errorMessagePrivateInfo');
 
 	if (!form || !errorDiv) {
-		console.log("form or erroDiv is empty");
+		console.log('form or erroDiv is empty');
 		return;
 	}
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
 
 		const data = {
-			firstName: form.elements["inputFirstName"].value,
-			lastName: form.elements["inputLastName"].value,
-		}
+			firstName: form.elements['inputFirstName'].value,
+			lastName: form.elements['inputLastName'].value,
+		};
 
 		try {
-			const response = await fetchWithRefresh("user-service/savePrivateInfo/", {
+			const response = await fetchWithRefresh('user-service/savePrivateInfo/', {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(data)
+				body: JSON.stringify(data),
 			});
 			const result = await response.json();
 
@@ -307,49 +368,68 @@ function SavePrivateInfo() {
 				errorDiv.classList.remove('text-danger');
 				errorDiv.classList.add('text-success');
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-				getUserInfo()
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
+				getUserInfo();
 				userInfoCache = null;
 			} else if (result.error) {
 				errorDiv.textContent = result.error;
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 5000);
 			}
-			removElemAccount()
+			removElemAccount();
 		} catch (error) {
-			errorDiv.textContent = "Error network : ";
+			errorDiv.textContent = 'Error network : ';
 			errorDiv.style.display = 'block';
-			setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
-			removElemAccount()
+			setTimeout(() => {
+				errorDiv.style.display = 'none';
+			}, 5000);
+			removElemAccount();
 		}
 	});
-
-};
+}
 
 function SavePrivateProfile() {
 	const form = document.getElementById('profileForm');
 	const errorDiv = document.getElementById('errorMessageProfile');
 
 	if (!form || !errorDiv) {
-		console.log("form or erroDiv is empty");
+		console.log('form or erroDiv is empty');
 		return;
 	}
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
 
-		const data = {
-			userName: form.elements["inputUsername"].value,
-			//mail: form.elements["inputEmail4"].value,
+		// Username validation - check for whitespace
+		const usernameValue = form.elements['inputUsername'].value;
+		if (/\s/.test(usernameValue)) {
+			errorDiv.textContent =
+				'Username cannot contain spaces or whitespace characters.';
+			errorDiv.classList.remove('text-success');
+			errorDiv.classList.add('text-danger');
+			errorDiv.style.display = 'block';
+			setTimeout(() => {
+				errorDiv.style.display = 'none';
+			}, 3000);
+			return;
 		}
 
+		const data = {
+			userName: form.elements['inputUsername'].value,
+			//mail: form.elements["inputEmail4"].value,
+		};
+
 		try {
-			const response = await fetchWithRefresh("user-service/saveProfile/", {
+			const response = await fetchWithRefresh('user-service/saveProfile/', {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(data)
+				body: JSON.stringify(data),
 			});
 			const result = await response.json();
 
@@ -370,51 +450,56 @@ function SavePrivateProfile() {
 			} else if (result.error) {
 				errorDiv.textContent = result.error;
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
 			}
-			removElemAccount()
+			removElemAccount();
 		} catch (error) {
-			errorDiv.textContent = "Error network : ";
+			errorDiv.textContent = 'Error network : ';
 			errorDiv.style.display = 'block';
-			setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
-			removElemAccount()
+			setTimeout(() => {
+				errorDiv.style.display = 'none';
+			}, 2200);
+			removElemAccount();
 		}
 	});
-
-};
-
+}
 
 function changePassword() {
-	const form = document.getElementById('changeMdp')
-	const errorDiv = document.getElementById('errorMessageMdp')
+	const form = document.getElementById('changeMdp');
+	const errorDiv = document.getElementById('errorMessageMdp');
 
 	if (!form) {
-		console.log("form or erroDiv is empty");
+		console.log('form or erroDiv is empty');
 		return;
 	}
 
-	animationPassword()
+	animationPassword();
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
 
 		const data = {
-			inputPasswordCurrent: form.elements["inputPasswordCurrent"].value,
-			inputPasswordNew: form.elements["inputPasswordNew"].value,
-			inputPasswordNew2: form.elements["inputPasswordNew2"].value,
-		}
+			inputPasswordCurrent: form.elements['inputPasswordCurrent'].value,
+			inputPasswordNew: form.elements['inputPasswordNew'].value,
+			inputPasswordNew2: form.elements['inputPasswordNew2'].value,
+		};
 		if (
 			data.inputPasswordNew === data.inputPasswordNew2 &&
 			data.inputPasswordNew.length >= 8
 		) {
 			try {
-				const response = await fetchWithRefresh("user-service/saveNewPassword/", {
-					method: 'PATCH',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(data)
-				});
+				const response = await fetchWithRefresh(
+					'user-service/saveNewPassword/',
+					{
+						method: 'PATCH',
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(data),
+					}
+				);
 				const result = await response.json();
 				console.log(result);
 
@@ -428,21 +513,23 @@ function changePassword() {
 						errorDiv.textContent = '';
 						errorDiv.classList.remove('text-success');
 						errorDiv.classList.add('text-danger');
-					  }, 2200);
+					}, 2200);
 				} else if (result.error) {
 					errorDiv.textContent = result.error;
 					errorDiv.style.display = 'block';
-					setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+					setTimeout(() => {
+						errorDiv.style.display = 'none';
+					}, 2200);
 				}
-				removElemPassword()
-
+				removElemPassword();
 			} catch (error) {
-				errorDiv.textContent = "Error network : ";
+				errorDiv.textContent = 'Error network : ';
 				errorDiv.style.display = 'block';
-				setTimeout(() => { errorDiv.style.display = 'none'; }, 2200);
+				setTimeout(() => {
+					errorDiv.style.display = 'none';
+				}, 2200);
 				removElemPassword();
 			}
 		}
 	});
 }
-

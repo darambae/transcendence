@@ -63,6 +63,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     env_file:
       - .env
     restart: always
@@ -85,6 +87,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     env_file:
       - .env
     restart: always
@@ -116,6 +120,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     # environment:
     #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
     env_file:
@@ -144,6 +150,7 @@ services:
       - .env
     depends_on:
       - postgres
+      - logstash
     restart: always
     networks:
       - elk_network
@@ -166,6 +173,9 @@ services:
     #   - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
     env_file:
       - .env
+    depends_on:
+      logstash:
+        condition: service_started
     restart: always
     networks:
       - mail_network
@@ -182,6 +192,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     env_file:
       - .env
     volumes:
@@ -203,6 +215,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     volumes:
       - certs:/certs
       - ./backend/AI_pong:/app
@@ -227,6 +241,8 @@ services:
     depends_on :
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     volumes:
       - certs:/certs
       - ./backend/tournamentManager:/app
@@ -260,12 +276,12 @@ services:
       - elk_network
     environment:
       LS_JAVA_OPTS: "-Xmx1g -Xms1g"
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f https://localhost:6000/_node/stats"]
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats"]
+    #   interval: 1m30s
+    #   timeout: 30s
+    #   retries: 5
+    #   start_period: 30s
     restart: unless-stopped
 
   elasticsearch:
@@ -293,12 +309,12 @@ services:
     networks:
       - elk_network
     healthcheck:
-      test: ["CMD-SHELL", "curl -k -u logstash_system:${ELASTIC_PASSWORD} --silent --fail https://elasticsearch:9200/_cluster/health"]
-      interval: 1m30s
+      test: ["CMD-SHELL", "curl -k -u logstash_internal:${ELASTIC_PASSWORD} --silent --fail https://elasticsearch:9200/_cluster/health"]
+      interval: 30s
       timeout: 30s
-      retries: 5
-      start_period: 30s
-    # restart: unless-stopped
+      retries: 10
+      start_period: 1m
+    restart: unless-stopped
   kibana:
     build:
       context: ./elk/kibana
@@ -322,6 +338,13 @@ services:
     volumes:
       - certs:/usr/share/kibana/config/certs
       - ./elk/kibana/my_kibana.yml:/usr/share/kibana/config/my_kibana.yml
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f http://localhost:5601/api/status"]
+      interval: 30s
+      timeout: 30s
+      retries: 10
+      start_period: 2m
+    restart: unless-stopped
 
 #################### VOLUMES #########################
 volumes:

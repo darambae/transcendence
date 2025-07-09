@@ -14,23 +14,29 @@ from django.conf import settings
 import os
 import json
 import requests
+import re
 from .utils import setTheCookie
+from .logging_utils import log_api_request, log_authentication_event, log_external_request, log_proxy_request, log_validation_error, api_logger as user_logger
 
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
 
+@log_api_request(action_type='USER_SIGNUP')
 def signup(request):
     url_access_postgresql = "https://access_postgresql:4000/api/signup/"
     url_mail = "https://mail:4010/mail/confirm_singup/"
 
     if request.method != 'POST':
+        user_logger.warning("Invalid method for signup", extra={'method': request.method})
         return JsonResponse({'create_user': {'error': 'Unauthorized method'}}, status=405)
 
     try:
         data = json.loads(request.body)
+        user_logger.info("Signup request received", extra={'email': data.get('mail', 'unknown')})
     except json.JSONDecodeError:
+        user_logger.warning("Invalid JSON in signup request")
         return JsonResponse({'create_user': {'error': 'Invalid JSON'}}, status=400)
 
     len_for_fields = {'username':15, 'firstName':15, 'lastName':15, 'mail':50, 'password':255}
@@ -44,6 +50,10 @@ def signup(request):
             return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
+
+    # Username validation - check for whitespace
+    if re.search(r'\s', data['username']):
+        return JsonResponse({'create_user': {'error': 'Username cannot contain spaces or whitespace characters'}}, status=400)
 
     try:
         validate_email(data['mail'])
@@ -274,6 +284,11 @@ class saveProfile(APIView):
 
         if not data.get('userName', '').strip():
             return JsonResponse({'error': 'userName is empty'}, status=400)
+
+        # Username validation - check for whitespace
+        username = data.get('userName', '')
+        if re.search(r'\s', username):
+            return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 
         try:
             response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})

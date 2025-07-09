@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+echo "Starting Logstash entrypoint script..."
 
 # Ensure certs directory and files have correct permissions
 if [ -d "/usr/share/logstash/config/certs" ]; then
@@ -13,10 +14,18 @@ fi
 
 # Check if elasticsearch has fully started
 echo "Waiting for Elasticsearch to start..."
+max_attempts=30
+attempt=0
 until curl -s -f -k -u elastic:${ELASTIC_PASSWORD} "https://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=50s" > /dev/null; do
-    echo "Elasticsearch is not ready yet. Waiting..."
-    sleep 5
+    attempt=$((attempt + 1))
+    if [ $attempt -ge $max_attempts ]; then
+        echo "ERROR: Elasticsearch did not start within expected time. Continuing anyway..."
+        break
+    fi
+    echo "Elasticsearch is not ready yet. Waiting... (attempt $attempt/$max_attempts)"
+    sleep 10
 done
 echo "Elasticsearch is up and running!"
 
-exec gosu logstash /usr/share/logstash/bin/logstash -f /usr/share/logstash/pipeline/my_pipeline.conf
+echo "Starting Logstash with configuration..."
+exec gosu logstash /usr/share/logstash/bin/logstash -f /usr/share/logstash/pipeline/my_pipeline.conf --log.level=debug

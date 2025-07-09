@@ -16,33 +16,67 @@ import os
 from .utils import setTheCookie, decodeJWT
 import random
 import string
+from .logging_utils import (
+    log_auth_api_request, log_auth_attempt, log_security_event, 
+    log_token_operation, log_2fa_event, log_session_event,
+    log_password_policy_violation, log_failed_login_attempt,
+    auth_logger, security_logger
+)
 
 
 class data_link(APIView):
 	permission_classes = [AllowAny]
 
+	@log_auth_api_request(action_type='DATA_LINK_REQUEST')
 	def post(self, request):
 		user = request.data
+		mail = user.get('mail')
+
+		auth_logger.info(f"Data link requested for mail: {mail}", extra={
+			'action': 'data_link_request', 
+			'mail': mail
+		})
 
 		json_data = {
-			'mail':user.get('mail')
+			'mail': mail
 		}
-		response = requests.post("https://access_postgresql:4000/api/info_link/", json=json_data, verify=False, headers={'Host': 'localhost'})
-
+		
 		try:
-			if not response.ok:
-				error_detail = response.json() if response.content else response.text
-				return JsonResponse({'error': error_detail}, status=response.status_code)
-			json_response = response.json()
+			response = requests.post("https://access_postgresql:4000/api/info_link/", json=json_data, verify=False, headers={'Host': 'localhost'})
 
+			if not response.ok:
+				try:
+					error_detail = response.json() if response.content else response.text
+				except requests.exceptions.JSONDecodeError:
+					error_detail = response.text
+				log_security_event('DATA_LINK_FAILED', severity='WARNING', 
+								 mail=mail, error=error_detail, status_code=response.status_code)
+				return JsonResponse({'error': error_detail}, status=response.status_code)
+			
+			try:
+				json_response = response.json()
+			except requests.exceptions.JSONDecodeError:
+				json_response = {}
+				log_security_event('AUTH_JSON_DECODE_ERROR', severity='ERROR',
+								 response_text=response.text[:500],  # Log partial response text 
+								 status_code=response.status_code)
 			uid = json_response.get('uid')
 			token = json_response.get('token')
-			#host = request.get_host()
 			host = os.getenv("DOMAIN", "localhost")
 			activation_link = f"https://{host}:8443/auth/activate_account/{uid}/{token}/"
+			
+			auth_logger.info(f"Data link generated successfully for mail: {mail}", extra={
+				'action': 'data_link_success', 
+				'mail': mail, 
+				'uid': uid
+			})
+			
 		except ValueError:
+			error_msg = 'Invalid response from mail service'
+			log_security_event('DATA_LINK_JSON_ERROR', severity='ERROR',
+							 mail=mail, error='Invalid JSON response')
 			json_response = {
-				'error': 'Invalid response from mail service',
+				'error': error_msg,
 				'detail': response.text
 			}
 			return JsonResponse({'error': json_response}, status=500)
@@ -53,22 +87,34 @@ class data_link(APIView):
 class login(APIView):
 	permission_classes = [AllowAny]
 
+	@log_auth_api_request(action_type='LOGIN_ATTEMPT')
 	def post(self, request):
 		if (request.method == 'POST'):
 
 			user = request.data
+			mail = user.get('mail')
+			
+			log_auth_attempt('LOGIN', success=False, user_email=mail, stage='initial')
 			
 			json_data = {
-				'mail':user.get('mail'),
-				'password':user.get('password')
+				'mail': mail,
+				'password': user.get('password')
 			}
 
 			response = requests.post("https://access_postgresql:4000/api/checkPassword/", json=json_data, verify=False, headers={'Host': 'localhost'})
 			
 			data_response = None
 			try:
-				data_response = response.json()
+				try:
+					data_response = response.json()
+				except requests.exceptions.JSONDecodeError:
+					data_response = {'error': 'Invalid response format', 'text': response.text[:200]}
+					log_security_event('LOGIN_JSON_DECODE_ERROR', severity='ERROR',
+									 response_text=response.text[:500],
+									 status_code=response.status_code)
 			except ValueError:
+				log_security_event('LOGIN_JSON_ERROR', severity='ERROR',
+								 user_email=mail, error='Invalid JSON response')
 				data_response = {
 					'error': 'Invalid response from mail service',
 					'detail': response.text
@@ -83,16 +129,34 @@ class login(APIView):
 					mail_response = requests.post("https://mail:4010/mail/send_tfa/", json=json_send_mail, verify=False, headers={'Host': 'mail'})
 
 					if not mail_response.ok:
-						mail_error_detail = mail_response.json() if mail_response.content else mail_response.text
+						# Safely attempt to parse JSON, fall back to text if parsing fails
+						try:
+							mail_error_detail = mail_response.json() if mail_response.content else mail_response.text
+						except requests.exceptions.JSONDecodeError:
+							mail_error_detail = mail_response.text
+							
+						log_security_event('2FA_EMAIL_FAILED', severity='ERROR',
+										 user_email=mail, mail_error=mail_error_detail, 
+										 status_code=mail_response.status_code)
 						data_response = {
 							'error': f"Failed to send 2FA email. Status: {mail_response.status_code}",
 							'detail': mail_error_detail
 						}
 						return JsonResponse(data_response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+					
+					log_2fa_event('2FA_EMAIL_SENT', success=True, 
+								user_email=mail, username=data_response.get('user_name'))
 					data_response = {
 						'success':'authentication code send',
 						'user_name': data_response.get('user_name'),
 					}
+			else:
+				log_auth_attempt('LOGIN', success=False, user_email=mail, stage='failed')
+				# log_error(
+				# 	f"Login failed for mail {mail}: {data_response}",
+				# 	extra={'action': 'login_failed', 'mail': mail, 'status_code': response.status_code}
+				# )
+				
 			return JsonResponse(data_response, status=response.status_code)
 
 
@@ -157,7 +221,13 @@ class verifyTwofa(APIView): # The initial cookie is set in this view
 			)
 			
 			# Parse JSON response safely
-			response_data = response.json() if response.content else {}
+			try:
+				response_data = response.json() if response.content else {}
+			except requests.exceptions.JSONDecodeError:
+				response_data = {}
+				log_security_event('LOGOUT_JSON_DECODE_ERROR', severity='WARNING',
+								 response_text=response.text[:500],
+								 status_code=response.status_code)
 			
 			# Update tokens if available
 			access_token = response_data.get("access", jwtDecoded[1])
@@ -229,7 +299,13 @@ def activate_account(request, uidb64, token):
 
 	response = requests.post("https://access_postgresql:4000/api/activate_account/", json=json_data, verify=False, headers={'Host': 'localhost'})
 
-	json_response = response.json()
+	try:
+		json_response = response.json()
+	except requests.exceptions.JSONDecodeError:
+		json_response = {'error': 'Invalid response format', 'text': response.text[:200]}
+		log_security_event('ACCOUNT_ACTIVATION_JSON_DECODE_ERROR', severity='ERROR',
+						  response_text=response.text[:500],
+						  status_code=response.status_code)
 	template_html = json_response.get('html', None)
 	if not template_html:
 		error_message = "Missing template path from activation service."
@@ -270,7 +346,16 @@ class refreshAccessToken(APIView):
             # Handle successful token refresh
             if refresh_response.status_code == 200:
                 # Extract new access token
-                new_access_token = refresh_response.json().get("access")
+                try:
+                    new_access_token = refresh_response.json().get("access")
+                except requests.exceptions.JSONDecodeError:
+                    log_security_event('REFRESH_TOKEN_JSON_DECODE_ERROR', severity='ERROR',
+                                     response_text=refresh_response.text[:500],
+                                     status_code=refresh_response.status_code)
+                    return JsonResponse(
+                        {'error': 'Invalid response from authentication service'},
+                        status=500
+                    )
                 
                 if not new_access_token:
                     return JsonResponse({"error": "Invalid response from authentication service"}, status=500)
@@ -344,7 +429,13 @@ class	forgotPassword(APIView):
 				return JsonResponse({'error': 'User does not exist'}, status=404)
 			if not user_info_response.ok:
 				return JsonResponse({'error': 'Failed to retrieve user info'}, status=500)
-			user_info = user_info_response.json()
+			try:
+				user_info = user_info_response.json()
+			except requests.exceptions.JSONDecodeError:
+				log_security_event('PASSWORD_RESET_JSON_DECODE_ERROR', severity='ERROR',
+								  response_text=user_info_response.text[:500],
+								  status_code=user_info_response.status_code)
+				return JsonResponse({'error': 'Invalid response from user service'}, status=500)
 			username = user_info.get('user_name', None)
 			if not username:
 				return JsonResponse({'error': 'Username not found for this mail'}, status=500)

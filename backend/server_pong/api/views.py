@@ -13,7 +13,13 @@ from channels.layers import get_channel_layer
 from datetime import datetime
 import requests
 from http import HTTPStatus
-import asyncio
+from .logging_utils import (
+    log_game_api_request, log_game_event, log_game_error,
+    log_player_action, log_server_event, log_websocket_game_event,
+    log_game_state_change, log_player_disconnect, log_matchmaking_event,
+    game_logger
+)
+
 from serverPong.Racket import dictInfoRackets, wall1, wall2
 from serverPong.ball import calcIntersections
 
@@ -75,18 +81,39 @@ def decodeJWT(request, func=None, encodedJwt=None) :
         print(f"encoded: {encodedJwt}", file=f)
         res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
         print(f"res : {res}", file=f)
-        res_json = res.json()
-        print(f"res.json() : {res_json}", file=f)
-        if res.status_code != 200 :
-            print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
-            if (res_json.get('error') == "Token expired"):
-                refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-                if refresh_res.status_code == 200:
-                    new_access_token = refresh_res.json().get('access')
-                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-                    return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+        try:
+            res_json = res.json()
+            print(f"res.json() : {res_json}", file=f)
+            
+            if res.status_code != 200:
+                print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
+                if (res_json.get('error') == "Token expired"):
+                    try:
+                        refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+                        if refresh_res.status_code == 200:
+                            try:
+                                refresh_json = refresh_res.json()
+                                new_access_token = refresh_json.get('access')
+                                if new_access_token:
+                                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+                                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+                                    try:
+                                        return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+                                    except:
+                                        print(f"Error parsing JSON from res2", file=f)
+                                        return [None] * 3
+                                else:
+                                    print(f"No access token in refresh response", file=f)
+                                    return [None] * 3
+                            except:
+                                print(f"Error parsing refresh response JSON", file=f)
+                                return [None] * 3
+                    except Exception as e:
+                        print(f"Error refreshing token: {str(e)}", file=f)
+                        return [None] * 3
                 return [None] * 3
+        except Exception as e:
+            print(f"Error parsing JSON: {str(e)}, response text: {res.text[:200]}", file=f)
             return [None] * 3
         return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
@@ -97,136 +124,380 @@ dictApiSp = {}
 apiKeys = []
 #print("VIEW IMPORTEEE", file=sys.stderr)
 
+@log_game_api_request(action_type='GET_SIMULATION_STATE')
 def getSimulationState(request):
-    #print(f"[DEBUG] En attente de l'apiKey", file=sys.stderr)
     apikey = request.GET.get('apikey')
-    #print(f"[DEBUG] API Key reçue : {apikey}", file=sys.stderr)
+    
+    log_game_event('SIMULATION_STATE_REQUEST', game_id=apikey)
     
     if not apikey:
+        log_game_error('MISSING_API_KEY', error_details='API key not provided in request')
         return JsonResponse({'error': 'API key manquante'}, status=400)
     
     data = cache.get(f'simulation_state_{apikey}')
-    #print(f"[DEBUG] Données récupérées du cache : {data}", file=sys.stderr)
     
     if data:
+        log_game_event('SIMULATION_STATE_FOUND', game_id=apikey)
         return JsonResponse(data)
     else:
+        log_game_error('SIMULATION_NOT_FOUND', game_id=apikey, 
+                     error_details='No simulation data in cache for the provided API key')
         return JsonResponse({'error': 'Simulation not found'}, status=404)
 
 # Asynchronous generator function('async' + 'yield') to handle WebSocket connections
 # -> When it runs, it produces a value (in this case, a formatted string) and pauses 
 # the function’s execution. The next time the generator is iterated, execution resumes right after the yield.
 async def  checkForUpdates(uriKey, key) :
-    try :
+    connection_id = str(uuid.uuid4())[:8]  # Generate a short connection ID for logging
+    
+    try:
+        log_websocket_game_event('WS_CONNECT_ATTEMPT', connection_id=connection_id, 
+                               game_id=key, uri=uriKey)
+                               
         ssl_context = ssl.create_default_context()
         ssl_context.load_verify_locations('/certs/fullchain.crt')
+        
         async with websockets.connect(uriKey, ssl=ssl_context) as ws:
+            log_websocket_game_event('WS_CONNECTED', connection_id=connection_id,
+                                   game_id=key, uri=uriKey)
+            
             while True:
                 message = await ws.recv()
+                
+                # Log only periodically to avoid excessive logging
+                if "gameState" in message:
+                    try:
+                        msg_data = json.loads(message)
+                        if msg_data.get("type") == "gameState":
+                            log_game_state_change(key, 
+                                                old_state=None, 
+                                                new_state=msg_data.get("state"),
+                                                trigger="websocket_update")
+                    except:
+                        # Don't crash if message parsing fails
+                        pass
+                
                 yield f"data: {message}\n\n"
-    except Exception as e :
+                
+    except Exception as e:
+        log_websocket_game_event('WS_ERROR', connection_id=connection_id,
+                               game_id=key, error_type=type(e).__name__,
+                               error_message=str(e))
         yield f"data: WebSocket stop, error : {e}\n\n"
+        
+    finally:
+        log_websocket_game_event('WS_DISCONNECTED', connection_id=connection_id,
+                               game_id=key)
 
 async def sseCheck(request) :
+    log_server_event('SSE_CHECK_REQUEST', 
+                    server_id=request.META.get('REMOTE_ADDR', 'unknown'))
+    
     JWT = decodeJWT(request, "sseCheck")
-    if not JWT[0] :
-        return HttpResponse401() # Set an error 
-    return JsonResponse({"username" : JWT[0]['payload']["username"], "guest" : JWT[0]["payload"]["invites"]})
+    
+    if not JWT[0]:
+        log_server_event('SSE_CHECK_AUTH_FAILED', 
+                        server_id=request.META.get('REMOTE_ADDR', 'unknown'),
+                        status='unauthorized')
+        return HttpResponse401() # Set an error
+        
+    username = JWT[0]['payload'].get("username", "unknown")
+    invites = JWT[0]['payload'].get("invites", [])
+    
+    log_server_event('SSE_CHECK_SUCCESS', 
+                    server_id=request.META.get('REMOTE_ADDR', 'unknown'),
+                    username=username,
+                    guest_count=len(invites))
+                    
+    return JsonResponse({"username": username, "guest": invites})
 
 async def sse(request):
-    apikey=request.GET.get("apikey")
+    apikey = request.GET.get("apikey")
     AI = request.GET.get('ai')
     idplayer = int(request.GET.get("idplayer"))
+    
+    log_game_event('SSE_CONNECTION_REQUEST', 
+                 game_id=apikey, 
+                 player_id=idplayer, 
+                 is_ai_game=bool(AI and AI != '0'))
+    
     rq = RequestParsed(apikey, {})
+    
+    if not rq.apiKey:
+        log_game_error('INVALID_API_KEY', 
+                     error_details='API key not found or invalid',
+                     api_key_provided=apikey)
+        return JsonResponse({'error': 'Invalid API key'}, status=400)
 
-    if idplayer == 0 :
+    if idplayer == 0:  # Observer mode
         idp1 = int(request.GET.get("JWTidP1"))
         idp2 = int(request.GET.get("JWTidP2"))
-        if idp1 < 0 :
+        
+        if idp1 < 0:
             username1 = request.GET.get("username", "Guest")
-        else :
+        else:
             username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
 
-        if idp2 < 0 :
+        if idp2 < 0:
             username2 = request.GET.get("username", "Guest")
-        else :
+        else:
             username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
         
-        if (rq.apiKey) :
-            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}", rq.apiKey), content_type="text/event-stream")
+        log_game_event('OBSERVER_CONNECTED', 
+                     game_id=rq.apiKey,
+                     player1_id=username1, 
+                     player2_id=username2)
+        
+        if rq.apiKey:
+            conn_uri = f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}"
+            return StreamingHttpResponse(
+                checkForUpdates(conn_uri, rq.apiKey), 
+                content_type="text/event-stream"
+            )
 
-    elif idplayer == 1 :
+    elif idplayer == 1:  # Player 1
         idp1 = int(request.GET.get("JWTid"))
-        if idp1 < 0 :
+        
+        if idp1 < 0:
             username1 = request.GET.get("username", "Guest")
-        else :
+        else:
             username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
 
-        if (rq.apiKey) :
-            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}", rq.apiKey), content_type="text/event-stream")
+        log_player_action('PLAYER_CONNECTED', 
+                        game_id=rq.apiKey, 
+                        player_id=username1, 
+                        action_data={'player_number': 1})
         
-    else :
+        if rq.apiKey:
+            conn_uri = f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}"
+            return StreamingHttpResponse(
+                checkForUpdates(conn_uri, rq.apiKey), 
+                content_type="text/event-stream"
+            )
+        
+    else:  # Player 2
         idp2 = int(request.GET.get("JWTid"))
-        if idp2 < 0 :
+        
+        if idp2 < 0:
             username2 = request.GET.get("username", "Guest")
-        else :
+        else:
             username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
 
-        if (rq.apiKey) :
-            return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
+        log_player_action('PLAYER_CONNECTED', 
+                        game_id=rq.apiKey, 
+                        player_id=username2, 
+                        action_data={'player_number': 2})
 
-@csrf_exempt
+        if rq.apiKey:
+            conn_uri = f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}"
+            return StreamingHttpResponse(
+                checkForUpdates(conn_uri, rq.apiKey), 
+                content_type="text/event-stream"
+            )
+
+@csrf_exempt  # This exempts the view from CSRF verification
+@log_game_api_request(action_type='SET_API_KEY_SP')
 def setApiKeySp(request):
+    # Log the request details to help debug cross-origin issues
+    game_logger.info(f"Processing setApiKeySp request", 
+                    extra={
+                        'path': request.path,
+                        'method': request.method,
+                        'origin': request.META.get('HTTP_ORIGIN', 'unknown'),
+                        'referer': request.META.get('HTTP_REFERER', 'unknown'),
+                        'content_type': request.content_type or 'none',
+                    })
+    
+    # Ensure we have a proper request object
+    if not request:
+        log_game_error('MISSING_REQUEST', 
+                     error_details='Request object missing in setApiKeySp',
+                     error_type='TypeError')
+        return JsonResponse({'error': 'Internal server error: Missing request'}, status=500)
+    
+    # Debug logging to track the issue
+    game_logger.info(f"setApiKeySp called with request method: {request.method}", 
+                    extra={'path': request.path, 'method': request.method})
+    
     JWT = decodeJWT(request, "setApiKeySp")
-    if not JWT[0] :
-        return HttpResponse401() # Set an error 
-    # print(f" Jwt : {JWT[0]}", file=sys.stderr)
-    body = json.loads(request.body)
-    apikey = body.get('apiKey')
-    dictApiSp[apikey] = 1
-    apiKeys.append(apikey)
-    return JsonResponse({"playable": "Game can start"})
+    
+    if not JWT[0]:
+        log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
+                     error_details='Missing or invalid JWT',
+                     ip=request.META.get('REMOTE_ADDR'))
+        return HttpResponse401() # Set an error
+        
+    user_id = JWT[0]['payload'].get('username', 'unknown')
+    
+    try:
+        body = json.loads(request.body)
+        apikey = body.get('apiKey')
+        
+        if not apikey:
+            log_game_error('INVALID_API_KEY_REQUEST', 
+                         error_details='Missing API key in request body',
+                         user_id=user_id)
+            return JsonResponse({'error': 'Missing API key'}, status=400)
+        
+        # Register the API key
+        dictApiSp[apikey] = 1
+        apiKeys.append(apikey)
+        
+        log_game_event('API_KEY_REGISTERED', 
+                     game_id=apikey, 
+                     player1_id=user_id,
+                     event_type='single_player')
+        
+        return JsonResponse({"playable": "Game can start"})
+        
+    except json.JSONDecodeError:
+        log_game_error('MALFORMED_REQUEST', 
+                     error_details='Invalid JSON in request body',
+                     user_id=user_id)
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        log_game_error('API_KEY_REGISTRATION_FAILED',
+                     error_details=str(e),
+                     error_type=type(e).__name__,
+                     user_id=user_id)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
 
 @csrf_exempt
+@log_game_api_request(action_type='SET_API_KEY')
 def setApiKey(request):
     JWT = decodeJWT(request, "setApiKey")
-    if not JWT[0] :
-        return HttpResponse401() # Set an error 
-    # fil = open('test.txt', 'w+')
-    # #print(f" Jwt : {JWT[0]}", file=fil)
-    # fil.close()
-    apikey = json.loads(request.body).get('apiKey')
-    if apikey not in apiKeysUnplayable:
-        return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
-    if apikey in dictApi :
-        dictApi[apikey] += 1
-    else :
-        dictApi[apikey] = 1
+    
+    if not JWT[0]:
+        log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
+                     error_details='Missing or invalid JWT',
+                     ip=request.META.get('REMOTE_ADDR'))
+        return HttpResponse401() # Set an error
+        
+    user_id = JWT[0]['payload'].get('username', 'unknown')
+    
+    try:
+        body = json.loads(request.body)
+        apikey = body.get('apiKey')
+        
+        if not apikey:
+            log_game_error('INVALID_API_KEY_REQUEST', 
+                         error_details='Missing API key in request body',
+                         user_id=user_id)
+            return JsonResponse({'error': 'Missing API key'}, status=400)
+            
+        if apikey not in apiKeysUnplayable:
+            log_game_error('ROOM_NOT_FOUND',
+                         error_details=f'Room {apikey} does not exist',
+                         user_id=user_id, 
+                         api_key=apikey)
+            return JsonResponse({"playable": f"Room {apikey} doesn't Exists"})
+            
+        # Update player count
+        if apikey in dictApi:
+            dictApi[apikey] += 1
+            log_game_event('PLAYER_JOINED_EXISTING_GAME',
+                         game_id=apikey,
+                         player2_id=user_id,
+                         player_count=dictApi[apikey])
+        else:
+            dictApi[apikey] = 1
+            log_game_event('PLAYER_JOINED_NEW_GAME',
+                         game_id=apikey,
+                         player1_id=user_id,
+                         player_count=1)
 
-    if (dictApi[apikey] > 1) :
-        apiKeysUnplayable.remove(apikey)
-        apiKeys.append(apikey)
-        playable = "Game can start"
-    else :
-        playable = "Need more player"
+        # Check if we have enough players
+        if (dictApi[apikey] > 1):
+            apiKeysUnplayable.remove(apikey)
+            apiKeys.append(apikey)
+            playable = "Game can start"
+            
+            log_matchmaking_event('GAME_READY',
+                                player_id=user_id,
+                                queue_time=None,
+                                game_id=apikey)
+        else:
+            playable = "Need more player"
+            
+            log_matchmaking_event('WAITING_FOR_OPPONENT',
+                                player_id=user_id,
+                                game_id=apikey)
 
-    return JsonResponse({"playable": playable})
+        return JsonResponse({"playable": playable})
+        
+    except json.JSONDecodeError:
+        log_game_error('MALFORMED_REQUEST', 
+                     error_details='Invalid JSON in request body',
+                     user_id=user_id)
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        log_game_error('API_KEY_REGISTRATION_FAILED',
+                     error_details=str(e),
+                     error_type=type(e).__name__,
+                     user_id=user_id)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
 @csrf_exempt
-def isGamePlayable(request) :
+@log_game_api_request(action_type='CHECK_GAME_PLAYABLE')
+def isGamePlayable(request):
     JWT = decodeJWT(request, "isGamePlayable")
-    if not JWT[0] :
-        return HttpResponse401() # Set an error 
-    #print(f" Jwt : {JWT[0]}", file=sys.stderr)
-    apikey = json.loads(request.body).get('apiKey')
-    if (dictApi[apikey] > 1) :
-        apiKeys.append(apikey)
-        playable = "Game can start"
-    else :
-        playable = "Need more player"
-    #print(f"playable : {playable}", file=sys.stderr)
-    return JsonResponse({"playable": playable})
+    
+    if not JWT[0]:
+        log_game_error('UNAUTHORIZED_GAME_CHECK', 
+                     error_details='Missing or invalid JWT',
+                     ip=request.META.get('REMOTE_ADDR'))
+        return HttpResponse401() # Set an error
+        
+    user_id = JWT[0]['payload'].get('username', 'unknown')
+    
+    try:
+        body = json.loads(request.body)
+        apikey = body.get('apiKey')
+        
+        if not apikey:
+            log_game_error('INVALID_GAME_CHECK', 
+                         error_details='Missing API key in request body',
+                         user_id=user_id)
+            return JsonResponse({'error': 'Missing API key'}, status=400)
+            
+        # Check if we have enough players
+        if apikey in dictApi and dictApi[apikey] > 1:
+            apiKeys.append(apikey)
+            playable = "Game can start"
+            
+            log_game_event('GAME_READY_CHECK_SUCCESS',
+                         game_id=apikey,
+                         player_id=user_id,
+                         player_count=dictApi[apikey])
+        else:
+            playable = "Need more player"
+            
+            log_game_event('GAME_WAITING_FOR_PLAYERS',
+                         game_id=apikey,
+                         player_id=user_id,
+                         player_count=dictApi.get(apikey, 0))
+            
+        return JsonResponse({"playable": playable})
+        
+    except json.JSONDecodeError:
+        log_game_error('MALFORMED_REQUEST', 
+                     error_details='Invalid JSON in request body',
+                     user_id=user_id)
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except KeyError:
+        log_game_error('GAME_NOT_FOUND',
+                     error_details=f'No game data for API key: {apikey}',
+                     user_id=user_id,
+                     api_key=apikey)
+        return JsonResponse({'error': f'Game with key {apikey} not found'}, status=404)
+    except Exception as e:
+        log_game_error('GAME_CHECK_FAILED',
+                     error_details=str(e),
+                     error_type=type(e).__name__,
+                     user_id=user_id,
+                     api_key=apikey if 'apikey' in locals() else None)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
 
 
 def get_api_key(request):

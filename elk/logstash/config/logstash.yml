@@ -1,11 +1,13 @@
 api.http.host: "0.0.0.0"
+api.http.port: 9600
 
 # xpack.monitoring.enabled: false
 log.level: "debug"
 xpack.monitoring.elasticsearch.hosts: ["https://elasticsearch:9200"]
 xpack.monitoring.enabled: true
 xpack.monitoring.elasticsearch.ssl.certificate_authority: "/usr/share/logstash/config/certs/ca/ca.crt"
-xpack.monitoring.elasticsearch.username: "logstash_system"
+# xpack.monitoring.elasticsearch.username: "logstash_system"
+xpack.monitoring.elasticsearch.username: "logstash_internal"
 xpack.monitoring.elasticsearch.password: "${ELASTIC_PASSWORD}"
 config.reload.automatic: false
 path.logs: "/usr/share/logstash/logs"

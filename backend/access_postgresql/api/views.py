@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.encoding import force_str
 from .utils import generate_otp_send_mail, generateJwt
+from .logging_utils import log_api_request, log_database_operation, log_user_action, log_profile_operation, log_authentication_event
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
@@ -24,6 +25,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import sys
 import jwt
+import re
 from django.conf import settings
 # Create your views here.
 
@@ -50,12 +52,20 @@ except ImportError:
 class api_signup(APIView):
 	permission_classes = [AllowAny]
 
+	@log_api_request(action_type='USER_SIGNUP')
 	def post(self, request):
 
 		data = request.data
 
+		# Username validation - check for whitespace
+		username = data.get('user_name', '')
+		if re.search(r'\s', username):
+			log_user_action('SIGNUP_FAILED', None, reason='username_whitespace', username=username)
+			return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
+
 		try:
 			with transaction.atomic():
+				log_database_operation('USER_CREATE', 'USER', username=username, email=data.get('mail'))
 				user = USER.objects.create(
 				user_name=data['user_name'],
 				first_name=data['first_name'],
@@ -63,13 +73,17 @@ class api_signup(APIView):
 				mail=data['mail'],
 				password=data['password']
 			)
+			log_user_action('USER_CREATED', user, email=data.get('mail'))
 		except IntegrityError as e:
 			err_msg = str(e)
 			if 'mail' in err_msg:
+				log_user_action('SIGNUP_FAILED', None, reason='email_exists', email=data.get('mail'))
 				return JsonResponse({'error': 'User with this email already exists'}, status=400)
 			elif 'user_name' in err_msg:
+				log_user_action('SIGNUP_FAILED', None, reason='username_exists', username=username)
 				return JsonResponse({'error': 'Username already taken'}, status=400)
 			else:
+				log_user_action('SIGNUP_FAILED', None, reason='integrity_error', error=str(e))
 				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
 
 		return JsonResponse({'success': 'User successfully created', 'user_id': user.id}, status=200)
@@ -99,14 +113,12 @@ class info_link(APIView):
 
 		return JsonResponse(json_response, status=200)
 
-
-logger = logging.getLogger(__name__)
-
 # url: /api/activate_account/
 # This view activates the user account using the uid and token generated in info_link
 class activate_account(APIView):
 	permission_classes = [AllowAny]
 
+	@log_api_request(action_type='ACCOUNT_ACTIVATION')
 	def post(self, request):
 		User = get_user_model()
 
@@ -125,13 +137,13 @@ class activate_account(APIView):
 			if not user.activated:
 				user.activated = True
 				user.save()
-				logger.info(f"User {user.mail} activated successfully.")
+				log_authentication_event('ACCOUNT_ACTIVATED', user, success=True, method='email_token')
 
 				return JsonResponse({'html': 'account_activated.html'}, status=200)
 			else:
 				return JsonResponse({'html': 'account_already_activated.html'}, status=200)
 		else:
-			logger.warning("Activation link invalid or expired.")
+			log_authentication_event('ACTIVATION_FAILED', None, success=False, reason='invalid_token')
 			return JsonResponse({'html': 'token_expired.html'}, status=200)
 
 # url: /api/checkPassword/
@@ -139,6 +151,7 @@ class activate_account(APIView):
 class checkPassword(APIView):
 	permission_classes = [AllowAny]
 
+	@log_api_request(action_type='PASSWORD_CHECK')
 	def post(self, request):
 
 		data = request.data
@@ -465,6 +478,10 @@ class uploadProfile(APIView):
 			data = request.data
 			new_username = data.get('userName')
 
+			# Username validation - check for whitespace
+			if re.search(r'\s', new_username):
+				return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
+
 			User = get_user_model()
 
 			if User.objects.filter(Q(user_name=new_username) & ~Q(id=user.id)).exists():
@@ -553,6 +570,7 @@ class ChatGroupListCreateView(APIView):
 	"""
 	permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
 
+	@log_api_request(action_type='GET_CHAT_GROUPS')
 	def get(self, request) -> Response:
 		"""
 		Lists chat groups for the currently authenticated user.
@@ -561,7 +579,7 @@ class ChatGroupListCreateView(APIView):
 		chat_groups = current_user.chat_groups.all()
 	
 		chat_list = []
-		logger.info(f"Retrieving chat groups for user {current_user.user_name}")
+		log_user_action('CHAT_GROUPS_RETRIEVED', current_user, group_count=len(chat_groups))
 		
 		for group in chat_groups:
 			# For private chats (2 members), get the other user
@@ -588,6 +606,7 @@ class ChatGroupListCreateView(APIView):
 			'status': 'success',
 			'chats': chat_list
 		})
+	@log_api_request(action_type='CREATE_CHAT_GROUP')
 	def post(self, request) -> Response:
 		"""
 		Creates or retrieves a private chat group between the authenticated user
@@ -606,7 +625,7 @@ class ChatGroupListCreateView(APIView):
 		try:
 			target_user = USER.objects.get(id=target_user_id)
 			if current_user.id == target_user.id:
-				logger.warning(f"User {current_user.id} attempted to create chat with themselves")
+				log_user_action('CHAT_CREATE_FAILED', current_user, reason='self_chat_attempt')
 				return Response({
 					'status': 'error',
 					'message': 'Cannot create chat with yourself'
@@ -623,14 +642,17 @@ class ChatGroupListCreateView(APIView):
 			).first()
 			
 			if existing_chat:
-				logger.info(f"Found existing chat group: {existing_chat.id} between users {current_user.id} and {target_user.id}")
+				log_user_action('CHAT_GROUP_FOUND', current_user, 
+							  chat_id=existing_chat.id, target_user_id=target_user.id)
 				chat_group = existing_chat
 			else:
 				# Create a new chat group
-				logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
+				log_database_operation('CHAT_GROUP_CREATE', 'ChatGroup', 
+									  users=[current_user.id, target_user.id])
 				chat_group = ChatGroup.objects.create(name=chat_name)
 				chat_group.members.add(current_user, target_user)
-				logger.info(f"Created new chat group: {chat_group.id}")
+				log_user_action('CHAT_GROUP_CREATED', current_user, 
+							  chat_id=chat_group.id, target_user_id=target_user.id)
 			
 			# Return the chat group details
 			return Response({
@@ -642,13 +664,13 @@ class ChatGroupListCreateView(APIView):
 			}, status=status.HTTP_200_OK)
 			
 		except USER.DoesNotExist:
-			logger.warning(f"Target user {target_user_id} not found for chat creation")
+			log_user_action('CHAT_CREATE_FAILED', current_user, reason='target_user_not_found', target_user_id=target_user_id)
 			return Response({
 				'status': 'error', 
 				'message': 'Target user not found'
 			}, status=status.HTTP_404_NOT_FOUND)
 		except Exception as e:
-			logger.exception(f"Error creating chat group: {e}")
+			log_user_action('CHAT_CREATE_ERROR', current_user, error=str(e))
 			return Response({
 				'status': 'error',
 				'message': f'Internal server error: {str(e)}'
@@ -712,13 +734,14 @@ class ChatMessageView(APIView):
 	API endpoint to send a chat message to a specific group.
 	This view saves the message to the database and broadcasts it via Channel Layers.
 	"""
+	@log_api_request(action_type='SEND_MESSAGE')
 	def post(self, request, group_id) -> Response:
 		current_user = request.user
 		data = request.data
 		content = data.get('content')
 		# group_id = data.get('group_id')
 		if not content:
-			logger.warning("Message content is empty for sending message.")
+			log_user_action('MESSAGE_SEND_FAILED', current_user, reason='empty_content', group_id=group_id)
 			return Response(
 				{'status': 'error', 'message': 'Message content cannot be empty.'},
 				status=status.HTTP_400_BAD_REQUEST
@@ -728,7 +751,7 @@ class ChatMessageView(APIView):
 			chat_group = ChatGroup.objects.get(id=group_id)
 			is_member = chat_group.members.filter(id=current_user.id).exists()
 			if not is_member:
-				logger.warning(f"User {current_user.user_name} is not a member of group '{group_id}'. Cannot send message.")
+				log_user_action('MESSAGE_SEND_FAILED', current_user, reason='not_member', group_id=group_id)
 				return Response(
 					{'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
 					status=status.HTTP_403_FORBIDDEN
@@ -745,11 +768,12 @@ class ChatMessageView(APIView):
 				content=content,
 				group=chat_group
 			)
-			logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_id}.")
+			log_database_operation('MESSAGE_CREATED', 'Message', 
+								 user_id=current_user.id, group_id=group_id, content_length=len(content))
 
 			channel_layer = get_channel_layer()
 			if channel_layer is None:
-				logger.critical("Channel Layer not configured. Real-time features will not work.")
+				log_user_action('SYSTEM_ERROR', current_user, error='channel_layer_not_configured')
 				return Response(
 					{'status': 'error', 'message': 'Server not configured for real-time communication.'},
 					status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -779,7 +803,7 @@ class ChatMessageView(APIView):
 					"message": message_data
 				}
 			)
-			logger.info(f"Message broadcasted to group '{channel_group_id}'.")
+			log_user_action('MESSAGE_BROADCASTED', current_user, group_id=group_id, channel_group=channel_group_id)
 
 			return Response({
 				'status': 'success',
@@ -788,13 +812,13 @@ class ChatMessageView(APIView):
 			}, status=status.HTTP_200_OK)
 
 		except ChatGroup.DoesNotExist:
-			logger.warning(f"Chat group '{group_id}' not found for sending message.")
+			log_user_action('MESSAGE_SEND_FAILED', current_user, reason='group_not_found', group_id=group_id)
 			return Response(
 				{'status': 'error', 'message': 'Chat group not found.'},
 				status=status.HTTP_404_NOT_FOUND
 			)
 		except Exception as e:
-			logger.exception(f"Error in ChatMessageSendView: {e}")
+			log_user_action('MESSAGE_SEND_ERROR', current_user, error=str(e), group_id=group_id)
 			return Response(
 				{'status': 'error', 'message': f'Internal server error: {e}'},
 				status=status.HTTP_500_INTERNAL_SERVER_ERROR

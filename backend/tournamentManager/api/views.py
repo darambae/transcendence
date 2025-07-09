@@ -13,6 +13,7 @@ from .tournamentStatic import Tournament, Player, trnmtDict, user_ws_connections
 from channels.layers import get_channel_layer
 from django.http import JsonResponse, StreamingHttpResponse
 import json
+from .logging_utils import log_api_request, log_tournament_event, tournament_logger
 
 channel_layer = get_channel_layer()
 
@@ -405,4 +406,4 @@ async def amIinTournament(request) :
 		return JsonResponse({"Tournament" : "None"})
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)
-	
+
