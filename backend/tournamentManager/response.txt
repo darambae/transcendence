@@ -1,0 +1,4 @@
+username : gautier | trnmt.match1.p1 : <api.tournamentStatic.Player object at 0x7fb504da6350> | trnmt.match1.p1.username : Bobby
+Default
+username : omar | trnmt.match1.p1 : <api.tournamentStatic.Player object at 0x7fa1cc95e810> | trnmt.match1.p1.username : omar
+Accepted

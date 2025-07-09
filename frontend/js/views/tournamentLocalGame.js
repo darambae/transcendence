@@ -40,5 +40,5 @@ export async function localGameTr() {
 
     setPlayersLocalName(key)
 
-    localGameController();
+    localGameController(id1, id2);
   }

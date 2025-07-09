@@ -29,7 +29,7 @@ export async function versusController() {
             });
       await setApiKeyWebSP(apiKey);
       setPlayersLocalName(apiKey);
-      actualizeIndexPage("idfooterCanvas", routesSp["game"])
+      actualizeIndexPage("idfooterCanvas", routesSp["game"](-1, 0))
   });
   replayBtnSinglePlayer.addEventListener("click", async (event) => {
     const player1Score = document.getElementById("player1score");
@@ -63,6 +63,6 @@ export async function versusController() {
           });
     await setApiKeyWebSP(apiKey);
     setPlayersLocalName(apiKey);
-    actualizeIndexPage("idfooterCanvas", routesSp["game"])
+    actualizeIndexPage("idfooterCanvas", routesSp["game"](-1, 0))
 });
 }

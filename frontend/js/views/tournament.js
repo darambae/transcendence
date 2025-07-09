@@ -7,11 +7,11 @@ import { onlineGameTr } from "./tournamentOnlineGaame.js";
 
 export let routesTr = {
   matchSp : {
-    template : "tournamentMatch",
+    template : "singlePlayTournament",
     controller : localGameTr
   },
   matchOnline : (key, playerID, isAiGame, JWTid, tkey) => ({
-    template : "tournamentMatch",
+    template : "multiplayerTournament",
     controller : () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey)
   }),
   tournament : { 
@@ -504,6 +504,7 @@ export async function tournamentController() {
         // const contentInfo = KeepInfo.innerHTML;
         
         if (target.dataset.type == "local") {
+          // if (target.dataset.p1 ==)
           localStorage.setItem("p1", target.dataset.p1);
           localStorage.setItem("p2", target.dataset.p2);
           localStorage.setItem("key", target.dataset.key);
