@@ -195,44 +195,44 @@ class checkTfa(APIView):
         data = request.data
         print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
-		try:
-			if "jwt" in data :
-				print("JWT IN DATA !", file=sys.stderr)
-				print(f"invites : {data['jwt']}", file=sys.stderr)
-				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
-				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
-						print("checkPassword ok !", file=sys.stderr)
-						data["jwt"]["invites"].append(user.user_name)
-						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-						print("JWT generated !", file=sys.stderr)
-						#user.two_factor_auth = False
-						print(666, file=sys.stderr)
-						user.save()
-						print(7777, file=sys.stderr)
-						return JsonResponse({'success': 'authentication code send',
-							  				 'refresh': str(data_generate_jwt['refresh']),
-											 'access': str(data_generate_jwt['access'])},
-											 status=200)
-					else :
-						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
-				else:
-					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
-			else :
-				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
-				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with no JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth):
-						print("checkPassword ok !", file=sys.stderr)
-						#user.two_factor_auth = False
-						user.online = True
-						user.last_login = datetime.now()
-						user.save()
+        try:
+            if "jwt" in data :
+                print("JWT IN DATA !", file=sys.stderr)
+                print(f"invites : {data['jwt']}", file=sys.stderr)
+                user = USER.objects.get(mail=data.get('mail'))
+                print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+                print("user.activated", user.activated, file=sys.stderr)
+                if user.activated and user.two_factor_auth:
+                    print("here in 2FA checking with JWT", file=sys.stderr)
+                    if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+                        print("checkPassword ok !", file=sys.stderr)
+                        data["jwt"]["invites"].append(user.user_name)
+                        data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
+                        print("JWT generated !", file=sys.stderr)
+                        #user.two_factor_auth = False
+                        print(666, file=sys.stderr)
+                        user.save()
+                        print(7777, file=sys.stderr)
+                        return JsonResponse({'success': 'authentication code send',
+                                               'refresh': str(data_generate_jwt['refresh']),
+                                             'access': str(data_generate_jwt['access'])},
+                                             status=200)
+                    else :
+                        return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+                else:
+                    return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
+            else :
+                user = USER.objects.get(mail=data.get('mail'))
+                print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+                print("user.activated", user.activated, file=sys.stderr)
+                if user.activated and user.two_factor_auth:
+                    print("here in 2FA checking with no JWT", file=sys.stderr)
+                    if check_password(data.get('tfa'), user.two_factor_auth):
+                        print("checkPassword ok !", file=sys.stderr)
+                        #user.two_factor_auth = False
+                        user.online = True
+                        user.last_login = datetime.now()
+                        user.save()
 
                         data_generate_jwt = generateJwt(user, user.toJson())
                         print("JWT generated !", file=sys.stderr)
@@ -321,26 +321,26 @@ class infoOtherUser(APIView):
         else:
             friend_status = None
 
-		user_matches = MATCHTABLE.objects.filter(
-			Q(username1=user) | Q(username2=user)
-		)
+        user_matches = MATCHTABLE.objects.filter(
+            Q(username1=user) | Q(username2=user)
+        )
 
         total_matches = user_matches.count()
 
         wins = 0
         losses = 0
 
-		for match in user_matches:
-			if match.username1 == user:
-				if match.score1 > match.score2:
-					wins += 1
-				elif match.score1 < match.score2:
-					losses += 1
-			elif match.username2 == user:
-				if match.score2 > match.score1:
-					wins += 1
-				elif match.score2 < match.score1:
-					losses += 1
+        for match in user_matches:
+            if match.username1 == user:
+                if match.score1 > match.score2:
+                    wins += 1
+                elif match.score1 < match.score2:
+                    losses += 1
+            elif match.username2 == user:
+                if match.score2 > match.score1:
+                    wins += 1
+                elif match.score2 < match.score1:
+                    losses += 1
 
 
         data = {
@@ -448,9 +448,9 @@ class uploadPrivateInfoUser(APIView):
             user.last_name = data.get('lastName')
             user.save()
 
-			return JsonResponse({'success': 'Successfully saved new first name and last name'}, status=200)
-		except Exception as e:
-			return JsonResponse({'error': f'Error saving new first name and last name: {str(e)}'}, status=400)
+            return JsonResponse({'success': 'Successfully saved new first name and last name'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'Error saving new first name and last name: {str(e)}'}, status=400)
 
 
 class uploadProfile(APIView):
@@ -470,14 +470,14 @@ class uploadProfile(APIView):
             user.user_name = new_username
             user.save()
 
-			data_generate_jwt = generateJwt(user, user.toJson())
+            data_generate_jwt = generateJwt(user, user.toJson())
 
-			return JsonResponse({'success': 'Successfully changed username',
-								'refresh': str(data_generate_jwt['refresh']),
-								'access': str(data_generate_jwt['access'])}
-								, status=200)
-		except Exception as e:
-			return JsonResponse({'error': f'Error changing username: {str(e)}'}, status=400)
+            return JsonResponse({'success': 'Successfully changed username',
+                                'refresh': str(data_generate_jwt['refresh']),
+                                'access': str(data_generate_jwt['access'])}
+                                , status=200)
+        except Exception as e:
+            return JsonResponse({'error': f'Error changing username: {str(e)}'}, status=400)
 
 
 class uploadNewPassword(APIView):
