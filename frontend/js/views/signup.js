@@ -47,10 +47,19 @@ export async function handleSignupSubmit(event) {
 		if (response.ok) {
 			console.log("signin form successfully submitted");
 			await actualizeIndexPage('main-content', routes.signupSuccess);
+			history.replaceState(null, '', '/'); // clean URL
 			const mailDiv = document.querySelector('.signup-success .user-mail');
 			const mail = cleanData.mail;
 			if (mailDiv){
 				mailDiv.textContent = mail;
+			}
+
+			const loginBtn = document.getElementById("signupSuccess-login");
+			if (loginBtn) {
+				loginBtn.addEventListener('click', async () => {
+					await actualizeIndexPage('modal-container', routes.login);
+					window.location.href = '/#home';
+				});
 			}
 		} else {
 			console.log("signup form couldn't connect")
@@ -90,6 +99,18 @@ export function signupController() {
 	const ruleUppercase = document.getElementById("rule-uppercase");
 	const ruleNumber = document.getElementById("rule-number");
 	const ruleSpecialChar = document.getElementById("rule-special-char");
+	const invalidSpan = document.getElementById('invalid');
+
+	function resetError() {
+        if (invalidSpan) {
+            invalidSpan.textContent = '';
+            invalidSpan.style.display = 'none';
+            invalidSpan.classList.remove('shake');
+        }
+    }
+
+	const passwordConfirmationInput = document.getElementById("password-confirmation");
+	const passwordConfirmationError = document.getElementById("passwordConfirmationError");
 
 	passwordInput.addEventListener('input', () => {
 		const value = passwordInput.value;
@@ -101,53 +122,48 @@ export function signupController() {
 		ruleUppercase.className = hasUppercase ? 'valid' : 'invalid';
 		ruleNumber.className = hasNumber ? 'valid' : 'invalid';
 		ruleSpecialChar.className = hasSpecialChar ? 'valid' : 'invalid';
+
+		resetError();
 	});
 
 	//password confirmation check
-	const passwordConfirmationInput = document.getElementById("password-confirmation");
-	const passwordConfirmationCheck = document.getElementById("passwordConfirmationCheck");
-
-	passwordInput.addEventListener('input', () => {
-		if (passwordConfirmationInput.value !== passwordInput.value) {
-			passwordConfirmationCheck.style.display = "block";
-		} else {
-			passwordConfirmationCheck.style.display = "none";
-		}
-	});
-	passwordConfirmationInput.addEventListener('input', () => {
-		if (passwordConfirmationInput.value !== passwordInput.value) {
-			passwordConfirmationCheck.style.display = 'block';
-		} else {
-			passwordConfirmationCheck.style.display = 'none';
-		}
-	});
+	// passwordConfirmationInput.addEventListener('input', () => {
+	// 	if (passwordConfirmationInput.value !== passwordInput.value) {
+	// 		passwordConfirmationError.style.display = 'block';
+	// 	} else {
+	// 		passwordConfirmationError.style.display = 'none';
+	// 	}
+	// });
 
 
 	const form = document.querySelector("#signup-form form");
 	if (form) {
 		form.addEventListener("submit", (event) => {
 			event.preventDefault();
-			const invalidSpan = document.getElementById('invalid');
 			let inputErr = false;
 			let errMsg = [];
 			if (invalidSpan) {
 				const value = passwordInput.value;
+				console.log("password input : ", value);
 				const hasUppercase = /[A-Z]/.test(value);
 				const hasNumber = /\d/.test(value);
 				const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
 
+				passwordConfirmationError.style.display = 'block';
 				if (!hasUppercase || !hasNumber || !hasSpecialChar) {
 					errMsg.push(
 						'Password must contain at least one uppercase letter, one number, and one special character.'
 					);
 					inputErr = true;
-				}
-				if (passwordConfirmationInput.value !== passwordInput.value) {
+				} else if (passwordConfirmationInput.value !== passwordInput.value) {
 					errMsg.push('Passwords do not match.');
 					inputErr = true;
 				}
+
 				if (inputErr) {
+					console.log("inputErr : ", inputErr);
 					invalidSpan.textContent = errMsg.join('\n');
+					console.log("invalidSpan textContent: ", invalidSpan.textContent);
 					invalidSpan.style.display = 'block';
 					invalidSpan.classList.remove('shake');
 					void invalidSpan.offsetWidth;
@@ -161,3 +177,98 @@ export function signupController() {
 		})
 	}
 }
+
+// // ...existing code...
+
+// export function signupController() {
+//     const loginForm = document.getElementById("login-form");
+//     const modalContainer = document.getElementById("modal-container");
+
+//     if (loginForm) {
+//         modalContainer.style.display = "none";
+//         loginForm.classList.remove("active");
+//     }
+
+//     const passwordInput = document.getElementById("inputPassword");
+//     const ruleUppercase = document.getElementById("rule-uppercase");
+//     const ruleNumber = document.getElementById("rule-number");
+//     const ruleSpecialChar = document.getElementById("rule-special-char");
+//     const passwordConfirmationInput = document.getElementById("password-confirmation");
+//     const passwordConfirmationCheck = document.getElementById("passwordConfirmationCheck");
+//     const invalidSpan = document.getElementById('invalid');
+
+//     // Réinitialise le message d'erreur à chaque modification
+//     function resetError() {
+//         if (invalidSpan) {
+//             invalidSpan.textContent = '';
+//             invalidSpan.style.display = 'none';
+//             invalidSpan.classList.remove('shake');
+//         }
+//     }
+
+//     passwordInput.addEventListener('input', () => {
+//         const value = passwordInput.value;
+//         const hasUppercase = /[A-Z]/.test(value);
+//         const hasNumber = /\d/.test(value);
+//         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+//         ruleUppercase.className = hasUppercase ? 'valid' : 'invalid';
+//         ruleNumber.className = hasNumber ? 'valid' : 'invalid';
+//         ruleSpecialChar.className = hasSpecialChar ? 'valid' : 'invalid';
+
+//         // Réinitialise le message d'erreur à chaque modification
+//         resetError();
+
+//         if (passwordConfirmationInput.value !== passwordInput.value) {
+//             passwordConfirmationCheck.style.display = "block";
+//         } else {
+//             passwordConfirmationCheck.style.display = "none";
+//         }
+//     });
+
+//     passwordConfirmationInput.addEventListener('input', () => {
+//         resetError();
+//         if (passwordConfirmationInput.value !== passwordInput.value) {
+//             passwordConfirmationCheck.style.display = 'block';
+//         } else {
+//             passwordConfirmationCheck.style.display = 'none';
+//         }
+//     });
+
+//     const form = document.querySelector("#signup-form form");
+//     if (form) {
+//         form.addEventListener("submit", (event) => {
+//             event.preventDefault();
+//             let inputErr = false;
+//             let errMsg = [];
+//             const value = passwordInput.value;
+//             const hasUppercase = /[A-Z]/.test(value);
+//             const hasNumber = /\d/.test(value);
+//             const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+//             if (!hasUppercase || !hasNumber || !hasSpecialChar) {
+//                 errMsg.push(
+//                     'Password must contain at least one uppercase letter, one number, and one special character.'
+//                 );
+//                 inputErr = true;
+//             }
+//             if (passwordConfirmationInput.value !== passwordInput.value) {
+//                 errMsg.push('Passwords do not match.');
+//                 inputErr = true;
+//             }
+//             if (inputErr && invalidSpan) {
+// 				console.log('invalidSpan element:', invalidSpan)
+//                 invalidSpan.textContent = errMsg.join('\n');
+//                 invalidSpan.style.display = 'block';
+//                 invalidSpan.classList.remove('shake');
+//                 void invalidSpan.offsetWidth;
+//                 invalidSpan.classList.add('shake');
+// 				console.log(errMsg)
+//                 return;
+//             } else {
+//                 resetError();
+//             }
+//             handleSignupSubmit(event);
+//         })
+//     }
+// }

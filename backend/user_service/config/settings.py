@@ -21,8 +21,8 @@ from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 
-ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql']
-#ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql']
+ALLOWED_HOSTS = ['*']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

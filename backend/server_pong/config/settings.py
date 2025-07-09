@@ -35,8 +35,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
-ALLOWED_HOSTS = ['server_pong']
+ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
+#ALLOWED_HOSTS = ['server_pong']
 # Application definition
 
 INSTALLED_APPS = [

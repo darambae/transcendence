@@ -3,33 +3,21 @@
 import json
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator # To apply csrf_exempt to class-based views
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import asyncio
 import logging
 from datetime import datetime
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework import status
 import requests
-# Configure logging
-# --- IMPORTANT: Ensure these models are correctly defined in .models ---
-# These are placeholder imports. Adjust based on your actual project structure
-# if USER, ChatGroup, or Message models are defined directly in this app.
-# If they are only used in access_postgresql, these specific imports might not be needed here,
-# but often Django projects define common models for consistency.
-# For the purpose of this file, we assume they are available if needed for local ORM ops,
-# but primarily, this service proxies to access_postgresql.
+import httpx
+import jwt
+import time
 
 logger = logging.getLogger(__name__)
 
-# Base URL for your access_postgresql service (without the /api/ prefix)
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
-# @method_decorator(csrf_exempt, name='dispatch') # Apply csrf_exempt to all methods in this class
-class ChatGroupListCreateView(View):
+class ChatGroupListCreateView(View):    
     def get(self, request, *args, **kwargs):
         """
         Lists chat groups for the logged-in user by proxying to access_postgresql.
@@ -39,7 +27,7 @@ class ChatGroupListCreateView(View):
         if not access_token:
             return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
         # Forward the access token in the request headers to access_postgresql
-        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost','Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
         try:
             resp = requests.get(url, headers=headers, timeout=10, verify=False)
@@ -59,13 +47,13 @@ class ChatGroupListCreateView(View):
         """
         try:
             data = json.loads(request.body)
-            current_username = data.get('current_username')
-            target_username = data.get('target_username')
-
-            if not current_username or not target_username:
-                return JsonResponse({'status': 'error', 'message': 'current_username and target_username are required.'}, status=400)
-
-            
+            target_user_id = data.get('target_user_id')
+            current_user_id = data.get('current_user_id')
+            if not target_user_id or not current_user_id:
+                return JsonResponse({'status': 'error', 'message': 'user ids are required.'}, status=400)
+                
+            # Get current user from the authenticated request
+            logger.info(f"Creating private chat for user {current_user_id} with target user {target_user_id}")
             access_token = request.COOKIES.get('access_token')
             if not access_token:
                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
@@ -73,8 +61,8 @@ class ChatGroupListCreateView(View):
             url = f"{ACCESS_PG_BASE_URL}/api/chat/"
             try:
                 resp = requests.post(url, json={
-                    'current_username': current_username,
-                    'target_username': target_username
+                    'current_user_id': current_user_id,
+                    'target_user_id': target_user_id
                 }, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
                 return JsonResponse(resp.json(), status=resp.status_code)
@@ -91,7 +79,6 @@ class ChatGroupListCreateView(View):
             logger.error(f"Internal server error: {e}")
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
-@method_decorator(csrf_exempt, name='dispatch')
 class ChatMessageView(View):
     """
     Handles fetching message history for a specific chat group by proxying to access_postgresql.
@@ -127,10 +114,19 @@ class ChatMessageView(View):
         try:
             data = json.loads(request.body)
             content = data.get('content')
-            # groupId = data.get('group_id')
+            MIN_LENGTH = 1
+            MAX_LENGTH = 1000
+            
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
-
+            if not content or len(content) < MIN_LENGTH:
+                return JsonResponse({'status': 'error', 'message': 'Message is empty'}, status=400)
+                
+            if len(content) > MAX_LENGTH:
+                return JsonResponse(
+                    {'status': 'error', 'message': f'Message exceeds maximum length of {MAX_LENGTH} characters'}, 
+                    status=400
+                )
             access_token = request.COOKIES.get('access_token')
             if not access_token:
                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
@@ -182,82 +178,85 @@ class ChatMessageView(View):
 async def sse_chat_stream(request, group_id):
     """
     Server-Sent Events stream for real-time chat messages.
-    Maps to: path("chat/stream/<int:group_id>/", views.sse_chat_stream, name="sse_chat_stream")
-    This view directly handles SSE via Django Channels, it does not proxy to access_postgresql.
     """
+    # Create a response object first
+    response = StreamingHttpResponse(_generate_events(request, group_id), 
+                                    content_type="text/event-stream")
+    response['Cache-Control'] = 'no-cache'
+    response['X-Accel-Buffering'] = 'no'
+    return response
+
+async def _generate_events(request, group_id):
+    """Internal generator for SSE events."""
     channel_layer = get_channel_layer()
     if channel_layer is None:
-        return StreamingHttpResponse("Internal Server Error: Channel layer not configured.", status=500, content_type="text/plain")
-
+        yield f"event: error\ndata: {json.dumps({'message': 'Channel layer not configured'})}\n\n"
+        return  # Empty return to stop the generator
+    
     channel_group_name = f"chat_{group_id}"
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
 
-    # --- SSE Token Authentication (Crucial for security) ---
-    # The frontend passes the token as a query parameter.
-    # You MUST validate this token here against your authentication system.
-    token_str = request.GET.get('token')
-    if not token_str:
-        await channel_layer.group_discard(channel_group_name, client_channel_name) # Discard channel on auth failure
-        return StreamingHttpResponse("Unauthorized: Token required.", status=401, content_type="text/plain")
+    # --- SSE Token Authentication ---
+    try:
+        # Your token expiration check code
+        access_token = request.COOKIES.get('access_token')
+        
+        token_data = jwt.decode(access_token, verify=False)
+        expiry_time = token_data.get('exp')
+        
+        current_time = time.time()
+        if expiry_time and (expiry_time - current_time < 300):
+            yield f"event: refresh_token\ndata: {{}}\n\n"
+            
+    except Exception as e:
+        logger.error(f"Error checking token expiration: {e}")
+    
+    # Validate token
+    try:
+        async with httpx.AsyncClient(verify=False) as client:
+            resp = await client.get(
+                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/", 
+                headers={
+                    'Authorization': f'Bearer {access_token}',
+                    'Host': 'localhost'
+                },
+                timeout=10
+            )
+            
+        if resp.status_code != 200:
+            logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}'")
+            await channel_layer.group_discard(channel_group_name, client_channel_name)
+            yield f"event: error\ndata: {json.dumps({'message': 'Unauthorized'})}\n\n"
+            return
+            
+        user_data = resp.json()
+        logger.info(f"live_chat (SSE): Validated token for group '{group_id}' - user data: {user_data}")
+        
+    except httpx.RequestError as e:
+        logger.exception(f"live_chat (SSE): Error validating token: {e}")
+        await channel_layer.group_discard(channel_group_name, client_channel_name)
+        yield f"event: error\ndata: {json.dumps({'message': 'Authentication error'})}\n\n"
+        return
 
-    # TODO: Implement actual token validation (e.g., JWT verification, Django Rest Framework Token lookup)
-    # This example is a placeholder. For production, replace with proper security.
-    # from rest_framework_simplejwt.authentication import JWTAuthentication
-    # from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-    # try:
-    #     auth = JWTAuthentication()
-    #     # Remove "Bearer " prefix if present
-    #     clean_token = token_str.replace('Bearer ', '')
-    #     # get_validated_token also performs expiration checks
-    #     validated_token = await sync_to_async(auth.get_validated_token)(clean_token)
-    #     user = await sync_to_async(auth.get_user)(validated_token)
-    #     if user:
-    #         logger.info(f"live_chat (SSE): Authenticated user '{user.username}' for group '{group_id}'.")
-    #         # Optionally, check if 'user' is allowed to access 'group_id' here
-    #     else:
-    #         raise InvalidToken("User not found for token.")
-    # except (InvalidToken, TokenError) as e:
-    #     logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}': {e}")
-    #     await channel_layer.group_discard(channel_group_name, client_channel_name)
-    #     return StreamingHttpResponse("Unauthorized: Invalid token.", status=401, content_type="text/plain")
-    # except Exception as e:
-    #     logger.exception(f"live_chat (SSE): Error validating token for SSE stream for group '{group_id}': {e}")
-    #     await channel_layer.group_discard(channel_group_name, client_channel_name)
-    #     return StreamingHttpResponse("Internal Server Error during authentication.", status=500, content_type="text/plain")
-
-    # --- END SSE Token Authentication ---
-
-
-    async def event_generator():
-        try:
-            while True:
-                # Add a timeout to send heartbeats, keeping the connection alive and
-                # allowing the server to clean up if the client disconnects silently.
+    try:
+        while True:
+            try:
                 message = await asyncio.wait_for(
                     channel_layer.receive(client_channel_name),
-                    timeout=20 # Send a heartbeat if no message for 20s
+                    timeout=20
                 )
 
                 if message and message["type"] == "chat_message":
                     sse_data = json.dumps(message["message"])
                     yield f"data: {sse_data}\n\n"
                 else:
-                    # Send an SSE comment (heartbeat) to maintain the connection
                     yield ":heartbeat\n\n"
-
-        except asyncio.TimeoutError:
-            # Timeout is normal, just a heartbeat, the loop continues
-            pass # Explicit heartbeat already yielded by the else block
-        except asyncio.CancelledError:
-            print(f"SSE stream for group '{group_id}' (channel {client_channel_name}) cancelled.")
-        except Exception as e:
-            yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
-        finally:
-            # Ensure the channel is discarded when the generator exits
-            await channel_layer.group_discard(channel_group_name, client_channel_name)
-
-    response = StreamingHttpResponse(event_generator(), content_type="text/event-stream")
-    response['Cache-Control'] = 'no-cache'
-    response['X-Accel-Buffering'] = 'no' # Essential for SSE to ensure events are sent immediately
-    return response
+                    
+            except asyncio.TimeoutError:
+                yield ":heartbeat\n\n"
+                
+    except Exception as e:
+        yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+    finally:
+        await channel_layer.group_discard(channel_group_name, client_channel_name)

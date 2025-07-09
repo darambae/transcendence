@@ -20,6 +20,7 @@
 	display: block;
   }
 
+
   #login-form .form-text {
 	font-family: 'helvetica', sans-serif;
 	font-size: 0.8em;
@@ -38,6 +39,19 @@
 
   .login-form .needs-validation .loading-msg {
 	font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  #forgotten-password {
+	text-decoration: underline;
+	display: block;
+	margin-top: 3px;
+	text-align: left;
+	padding: 0;
+	background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
   }
 
 @font-face {

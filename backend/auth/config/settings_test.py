@@ -38,50 +38,50 @@ SESSION_COOKIE_SECURE = False
 # =========================================================================
 # Simplify logging for tests to avoid external dependencies (Logstash).
 # You typically only want console logging during tests.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'add_app_name': { # Keep this filter if it's used in your main settings
-            '()': AddAppNameFilter, # Ensure AddAppNameFilter is available from .settings import *
-        },
-    },
-    'formatters': {
-        'text': {
-            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-            'class': 'logging.Formatter',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'text',
-            'filters': ['add_app_name'], # Keep if you use AddAppNameFilter
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO', # Reduce verbosity for Django's internal logs
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'api': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING', # Set root logger to a higher level
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'filters': {
+#         'add_app_name': { # Keep this filter if it's used in your main settings
+#             '()': AddAppNameFilter, # Ensure AddAppNameFilter is available from .settings import *
+#         },
+#     },
+#     'formatters': {
+#         'text': {
+#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+#             'class': 'logging.Formatter',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'text',
+#             'filters': ['add_app_name'], # Keep if you use AddAppNameFilter
+#         }
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO', # Reduce verbosity for Django's internal logs
+#             'propagate': False,
+#         },
+#         'django.request': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         },
+#         'api': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#             'propagate': False,
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'WARNING', # Set root logger to a higher level
+#     },
+# }
 
 # =========================================================================
 # Simple JWT Settings for Tests

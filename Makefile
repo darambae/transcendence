@@ -4,14 +4,14 @@ ELK=elk
 
 DOCKER_FILE=docker-compose.yml
 
-MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access_postgresql live_chat #tournament	
+MAIN_CONTAINERS=user_service ai_pong server_pong nginx_modsecurity postgres redis game_redis auth mail access_postgresql live_chat tournament
 ELK_CONTAINERS=elasticsearch kibana logstash
 
 # POUR GAUTIER & OMAR
 USER_CONTAINER=nginx_modsecurity postgres access_postgresql auth user_service mail live_chat
 
 # POUR RAFAEL
-GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access_postgresql auth mail	 # tournament
+GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access_postgresql auth mail tournament live_chat
 
 # POUR KELLY PLUS TARD
 CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access_postgresql server_pong ai_pong user_service tournament
@@ -39,7 +39,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator: #add-ca
+certs_generator: add-ca
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
@@ -135,9 +135,15 @@ down:
 	@cat << EOF > ./backend/access_postgresql/api/migrations/__init__.py
 	@cat << EOF > ./backend/user_service/api/migrations/__init__.py
 	@echo "Migrations directories recreated."
+	@echo "Deleting uploaded images except default.png..."
+	@find ./backend/user_service/api/media/imgs/ -type f -not -name "default.png" -delete
+	@echo "Uploaded images deleted."
 	@echo "Deleting pycache directories..."
 	@find ./backend -type d -name "__pycache__" -exec rm -rf {} +
 	@echo "Pycache directories deleted."
+	@echo "Deleting server_pong log files..."
+	@rm -f ./backend/server_pong/*_decodeJWT.txt ./backend/server_pong/test.txt
+	@echo "Server pong log files deleted."
 
 destroy:
 	@echo "Destroying Transcendence..."

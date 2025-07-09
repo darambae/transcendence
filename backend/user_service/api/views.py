@@ -14,8 +14,9 @@ from django.conf import settings
 import os
 import json
 import requests
+from .utils import setTheCookie
 
-# Create your views here.
+
 @ensure_csrf_cookie
 def get_csrf_token(request):
 	return JsonResponse({"message": "CSRF cookie set"})
@@ -40,14 +41,14 @@ def signup(request):
         if not data[field]:
             return JsonResponse({'create_user': {'error': f'Field {field} cannot be empty'}}, status=400)
         if len(data[field]) > len_for_fields[field]:
-            return JsonResponse({'create_user': {'error': f'Field {field} is too long max body is {len_for_fields[field]} character'}}, status=400)
+            return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
 
     try:
         validate_email(data['mail'])
     except ValidationError:
-        return JsonResponse({'error': 'Invalid e-mail address'}, status=400)
+        return JsonResponse({'create_user': {'error':'Invalid e-mail address'}}, status=400)
 
     json_data = {
         "user_name":data['username'],
@@ -59,7 +60,7 @@ def signup(request):
     creat_user_status = False
     response_mail_status = False
 
-    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'}) #Testing
+    response_creat_user = requests.post(url_access_postgresql, json=json_data, verify=False, headers={'Host': 'localhost'})
     try:
         data_response_create_user = response_creat_user.json()
     except ValueError:
@@ -155,17 +156,18 @@ class avatar(APIView):
                     'Host': 'localhost'
                 }
             )
-            # with open("log.txt", "w+") as f:
-            #     print(f"status_code : {response.status_code}\nbody : {response.json()}\ntoken : {token}", file=f)
-            data = response.json()
-            path = data['avatar']
+            path = None
+            
+            if response.status_code == 200:
+                data = response.json()
+                path = data['avatar']
             if path:
                 full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
                 return FileResponse(open(full_path, 'rb'), content_type='image/png')
             else:
                 return JsonResponse({'error': 'not authorized'}, status=401)
         except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=500)
+            return Response({'error': 'Access to access_postgres failed'}, status=401)
 
 class avatarOther(APIView):
     permission_classes = [AllowAny]
@@ -182,15 +184,18 @@ class avatarOther(APIView):
                     'Host': 'localhost'
                 }
             )
-            data = response.json()
-            path = data['avatar']
+            path = None
+
+            if response.status_code == 200:
+                data = response.json()
+                path = data['avatar']
             if path:
                 full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
                 return FileResponse(open(full_path, 'rb'), content_type='image/png')
             else:
                 return JsonResponse({'error': 'not authorized'}, status=401)
         except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=500)
+            return Response({'error': 'Access to access_postgres failed'}, status=401)
 
 
 
@@ -204,6 +209,10 @@ class saveImg(APIView):
 
         if not image:
             return JsonResponse({'error': 'Save image.'}, status=400)
+        
+        max_size = 2 * 1024 * 1024
+        if image.size > max_size:
+            return JsonResponse({'error': 'Image file is too large (max 2MB)'}, status=413)
         
         upload_dir = os.path.join(settings.MEDIA_ROOT, 'imgs')
         image_path = os.path.join(upload_dir, image.name)
@@ -266,16 +275,20 @@ class saveProfile(APIView):
         if not data.get('userName', '').strip():
             return JsonResponse({'error': 'userName is empty'}, status=400)
 
-        #if not data.get('mail', '').strip():
-        #    return JsonResponse({'error': 'mail is empty'}, status=400)
         try:
             response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
-            return JsonResponse(response.json(), status=response.status_code)
+            response_data = response.json()
+
+            return setTheCookie(
+                JsonResponse({'success': 'Successfully changed username'}, status=response.status_code),
+                response_data.get('access'),
+                response_data.get('refresh')
+            )
+
+        
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
-
-
 
 class saveNewPassword(APIView):
     permission_classes = [AllowAny]
@@ -298,7 +311,7 @@ class saveNewPassword(APIView):
         checkResponse = requests.post("https://access_postgresql:4000/api/checkCurrentPassword/", json=json_data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
 
         if (checkResponse.status_code != 200):
-            return JsonResponse({'error': 'Current password is not valid'}, status=400)
+            return JsonResponse({'error': 'Current password is not valid'}, status=401)
         if newPassword != data.get('inputPasswordNew2'):
             return JsonResponse({'error': 'New password do not match'}, status=400)
         elif (len(newPassword) < 8):
@@ -312,7 +325,6 @@ class saveNewPassword(APIView):
 
         if (uploadResponse.status_code != 200):
             return JsonResponse({'error': 'Error witch save new password'}, status=400)
-        
         return JsonResponse({'success': 'Successfully saved new password'}, status=200)
 
 
@@ -475,7 +487,9 @@ class matchHistory(APIView):
                     'Host': 'localhost'
                 },
             )
-            
+            res = requests.get('https://access_postgresql:4000/api/DecodeJwt/', headers={"Authorization" : f"bearer {token}", 'Host': 'localhost'}, verify=False)
+            print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
+
             return Response(response.json().get("result"), status=response.status_code)
 
         except requests.exceptions.RequestException as e:

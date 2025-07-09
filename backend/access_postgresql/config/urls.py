@@ -16,24 +16,14 @@ Including another URLconf
 """
 
 from django.urls import path
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword
-from api.views import DecodeJwt, addResultGames, keyGame, api_signup, InfoUser
-from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshToken
+from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword, forgotPassword
+from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvite, acceptInvite, logout, disconnected
+from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
 from api.views import ChatGroupListCreateView, ChatMessageView
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite, logout
-from api.views import ChatGroupListCreateView
-#, ChatMessageHistoryView, ChatMessageSendView
-from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, DecodeJwt, InfoUser, declineInvite, acceptInvite
 from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
-# POST   /api/chat/                       # Create a chat group
-# GET    /api/chat/                       # List all chat groups
-# DELETE /api/chat/<group_name>/          # Delete a chat group
-
-# GET    /api/chat/<group_name>/messages/ # Get messages (with ?offset, ?limit)
-# POST   /api/chat/<group_name>/messages/ # Send a message
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -42,9 +32,11 @@ urlpatterns = [
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
 	path('api/checkPassword/', checkPassword.as_view(), name='checkPassword'),
 	path('api/checkCurrentPassword/', checkCurrentPassword.as_view(), name='checkCurrentPassword'),
-	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'),
-	path('api/token/refresh/', refreshToken.as_view(), name='token_refresh'),
+	path('api/guest/', DeleteGuest.as_view(), name='DeleteGuest'),
+	path('api/checkTfa/', checkTfa.as_view(), name='checkTfa'), # the initial token is generated in this view
+	path('api/token/refresh/', refreshAccessToken.as_view(), name='token_refresh'),
 	path('api/DecodeJwt/', DecodeJwt.as_view(), name='DecodeJwt'),
+	path('api/disconnected/<str:token>/', disconnected.as_view(), name='DecodeJwtExpired'),
 	path('api/InfoUser/', InfoUser.as_view(), name='InfoUser'),
 	path('api/infoOtherUser/<str:username>/', infoOtherUser.as_view(), name='infoOtherUser'),
 	path('api/uploadImgAvatar/', uploadImgAvatar.as_view(), name='uploadImgAvatar'),
@@ -60,8 +52,8 @@ urlpatterns = [
 	path('api/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
 	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
 	path('api/logout/', logout.as_view(), name='logout'),
-
-    # RESTful chat message endpoints
+	path('api/forgotPassword/', forgotPassword.as_view(), name='forgotPassword'),
+    #### Live Chat API URLs
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
 

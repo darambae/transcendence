@@ -52,18 +52,19 @@ class Message(models.Model):
     def __str__(self):
         # Affiche le nom de l'expéditeur et le début du message
         return f'{self.sender.user_name}: {self.content[:50]}'
-    
+
+
 class MATCHTABLE(models.Model):
     matchKey = models.CharField(unique=True, max_length=100)
     dateMatch = models.DateTimeField(auto_now_add=True)
-    username1 = models.CharField(max_length=15)
+    username1 = models.ForeignKey(USER, related_name='match_as_user1', on_delete=models.CASCADE)
     score1 = models.IntegerField()
     score2 = models.IntegerField()
-    username2 = models.CharField(max_length=15)
-    winner = models.CharField(max_length=15)
+    username2 = models.ForeignKey(USER, related_name='match_as_user2', on_delete=models.CASCADE)
+    winner = models.ForeignKey(USER, related_name='matches_won', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.username1} {self.score1} - {self.score2} {self.username2}"
+        return f"{self.user1.username} {self.score1} - {self.score2} {self.user2.username}"
 
 
 class FRIEND(models.Model):

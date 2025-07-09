@@ -60,16 +60,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
 		
 		if self.usrID == 0 :
-			u1 = params.get("u1", "Default")
-			u2 = params.get("u2", "Default")
+			u1 = params.get("u1", "Guest")
+			u2 = params.get("u2", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u1
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u2
 		
 		elif self.usrID == 1 :
-			u = params.get("name", "Default")
+			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u
 		else :
-			u = params.get("name", "Default")
+			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u
 
 		# print(dictInfoRackets, file=sys.stderr)
@@ -103,7 +103,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		elif action == "forfait" :
 			plId = data.get("player")
 			stats = cache.get(f'simulation_state_{self.room_group_name}')
-			stats[f"team{2 - (plId != 1)}Score"] = 200 ##########################################################################################################____________________________________
+			stats[f"team{2 - (plId != 1)}Score"] = 5 ##########################################################################################################____________________________________
 			cache.set(f'simulation_state_{self.room_group_name}', stats, timeout=None)
 			# print(f"cache : {cache.get(f'simulation_state_{self.room_group_name}')}", file=sys.stderr)
 		elif action == "start":
@@ -144,6 +144,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			# 	print(f"ERROR : {e}")
 
 	async def tempReceived(self, event) :
+		print(f"tempReiceived server_pong : {event}", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	async def disconnectUser(self, event) :
@@ -182,7 +183,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				self.t2 = asyncio.create_task(self.run_simulation())
 
 				while self.game_running:
-					await asyncio.sleep(0.2)
+					await asyncio.sleep(0.016)
 					try:
 						stats = cache.get(f"simulation_state_{self.room_group_name}")
 						#print(f"self.ai : {self.AI}", file=sys.stderr)
@@ -192,9 +193,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 							#print("Task created, setting AI to false", file=sys.stderr)
 							self.AI = False
 							#print("Self.ai put to false", file=sys.stderr)
-						# #print(f"statissssss : {stats}", file=sys.stderr)
-						if (stats.get("team1Score", 0) >= 200 or stats.get("team2Score", 0) >= 200) and self.usrID <= 1: ##########################################################################################################____________________________________
-							#print("Yaaaaay stoping game", file=sys.stderr)
+						#print(f"11111111 : {stats}", file=sys.stderr)
+						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID <= 1: ##########################################################################################################____________________________________
 							await self.channel_layer.group_send(
 								self.room_group_name,
 								{
@@ -202,31 +202,27 @@ class GameConsumer(AsyncWebsocketConsumer):
 									"game_stats" : stats
 								}
 							)
+							if stats['team1Score'] == 5 :
+								winnerTeam = 0
+							else :
+								winnerTeam = 1
 							json_data = {
 								"matchKey" : self.room_group_name,
-								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0],
+								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0][0],
 								"score1" : stats['team1Score'],
 								"score2" : stats['team2Score'],
-								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1]
+								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1][0],
+								"winner" : dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam][0],
 							}
-							requests.post("https://access-postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'access-postgresql'})
-######################################### Writing into a file, waiting for Db #########################################
-							# outfile = open(f"replay_{self.room_group_name}.json", 'w')
-							# json.dump(self.matchReplay, outfile)
-							# outfile.close()
-######################################### Writing into a file, waiting for Db #########################################
+							requests.post("https://access_postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'localhost'})
 							if self.t2 is not None :
 								self.task.cancel()
 								await self.task
 							self.gameSimulation.stopSimulation()
+						#print(f"22222222 : {stats}", file=sys.stderr)
 						if self.usrID <= 1 :
 							await self.gameSimulation.setRedisCache(self.room_group_name)
-							# r = redis.Redis(host='game_redis', port=6379, db=0)
-							# cles_redis = r.keys('*')
-							# #print([clé.decode('utf-8') for clé in cles_redis], file=sys.stderr)
 							stats = cache.get(f'simulation_state_{self.room_group_name}')
-							# #print(f"caches: {str(cache)}", file=sys.stderr)
-							# #print(f"usrID : {self.usrID}\nstats: {stats}", file=sys.stderr)
 							await self.channel_layer.group_send(
 								self.room_group_name,
 								{
@@ -237,7 +233,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 					except Exception as e:
 						print(f"!!! Failed to send update: {e}", file=sys.stderr)
 		except asyncio.CancelledError:
-			# #print("Task send_game_update Cancelled", file=sys.stderr)
 			self.t2.cancel()
 			await self.t2
 

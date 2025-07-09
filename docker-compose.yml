@@ -186,7 +186,7 @@ services:
       - .env
     volumes:
       - certs:/certs
-      - ./backend/server_pong:/app
+      - ./backend/server_pong:/app:rw
     networks:
       - game_network
       - nginx_network

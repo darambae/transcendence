@@ -9,6 +9,9 @@ import { settingsProfileController } from './views/settings_profile.js';
 import { tournamentController } from './views/tournament.js';
 import { card_profileController } from './views/card_profile.js';
 import { dashboardsController } from './views/dashboards.js';
+import { forgotPasswordController } from './views/forgotPassword.js';
+import { invitsController } from './views/tournament.js';
+
 
 export const routes = {
 
@@ -54,14 +57,22 @@ export const routes = {
 		template: 'settings_profile',
 		controller: settingsProfileController,
 	},
-	chat: (username) => ({
+	chat: (userId ,username) => ({
 		template: 'chat',
-		controller: () => chatController(username),
+		controller: () => chatController(userId, username),
 		username: username	
 	}),
 	dashboards: {
 		template: 'dashboards',
 		controller: dashboardsController,
+	},
+	forgotPassword: {
+		template: 'forgotPassword',
+		controller: forgotPasswordController
+	},
+	guest: {
+		template: 'invits',
+		controller: invitsController,
 	},
 };
 		

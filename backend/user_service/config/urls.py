@@ -22,7 +22,7 @@ from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
 from api.views import searchUsers, infoOtherUser, avatarOther, listennerFriends, addFriend, acceptInvite, declineInvite
 from api.views import matchHistory
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
 	path('user-service/csrf/', views.get_csrf_token, name='csrf'),
 	path('user-service/signup/', views.signup, name='signup'),
 	path('user-service/infoUser/', infoUser.as_view(), name='infoUser'),

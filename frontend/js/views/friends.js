@@ -1,4 +1,4 @@
-import { actualizeIndexPage } from "../utils.js";
+import { actualizeIndexPage, fetchWithRefresh } from "../utils.js";
 import { routes } from "../routes.js"
 
 
@@ -8,7 +8,7 @@ export function searchFriends() {
 		const resultsBox = document.getElementById("resultsSearch");
 		const query = this.value;
 		
-		const response = await fetch(`user-service/searchUsers?q=${encodeURIComponent(query)}`, {
+		const response = await fetchWithRefresh(`user-service/searchUsers?q=${encodeURIComponent(query)}`, {
 			method: "GET",
 			credentials: 'include',
 			headers: {
@@ -21,13 +21,13 @@ export function searchFriends() {
 		const users = data.results ?? [];
 		
 		resultsBox.innerHTML = users
-		.map(user => `<li class="list-group-item user-link"> <button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
+		.map(user => `<li class="list-group-item user-link"><button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
 			.join('');
 
 		document.querySelectorAll('.profile-btn').forEach(btn => {
-			btn.addEventListener('click', function() {
+			btn.addEventListener('click', async function() {
 				const username = btn.dataset.username;
-				actualizeIndexPage('modal-container', routes.card_profile(username))
+				await actualizeIndexPage('modal-container', routes.card_profile(username))
 			})
 		})
 	})
@@ -35,9 +35,11 @@ export function searchFriends() {
 
 export async function listennerFriends() {
 	const resultsBox = document.getElementById("resultsListFriends");
+	resultsBox.innerHTML = "";  // CORRECTION ici
+
 	let html = "";
 
-	const response = await fetch("user-service/listennerFriends/", {
+	const response = await fetchWithRefresh("user-service/listennerFriends/", {
 		method: "GET",
 		credentials: 'include',
 		headers: {
@@ -49,53 +51,48 @@ export async function listennerFriends() {
 	console.log("Résultat JSON :", data);
 
 	const users = data.results ?? [];
- 
-	// for tabl friends
+
 	for (const user of users) {
 		const statusColor = user.online ? 'bg-success' : 'bg-danger';
-	  
+
 		html += `<li class="list-group-item user-link">
-		  <div class="d-flex justify-content-between align-items-center">
-			<div class="d-flex align-items-center gap-2">
-			  <span class="rounded-circle ${statusColor}" style="width: 10px; height: 10px; display: inline-block;"></span>
-			  <a href="/#card_profile/${user.username}"
-				 data-username="${user.username}"
-				 class="text-decoration-none">
-				${user.username}
-			  </a>
-			</div>`;
-	  
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="d-flex align-items-center gap-2">
+					<span class="rounded-circle ${statusColor}" style="width: 10px; height: 10px; display: inline-block;"></span>
+					<button class="profile-btn text-decoration-none" data-username="${user.username}">
+						${user.username}
+					</button>
+				</div>`;
+
 		if (user.direction === 'sent' && user.status === "pending") {
-		  html += `<span class="badge bg-warning text-dark">${user.status}</span>`;
+			html += `<span class="badge bg-warning text-dark">${user.status}</span>`;
 		} else if (user.direction === 'received' && user.status === "pending") {
-		  html += `<div>
-			<button class="btn btn-sm btn-success me-1"
-					onclick="acceptInvite('${user.username}')">
-			  Accepter
-			</button>
-			<button class="btn btn-sm btn-danger"
-					onclick="declineInvite('${user.username}')">
-			  Refuser
-			</button>
-		  </div>`;
+			html += `<div>
+				<button class="btn btn-sm btn-success me-1" onclick="acceptInvite('${user.username}')">
+					Accepter
+				</button>
+				<button class="btn btn-sm btn-danger" onclick="declineInvite('${user.username}')">
+					Refuser
+				</button>
+			</div>`;
 		} else {
-		  const badgeClass = user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
-		  html += `<span class="badge ${badgeClass}">${user.status}</span>`;
+			const badgeClass = user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
+			html += `<span class="badge ${badgeClass}">${user.status}</span>`;
 		}
-	  
-		html += `resultsListFriends
-		  </div>
+
+		html += `
+			</div>
 		</li>`;
-	  }
-	  
-	
-	  resultsBox.innerHTML = html;
-	  document.querySelectorAll('.profile-btn').forEach(btn => {
-			btn.addEventListener('click', function() {
-				const username = btn.dataset.username;
-				actualizeIndexPage('modal-container', routes.card_profile(username))
-			})
-		})
+	}
+
+	resultsBox.innerHTML = html;
+
+	document.querySelectorAll('.profile-btn').forEach(btn => {
+		btn.addEventListener('click', async function () {
+			const username = btn.dataset.username;
+			await actualizeIndexPage('modal-container', routes.card_profile(username));
+		});
+	});
 }
 
 
@@ -106,7 +103,7 @@ export async function acceptInvite(username) {
 			username: username
 		}
 
-		const response = await fetch("user-service/acceptInvite/", {
+		const response = await fetchWithRefresh("user-service/acceptInvite/", {
 			method: "PATCH",
 			credentials: 'include',
 			headers: {
@@ -135,7 +132,7 @@ export async function declineInvite(username) {
 			username: username
 		}
 
-		const response = await fetch("user-service/declineInvite/", {
+		const response = await fetchWithRefresh("user-service/declineInvite/", {
 			method: "PATCH",
 			credentials: 'include',
 			headers: {

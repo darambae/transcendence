@@ -11,3 +11,5 @@ redis
 dj-database-url
 httpx
 djangorestframework
+djangorestframework-simplejwt
+jwt

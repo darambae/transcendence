@@ -42,6 +42,15 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('game_redis', 6379)],
+        },
+    },
+}
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +60,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'api',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost:8443",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 MIDDLEWARE = [
@@ -92,9 +107,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'default': dj_database_url.parse(DATABASE_URL)
+    'default': {
+        'ENGINE': 'django.db.backends.dummy'
+    }
 }
 
 
