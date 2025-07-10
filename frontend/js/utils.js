@@ -114,28 +114,7 @@ function setupLoginClick(toggleLogin, isAuth) {
 	});
 }
 
-export async function getBlockedStatus(targetUserId) {
-    try {
-        const response = await fetchWithRefresh(`/chat/${targetUserId}/blockedStatus`, {
-            method : 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-			credentials: 'include'
-        });
-		if (!response.ok) {
-			const errorData = await response.json();
-			console.error('error loading blocked status', errorData.message || 'unknown error');
-			alert('error loading blocked status' + (errorData.message || 'unknown error'));
-			return;
-		}
-		const data = response.json();
-		return (data);
-    } catch (error) {
-		console.error('Network error loading blocked status :', error);
-		alert('network error: could not load blocked status');
-	}
-}
+
 
 
 // export async function fetchWithRefresh(url, options = {}) {
@@ -240,5 +219,28 @@ export async function fetchWithRefresh(url, options = {}) {
 	} finally {
 		// Remove from in-flight tracking when done
 		inFlightRequests.delete(cacheKey);
+	}
+}
+
+export async function getBlockedStatus(targetUserId) {
+    try {
+        const response = await fetchWithRefresh(`/chat/${targetUserId}/blockedStatus`, {
+            method : 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+			credentials: 'include'
+        });
+		if (!response.ok) {
+			const errorData = await response.json();
+			console.error('error loading blocked status', errorData.message || 'unknown error');
+			alert('error loading blocked status' + (errorData.message || 'unknown error'));
+			return;
+		}
+		const data = response.json();
+		return (data);
+    } catch (error) {
+		console.error('Network error loading blocked status :', error);
+		alert('network error: could not load blocked status');
 	}
 }

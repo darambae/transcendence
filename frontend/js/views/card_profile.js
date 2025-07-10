@@ -1,5 +1,6 @@
 import { closeModal, fetchWithRefresh, getBlockedStatus } from "../utils.js";
 
+
 export async function card_profileController(username) {
 
 	const modalContainer = document.getElementById("modal-container");
@@ -106,7 +107,7 @@ async function getOtherUserInfo(userName) {
 	try {
 		const timestamp = Date.now();
 		const response = await fetchWithRefresh(
-			`user-service/infoOtherUser/${userName}?t=${timestamp}`,
+			`/user-service/infoOtherUser/${userName}?t=${timestamp}`,
 			{
 				method: 'GET',
 				credentials: 'include',
@@ -133,7 +134,7 @@ async function getOtherUserInfo(userName) {
 
 
 function getOtherUserAvatar(userName) {
-	fetchWithRefresh(`user-service/avatarOther/${userName}`, {
+	fetchWithRefresh(`/user-service/avatarOther/${userName}`, {
 		method: "GET",
 		credentials: 'include',
 	})
@@ -159,7 +160,7 @@ function addFriend() {
 			addFriendsBtn.addEventListener('click', async () => {
 				const userName = addFriendsBtn.dataset.username;
 
-				const response = await fetchWithRefresh('user-service/add/friend/', {
+				const response = await fetchWithRefresh('/user-service/add/friend/', {
 					method: 'POST',
 					credentials: 'include',
 					headers: {
@@ -190,7 +191,7 @@ function changeBlockedStatus(userName) {
 		if (blockBtn) {
 			blockBtn.addEventListener('click', async () => {
 				const userId = blockBtn.dataset.userId;
-				const response = await fetchWithRefresh(`chat/${userId}/blockedStatus/`, {
+				const response = await fetchWithRefresh(`/chat/${userId}/blockedStatus/`, {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',

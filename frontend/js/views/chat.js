@@ -185,7 +185,7 @@ function sendMessage(currentUserId) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'X-CSRFToken': getCookie('csrftoken'),
+			// 'X-CSRFToken': getCookie('csrftoken'),
 		},
 		credentials: 'include',
 		body: JSON.stringify({
@@ -252,8 +252,8 @@ async function initEventSource(groupId, currentUserId) {
 		// 	credentials: 'include',
 		// });
 		// UPDATED URL: /chat/stream/{group_id}/
-		await fetchWithRefresh('auth/refresh-token/', { method: 'GET', credentials: 'include', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
-		const source = new EventSource(`/chat/stream/${groupId}/`);
+		await fetchWithRefresh('/auth/refresh-token/', { method: 'GET', credentials: 'include', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
+		const source = new EventSource(`chat/stream/${groupId}/`);
 
 		eventSources[groupId] = source;
 
@@ -261,7 +261,7 @@ async function initEventSource(groupId, currentUserId) {
 			console.log('Token refresh requested by server');
 			// Make a request that will refresh the token
 			try {
-				await fetch('auth/refresh-token/', {
+				await fetch('/auth/refresh-token/', {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
@@ -369,7 +369,7 @@ async function loadChatRoomList(currentUserId) {
     }
     try {
         console.log('Loading chat list for user:', currentUserId);
-        const response = await fetchWithRefresh(`chat/`, {
+        const response = await fetchWithRefresh(`/chat/`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -495,7 +495,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		//create a pop window to ask unblock
 		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
 		if (unblockTargetUser) {//if yes
-			fetchWithRefresh(`chat/${targetUserId}/blockedStatus/`, {
+			fetchWithRefresh(`/chat/${targetUserId}/blockedStatus/`, {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -592,7 +592,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	}
 
 	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetchWithRefresh('chat/', {
+		fetchWithRefresh('/chat/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -668,7 +668,7 @@ function setupUserSearchAutocomplete() {
 
 		try {
 			const response = await fetch(
-				`user-service/searchUsers?t=${Date.now()}&q=${encodeURIComponent(query)}`,
+				`/user-service/searchUsers?t=${Date.now()}&q=${encodeURIComponent(query)}`,
 				{
 					method: 'GET',
 					credentials: 'include',
@@ -852,7 +852,7 @@ export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 	}
 
 	if (userIsAuth) {
-		const userData = await fetchWithRefresh('user-service/infoUser/', {
+		const userData = await fetchWithRefresh('/user-service/infoUser/', {
 			method: 'GET',
 			credentials: 'include',
 		})
