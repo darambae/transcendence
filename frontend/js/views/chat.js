@@ -1,6 +1,7 @@
 
 import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
+import { handleGame2Players } from './utils/commonFunctions.js';
 import { card_profileController } from './card_profile.js';
 
 
@@ -437,6 +438,7 @@ async function switchChatRoom(currentUserId, newgroupId) {
     // Update current active group
     currentActiveChatGroup = newgroupId;
     console.log(`Switched to chat room: ${newgroupId}`);
+
     // Update header of the right column with the other user's name
     const activeChatRoomName = document.getElementById('activeChatRoomName');
     const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${newgroupId}"]`);
@@ -451,6 +453,17 @@ async function switchChatRoom(currentUserId, newgroupId) {
                 await actualizeIndexPage('modal-container', routes['card_profile'](receiverUsername));
             });
         }
+
+		//Invite friend to play the game
+		const gameInvitationBtn = document.getElementById('gameInvitationBtn');
+		if (gameInvitationBtn) {
+			gameInvitationBtn.classList.remove('d-none');
+			gameInvitationBtn.onclick = function() {
+				if (confirm(`Do you want to invite ${receiverUsername} to play a game of PongPong ?`)) {
+					inviteFriendToPlay(receiverUsername);
+				}
+			}
+		}
     }
 
     // Update hidden input for sending messages
@@ -483,6 +496,102 @@ async function switchChatRoom(currentUserId, newgroupId) {
         messageInput.focus();
     }
 }
+
+async function createGameApiKey() {
+    try {
+        const csrf = getCookie('csrftoken');
+        const response = await fetchWithRefresh(`server-pong/api-key`, {
+            headers: {
+                'X-CSRFToken': csrf,
+            },
+            credentials: 'include',
+        });
+        
+        if (!response.ok) {
+            throw new Error("HTTPS Error: " + response.status);
+        }
+        
+        const data = await response.json();
+        console.log('Game created with key:', data.api_key);
+        return data.api_key;
+        
+    } catch (error) {
+        console.error('Error creating game:', error);
+        return null;
+    }
+}
+
+async function inviteFriendToPlay(receiverUsername) {
+	console.log("here in inviteFriendToPlay");
+	//create API key for the game;
+	
+	let apiKey = await createGameApiKey();
+	
+    if (!apiKey) {
+        console.error('No API key generated');
+        alert('Failed to create game. Please try again.');
+        return;
+    }
+
+	try {
+		const usernameInput = document.getElementById('usernameInput-active');
+        const currentUserId = parseInt(usernameInput.value);
+        const messageInput = document.getElementById('messageInput-active');
+		messageInput.value = `🎮 PongPong invitation: join my game with this key: ${apiKey}\n Copy and paste it in Multiplayer and let's play !`
+        
+		sendMessage(currentUserId);
+   
+		window.location.hash = "#multiplayer";
+		setTimeout(() => {
+			handleGame2Players(apiKey, 1, 0, -1);
+		}, 300);
+	} catch (error) {
+		console.error("error sending invitation : ", error);
+		alert('Failed to send game invitation. Please try again.');
+	}
+}
+
+// async function sendInvitationMessage(content, currentUserId) {
+//     const groupIdInput = document.getElementById('groupIdInput-active');
+//     const usernameInput = document.getElementById('usernameInput-active');
+    
+//     const groupId = groupIdInput.value;
+//     const username = usernameInput.value;
+    
+//     if (!groupId || !username) {
+//         throw new Error('No active chat to send invitation');
+//     }
+    
+//     try {
+//         const response = await fetchWithRefresh(`/chat/${groupId}/messages/`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'X-CSRFToken': getCookie('csrftoken'),
+//             },
+//             credentials: 'include',
+//             body: JSON.stringify({
+//                 content: content,
+//                 group_id: groupId,
+//                 sender_id: currentUserId,
+//                 sender_username: username,
+//             }),
+//         });
+        
+//         const data = await response.json();
+        
+//         if (!response.ok || data.status !== 'success') {
+//             throw new Error(data.message || 'Failed to send message');
+//         }
+        
+//         console.log('Invitation message sent successfully');
+//         return true;
+        
+//     } catch (error) {
+//         console.error('Error sending invitation message:', error);
+//         throw error;
+//     }
+// }
 
 async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	console.log(
@@ -690,6 +799,11 @@ export function chatController(userId, username) {
 			document.getElementById('activeChatRoomName').textContent = ''; // Clear header
 			document.getElementById('groupIdInput-active').value = '';
 			document.getElementById('targetUserInput').value = ''; // Clear new chat input
+
+			const gameInvitationBtn = document.getElementById('gameInvitationBtn');
+			if (gameInvitationBtn) {
+				gameInvitationBtn.classList.add('d-none');
+			}
 		});
 	} else {
 		console.error('Main chat window modal element not found!');

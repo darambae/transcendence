@@ -78,6 +78,9 @@ export async function listennerFriends() {
 		} else {
 			const badgeClass = user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
 			html += `<span class="badge ${badgeClass}">${user.status}</span>`;
+			if (user.status === 'accepted') {
+            	html += `<button class="btn btn-sm btn-outline-danger ms-2 unfriend-btn" data-username="${user.username}" title="unfriend">&times;</button>`;
+        	}
 		}
 
 		html += `
