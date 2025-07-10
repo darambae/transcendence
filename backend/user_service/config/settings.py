@@ -12,13 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import sys
 #### REQUIRED ELK LIBRARY ####
-from .jsonSocketHandler import JSONSocketHandler
-import dj_database_url
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
 
 APP_NAME = 'user_service'
 
@@ -96,15 +91,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.dummy'
-#     }
-# }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -159,43 +145,7 @@ CSRF_TRUSTED_ORIGINS = [
 MEDIA_URL = '/app/api/media/'
 MEDIA_ROOT = '/app/api/media/'
 
-import logging
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'simple': {
-#             'format': '[{levelname}] {asctime} {name}: {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple',
-#             'level': 'DEBUG',  # Show all logs
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG',  # Show all logs
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from Django
-#             'propagate': False,
-#         },
-#         'api': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from your app
-#             'propagate': False,
-#         },
-#     },
-# }
-
-#import logging
 
 # LOGGING = {
 #     'version': 1,

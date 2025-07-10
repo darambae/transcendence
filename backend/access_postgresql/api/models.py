@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-
+from django.core.exceptions import ValidationError
+import re
 # Create your models here.
 
 class USER(AbstractBaseUser, PermissionsMixin):
@@ -23,7 +24,13 @@ class USER(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.user_name
-	
+    
+    def clean(self):
+        super().clean()
+        # Validate username doesn't contain whitespace
+        if self.user_name and re.search(r'\s', self.user_name):
+            raise ValidationError({'user_name': 'Username cannot contain spaces or whitespace characters.'})
+    
     def toJson(self):
         return {"user_id" : self.id, "username" : self.user_name, "avatar" : self.avatar, "invites" : []}
 
@@ -61,7 +68,7 @@ class MATCHTABLE(models.Model):
     score1 = models.IntegerField()
     score2 = models.IntegerField()
     username2 = models.ForeignKey(USER, related_name='match_as_user2', on_delete=models.CASCADE)
-    winner = models.ForeignKey(USER, related_name='matches_won', on_delete=models.SET_NULL, null=True, blank=True)
+    winner = models.ForeignKey(USER, related_name='matches_won', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user1.username} {self.score1} - {self.score2} {self.user2.username}"

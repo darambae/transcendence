@@ -1,5 +1,10 @@
-
-import { actualizeIndexPage, getCookie, isUserAuthenticated, fetchWithRefresh, getBlockedStatus } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+import {
+	actualizeIndexPage,
+	getCookie,
+	isUserAuthenticated,
+	fetchWithRefresh,
+	getBlockedStatus,
+} from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
@@ -12,115 +17,124 @@ const messageOffsets = {}; // Stores the offset for message history for each gro
 
 // Helper to create an HTML message element
 function createMessageElement(messageData, currentUserId) {
-    const msg = document.createElement('div');
-    msg.classList.add('chat-message');
+	const msg = document.createElement('div');
+	msg.classList.add('chat-message');
 
-    // Determine if the message sender is the current logged-in user
+	// Determine if the message sender is the current logged-in user
 	const isSelf = messageData.sender_id === currentUserId;
 
-    if (isSelf) {
-        msg.classList.add('self');
-    } else {
-        msg.classList.add('other');
-    }
+	if (isSelf) {
+		msg.classList.add('self');
+	} else {
+		msg.classList.add('other');
+	}
 
-    const senderSpan = document.createElement('span');
-    senderSpan.classList.add('message-sender');
+	const senderSpan = document.createElement('span');
+	senderSpan.classList.add('message-sender');
 	senderSpan.textContent = messageData.sender_username;
-    msg.appendChild(senderSpan);
+	msg.appendChild(senderSpan);
 
-    const contentText = document.createTextNode(messageData.content);
-    msg.appendChild(contentText);
+	const contentText = document.createTextNode(messageData.content);
+	msg.appendChild(contentText);
 
-    const timestampSpan = document.createElement('span');
-    timestampSpan.classList.add('message-timestamp');
-    // Format timestamp nicely if possible, or just display raw
-    // Assuming timestamp comes as ISO 8601 string from backend
-    try {
-        const date = new Date(messageData.timestamp);
-        timestampSpan.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch (e) {
-        timestampSpan.textContent = messageData.timestamp || new Date().toLocaleTimeString();
-    }
-    msg.appendChild(timestampSpan);
+	const timestampSpan = document.createElement('span');
+	timestampSpan.classList.add('message-timestamp');
+	// Format timestamp nicely if possible, or just display raw
+	// Assuming timestamp comes as ISO 8601 string from backend
+	try {
+		const date = new Date(messageData.timestamp);
+		timestampSpan.textContent = date.toLocaleTimeString([], {
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+	} catch (e) {
+		timestampSpan.textContent =
+			messageData.timestamp || new Date().toLocaleTimeString();
+	}
+	msg.appendChild(timestampSpan);
 
-    return msg;
+	return msg;
 }
 
 // Function to load message history for the active group
 async function loadMessageHistory(currentUserId, groupId, prepend = false) {
-    const chatLog = document.getElementById('chatLog-active');
-    if (groupId === null || groupId === undefined) {
-        console.error('No groupId provided for loading history.');
-        return;
-    }
-    if (!chatLog) {
-        console.error(`chatLog-active not found for loading history.`);
-        return;
-    }
+	const chatLog = document.getElementById('chatLog-active');
+	if (groupId === null || groupId === undefined) {
+		console.error('No groupId provided for loading history.');
+		return;
+	}
+	if (!chatLog) {
+		console.error(`chatLog-active not found for loading history.`);
+		return;
+	}
 
-    // Clear "No chat selected" or "No messages yet" messages before loading
-    const noChatSelectedDiv = chatLog.querySelector('.no-chat-selected');
-    if (noChatSelectedDiv) {
-        noChatSelectedDiv.remove();
-    }
-    const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
-    if (noMessagesDiv) {
-        noMessagesDiv.remove();
-    }
+	// Clear "No chat selected" or "No messages yet" messages before loading
+	const noChatSelectedDiv = chatLog.querySelector('.no-chat-selected');
+	if (noChatSelectedDiv) {
+		noChatSelectedDiv.remove();
+	}
+	const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
+	if (noMessagesDiv) {
+		noMessagesDiv.remove();
+	}
 
-    const offset = messageOffsets[groupId] || 0;
-    const limit = 20;
+	const offset = messageOffsets[groupId] || 0;
+	const limit = 20;
 
-    try {
-        const response = await fetchWithRefresh(
-            `/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            }
-        );
-        const data = await response.json();
+	try {
+		const response = await fetchWithRefresh(
+			`/chat/${groupId}/messages/?offset=${offset}&limit=${limit}`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+			}
+		);
+		const data = await response.json();
 
-        if (response.ok && data.status === 'success') {
-            if (data.messages.length > 0) {
-                const fragment = document.createDocumentFragment();
-                const orderedMessages = [...data.messages].reverse();
+		if (response.ok && data.status === 'success') {
+			if (data.messages.length > 0) {
+				const fragment = document.createDocumentFragment();
+				const orderedMessages = [...data.messages].reverse();
 				orderedMessages.forEach((msgData) => {
-                    const msgElement = createMessageElement(msgData, currentUserId);
-                    fragment.appendChild(msgElement);
-                });
+					const msgElement = createMessageElement(msgData, currentUserId);
+					fragment.appendChild(msgElement);
+				});
 
-                if (prepend) {
-                    const oldScrollHeight = chatLog.scrollHeight;
-                    chatLog.insertBefore(fragment, chatLog.firstChild);
-                    const newScrollHeight = chatLog.scrollHeight;
-                    chatLog.scrollTop = newScrollHeight - oldScrollHeight;
-                } else {
-                    chatLog.appendChild(fragment);
-                    chatLog.scrollTop = chatLog.scrollHeight;
-                }
-                // Update offset based on backend's next_offset
-                messageOffsets[groupId] = data.next_offset;
-
-            } else if (!prepend && chatLog.children.length === 0) {
-                // If no messages at all and not prepending, show "No messages yet"
-                const noMessagesYet = document.createElement('div');
-                noMessagesYet.classList.add('no-messages-yet', 'text-center', 'text-muted', 'py-5');
-                noMessagesYet.innerHTML = '<p>No messages yet. Start the conversation!</p>';
-                chatLog.appendChild(noMessagesYet);
-            }
-        } else {
-            console.error('Error loading history:', data.message || 'Unknown error');
-            alert('Error loading chat history: ' + (data.message || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Network error while loading history:', error);
-        alert('Network error: Could not load chat history.');
-    }
+				if (prepend) {
+					const oldScrollHeight = chatLog.scrollHeight;
+					chatLog.insertBefore(fragment, chatLog.firstChild);
+					const newScrollHeight = chatLog.scrollHeight;
+					chatLog.scrollTop = newScrollHeight - oldScrollHeight;
+				} else {
+					chatLog.appendChild(fragment);
+					chatLog.scrollTop = chatLog.scrollHeight;
+				}
+				// Update offset based on backend's next_offset
+				messageOffsets[groupId] = data.next_offset;
+			} else if (!prepend && chatLog.children.length === 0) {
+				// If no messages at all and not prepending, show "No messages yet"
+				const noMessagesYet = document.createElement('div');
+				noMessagesYet.classList.add(
+					'no-messages-yet',
+					'text-center',
+					'text-muted',
+					'py-5'
+				);
+				noMessagesYet.innerHTML =
+					'<p>No messages yet. Start the conversation!</p>';
+				chatLog.appendChild(noMessagesYet);
+			}
+		} else {
+			console.error('Error loading history:', data.message || 'Unknown error');
+			alert('Error loading chat history: ' + (data.message || 'Unknown error'));
+		}
+	} catch (error) {
+		console.error('Network error while loading history:', error);
+		alert('Network error: Could not load chat history.');
+	}
 }
 
 function sendMessage(currentUserId) {
@@ -129,30 +143,30 @@ function sendMessage(currentUserId) {
 	const usernameInput = document.getElementById('usernameInput-active');
 
 	const content = messageInput.value.trim();
-    const groupId = groupIdInput.value;
+	const groupId = groupIdInput.value;
 	const username = usernameInput.value;
 
 	const MIN_LENGTH = 1;
-    const MAX_LENGTH = 1000; // Set appropriate limit
+	const MAX_LENGTH = 1000; // Set appropriate limit
 
 	if (!content || !groupId) {
 		alert(
 			'Please ensure you are logged in, selected a chat, and typed a message.'
 		);
 		return;
-    }
-    if (content.length < MIN_LENGTH) {
-        alert(
-            `Message too short (${content.length}/${MIN_LENGTH} characters). Please type a longer message.`
-        );
-        return;
-    }
-    if (content.length > MAX_LENGTH) {
-        alert(
-            `Message too long (${content.length}/${MAX_LENGTH} characters). Please shorten your message.`
-        );
-        return;
-    }
+	}
+	if (content.length < MIN_LENGTH) {
+		alert(
+			`Message too short (${content.length}/${MIN_LENGTH} characters). Please type a longer message.`
+		);
+		return;
+	}
+	if (content.length > MAX_LENGTH) {
+		alert(
+			`Message too long (${content.length}/${MAX_LENGTH} characters). Please shorten your message.`
+		);
+		return;
+	}
 
 	// Create temporary message data to display immediately
 	const tempMessageData = {
@@ -181,7 +195,6 @@ function sendMessage(currentUserId) {
 	messageInput.value = '';
 
 	fetchWithRefresh(`/chat/${groupId}/messages/`, {
-
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -222,7 +235,6 @@ function sendMessage(currentUserId) {
 		});
 }
 
-
 // Function to initialize EventSource (SSE) for a group
 async function initEventSource(groupId, currentUserId) {
 	// Close any other active EventSources before opening a new one
@@ -252,8 +264,12 @@ async function initEventSource(groupId, currentUserId) {
 		// 	credentials: 'include',
 		// });
 		// UPDATED URL: /chat/stream/{group_id}/
-		await fetchWithRefresh('/auth/refresh-token/', { method: 'GET', credentials: 'include', headers: { 'X-CSRFToken': getCookie('csrftoken') } });
-		const source = new EventSource(`chat/stream/${groupId}/`);
+		await fetchWithRefresh('/auth/refresh-token/', {
+			method: 'GET',
+			credentials: 'include',
+			headers: { 'X-CSRFToken': getCookie('csrftoken') },
+		});
+		const source = new EventSource(`/chat/stream/${groupId}/`);
 
 		eventSources[groupId] = source;
 
@@ -284,8 +300,9 @@ async function initEventSource(groupId, currentUserId) {
 					console.log('Skipping own message from SSE');
 					return;
 				}
-				const messageId = `${messageData.id || ''}-${messageData.timestamp
-					}-${messageData.sender_id}-${messageData.content}`;
+				const messageId = `${messageData.id || ''}-${messageData.timestamp}-${
+					messageData.sender_id
+				}-${messageData.content}`;
 
 				// Skip if we've seen this message recently (deduplication)
 				if (recentlyReceivedMessages.has(messageId)) {
@@ -316,18 +333,24 @@ async function initEventSource(groupId, currentUserId) {
 					chatLog.appendChild(msgElement);
 					chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
 				} else {
-                    // *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
-                    console.log(`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`);
-                    const inactiveChatListItem = document.querySelector(`#chatRoomList [data-group-id="${messageData.group_id}"]`);
-                    if (inactiveChatListItem) {
-                        inactiveChatListItem.classList.add('has-unread-messages');
+					// *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
+					console.log(
+						`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`
+					);
+					const inactiveChatListItem = document.querySelector(
+						`#chatRoomList [data-group-id="${messageData.group_id}"]`
+					);
+					if (inactiveChatListItem) {
+						inactiveChatListItem.classList.add('has-unread-messages');
 					}
-					const mainChatToggleButton = document.getElementById('mainChatToggleButton');
-                    if (mainChatToggleButton && !hasOverallUnreadMessages) {
-                        mainChatToggleButton.classList.add('has-unread-overall');
-                        hasOverallUnreadMessages = true; // Empêche d'ajouter la classe plusieurs fois
-                    }
-                }
+					const mainChatToggleButton = document.getElementById(
+						'mainChatToggleButton'
+					);
+					if (mainChatToggleButton && !hasOverallUnreadMessages) {
+						mainChatToggleButton.classList.add('has-unread-overall');
+						hasOverallUnreadMessages = true; // Empêche d'ajouter la classe plusieurs fois
+					}
+				}
 			} catch (error) {
 				console.error(
 					'JSON parsing error or SSE message processing error:',
@@ -341,11 +364,11 @@ async function initEventSource(groupId, currentUserId) {
 			console.error('EventSource failed for group ' + groupId + ':', err);
 			source.close();
 			delete eventSources[groupId];
-			await new Promise(resolve => setTimeout(resolve, 3000));
+			await new Promise((resolve) => setTimeout(resolve, 3000));
 			// Only attempt reconnect if currentActiveChatGroup is still this groupId
 			// Otherwise, it means user switched chat, and we shouldn't reconnect here
 			if (currentActiveChatGroup === groupId) {
-				console.log("Refreshing token and reconnecting SSE...");
+				console.log('Refreshing token and reconnecting SSE...');
 				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
 			}
 		};
@@ -357,41 +380,46 @@ async function initEventSource(groupId, currentUserId) {
 
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
 async function loadChatRoomList(currentUserId) {
-    const chatRoomListUl = document.getElementById('chatRoomList');
-    if (!chatRoomListUl) {
-        console.error('Chat room list element not found!');
-        return;
-    }
-    if (!currentUserId) {
-        console.log("Not logged in, cannot load chat list.");
-        chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
-        return;
-    }
-    try {
-        console.log('Loading chat list for user:', currentUserId);
-        const response = await fetchWithRefresh(`/chat/`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Error loading chat list:', errorData.message || 'Unknown error');
-            alert('Error loading chat list: ' + (errorData.message || 'Unknown error'));
-            return;
-        }
-        const data = await response.json();
+	const chatRoomListUl = document.getElementById('chatRoomList');
+	if (!chatRoomListUl) {
+		console.error('Chat room list element not found!');
+		return;
+	}
+	if (!currentUserId) {
+		console.log('Not logged in, cannot load chat list.');
+		chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">Please log in to see chats.</li>`;
+		return;
+	}
+	try {
+		console.log('Loading chat list for user:', currentUserId);
+		const response = await fetchWithRefresh(`/chat/?t=${Date.now()}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+		});
+		if (!response.ok) {
+			const errorData = await response.json();
+			console.error(
+				'Error loading chat list:',
+				errorData.message || 'Unknown error'
+			);
+			alert(
+				'Error loading chat list: ' + (errorData.message || 'Unknown error')
+			);
+			return;
+		}
+		const data = await response.json();
 
-        if (response.ok && Array.isArray(data.chats)) {
-            chatRoomListUl.innerHTML = ''; // Clear existing list
-            if (data.chats.length === 0) {
-                chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">No active chats. Start one!</li>`;
-            }
-            console.log('Loaded chat list:', data.chats);
-            data.chats.forEach((chat) => {
-                const listItem = document.createElement('li');
+		if (response.ok && Array.isArray(data.chats)) {
+			chatRoomListUl.innerHTML = ''; // Clear existing list
+			if (data.chats.length === 0) {
+				chatRoomListUl.innerHTML = `<li class="list-group-item text-muted">No active chats. Start one!</li>`;
+			}
+			console.log('Loaded chat list:', data.chats);
+			data.chats.forEach((chat) => {
+				const listItem = document.createElement('li');
 				listItem.classList.add('list-group-item');
 				if (chat.group_id === currentActiveChatGroup) {
 					listItem.classList.add('active');
@@ -403,137 +431,150 @@ async function loadChatRoomList(currentUserId) {
 				listItem.style.cursor = 'pointer';
 				listItem.onclick = async () => {
 					try {
-						await switchChatRoom(currentUserId, chat.group_id, chat.receiver_id);
-	                    listItem.classList.remove('has-unread-messages');
-
+						await switchChatRoom(
+							currentUserId,
+							chat.group_id,
+							chat.receiver_id
+						);
+						listItem.classList.remove('has-unread-messages');
 					} catch (e) {
 						console.error('Error switching chat room:', e);
 						alert('Could not switch chat room. Please try again.');
 					}
-				}
+				};
 				chatRoomListUl.appendChild(listItem);
-                initEventSource(chat.group_id, currentUserId);
-            });
-        } else {
-            console.error(
-                'Error loading chat list:',
-                data.message || 'Unknown error'
-            );
-            alert(
-                'Error loading chat list: ' + (data.message || 'Unknown error')
-            );
-        }
-    } catch (error) {
-        console.error('Network error while loading chat list:', error);
-        alert('Network error: Could not load chat list.');
-    }
+				initEventSource(chat.group_id, currentUserId);
+			});
+		} else {
+			console.error(
+				'Error loading chat list:',
+				data.message || 'Unknown error'
+			);
+			alert('Error loading chat list: ' + (data.message || 'Unknown error'));
+		}
+	} catch (error) {
+		console.error('Network error while loading chat list:', error);
+		alert('Network error: Could not load chat list.');
+	}
 }
 
 // Function to switch between chat rooms
 async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
-    if (newgroupId === null || newgroupId === undefined) {
-			console.error('No groupId provided for loading history.');
-			return;
-		}
-    if (currentActiveChatGroup === newgroupId) {
-        return;
-    }
+	if (newgroupId === null || newgroupId === undefined) {
+		console.error('No groupId provided for loading history.');
+		return;
+	}
+	if (currentActiveChatGroup === newgroupId) {
+		return;
+	}
 
-    // Update active class in the list
-    const oldActiveItem = document.querySelector(`#chatRoomList .list-group-item.active`);
-    if (oldActiveItem) {
-        oldActiveItem.classList.remove('active');
-    }
-    const newActiveItem = document.querySelector(`#chatRoomList [data-group-id="${newgroupId}"]`);
-    if (newActiveItem) {
-        newActiveItem.classList.add('active');
-    }
+	// Update active class in the list
+	const oldActiveItem = document.querySelector(
+		`#chatRoomList .list-group-item.active`
+	);
+	if (oldActiveItem) {
+		oldActiveItem.classList.remove('active');
+	}
+	const newActiveItem = document.querySelector(
+		`#chatRoomList [data-group-id="${newgroupId}"]`
+	);
+	if (newActiveItem) {
+		newActiveItem.classList.add('active');
+	}
 	newActiveItem.classList.remove('has-unread-messages');
-    // Update current active group
-    currentActiveChatGroup = newgroupId;
+	// Update current active group
+	currentActiveChatGroup = newgroupId;
 	currentTargetId = targetUserId;
-    console.log(`Switched to chat room: ${newgroupId}`);
-    // Update header of the right column with the other user's name
-    const activeChatRoomName = document.getElementById('activeChatRoomName');
-    const targetChatListItem = document.querySelector(`#chatRoomList [data-group-id="${newgroupId}"]`);
-    if (activeChatRoomName && targetChatListItem) {
-        const receiverUsername = targetChatListItem.dataset.receiver;
-        activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
+	console.log(`Switched to chat room: ${newgroupId}`);
+	// Update header of the right column with the other user's name
+	const activeChatRoomName = document.getElementById('activeChatRoomName');
+	const targetChatListItem = document.querySelector(
+		`#chatRoomList [data-group-id="${newgroupId}"]`
+	);
+	if (activeChatRoomName && targetChatListItem) {
+		const receiverUsername = targetChatListItem.dataset.receiver;
+		activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
 
-        const profileLink = document.getElementById('receiverProfileLink');
-        if (profileLink) {
-            profileLink.addEventListener('click', async function (e) {
-                e.preventDefault();
-                await actualizeIndexPage('modal-container', routes['card_profile'](receiverUsername));
-            });
-        }
-    }
+		const profileLink = document.getElementById('receiverProfileLink');
+		if (profileLink) {
+			profileLink.addEventListener('click', async function (e) {
+				e.preventDefault();
+				await actualizeIndexPage(
+					'modal-container',
+					routes['card_profile'](receiverUsername)
+				);
+			});
+		}
+	}
 
-    // Update hidden input for sending messages
-    const groupIdInput = document.getElementById('groupIdInput-active');
-    if (groupIdInput) {
-        groupIdInput.value = newgroupId;
-    }
+	// Update hidden input for sending messages
+	const groupIdInput = document.getElementById('groupIdInput-active');
+	if (groupIdInput) {
+		groupIdInput.value = newgroupId;
+	}
 
-    // Clear current messages
-    const chatLog = document.getElementById('chatLog-active');
-    if (chatLog) {
-        chatLog.innerHTML = ''; // Clear chat log
-        setTimeout(() => {
-					chatLog.scrollTop = chatLog.scrollHeight;
-        }, 0);
-    }
+	// Clear current messages
+	const chatLog = document.getElementById('chatLog-active');
+	if (chatLog) {
+		chatLog.innerHTML = ''; // Clear chat log
+		setTimeout(() => {
+			chatLog.scrollTop = chatLog.scrollHeight;
+		}, 0);
+	}
 
-    // Load history and initialize SSE for the new group
-    messageOffsets[newgroupId] = 0; // Reset offset for new room
-    loadMessageHistory(currentUserId, newgroupId);
-	const targetbBlockedStatus = await getBlockedStatus(targetUserId)
+	// Load history and initialize SSE for the new group
+	messageOffsets[newgroupId] = 0; // Reset offset for new room
+	loadMessageHistory(currentUserId, newgroupId);
+	const targetbBlockedStatus = await getBlockedStatus(targetUserId);
 	let block_reason = null;
 	if (targetbBlockedStatus.hasBlocked) {
 		block_reason = 'this user blocked you';
 	} else if (targetbBlockedStatus.isBlocked) {
 		//create a pop window to ask unblock
-		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
-		if (unblockTargetUser) {//if yes
+		const unblockTargetUser = confirm(
+			'You blocked this user, do you want to unblock him ?'
+		);
+		if (unblockTargetUser) {
+			//if yes
 			fetchWithRefresh(`/chat/${targetUserId}/blockedStatus/`, {
-				method : 'POST',
+				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				credentials : 'include',
+				credentials: 'include',
 				body: JSON.stringify({}),
 			})
 				.then((response) =>
-					response
-						.json()
-						.then((data) => ({
-							data,
-							ok: response.ok,
-							status: response.status,
-							statusText: response.statusText,
-						}))
-			)
-			.then(({ data, ok, status, statusText }) => {
-				if (ok) {
-					if (data.status === 'success') {
-						// Enable message input and send button
-						document.getElementById('messageInput-active').disabled = false;
-						document.getElementById('sendMessageBtn').disabled = false;
-						// Focus on message input
-						const messageInput = document.getElementById('messageInput-active');
-						if (messageInput) {
-							messageInput.focus();
+					response.json().then((data) => ({
+						data,
+						ok: response.ok,
+						status: response.status,
+						statusText: response.statusText,
+					}))
+				)
+				.then(({ data, ok, status, statusText }) => {
+					if (ok) {
+						if (data.status === 'success') {
+							// Enable message input and send button
+							document.getElementById('messageInput-active').disabled = false;
+							document.getElementById('sendMessageBtn').disabled = false;
+							// Focus on message input
+							const messageInput = document.getElementById(
+								'messageInput-active'
+							);
+							if (messageInput) {
+								messageInput.focus();
+							}
+							return;
+						} else {
+							console.error('Server error unblocking the user:', targetUserId);
+							alert('Error unblocking the user: ' + targetUserId);
 						}
-						return;
 					} else {
-						console.error('Server error unblocking the user:', targetUser);
-						alert('Error unblocking the user: ' + targetUser);
-					}
-				} else {
-					console.error(
-						'HTTP error unblocking the user :',
-						status,
-						targetUserId || statusText
+						console.error(
+							'HTTP error unblocking the user :',
+							status,
+							targetUserId || statusText
 						);
 						alert('HTTP Error: ' + (targetUserId || statusText));
 					}
@@ -542,8 +583,9 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 					console.error('Network or JSON error:', error);
 					alert('Cannot connect to server to unblock the user.');
 				});
-		} else {//user doesn't want to unblock
-			block_reason = "you blocked this user"
+		} else {
+			//user doesn't want to unblock
+			block_reason = 'you blocked this user';
 		}
 	}
 	if (block_reason != null) {
@@ -551,7 +593,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		document.getElementById('sendMessageBtn').disabled = true;
 		alert(block_reason);
 	} else {
-	    // Enable message input and send button
+		// Enable message input and send button
 		document.getElementById('messageInput-active').disabled = false;
 		document.getElementById('sendMessageBtn').disabled = false;
 		// Focus on message input
@@ -612,7 +654,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 					loadChatRoomList(currentUserId).then(() => {
 						async () => {
 							await switchChatRoom(currentUserId, data.group_id, targetUserId);
-						}
+						};
 					});
 				} else {
 					console.error('Server error creating chat group:', data.message);
@@ -668,7 +710,9 @@ function setupUserSearchAutocomplete() {
 
 		try {
 			const response = await fetch(
-				`/user-service/searchUsers?t=${Date.now()}&q=${encodeURIComponent(query)}`,
+				`/user-service/searchUsers/?t=${Date.now()}&q=${encodeURIComponent(
+					query
+				)}`,
 				{
 					method: 'GET',
 					credentials: 'include',
@@ -704,7 +748,6 @@ function setupUserSearchAutocomplete() {
 	});
 }
 
-
 // Main chat controller function, called after login
 export function chatController(userId, username) {
 	const container = document.getElementById('chat-container');
@@ -730,7 +773,9 @@ export function chatController(userId, username) {
 		mainChatWindowElement.addEventListener('shown.bs.modal', async () => {
 			console.log('Main Chat Window is shown');
 			hasOverallUnreadMessages = false; // Réinitialiser l'état global
-			const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+			const mainChatToggleButton = document.getElementById(
+				'mainChatToggleButton'
+			);
 			if (mainChatToggleButton) {
 				mainChatToggleButton.classList.remove('has-unread-overall');
 			}
@@ -806,31 +851,31 @@ export function chatController(userId, username) {
 				e.preventDefault();
 				sendMessage(userId);
 			}
-        });
-        const charCounter = document.getElementById('char-counter');
-        const MAX_LENGTH = 1000;
+		});
+		const charCounter = document.getElementById('char-counter');
+		const MAX_LENGTH = 1000;
 
-        // Initial counter value
-        if (charCounter) {
-            charCounter.textContent = `0/${MAX_LENGTH}`;
-        }
+		// Initial counter value
+		if (charCounter) {
+			charCounter.textContent = `0/${MAX_LENGTH}`;
+		}
 
-        messageInput.addEventListener('input', function () {
-            if (charCounter) {
-                const length = this.value.length;
-                charCounter.textContent = `${length}/${MAX_LENGTH}`;
+		messageInput.addEventListener('input', function () {
+			if (charCounter) {
+				const length = this.value.length;
+				charCounter.textContent = `${length}/${MAX_LENGTH}`;
 
-                // Add visual feedback based on length
-                if (length > MAX_LENGTH) {
-                    charCounter.className = 'char-counter danger';
-                } else if (length > MAX_LENGTH * 0.8) {
-                    // At 80% of limit
-                    charCounter.className = 'char-counter warning';
-                } else {
-                    charCounter.className = 'char-counter';
-                }
-            }
-        });
+				// Add visual feedback based on length
+				if (length > MAX_LENGTH) {
+					charCounter.className = 'char-counter danger';
+				} else if (length > MAX_LENGTH * 0.8) {
+					// At 80% of limit
+					charCounter.className = 'char-counter warning';
+				} else {
+					charCounter.className = 'char-counter';
+				}
+			}
+		});
 	}
 
 	// 4. Attach "Start New Chat" button event listener

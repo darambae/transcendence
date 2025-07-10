@@ -1,9 +1,9 @@
-import { routes } from "./routes.js";
+import { routes } from './routes.js';
 
 export async function loadTemplate(viewName) {
 	const response = await fetch(`templates/${viewName}.html`);
 	if (!response.ok) {
-	  throw new Error(`Unable to load template ${viewName}`);
+		throw new Error(`Unable to load template ${viewName}`);
 	}
 	return await response.text();
 }
@@ -34,17 +34,16 @@ export async function actualizeIndexPage(elementId, view) {
 }
 
 export async function closeModal() {
-	const loginForm = document.getElementById("login-form");
-	const modalContainer = document.getElementById("modal-container")
+	const loginForm = document.getElementById('login-form');
+	const modalContainer = document.getElementById('modal-container');
 
-	modalContainer.style.display = "none";
-	modalContainer.innerHTML = "";
+	modalContainer.style.display = 'none';
+	modalContainer.innerHTML = '';
 	if (loginForm) {
-		loginForm.classList.remove("active");
+		loginForm.classList.remove('active');
 	}
 	//window.location = "#home";
 }
-
 
 //csrf token getter
 export function getCookie(name) {
@@ -53,7 +52,7 @@ export function getCookie(name) {
 		const cookies = document.cookie.split(';');
 		for (let i = 0; i < cookies.length; i++) {
 			const cookie = cookies[i].trim();
-			if (cookie.substring(0, name.length + 1) === (name + '=')) {
+			if (cookie.substring(0, name.length + 1) === name + '=') {
 				cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
 				break;
 			}
@@ -63,25 +62,24 @@ export function getCookie(name) {
 }
 
 export async function isUserAuthenticated() {
-    const response = await fetchWithRefresh('user-service/infoUser/', {
+	const response = await fetchWithRefresh('/user-service/infoUser/', {
 		method: 'GET',
 		credentials: 'include',
 	});
 	if (response.ok) {
-		if (response.online)
-			console.log("online : ", response.online);
+		if (response.online) console.log('online : ', response.online);
 		return true;
 	} else {
 		let errorMsg = `Status: ${response.status}`;
-        try {
-            const data = await response.json();
-            if (data && data.error) {
-                errorMsg = data.error + " (status " + response.status + ")";
-            }
-        } catch (e) {
-            // ignore JSON parse error
-        }
-		console.log("is auth error : ", errorMsg);
+		try {
+			const data = await response.json();
+			if (data && data.error) {
+				errorMsg = data.error + ' (status ' + response.status + ')';
+			}
+		} catch (e) {
+			// ignore JSON parse error
+		}
+		console.log('is auth error : ', errorMsg);
 		return false;
 	}
 }
@@ -105,7 +103,7 @@ export function attachLoginListener(userIsAuth = null) {
 
 // Helper function to keep code DRY
 function setupLoginClick(toggleLogin, isAuth) {
-	toggleLogin.addEventListener('click',async () => {
+	toggleLogin.addEventListener('click', async () => {
 		if (isAuth === false) {
 			await actualizeIndexPage('modal-container', routes.login);
 		} else {
@@ -114,8 +112,36 @@ function setupLoginClick(toggleLogin, isAuth) {
 	});
 }
 
-
-
+export async function getBlockedStatus(targetUserId) {
+	try {
+		const response = await fetchWithRefresh(
+			`/chat/${targetUserId}/blockedStatus/`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+			}
+		);
+		if (!response.ok) {
+			const errorData = await response.json();
+			console.error(
+				'error loading blocked status',
+				errorData.message || 'unknown error'
+			);
+			alert(
+				'error loading blocked status' + (errorData.message || 'unknown error')
+			);
+			return;
+		}
+		const data = response.json();
+		return data;
+	} catch (error) {
+		console.error('Network error loading blocked status :', error);
+		alert('network error: could not load blocked status');
+	}
+}
 
 // export async function fetchWithRefresh(url, options = {}) {
 
@@ -145,9 +171,36 @@ function setupLoginClick(toggleLogin, isAuth) {
 // 	}
 // 	return response;
 // }
-const requestCache = new Map();         // Stores cached responses
-const inFlightRequests = new Map();     // Tracks pending requests
-let refreshPromise = null;              // Holds the single refresh token operation
+const requestCache = new Map(); // Stores cached responses
+const inFlightRequests = new Map(); // Tracks pending requests
+let refreshPromise = null; // Holds the single refresh token operation
+
+// Authentication state management
+let isRedirecting = false;
+
+// Clear authentication state and redirect to home
+function clearAuthAndRedirect() {
+	if (isRedirecting) return; // Prevent multiple redirections
+	isRedirecting = true;
+	window.isRedirecting = true; // Make it globally accessible
+
+	console.log('Clearing authentication state and redirecting to home');
+
+	// Clear any cached authentication status
+	if (window.cachedAuthStatus !== undefined) {
+		window.cachedAuthStatus = null;
+	}
+
+	// Clear tokens from cookies if possible
+	document.cookie =
+		'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+	document.cookie =
+		'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+	setTimeout(() => {
+		window.location.href = '/#home';
+	}, 100);
+}
 
 export async function fetchWithRefresh(url, options = {}) {
 	const cacheKey = `${url}-${JSON.stringify(options.body || {})}`;
@@ -171,7 +224,7 @@ export async function fetchWithRefresh(url, options = {}) {
 		if (response.status === 401) {
 			// Use a single shared refresh promise
 			if (!refreshPromise) {
-				refreshPromise = fetch('auth/refresh-token/', {
+				refreshPromise = fetch('/auth/refresh-token/', {
 					method: 'GET',
 					credentials: 'include',
 					headers: { 'Content-Type': 'application/json' },
@@ -186,7 +239,30 @@ export async function fetchWithRefresh(url, options = {}) {
 				// Update our clone with the fresh response
 				responseToReturn = response.clone();
 			} else {
-				window.location.href = '/#home';
+				// Refresh token is also expired or invalid
+				console.log('Refresh token expired or invalid');
+
+				// For logout requests, allow the logout to complete locally
+				if (url.includes('logout')) {
+					clearAuthAndRedirect();
+					return new Response(
+						JSON.stringify({
+							message: 'User logged out successfully (tokens expired)',
+							status: 'success',
+						}),
+						{ status: 200 }
+					);
+				} else {
+					// For other requests, clear auth and redirect
+					clearAuthAndRedirect();
+					return new Response(
+						JSON.stringify({
+							error: 'Authentication failed - tokens expired',
+							status: 'auth_failed',
+						}),
+						{ status: 401 }
+					);
+				}
 			}
 		} else if (response.status === 413) {
 			// Handle "Request Entity Too Large" errors
@@ -219,28 +295,5 @@ export async function fetchWithRefresh(url, options = {}) {
 	} finally {
 		// Remove from in-flight tracking when done
 		inFlightRequests.delete(cacheKey);
-	}
-}
-
-export async function getBlockedStatus(targetUserId) {
-    try {
-        const response = await fetchWithRefresh(`/chat/${targetUserId}/blockedStatus`, {
-            method : 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-			credentials: 'include'
-        });
-		if (!response.ok) {
-			const errorData = await response.json();
-			console.error('error loading blocked status', errorData.message || 'unknown error');
-			alert('error loading blocked status' + (errorData.message || 'unknown error'));
-			return;
-		}
-		const data = response.json();
-		return (data);
-    } catch (error) {
-		console.error('Network error loading blocked status :', error);
-		alert('network error: could not load blocked status');
 	}
 }

@@ -1,4 +1,3 @@
-from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -19,12 +18,12 @@ from django.utils.dateformat import format
 import json
 import logging
 from datetime import datetime
-from django.core.paginator import Paginator, EmptyPage
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import sys
 import jwt
 from django.conf import settings
+import re
 # Create your views here.
 
 try:
@@ -52,6 +51,9 @@ class api_signup(APIView):
 	def post(self, request):
 
 		data = request.data
+		username = data.get('user_name', '')
+		if re.search(r'\s', username):
+			return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 
 		try:
 			with transaction.atomic():
@@ -364,9 +366,10 @@ class infoOtherUser(APIView):
 
 class addResultGames(APIView):
 	permission_classes = [AllowAny]
+	permission_classes = [AllowAny]
 
 	def post(self, request):
-
+		
 		data = request.data
 		#data_json = data.json()
 
@@ -384,7 +387,23 @@ class addResultGames(APIView):
 					username2=user2,
 					winner=winnergame
 				)
+				match = MATCHTABLE.objects.create(
+					matchKey=data['matchKey'],
+					username1=user1,
+					score1=data['score1'],
+					score2=data['score2'],
+					username2=user2,
+					winner=winnergame
+				)
 
+		except USER.DoesNotExist as e:
+			return JsonResponse({'error': 'User not found', 'details': str(e)}, status=400)
+		except IntegrityError as e:
+			err_msg = str(e)
+			if 'matchKey' in err_msg:
+				return JsonResponse({'error': 'matchKey already exists'}, status=400)
+			else:
+				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
 		except USER.DoesNotExist as e:
 			return JsonResponse({'error': 'User not found', 'details': str(e)}, status=400)
 		except IntegrityError as e:
@@ -463,7 +482,8 @@ class uploadProfile(APIView):
 			user = request.user
 			data = request.data
 			new_username = data.get('userName')
-
+			if re.search(r'\s', new_username):
+				return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 			User = get_user_model()
 
 			if User.objects.filter(Q(user_name=new_username) & ~Q(id=user.id)).exists():
@@ -1003,7 +1023,7 @@ class forgotPassword(APIView):
 			user.save()
 
 			return JsonResponse({'success': 'Temporary password uploaded'})
-
+		
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 		except Exception as e:
@@ -1051,3 +1071,4 @@ class blockedStatus(APIView):
                 {'status': 'error', 'message': 'Internal server error changing blocked status.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+

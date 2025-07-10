@@ -15,7 +15,6 @@ import os
 import dj_database_url
 from datetime import timedelta
 from decouple import config
-from .jsonSocketHandler import JSONSocketHandler
 
 APP_NAME = 'access-postgresql'
 
@@ -156,9 +155,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.USER'
 
 SIMPLE_JWT = {
-	#"ACCESS_TOKEN_LIFETIME": timedelta(seconds=7),
-    #"REFRESH_TOKEN_LIFETIME": timedelta(minutes=2),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=2),
+	# "ACCESS_TOKEN_LIFETIME": timedelta(seconds=7),
+    # "REFRESH_TOKEN_LIFETIME": timedelta(minutes=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
 	'SIGNING_KEY':config('DJANGO_SECRET_KEY'),
@@ -178,39 +177,39 @@ REST_FRAMEWORK = {
 
 import logging
 
-#LOGGING = {
-#    'version': 1,
-#    'disable_existing_loggers': False,
-#    'formatters': {
-#        'simple': {
-#            'format': '[{levelname}] {asctime} {name}: {message}',
-#            'style': '{',
-#        },
-#    },
-#    'handlers': {
-#        'console': {
-#            'class': 'logging.StreamHandler',
-#            'formatter': 'simple',
-#            'level': 'DEBUG',  # Show all logs
-#        },
-#    },
-#    'root': {
-#        'handlers': ['console'],
-#        'level': 'DEBUG',  # Show all logs
-#    },
-#    'loggers': {
-#        'django': {
-#            'handlers': ['console'],
-#            'level': 'DEBUG',  # Show all logs from Django
-#            'propagate': False,
-#        },
-#        'api': {
-#            'handlers': ['console'],
-#            'level': 'DEBUG',  # Show all logs from your app
-#            'propagate': False,
-#        },
-#    },
-#}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'simple': {
+#             'format': '[{levelname}] {asctime} {name}: {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple',
+#             'level': 'DEBUG',  # Show all logs
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'DEBUG',  # Show all logs
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from Django
+#             'propagate': False,
+#         },
+#         'api': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Show all logs from your app
+#             'propagate': False,
+#         },
+#     },
+# }
 
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
