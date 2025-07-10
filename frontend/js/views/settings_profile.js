@@ -16,6 +16,9 @@ export async function settingsProfileController() {
 
 	// Add real-time username validation
 	setupUsernameValidation();
+
+	// Add real-time name validation
+	setupNameValidation();
 }
 
 // Add username validation for real-time feedback
@@ -25,14 +28,14 @@ function setupUsernameValidation() {
 	if (usernameInput) {
 		usernameInput.addEventListener('input', function () {
 			const value = this.value;
+			const errorDiv = document.getElementById('errorMessageProfile');
 
-			// Check for whitespace
+			// Check for whitespace and maximum length
 			if (/\s/.test(value)) {
 				this.style.borderColor = 'red';
 				this.title = 'Username cannot contain spaces or whitespace';
 
 				// Show immediate feedback
-				const errorDiv = document.getElementById('errorMessageProfile');
 				if (errorDiv) {
 					errorDiv.textContent =
 						'Username cannot contain spaces or whitespace characters.';
@@ -47,30 +50,69 @@ function setupUsernameValidation() {
 						}
 					}, 2000);
 				}
+			} else if (value.length > 15) {
+				this.style.borderColor = 'red';
+				this.title = 'Username cannot exceed 15 characters';
+
+				// Show immediate feedback
+				if (errorDiv) {
+					errorDiv.textContent = 'Username cannot exceed 15 characters.';
+					errorDiv.classList.remove('text-success');
+					errorDiv.classList.add('text-danger');
+					errorDiv.style.display = 'block';
+
+					// Hide after 2 seconds
+					setTimeout(() => {
+						if (errorDiv.textContent.includes('exceed 15')) {
+							errorDiv.style.display = 'none';
+						}
+					}, 2000);
+				}
 			} else {
 				this.style.borderColor = '';
 				this.title = '';
 
-				// Clear error if it was about whitespace
-				const errorDiv = document.getElementById('errorMessageProfile');
-				if (errorDiv && errorDiv.textContent.includes('whitespace')) {
+				// Clear error if it was about whitespace or length
+				if (
+					errorDiv &&
+					(errorDiv.textContent.includes('whitespace') ||
+						errorDiv.textContent.includes('exceed 15'))
+				) {
 					errorDiv.style.display = 'none';
 				}
 			}
 		});
 
-		// Prevent pasting content with whitespace
+		// Prevent pasting content with whitespace and enforce character limit
 		usernameInput.addEventListener('paste', function (e) {
 			setTimeout(() => {
-				const value = this.value;
-				if (/\s/.test(value)) {
-					// Remove whitespace characters
-					this.value = value.replace(/\s/g, '');
+				let value = this.value;
+				const errorDiv = document.getElementById('errorMessageProfile');
+				let message = '';
+				let modified = false;
 
-					const errorDiv = document.getElementById('errorMessageProfile');
+				// Check and remove whitespace
+				if (/\s/.test(value)) {
+					value = value.replace(/\s/g, '');
+					message = 'Whitespace characters were removed from username.';
+					modified = true;
+				}
+
+				// Check and truncate length
+				if (value.length > 15) {
+					value = value.substring(0, 15);
+					message = modified
+						? 'Whitespace removed and username truncated to 15 characters.'
+						: 'Username truncated to 15 characters.';
+					modified = true;
+				}
+
+				// Update the input value if modifications were made
+				if (modified) {
+					this.value = value;
+
 					if (errorDiv) {
-						errorDiv.textContent =
-							'Whitespace characters were removed from username.';
+						errorDiv.textContent = message;
 						errorDiv.classList.remove('text-success');
 						errorDiv.classList.add('text-danger');
 						errorDiv.style.display = 'block';
@@ -80,6 +122,77 @@ function setupUsernameValidation() {
 					}
 				}
 			}, 10);
+		});
+	}
+}
+
+// Add first and last name validation for real-time feedback
+function setupNameValidation() {
+	const firstNameInput = document.getElementById('inputFirstName');
+	const lastNameInput = document.getElementById('inputLastName');
+	const errorDiv = document.getElementById('errorMessagePrivateInfo');
+
+	// First name validation
+	if (firstNameInput) {
+		firstNameInput.addEventListener('input', function () {
+			const value = this.value;
+
+			if (value.length > 15) {
+				this.style.borderColor = 'red';
+				this.title = 'First name cannot exceed 15 characters';
+
+				if (errorDiv) {
+					errorDiv.textContent = 'First name cannot exceed 15 characters.';
+					errorDiv.classList.remove('text-success');
+					errorDiv.classList.add('text-danger');
+					errorDiv.style.display = 'block';
+
+					setTimeout(() => {
+						if (errorDiv.textContent.includes('First name')) {
+							errorDiv.style.display = 'none';
+						}
+					}, 2000);
+				}
+			} else {
+				this.style.borderColor = '';
+				this.title = '';
+
+				if (errorDiv && errorDiv.textContent.includes('First name')) {
+					errorDiv.style.display = 'none';
+				}
+			}
+		});
+	}
+
+	// Last name validation
+	if (lastNameInput) {
+		lastNameInput.addEventListener('input', function () {
+			const value = this.value;
+
+			if (value.length > 15) {
+				this.style.borderColor = 'red';
+				this.title = 'Last name cannot exceed 15 characters';
+
+				if (errorDiv) {
+					errorDiv.textContent = 'Last name cannot exceed 15 characters.';
+					errorDiv.classList.remove('text-success');
+					errorDiv.classList.add('text-danger');
+					errorDiv.style.display = 'block';
+
+					setTimeout(() => {
+						if (errorDiv.textContent.includes('Last name')) {
+							errorDiv.style.display = 'none';
+						}
+					}, 2000);
+				}
+			} else {
+				this.style.borderColor = '';
+				this.title = '';
+
+				if (errorDiv && errorDiv.textContent.includes('Last name')) {
+					errorDiv.style.display = 'none';
+				}
+			}
 		});
 	}
 }
@@ -347,9 +460,36 @@ function SavePrivateInfo() {
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
 
+		// Get form data
+		const firstName = form.elements['inputFirstName'].value;
+		const lastName = form.elements['inputLastName'].value;
+
+		// Validate name lengths before submitting
+		if (firstName.length > 15) {
+			errorDiv.textContent = 'First name cannot exceed 15 characters.';
+			errorDiv.classList.remove('text-success');
+			errorDiv.classList.add('text-danger');
+			errorDiv.style.display = 'block';
+			setTimeout(() => {
+				errorDiv.style.display = 'none';
+			}, 3000);
+			return;
+		}
+
+		if (lastName.length > 15) {
+			errorDiv.textContent = 'Last name cannot exceed 15 characters.';
+			errorDiv.classList.remove('text-success');
+			errorDiv.classList.add('text-danger');
+			errorDiv.style.display = 'block';
+			setTimeout(() => {
+				errorDiv.style.display = 'none';
+			}, 3000);
+			return;
+		}
+
 		const data = {
-			firstName: form.elements['inputFirstName'].value,
-			lastName: form.elements['inputLastName'].value,
+			firstName: firstName,
+			lastName: lastName,
 		};
 
 		try {
@@ -403,11 +543,22 @@ function SavePrivateProfile() {
 	form.addEventListener('submit', async function (e) {
 		e.preventDefault();
 
-		// Username validation - check for whitespace
+		// Username validation - check for whitespace and length
 		const usernameValue = form.elements['inputUsername'].value;
 		if (/\s/.test(usernameValue)) {
 			errorDiv.textContent =
 				'Username cannot contain spaces or whitespace characters.';
+			errorDiv.classList.remove('text-success');
+			errorDiv.classList.add('text-danger');
+			errorDiv.style.display = 'block';
+			setTimeout(() => {
+				errorDiv.style.display = 'none';
+			}, 3000);
+			return;
+		}
+
+		if (usernameValue.length > 15) {
+			errorDiv.textContent = 'Username cannot exceed 15 characters.';
 			errorDiv.classList.remove('text-success');
 			errorDiv.classList.add('text-danger');
 			errorDiv.style.display = 'block';
