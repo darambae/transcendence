@@ -32,8 +32,10 @@ path.logs: /usr/share/elasticsearch/logs
 # ---------------------------------- Network -----------------------------------
 #
 #
-network.host: elasticsearch
-
+# network.host: elasticsearch
+network.host: 0.0.0.0 # 컨테이너 내부의 모든 인터페이스에 바인딩
+# http.port: 9200
+# transport.port: 9300
 http.port: "9200"
 
 xpack.security.enabled: true

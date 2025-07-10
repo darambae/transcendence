@@ -13,11 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 #### REQUIRED ELK LIBRARY ####
-import dj_database_url
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
-from .jsonSocketHandler import JSONSocketHandler
 
 APP_NAME = 'server-pong'
 
@@ -66,15 +62,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://localhost:8443",
-    "http://127.0.0.1:3000",
-    "https://server-pong:8030",
-
-    "https://10.18.161.147:8443",
-]
-
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "https://localhost:8443",
+#     "http://127.0.0.1:3000",
+#     "https://server-pong:8030",
+#     "https://transcendence.42.fr:8443",
+#     "https://10.18.161.147:8443",
+# ]
+CORS_ALLOWED_ORIGINS = ["*"]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -101,7 +97,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -153,7 +148,6 @@ STATIC_ROOT = FRONTEND_DIR
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import logging
 
 # LOGGING = {
 #     'version': 1,

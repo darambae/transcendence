@@ -13,11 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 #### REQUIRED ELK LIBRARY ####
-import dj_database_url
 from .jsonSocketHandler import JSONSocketHandler
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -164,7 +161,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-import logging
 
 # LOGGING = {
 #     'version': 1,
