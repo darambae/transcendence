@@ -100,22 +100,26 @@ export function guideTouch() {
 
 export function checkwin() {
 	const player1Score = document.getElementById("player1score");
-	const player1Name = document.getElementById("player1Username");
 	const player2Score = document.getElementById("player2score");
+	const player1Name = document.getElementById("player1Username");
 	const player2Name = document.getElementById("player2Username");
+	const replaySinglePlayer = document.getElementById("replaySinglePlayer")
 
 	if (player2Score.getAttribute("data-score") == 5) {
-		player1Score.style.color = "red";
+		player1Score.style.setProperty('--score-color', "red");
 		player1Name.style.color = "red";
-		player2Score.style.color = "green";
+		player2Score.style.setProperty('--score-color', "green");
 		player2Name.style.color = "green";
-	}
+		replaySinglePlayer.style.display = "block"
 
-	if (player1Score.getAttribute("data-score") == 5) {
-		player2Score.style.color = "red";
+	}
+	else if (player1Score.getAttribute("data-score") == 5) {
+		player2Score.style.setProperty('--score-color', "red");
 		player2Name.style.color = "red";
-		player1Score.style.color = "green";
+		player1Score.style.setProperty('--score-color', "green");
 		player1Name.style.color = "green";
+		replaySinglePlayer.style.display = "block"
+		
 	}
 }
 

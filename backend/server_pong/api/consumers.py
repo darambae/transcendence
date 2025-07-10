@@ -60,16 +60,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
 		
 		if self.usrID == 0 :
-			u1 = params.get("u1", "Default")
-			u2 = params.get("u2", "Default")
+			u1 = params.get("u1", "Guest")
+			u2 = params.get("u2", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u1
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u2
 		
 		elif self.usrID == 1 :
-			u = params.get("name", "Default")
+			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][0] = u
 		else :
-			u = params.get("name", "Default")
+			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u
 
 		# print(dictInfoRackets, file=sys.stderr)
@@ -193,9 +193,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 							#print("Task created, setting AI to false", file=sys.stderr)
 							self.AI = False
 							#print("Self.ai put to false", file=sys.stderr)
-						# #print(f"statissssss : {stats}", file=sys.stderr)
+						#print(f"11111111 : {stats}", file=sys.stderr)
 						if (stats.get("team1Score", 0) >= 5 or stats.get("team2Score", 0) >= 5) and self.usrID <= 1: ##########################################################################################################____________________________________
-							#print("Yaaaaay stoping game", file=sys.stderr)
 							await self.channel_layer.group_send(
 								self.room_group_name,
 								{
@@ -209,17 +208,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 								winnerTeam = 1
 							json_data = {
 								"matchKey" : self.room_group_name,
-								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0],
+								"username1" : dictInfoRackets[self.room_group_name]["playersUsernames"][0][0],
 								"score1" : stats['team1Score'],
 								"score2" : stats['team2Score'],
-								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1],
-								"winner" : dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam],
+								"username2" : dictInfoRackets[self.room_group_name]["playersUsernames"][1][0],
+								"winner" : dictInfoRackets[self.room_group_name]["playersUsernames"][winnerTeam][0],
 							}
 							requests.post("https://access_postgresql:4000/api/addResultGames/", verify=False, json=json_data, headers={'Host': 'localhost'})
 							if self.t2 is not None :
 								self.task.cancel()
 								await self.task
 							self.gameSimulation.stopSimulation()
+						#print(f"22222222 : {stats}", file=sys.stderr)
 						if self.usrID <= 1 :
 							await self.gameSimulation.setRedisCache(self.room_group_name)
 							stats = cache.get(f'simulation_state_{self.room_group_name}')
