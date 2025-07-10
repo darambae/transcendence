@@ -175,15 +175,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			else :
 				user = match.p2.username
 				playerId = 2
-			await self.send(text_data=json.dumps({
-				"t_state" : "game-start",
-				"mode" : "remote",
-				"tkey" : self.room_group_name,
-				"playerId" : playerId,
-				"player" : user,
-				"key" : match.key,
-				"round" : roundM,
-			}))
+            if (self.name == match.p1.username or self.name == match.p2.username) :
+				await self.send(text_data=json.dumps({
+					"t_state" : "game-start",
+					"mode" : "remote",
+					"tkey" : self.room_group_name,
+					"playerId" : playerId,
+					"player" : user,
+					"key" : match.key,
+					"round" : roundM,
+				}))
 		else :
 			with open("response.txt", 'a+') as f :
 				print(f"--=LOCAL=--\n\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}\n", file=f)
@@ -204,7 +205,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		action = data.get("action")
 		print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
-			print(f"self.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=sys.stderr)
+			with open("response.txt", 'a+') as f:
+				print(f"--=Create-Bracket=--\nself.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=f)
 			if trnmtDict[self.room_group_name].match1.launchable and not trnmtDict[self.room_group_name].match1.played:
 				await self.launchGame(trnmtDict[self.room_group_name].match1, 1)
 			if trnmtDict[self.room_group_name].match2.launchable and not trnmtDict[self.room_group_name].match2.played:
