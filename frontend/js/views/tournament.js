@@ -307,9 +307,9 @@ export async function tournamentController() {
             },
             credentials : "include",
           })
-          .then(response => {
+          .then(async response => {
             if (!response.ok) throw new Error("https Error: " + response.status);
-            jwtInfo = response.json();
+            jwtInfo = await response.json();
             console.log(jwtInfo);
             usernameJwt = jwtInfo["key"];
             guestJwt = jwtInfo["guests"]
@@ -335,6 +335,8 @@ export async function tournamentController() {
         })
           .then(async data => {
             console.log("Données reçues Join:", data["key"]);
+            console.log("Jwt info :", jwtInfo);
+            
             const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
             SSEStream = new EventSource(url_sse);
             setSSE(SSEStream);

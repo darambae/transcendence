@@ -166,6 +166,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		print(f"roundMatch lauchGame : {roundM}", file=sys.stderr)
 		if match.gameMode == REMOTE :
 			userLst = sorted([match.p1.username, match.p2.username])
+			with open("response.txt", 'a+') as f :
+				print(f"--=REMOTE=--\n\nself.name : {self.name} | self.guests : {self.guests}\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\n", file=f)
 
 			if self.name == match.p1.username or match.p1.username in self.guests:
 				user = match.p1.username
@@ -183,7 +185,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 				"round" : roundM,
 			}))
 		else :
-			print(f"match.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}", file=sys.stderr)
+			with open("response.txt", 'a+') as f :
+				print(f"--=LOCAL=--\n\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}\n", file=f)
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-start",
 				"mode" : "local",
@@ -214,6 +217,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			if trnmtDict[self.room_group_name].matchLoserBracket.launchable and not trnmtDict[self.room_group_name].matchLoserBracket.played:
 				await self.launchGame(trnmtDict[self.room_group_name].matchLoserBracket, 2)
 	
+		elif action == "update-guest": 
+			jwt_l = data.get("jwt-list")
+			with open("response.txt", 'a+') as f :
+				print(f"--=Update guest=--\nguests : {jwt_l} , type : {type(jwt_l).__name__}\n\n", file=f)
+			
+			for elem in jwt_l :
+				with open("response.txt", 'a+') as f :
+					print(f'--=LOOP jwt_l=--\nself.name : {self.name}\nelem["username"] : {elem["username"]}\nelem["invites"] : {elem["invites"]}\n\nCondition : {self.name == elem["username"] or self.name in elem["invites"]}', file=f)
+				if (self.name == elem["username"] or self.name in elem["invites"]) :
+					self.guests == elem["invites"]
 		elif action == "supervise" :
 			print(f"A0 - {action}", file=sys.stderr)
 			roundMatch = data.get("round", 1)
