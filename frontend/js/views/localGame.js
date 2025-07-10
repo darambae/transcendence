@@ -123,8 +123,6 @@ export function checkwin() {
 	}
 }
 
-
-
 const keysPressed = new Set();
 
 function keydownHandler(event) {
@@ -207,7 +205,7 @@ export async function localGameController() {
 			let sc1 = document.getElementById("player1score");
 			let sc2 = document.getElementById("player2score");
 
-			 console.log(data);
+			//console.log(data);
 			game_stats = data["game_stats"]
 			if (game_stats["State"] != "Waiting for start") {
 				if (started == false) {

@@ -500,17 +500,29 @@ async function switchChatRoom(currentUserId, newgroupId) {
 async function createGameApiKey() {
     try {
         const csrf = getCookie('csrftoken');
-        const response = await fetchWithRefresh(`server-pong/api-key`, {
+        const response = await fetch(`server-pong/api-key`, {
             headers: {
                 'X-CSRFToken': csrf,
             },
             credentials: 'include',
         });
         
+		console.log('createGameApiKey Response status:', response.status);
+        console.log('createGameApiKey Response headers:', response.headers);
+
         if (!response.ok) {
             throw new Error("HTTPS Error: " + response.status);
         }
         
+		const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+            const textResponse = await response.text();
+            console.error('Expected JSON but got:', textResponse);
+            throw new Error('Server returned non-JSON response: ' + textResponse);
+        }
+
         const data = await response.json();
         console.log('Game created with key:', data.api_key);
         return data.api_key;
@@ -519,6 +531,30 @@ async function createGameApiKey() {
         console.error('Error creating game:', error);
         return null;
     }
+}
+
+function waitForElement(elementId, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        
+        function checkElement() {
+            const element = document.getElementById(elementId);
+            if (element) {
+                resolve(element);
+                return;
+            }
+            
+            if (Date.now() - startTime > timeout) {
+                reject(new Error(`Element ${elementId} not found within ${timeout}ms`));
+                return;
+            }
+            
+            // Vérifier à nouveau dans 50ms
+            setTimeout(checkElement, 50);
+        }
+        
+        checkElement();
+    });
 }
 
 async function inviteFriendToPlay(receiverUsername) {
@@ -534,17 +570,27 @@ async function inviteFriendToPlay(receiverUsername) {
     }
 
 	try {
-		const usernameInput = document.getElementById('usernameInput-active');
-        const currentUserId = parseInt(usernameInput.value);
+		const userIdInput = document.getElementById('userIdInput-active');
+        const currentUserId = parseInt(userIdInput.value);
         const messageInput = document.getElementById('messageInput-active');
 		messageInput.value = `🎮 PongPong invitation: join my game with this key: ${apiKey}\n Copy and paste it in Multiplayer and let's play !`
         
 		sendMessage(currentUserId);
+
+		// const invitationMessage = `🎮 Game Invitation: Join my PongPong game with this key: ${apiKey}`;
+        // await sendInvitationMessage(invitationMessage, currentUserId);
    
 		window.location.hash = "#multiplayer";
-		setTimeout(() => {
+
+		await waitForElement('gameCanvas');
+		const gameCanvas = document.getElementById('gameCanvas');
+		if (gameCanvas) {
 			handleGame2Players(apiKey, 1, 0, -1);
-		}, 300);
+		} else {
+			console.error('Game canvas not found after navigation');
+			alert('Could not initialize game. Please try manually navigating to multiplayer.');
+		}
+
 	} catch (error) {
 		console.error("error sending invitation : ", error);
 		alert('Failed to send game invitation. Please try again.');
@@ -560,6 +606,29 @@ async function inviteFriendToPlay(receiverUsername) {
     
 //     if (!groupId || !username) {
 //         throw new Error('No active chat to send invitation');
+//     }
+    
+//     // Créer les données du message temporaire pour l'affichage immédiat
+//     const tempMessageData = {
+//         content: content,
+//         group_id: groupId,
+//         sender_id: currentUserId,
+//         sender_username: username,
+//         timestamp: new Date().toISOString(),
+//     };
+
+//     // Ajouter le message à l'UI immédiatement (comme dans sendMessage)
+//     const chatLog = document.getElementById('chatLog-active');
+//     if (chatLog) {
+//         // Supprimer "No messages yet" si présent
+//         const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
+//         if (noMessagesDiv) {
+//             noMessagesDiv.remove();
+//         }
+
+//         const msgElement = createMessageElement(tempMessageData, currentUserId);
+//         chatLog.appendChild(msgElement);
+//         chatLog.scrollTop = chatLog.scrollHeight;
 //     }
     
 //     try {
