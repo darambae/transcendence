@@ -511,7 +511,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 			gameInvitationBtn.classList.remove('d-none');
 			gameInvitationBtn.onclick = function() {
 				if (confirm(`Do you want to invite ${receiverUsername} to play a game of PongPong ?`)) {
-					inviteFriendToPlay(receiverUsername);
+					inviteFriendToPlay(currentUserId);
 				}
 			}
 		}
@@ -535,6 +535,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
     // Load history and initialize SSE for the new group
     messageOffsets[newgroupId] = 0; // Reset offset for new room
     loadMessageHistory(currentUserId, newgroupId);
+	const targetbBlockedStatus = await getBlockedStatus(targetUserId);
     let block_reason = null;
 	if (targetbBlockedStatus.hasBlocked) {
 		block_reason = 'this user blocked you';
@@ -612,9 +613,10 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 
     // Focus on message input
     const messageInput = document.getElementById('messageInput-active');
-    if (messageInput) {
-        messageInput.focus();
-    }
+	if (messageInput) {
+		messageInput.focus();
+	}
+}
 }
 
 async function createGameApiKey() {
@@ -677,7 +679,7 @@ function waitForElement(elementId, timeout = 5000) {
     });
 }
 
-async function inviteFriendToPlay(receiverUsername) {
+async function inviteFriendToPlay(currentUserId) {
 	console.log("here in inviteFriendToPlay");
 	//create API key for the game;
 	
@@ -690,10 +692,10 @@ async function inviteFriendToPlay(receiverUsername) {
     }
 
 	try {
-		const userIdInput = document.getElementById('userIdInput-active');
-        const currentUserId = parseInt(userIdInput.value);
+		//const userIdInput = document.getElementById('userIdInput-active');
+        //const currentUserId = parseInt(userIdInput.value);
         const messageInput = document.getElementById('messageInput-active');
-		messageInput.value = `🎮 PongPong invitation: join my game with this key: ${apiKey}\n Copy and paste it in Multiplayer and let's play !`
+		messageInput.value = `🎮 PongPong invitation: copy and paste this key to join my game : ${apiKey}.\n`
         
 		sendMessage(currentUserId);
 

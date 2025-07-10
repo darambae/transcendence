@@ -4,8 +4,10 @@ import { adress } from './utils/commonFunctions.js';
 import { drawMap } from './utils/commonFunctions.js';
 import { drawCenterText } from './multiplayer.js';
 
-// Global variable to track the game interval
+// Global variables to track the game interval and event handlers
 let gameInterval = null;
+let keydownHandler = null;
+let keyupHandler = null;
 
 function drawRoundedRect(x, y, width, height, radius) {
 	const canvas = document.getElementById('gameCanvas');
@@ -141,7 +143,7 @@ export async function localGameController() {
 
 	let key_game = getPlayersLocalName();
 
-	let url_post = `server-pong/send-message`;
+	let url_post = `/server-pong/send-message`;
 	let started = false;
 	let game_stats;
 	const csrf = getCookie('csrftoken');
@@ -179,7 +181,7 @@ export async function localGameController() {
 		// Could set default values for a, b, c if needed
 	}
 	console.log('results: ', username, a, b, c);
-	let url_sse = `server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
+	let url_sse = `/server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
 	if (a !== undefined) {
 		url_sse += `&guest1=${a}`;
 	}
@@ -250,18 +252,37 @@ export async function localGameController() {
 	const intervalDelay = 33;
 	let lastSent = 0;
 
-	document.addEventListener('keydown', (event) => {
+	// Clean up any existing event listeners before adding new ones
+	if (keydownHandler) {
+		document.removeEventListener('keydown', keydownHandler);
+	}
+	if (keyupHandler) {
+		document.removeEventListener('keyup', keyupHandler);
+	}
+
+	// Create and store references to event handlers
+	keydownHandler = (event) => {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
+			console.log('Local game keydown handler activated for key:', key);
 			event.preventDefault();
 			keysPressed.add(key);
 		}
-	});
+	};
 
-	// document.addEventListener('keyup', (event) => {
-	// 	keysPressed.delete(event.key);
-	// });
+	keyupHandler = (event) => {
+		const key = event.key;
+		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
+		if (keysToPrevent.includes(key)) {
+			console.log('Local game keyup handler activated for key:', key);
+		}
+		keysPressed.delete(event.key);
+	};
+
+	// Add event listeners
+	document.addEventListener('keydown', keydownHandler);
+	document.addEventListener('keyup', keyupHandler);
 
 		// Clear any existing interval before starting a new one
 	if (gameInterval) {
@@ -295,23 +316,32 @@ export async function localGameController() {
 				case 'q':
 					// console.log("Started : ", started);
 					if (started == true) {
-						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`, {
-							// headers: {
-							// 	"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
-							// },
-							credentials: 'include'
-						});
+						await fetchWithRefresh(
+							`/server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`,
+							{
+								headers: {
+									Authorization: `bearer ${sessionStorage.getItem(
+										'accessToken'
+									)}`,
+								},
+							}
+						);
 					}
 					break;
 				case 'l':
 					// console.log("Started : ", started);
 					if (started == true) {
-						await fetchWithRefresh(`server-pong/forfait-game?apikey=${key_game}&idplayer=${1}`, {
-							// headers: {
-							// 	"Authorization": `bearer ${sessionStorage.getItem("accessToken")}`
-							// }
-							credentials: 'include'
-						});
+						await fetchWithRefresh(
+							`/server-pong/forfait-game?apikey=${key_game}&idplayer=${2}`,
+							{
+								// headers: {
+								// 	Authorization: `bearer ${sessionStorage.getItem(
+								// 		'accessToken'
+								// 	)}`,
+								// },
+								credentials: 'include'
+							}
+						);
 					}
 					break;
 				case 'ArrowUp':
@@ -373,10 +403,24 @@ export async function localGameController() {
 
 // Cleanup function to clear intervals and prevent memory leaks
 export function cleanupLocalGame() {
+	console.log('cleanupLocalGame() called');
+	
 	if (gameInterval) {
 		clearInterval(gameInterval);
 		gameInterval = null;
 		console.log('Local game interval cleared');
+	}
+
+	// Remove key event listeners
+	if (keydownHandler) {
+		document.removeEventListener('keydown', keydownHandler);
+		keydownHandler = null;
+		console.log('Keydown listener removed');
+	}
+	if (keyupHandler) {
+		document.removeEventListener('keyup', keyupHandler);
+		keyupHandler = null;
+		console.log('Keyup listener removed');
 	}
 
 	// Remove event listeners to prevent memory leaks
