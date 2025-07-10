@@ -15,6 +15,7 @@ import os
 import json
 import requests
 from .utils import setTheCookie
+import re
 
 
 @ensure_csrf_cookie
@@ -44,6 +45,8 @@ def signup(request):
             return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
+        if re.search(r'\s', data['username']):
+            return JsonResponse({'create_user': {'error': 'Username cannot contain spaces or whitespace characters'}}, status=400)
 
     try:
         validate_email(data['mail'])
@@ -274,6 +277,9 @@ class saveProfile(APIView):
 
         if not data.get('userName', '').strip():
             return JsonResponse({'error': 'userName is empty'}, status=400)
+        username = data.get('userName', '')
+        if re.search(r'\s', username):
+            return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 
         try:
             response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})

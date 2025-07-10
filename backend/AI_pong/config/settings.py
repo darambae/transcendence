@@ -13,11 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 #### Required ELK library ####
-import dj_database_url
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
-from .jsonSocketHandler import JSONSocketHandler
 
 APP_NAME = 'AI_pong'
 
@@ -130,7 +126,7 @@ STATIC_ROOT = FRONTEND_DIR
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import logging
+# import logging
 
 # LOGGING = {
 #     'version': 1,

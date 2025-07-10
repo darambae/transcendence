@@ -15,7 +15,6 @@ import os
 import sys
 #### REQUIRED ELK LIBRARY ####
 from .jsonSocketHandler import JSONSocketHandler
-import dj_database_url
 import logging
 from logstash_async.formatter import LogstashFormatter
 from logstash_async.handler import AsynchronousLogstashHandler
@@ -153,8 +152,6 @@ STATIC_ROOT = FRONTEND_DIR
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-import logging
 
 # LOGGING = {
 #     'version': 1,

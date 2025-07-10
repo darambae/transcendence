@@ -285,9 +285,9 @@ services:
       - certs:/usr/share/elasticsearch/config/certs
       - elk_data:/usr/share/elasticsearch/data
       - ./elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    ports:
-      - ${ELASTICSEARCH_PORT}:9200
-      - 9300:9300
+    # ports:
+    #   - ${ELASTICSEARCH_PORT}:9200
+    #   - 9300:9300
     env_file:
       - .env
     networks:

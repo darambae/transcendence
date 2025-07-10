@@ -39,7 +39,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator: add-ca
+certs_generator: #add-ca
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."
@@ -126,23 +126,37 @@ start:
 
 down:
 	@echo "Stopping Transcendence..."
+	@# Safety check: ensure we're in the correct directory
+	@if [ ! -f "docker-compose.yml" ] || [ ! -d "backend" ] || [ ! -d "frontend" ]; then \
+		echo "ERROR: This command must be run from the transcendence project root directory!"; \
+		echo "Expected files/directories: docker-compose.yml, backend/, frontend/"; \
+		echo "Current directory: $$(pwd)"; \
+		exit 1; \
+	fi
 	@${COMPOSE} down -v
 	@echo "Transcendence stopped."
 	@echo "Deleting migrations & creating new migrations directory..."
-	@rm -rf ./backend/access_postgresql/api/migrations ./backend/user_service/api/migrations
+	@if [ -d "./backend/access_postgresql/api/migrations" ]; then rm -rf ./backend/access_postgresql/api/migrations; fi
+	@if [ -d "./backend/user_service/api/migrations" ]; then rm -rf ./backend/user_service/api/migrations; fi
 	@mkdir -p ./backend/access_postgresql/api/migrations
 	@mkdir -p ./backend/user_service/api/migrations
-	@cat << EOF > ./backend/access_postgresql/api/migrations/__init__.py
-	@cat << EOF > ./backend/user_service/api/migrations/__init__.py
+	@touch ./backend/access_postgresql/api/migrations/__init__.py
+	@touch ./backend/user_service/api/migrations/__init__.py
 	@echo "Migrations directories recreated."
 	@echo "Deleting uploaded images except default.png..."
-	@find ./backend/user_service/api/media/imgs/ -type f -not -name "default.png" -delete
+	@if [ -d "./backend/user_service/api/media/imgs" ]; then \
+		find ./backend/user_service/api/media/imgs/ -type f -not -name "default.png" -delete; \
+	fi
 	@echo "Uploaded images deleted."
 	@echo "Deleting pycache directories..."
-	@find ./backend -type d -name "__pycache__" -exec rm -rf {} +
+	@if [ -d "./backend" ]; then \
+		find ./backend -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true; \
+	fi
 	@echo "Pycache directories deleted."
 	@echo "Deleting server_pong log files..."
-	@rm -f ./backend/server_pong/*_decodeJWT.txt ./backend/server_pong/test.txt
+	@if [ -d "./backend/server_pong" ]; then \
+		rm -f ./backend/server_pong/*_decodeJWT.txt ./backend/server_pong/test.txt; \
+	fi
 	@echo "Server pong log files deleted."
 
 destroy:

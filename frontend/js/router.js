@@ -1,4 +1,3 @@
-
 // import { routes } from './routes.js';
 // import { actualizeIndexPage, getCookie, isUserAuthenticated, attachLoginListener, fetchWithRefresh } from './utils.js';
 // import { renderChatButtonIfAuthenticated } from './views/chat.js';
@@ -20,7 +19,6 @@
 // 		});
 // 	}
 // }
-
 
 // // window.addEventListener('DOMContentLoaded', renderChatButtonIfAuthenticated);
 // window.addEventListener('DOMContentLoaded', async () => {
@@ -76,10 +74,10 @@
 // 	console.log("csrf home: ", csrf);
 
 // //-----------------------------
-	
+
 // 	let routeName = hash;
 // 	let param = null;
-	
+
 // 	if (!hash || hash === '') {
 // 		routeName = 'home';
 // 		history.replaceState(null, '', '/'); // clean URL
@@ -88,7 +86,7 @@
 // 	/* if (hash.includes('/')) {
 // 		[routeName, param] = hash.split('/');
 // 	} */
-	
+
 // 	let view;
 // 	let userIsAuth = await isUserAuthenticated();
 // 	console.log('is User Auth : ', userIsAuth);
@@ -111,7 +109,7 @@
 // 	//-----------------------------
 
 // 	console.log("routeName:", routeName, "view:", view);
-	
+
 // 	//check if user is trying to access a page forbidden if not authenticated
 // 	if (!userIsAuth && routeName !== 'signup' && routeName !== 'home') {
 // 		const mainContent = document.getElementById('main-content');
@@ -133,7 +131,6 @@
 // //-------------------------------
 // }
 
-
 import { routes } from './routes.js';
 import {
 	actualizeIndexPage,
@@ -142,6 +139,7 @@ import {
 	attachLoginListener,
 } from './utils.js';
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
+import { cleanupLocalGame } from './views/localGame.js';
 
 // State management
 let navigationBlocked = false;
@@ -213,13 +211,18 @@ export async function navigate() {
 		return;
 	}
 
+	// Reset any auth redirection flags
+	if (window.isRedirecting) {
+		window.isRedirecting = false;
+	}
+
 	// Get and normalize route
 	const hash = location.hash.slice(1);
 	console.log('navigating to:', hash);
 
 	// Check CSRF only once per session
 	if (!csrfTokenFetched && !getCookie('csrftoken')) {
-		await fetch('user-service/csrf/', {
+		await fetch('/user-service/csrf/', {
 			method: 'GET',
 			credentials: 'include',
 		});
@@ -268,6 +271,9 @@ export async function navigate() {
 
 	// Render the view
 	try {
+		// Cleanup any active game timers before navigating to a new page
+		cleanupLocalGame();
+
 		await actualizeIndexPage('main-content', view);
 	} catch (error) {
 		console.error('Error loading template:', error);

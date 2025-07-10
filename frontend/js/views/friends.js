@@ -1,54 +1,63 @@
-import { actualizeIndexPage, fetchWithRefresh } from "../utils.js";
-import { routes } from "../routes.js"
-
+import { actualizeIndexPage, fetchWithRefresh } from '../utils.js';
+import { routes } from '../routes.js';
 
 export function searchFriends() {
-	
-	document.getElementById("userSearch").addEventListener("input", async function () {
-		const resultsBox = document.getElementById("resultsSearch");
-		const query = this.value;
-		
-		const response = await fetchWithRefresh(`user-service/searchUsers?q=${encodeURIComponent(query)}`, {
-			method: "GET",
-			credentials: 'include',
-			headers: {
-				"Content-Type": "application/json",
-			},
-		})
+	document
+		.getElementById('userSearch')
+		.addEventListener('input', async function () {
+			const resultsBox = document.getElementById('resultsSearch');
+			const query = this.value;
 
-		const data = await response.json();
+			const response = await fetchWithRefresh(
+				`/user-service/searchUsers?q=${encodeURIComponent(query)}`,
+				{
+					method: 'GET',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+			);
 
-		const users = data.results ?? [];
-		
-		resultsBox.innerHTML = users
-		.map(user => `<li class="list-group-item user-link"><button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`)
-			.join('');
+			const data = await response.json();
 
-		document.querySelectorAll('.profile-btn').forEach(btn => {
-			btn.addEventListener('click', async function() {
-				const username = btn.dataset.username;
-				await actualizeIndexPage('modal-container', routes.card_profile(username))
-			})
-		})
-	})
+			const users = data.results ?? [];
+
+			resultsBox.innerHTML = users
+				.map(
+					(user) =>
+						`<li class="list-group-item user-link"><button class="profile-btn" data-username="${user.username}">${user.username}</button></li>`
+				)
+				.join('');
+
+			document.querySelectorAll('.profile-btn').forEach((btn) => {
+				btn.addEventListener('click', async function () {
+					const username = btn.dataset.username;
+					await actualizeIndexPage(
+						'modal-container',
+						routes.card_profile(username)
+					);
+				});
+			});
+		});
 }
 
 export async function listennerFriends() {
-	const resultsBox = document.getElementById("resultsListFriends");
-	resultsBox.innerHTML = "";  // CORRECTION ici
+	const resultsBox = document.getElementById('resultsListFriends');
+	resultsBox.innerHTML = ''; // CORRECTION ici
 
-	let html = "";
+	let html = '';
 
-	const response = await fetchWithRefresh("user-service/listennerFriends/", {
-		method: "GET",
+	const response = await fetchWithRefresh('/user-service/listennerFriends/', {
+		method: 'GET',
 		credentials: 'include',
 		headers: {
-			"Content-Type": "application/json",
+			'Content-Type': 'application/json',
 		},
 	});
 
 	const data = await response.json();
-	console.log("Résultat JSON :", data);
+	console.log('Résultat JSON :', data);
 
 	const users = data.results ?? [];
 
@@ -64,9 +73,9 @@ export async function listennerFriends() {
 					</button>
 				</div>`;
 
-		if (user.direction === 'sent' && user.status === "pending") {
+		if (user.direction === 'sent' && user.status === 'pending') {
 			html += `<span class="badge bg-warning text-dark">${user.status}</span>`;
-		} else if (user.direction === 'received' && user.status === "pending") {
+		} else if (user.direction === 'received' && user.status === 'pending') {
 			html += `<div>
 				<button class="btn btn-sm btn-success me-1" onclick="acceptInvite('${user.username}')">
 					Accepter
@@ -76,7 +85,8 @@ export async function listennerFriends() {
 				</button>
 			</div>`;
 		} else {
-			const badgeClass = user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
+			const badgeClass =
+				user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
 			html += `<span class="badge ${badgeClass}">${user.status}</span>`;
 			if (user.status === 'accepted') {
             	html += `<button class="btn btn-sm btn-outline-danger ms-2 unfriend-btn" data-username="${user.username}" title="unfriend">&times;</button>`;
@@ -90,71 +100,66 @@ export async function listennerFriends() {
 
 	resultsBox.innerHTML = html;
 
-	document.querySelectorAll('.profile-btn').forEach(btn => {
+	document.querySelectorAll('.profile-btn').forEach((btn) => {
 		btn.addEventListener('click', async function () {
 			const username = btn.dataset.username;
-			await actualizeIndexPage('modal-container', routes.card_profile(username));
+			await actualizeIndexPage(
+				'modal-container',
+				routes.card_profile(username)
+			);
 		});
 	});
 }
 
-
 export async function acceptInvite(username) {
-	
 	try {
 		const data_body = {
-			username: username
-		}
+			username: username,
+		};
 
-		const response = await fetchWithRefresh("user-service/acceptInvite/", {
-			method: "PATCH",
+		const response = await fetchWithRefresh('/user-service/acceptInvite/', {
+			method: 'PATCH',
 			credentials: 'include',
 			headers: {
-				"Content-Type": "application/json",
+				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(data_body),
-		})
+		});
 
 		const data = await response.json();
-		console.log("Résultat JSON :", data);
+		console.log('Résultat JSON :', data);
 		if (data.message) {
-			listennerFriends()
+			listennerFriends();
 		}
-
-
 	} catch (err) {
-		console.error("Erreur réseau acceptInvite :", err);
+		console.error('Erreur réseau acceptInvite :', err);
 	}
 }
-
 
 export async function declineInvite(username) {
-	
 	try {
 		const data_body = {
-			username: username
-		}
+			username: username,
+		};
 
-		const response = await fetchWithRefresh("user-service/declineInvite/", {
-			method: "PATCH",
+		const response = await fetchWithRefresh('/user-service/declineInvite/', {
+			method: 'PATCH',
 			credentials: 'include',
 			headers: {
-				"Content-Type": "application/json",
+				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(data_body),
-		})
+		});
 
 		const data = await response.json();
-		console.log("Résultat JSON :", data);
+		console.log('Résultat JSON :', data);
 		if (data.message) {
-			listennerFriends()
+			listennerFriends();
 		}
-
-
 	} catch (err) {
-		console.error("declineInvite network error :", err);
+		console.error('declineInvite network error :', err);
 	}
 }
 
-window.acceptInvite  = acceptInvite;
+window.acceptInvite = acceptInvite;
 window.declineInvite = declineInvite;

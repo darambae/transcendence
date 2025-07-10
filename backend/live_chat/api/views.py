@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
-class ChatGroupListCreateView(View):    
+class ChatGroupListCreateView(View):
     def get(self, request, *args, **kwargs):
         """
         Lists chat groups for the logged-in user by proxying to access_postgresql.
@@ -51,7 +51,7 @@ class ChatGroupListCreateView(View):
             current_user_id = data.get('current_user_id')
             if not target_user_id or not current_user_id:
                 return JsonResponse({'status': 'error', 'message': 'user ids are required.'}, status=400)
-                
+
             # Get current user from the authenticated request
             logger.info(f"Creating private chat for user {current_user_id} with target user {target_user_id}")
             access_token = request.COOKIES.get('access_token')
@@ -116,15 +116,15 @@ class ChatMessageView(View):
             content = data.get('content')
             MIN_LENGTH = 1
             MAX_LENGTH = 1000
-            
+
             if not content:
                 return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
             if not content or len(content) < MIN_LENGTH:
                 return JsonResponse({'status': 'error', 'message': 'Message is empty'}, status=400)
-                
+
             if len(content) > MAX_LENGTH:
                 return JsonResponse(
-                    {'status': 'error', 'message': f'Message exceeds maximum length of {MAX_LENGTH} characters'}, 
+                    {'status': 'error', 'message': f'Message exceeds maximum length of {MAX_LENGTH} characters'},
                     status=400
                 )
             access_token = request.COOKIES.get('access_token')
@@ -180,7 +180,7 @@ async def sse_chat_stream(request, group_id):
     Server-Sent Events stream for real-time chat messages.
     """
     # Create a response object first
-    response = StreamingHttpResponse(_generate_events(request, group_id), 
+    response = StreamingHttpResponse(_generate_events(request, group_id),
                                     content_type="text/event-stream")
     response['Cache-Control'] = 'no-cache'
     response['X-Accel-Buffering'] = 'no'
@@ -192,7 +192,7 @@ async def _generate_events(request, group_id):
     if channel_layer is None:
         yield f"event: error\ndata: {json.dumps({'message': 'Channel layer not configured'})}\n\n"
         return  # Empty return to stop the generator
-    
+
     channel_group_name = f"chat_{group_id}"
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
@@ -201,38 +201,38 @@ async def _generate_events(request, group_id):
     try:
         # Your token expiration check code
         access_token = request.COOKIES.get('access_token')
-        
+
         token_data = jwt.decode(access_token, verify=False)
         expiry_time = token_data.get('exp')
-        
+
         current_time = time.time()
         if expiry_time and (expiry_time - current_time < 300):
             yield f"event: refresh_token\ndata: {{}}\n\n"
-            
+
     except Exception as e:
         logger.error(f"Error checking token expiration: {e}")
-    
+
     # Validate token
     try:
         async with httpx.AsyncClient(verify=False) as client:
             resp = await client.get(
-                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/", 
+                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/",
                 headers={
                     'Authorization': f'Bearer {access_token}',
                     'Host': 'localhost'
                 },
                 timeout=10
             )
-            
+
         if resp.status_code != 200:
             logger.warning(f"live_chat (SSE): Invalid token for group '{group_id}'")
             await channel_layer.group_discard(channel_group_name, client_channel_name)
             yield f"event: error\ndata: {json.dumps({'message': 'Unauthorized'})}\n\n"
             return
-            
+
         user_data = resp.json()
         logger.info(f"live_chat (SSE): Validated token for group '{group_id}' - user data: {user_data}")
-        
+
     except httpx.RequestError as e:
         logger.exception(f"live_chat (SSE): Error validating token: {e}")
         await channel_layer.group_discard(channel_group_name, client_channel_name)
@@ -252,11 +252,52 @@ async def _generate_events(request, group_id):
                     yield f"data: {sse_data}\n\n"
                 else:
                     yield ":heartbeat\n\n"
-                    
+
             except asyncio.TimeoutError:
                 yield ":heartbeat\n\n"
-                
+
     except Exception as e:
         yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
     finally:
         await channel_layer.group_discard(channel_group_name, client_channel_name)
+		
+class blockedStatus(View):
+    def get(self, request, targetUserId):
+        access_token = request.COOKIES.get('access_token')
+        if not access_token:
+            return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+        headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+        url = f"{ACCESS_PG_BASE_URL}/api/chat/{targetUserId}/blockedStatus/"
+        try:
+            resp = requests.get(url, headers=headers, timeout=10, verify=False)
+            resp.raise_for_status()
+            return JsonResponse(resp.json(), status=resp.status_code)
+        except requests.RequestException as exc:
+            logger.error(f"blocked Status GET request failed: {exc}")
+            return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service.'}, status=502)
+        except Exception as e:
+            logger.error(f"Failed to decode JSON from backend: {e}")
+            return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
+    def post (self, request, targetUserId):
+        try:
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+            url = f"{ACCESS_PG_BASE_URL}/api/chat/{targetUserId}/blockedStatus/"
+            try:
+                resp = requests.post(url, json={}, headers=headers, timeout=10, verify=False)
+                resp.raise_for_status()
+                return JsonResponse(resp.json(), status=resp.status_code)
+            except requests.RequestException as exc:
+                logger.error(f"chat blockedStatus POST request failed: {exc}")
+                return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for blocked status.'}, status=502)
+            except Exception as e:
+                logger.error(f"Internal server error during blocked status changes: {e}")
+                return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status changes.'}, status=500)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+        except Exception as e:
+            logger.error(f"Internal server error: {e}")
+            return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
