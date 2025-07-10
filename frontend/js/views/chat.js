@@ -198,7 +198,7 @@ function sendMessage(currentUserId) {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			// 'X-CSRFToken': getCookie('csrftoken'),
+			'X-CSRFToken': getCookie('csrftoken'),
 		},
 		credentials: 'include',
 		body: JSON.stringify({
@@ -281,6 +281,7 @@ async function initEventSource(groupId, currentUserId) {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
+						'X-CSRFToken': getCookie('csrftoken'),
 						'Content-Type': 'application/json',
 					},
 				});
@@ -395,6 +396,7 @@ async function loadChatRoomList(currentUserId) {
 		const response = await fetchWithRefresh(`/chat/?t=${Date.now()}`, {
 			method: 'GET',
 			headers: {
+				'X-CSRFToken': getCookie('csrftoken'),
 				'Content-Type': 'application/json',
 			},
 			credentials: 'include',
@@ -638,6 +640,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				'X-CSRFToken': getCookie('csrftoken'),
 			},
 			body: JSON.stringify({
 				current_user_id: currentUserId,
@@ -717,6 +720,7 @@ function setupUserSearchAutocomplete() {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
+						'X-CSRFToken': getCookie('csrftoken'),
 						'Content-Type': 'application/json',
 						'Cache-Control': 'no-cache', // Disable caching
 					},

@@ -22,6 +22,7 @@ export async function card_profileController(username) {
 		getOtherUserAvatar(username);
 		addFriend();
 		changeBlockedStatus(username);
+		//ajouter une mise a jour de la carte
 	}
 }
 
@@ -155,6 +156,7 @@ function addFriend() {
 					method: 'POST',
 					credentials: 'include',
 					headers: {
+						'X-CSRFToken': getCookie('csrftoken'),
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({
