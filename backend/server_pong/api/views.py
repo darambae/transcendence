@@ -62,23 +62,55 @@ def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-    with open(f"/app/{func}_decodeJWT.txt", "a+") as f :
-        tm = datetime.now()
-        print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-    with open(f"/app/{func}_decodeJWT.txt", "a+") as f : 
+    # Use a default function name if none provided
+    log_func = func if func else "unknown"
+    
+    # Ensure the log file can be created, handle any potential errors
+    try:
+        with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f :
+            tm = datetime.now()
+            print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
+    except (OSError, IOError) as e:
+        # If file creation fails, print to stderr instead
+        print(f"Warning: Could not create log file for {log_func}: {e}", file=sys.stderr)
+    
+    try:
+        with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f : 
+            if not encodedJwt :
+                encodedJwt = request.COOKIES.get("access_token", None)
+            if not encodedJwt :
+                print("Error 1", file=f)
+                return [None] * 3
+            
+            print(f"encoded: {encodedJwt}", file=f)
+            res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+            print(f"res : {res}", file=f)
+            res_json = res.json()
+            print(f"res.json() : {res_json}", file=f)
+            if res.status_code != 200 :
+                print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
+                if (res_json.get('error') == "Token expired"):
+                    refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+                    if refresh_res.status_code == 200:
+                        new_access_token = refresh_res.json().get('access')
+                        res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+                        res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+                        return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+                    return [None] * 3
+                return [None] * 3
+            return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
+    except (OSError, IOError) as e:
+        # If file operations fail, continue without logging
+        print(f"Warning: Could not write to log file for {log_func}: {e}", file=sys.stderr)
+        # Continue with the JWT decoding logic without file logging
         if not encodedJwt :
             encodedJwt = request.COOKIES.get("access_token", None)
         if not encodedJwt :
-            print("Error 1", file=f)
             return [None] * 3
         
-        print(f"encoded: {encodedJwt}", file=f)
         res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-        print(f"res : {res}", file=f)
         res_json = res.json()
-        print(f"res.json() : {res_json}", file=f)
         if res.status_code != 200 :
-            print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
             if (res_json.get('error') == "Token expired"):
                 refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
                 if refresh_res.status_code == 200:
@@ -323,7 +355,7 @@ async def forfaitUser(request) :
     return HttpResponseNoContent()
 
 async def disconnectUsr(request) :
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "disconnectUsr")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
    # print(f" Jwt : {JWT[0]}", file=sys.stderr)
