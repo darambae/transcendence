@@ -25,7 +25,7 @@ export async function handleSignupSubmit(event) {
 		const { username, mail, firstName, lastName, password } = data;
 		const cleanData = { username, mail, firstName, lastName, password };
 
-		const response = await fetch('user-service/signup/', {
+		const response = await fetch('/user-service/signup/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -106,26 +106,26 @@ export function signupController() {
 			invalidSpan.classList.remove('shake');
 		}
 	}
-	
+
 	// Utility function to display validation errors with animation
 	function displayErrors(element, messages) {
 		console.log('Validation errors:', messages);
 		if (!element) return;
-		
+
 		element.textContent = messages.join('\n');
 		element.style.display = 'block';
 		element.classList.remove('shake');
 		void element.offsetWidth; // Force reflow
 		element.classList.add('shake');
 	}
-	
+
 	// Utility function to validate input length with a maximum of 15 characters
 	function validateMaxLength(inputElement, maxLength, fieldName) {
 		if (!inputElement) return;
-		
+
 		inputElement.addEventListener('input', () => {
 			const value = inputElement.value;
-			
+
 			if (value.length > maxLength) {
 				inputElement.style.borderColor = 'red';
 				inputElement.title = `${fieldName} cannot exceed ${maxLength} characters`;
@@ -133,7 +133,7 @@ export function signupController() {
 				inputElement.style.borderColor = '';
 				inputElement.title = '';
 			}
-			
+
 			resetError();
 		});
 	}
@@ -210,19 +210,25 @@ export function signupController() {
 	// });
 
 	// Utility function to validate field length on form submission
-	function validateFieldLength(value, fieldName, maxLength, errMsg, inputErrRef) {
+	function validateFieldLength(
+		value,
+		fieldName,
+		maxLength,
+		errMsg,
+		inputErrRef
+	) {
 		if (value && value.length > maxLength) {
 			errMsg.push(`${fieldName} cannot exceed ${maxLength} characters.`);
 			inputErrRef.inputErr = true;
 		}
 		return inputErrRef.inputErr;
 	}
-	
+
 	const form = document.querySelector('#signup-form form');
 	if (form) {
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();
-			const inputErrRef = { inputErr: false };  // Using an object to pass by reference
+			const inputErrRef = { inputErr: false }; // Using an object to pass by reference
 			let errMsg = [];
 			if (invalidSpan) {
 				// Get input values
@@ -230,17 +236,17 @@ export function signupController() {
 					document.getElementById('inputUsername') ||
 					document.querySelector("input[name='username']");
 				const usernameValue = usernameInput ? usernameInput.value : '';
-				
+
 				const firstNameInput =
 					document.getElementById('inputFirstName') ||
 					document.querySelector("input[name='firstName']");
 				const firstNameValue = firstNameInput ? firstNameInput.value : '';
-				
+
 				const lastNameInput =
 					document.getElementById('inputLastName') ||
 					document.querySelector("input[name='lastName']");
 				const lastNameValue = lastNameInput ? lastNameInput.value : '';
-				
+
 				// Username validation (whitespace check + length check)
 				if (/\s/.test(usernameValue)) {
 					errMsg.push(
@@ -248,12 +254,30 @@ export function signupController() {
 					);
 					inputErrRef.inputErr = true;
 				} else {
-					validateFieldLength(usernameValue, 'Username', 15, errMsg, inputErrRef);
+					validateFieldLength(
+						usernameValue,
+						'Username',
+						15,
+						errMsg,
+						inputErrRef
+					);
 				}
 
 				// First name and last name validation
-				validateFieldLength(firstNameValue, 'First name', 15, errMsg, inputErrRef);
-				validateFieldLength(lastNameValue, 'Last name', 15, errMsg, inputErrRef);
+				validateFieldLength(
+					firstNameValue,
+					'First name',
+					15,
+					errMsg,
+					inputErrRef
+				);
+				validateFieldLength(
+					lastNameValue,
+					'Last name',
+					15,
+					errMsg,
+					inputErrRef
+				);
 
 				// Password validation
 				const value = passwordInput.value;

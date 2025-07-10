@@ -307,7 +307,7 @@ const USER_INFO_CACHE_DURATION = 60000; // 60 seconds
 async function getUserInfo() {
 	try {
 		const timestamp = Date.now();
-		const response = await fetch(`user-service/infoUser/?t=${timestamp}`, {
+		const response = await fetch(`/user-service/infoUser/?t=${timestamp}`, {
 			method: 'GET',
 			credentials: 'include',
 			headers: {
@@ -344,7 +344,7 @@ function handleResponse(response) {
 async function getUserAvatar() {
 	try {
 		const timestamp = Date.now();
-		const res = await fetch(`user-service/avatar/?t=${timestamp}`, {
+		const res = await fetch(`/user-service/avatar/?t=${timestamp}`, {
 			method: 'GET',
 			credentials: 'include',
 		});
@@ -404,7 +404,7 @@ function SaveImg() {
 		formData.append('image', fileInput.files[0]);
 
 		try {
-			const response = await fetchWithRefresh('user-service/saveImg/', {
+			const response = await fetchWithRefresh('/user-service/saveImg/', {
 				method: 'PATCH',
 				credentials: 'include',
 				body: formData,
@@ -493,14 +493,17 @@ function SavePrivateInfo() {
 		};
 
 		try {
-			const response = await fetchWithRefresh('user-service/savePrivateInfo/', {
-				method: 'PATCH',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(data),
-			});
+			const response = await fetchWithRefresh(
+				'/user-service/savePrivateInfo/',
+				{
+					method: 'PATCH',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(data),
+				}
+			);
 			const result = await response.json();
 
 			if (result.success) {
@@ -574,7 +577,7 @@ function SavePrivateProfile() {
 		};
 
 		try {
-			const response = await fetchWithRefresh('user-service/saveProfile/', {
+			const response = await fetchWithRefresh('/user-service/saveProfile/', {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: {

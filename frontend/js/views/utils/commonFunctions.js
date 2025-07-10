@@ -150,10 +150,10 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
   let mul = await fetchWithRefresh('./templates/localGame.html')
   let mulTxt = await mul.text()
-  
+
   let gameState  = document.getElementById("idfooterCanvas");
   gameState.innerHTML = mulTxt;
-  
+
   await fetchWithRefresh(`server-pong/check-sse`, {
     headers: {
       'X-CSRFToken': csrf,
@@ -187,7 +187,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     console.log("url_sse ->->-> ", url_sse);
 
     const SSEStream = new EventSource(url_sse);
-  
+
   SSEStream.onerror = function(event) {
     console.error("Erreur SSE :", event);
 
@@ -215,7 +215,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
         // console.log(data);
         game_stats = data["game_stats"]
-        if (game_stats["State"] != "Waiting for start" ) {  
+        if (game_stats["State"] != "Waiting for start" ) {
           if (started == false) {
             started = true;
           }
@@ -283,8 +283,8 @@ document.addEventListener('keydown', function (event) {
                 });
               }
               break;
-              case "ArrowUp" : 
-              if (playerID == 1) { 
+              case "ArrowUp" :
+              if (playerID == 1) {
                 fetchWithRefresh(url_post, {
                   method: 'POST',
                   headers: {
@@ -308,7 +308,7 @@ document.addEventListener('keydown', function (event) {
               } ;
               break;
               case "ArrowDown" :
-              if (playerID == 1) { 
+              if (playerID == 1) {
                   fetchWithRefresh(url_post, {
                   method: 'POST',
                   headers: {
@@ -334,7 +334,7 @@ document.addEventListener('keydown', function (event) {
             }
     }
   })
-  
+
 }
 
 export async function loadGamePlayable(apikey) {
