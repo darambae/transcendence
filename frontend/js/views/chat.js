@@ -233,9 +233,14 @@ async function initEventSource(groupId, currentUserId) {
 	// 		console.log(`Closed SSE for group: ${key}`);
 	// 	}
 	// }
-    if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
-        console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
-        return;
+    // if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
+    //     console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
+    //     return;
+    // }
+	if (eventSources[groupId]) {
+        console.log(`Fermeture de la connexion SSE existante pour le groupe ${groupId}.`);
+        eventSources[groupId].close(); // <-- C'est la ligne magique !
+        delete eventSources[groupId]; // Facultatif mais bonne pratique pour nettoyer
     }
 	try {
 		// await fetchWithRefresh(`/chat/${groupId}/messages/`, {
@@ -261,7 +266,6 @@ async function initEventSource(groupId, currentUserId) {
 					credentials: 'include',
 					headers: {
 						'Content-Type': 'application/json',
-						'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
 					},
 				});
 				console.log('Token refreshed successfully');
@@ -491,11 +495,10 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		//create a pop window to ask unblock
 		const unblockTargetUser = confirm("You blocked this user, do you want to unblock him ?")
 		if (unblockTargetUser) {//if yes
-			fetchWithRefresh(`/chat/${targetUserId}/blockedStatus`, {
+			fetchWithRefresh(`chat/${targetUserId}/blockedStatus/`, {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'X-CSRFToken': getCookie('csrftoken'),
 				},
 				credentials : 'include',
 				body: JSON.stringify({}),
@@ -516,7 +519,6 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 						// Enable message input and send button
 						document.getElementById('messageInput-active').disabled = false;
 						document.getElementById('sendMessageBtn').disabled = false;
-						initEventSource(newgroupId, currentUserId);
 						// Focus on message input
 						const messageInput = document.getElementById('messageInput-active');
 						if (messageInput) {
@@ -552,7 +554,6 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	    // Enable message input and send button
 		document.getElementById('messageInput-active').disabled = false;
 		document.getElementById('sendMessageBtn').disabled = false;
-		initEventSource(newgroupId, currentUserId);
 		// Focus on message input
 		const messageInput = document.getElementById('messageInput-active');
 		if (messageInput) {
@@ -595,7 +596,6 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-CSRFToken': getCookie('csrftoken'),
 			},
 			body: JSON.stringify({
 				current_user_id: currentUserId,

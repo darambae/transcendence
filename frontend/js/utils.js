@@ -18,7 +18,7 @@ export async function actualizeIndexPage(elementId, view) {
 		content.innerHTML = '<h2>404 Page not found</h2>';
 		return;
 	}
-	
+
 	if (view.isModal) {
 		content.style.display = 'block';
 	}

@@ -55,7 +55,7 @@ function displayUserInfo(data) {
 	  statusBadge.classList.remove('badge-offline');
 	} else {
 	  statusBadge.textContent = '🔴 Offline';
-	  statusBadge.classList.add('badge-ofline');
+	  statusBadge.classList.add('badge-offline');
 	  statusBadge.classList.remove('badge-online');
 		if (lastOne) {
 			lastOne.textContent = "";
@@ -190,8 +190,7 @@ function changeBlockedStatus(userName) {
 		if (blockBtn) {
 			blockBtn.addEventListener('click', async () => {
 				const userId = blockBtn.dataset.userId;
-
-				const response = await fetchWithRefresh(`/chat/${userId}/blockedStatus`, {
+				const response = await fetchWithRefresh(`chat/${userId}/blockedStatus/`, {
 				method : 'POST',
 				headers: {
 					'Content-Type': 'application/json',

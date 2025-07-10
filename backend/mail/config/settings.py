@@ -31,6 +31,10 @@ APP_NAME = 'mail'
 #ALLOWED_HOSTS = ['mail']
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://transcendence.42.fr:8443',
+	'https://localhost:8443',
+]
 
 # HTTP settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
