@@ -8,6 +8,7 @@ import {
 import { routes } from '../routes.js';
 import { handleGame2Players } from './utils/commonFunctions.js';
 import { card_profileController } from './card_profile.js';
+import eventBus, { EVENTS } from "../eventBus.js";
 
 let hasOverallUnreadMessages = false;
 let mainChatBootstrapModal; // Bootstrap Modal instance
@@ -260,15 +261,15 @@ async function initEventSource(groupId, currentUserId) {
 	// 		console.log(`Closed SSE for group: ${key}`);
 	// 	}
 	// }
-	if (
-		eventSources[groupId] &&
-		eventSources[groupId].readyState === EventSource.OPEN
-	) {
-		console.log(
-			`SSE for group ${groupId} is already open. Skipping re-initialization.`
-		);
-		return;
-	}
+    // if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
+    //     console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
+    //     return;
+    // }
+	if (eventSources[groupId]) {
+        console.log(`Fermeture de la connexion SSE existante pour le groupe ${groupId}.`);
+        eventSources[groupId].close(); // <-- C'est la ligne magique !
+        delete eventSources[groupId]; // Facultatif mais bonne pratique pour nettoyer
+    }
 	try {
 		// await fetchWithRefresh(`/chat/${groupId}/messages/`, {
 		// 	method: 'GET',
@@ -296,8 +297,8 @@ async function initEventSource(groupId, currentUserId) {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
+						'X-CSRFToken': getCookie('csrftoken'),
 						'Content-Type': 'application/json',
-						'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
 					},
 				});
 				console.log('Token refreshed successfully');
@@ -411,7 +412,7 @@ async function initEventSource(groupId, currentUserId) {
 }
 
 // Function to populate the chat room list (now dynamic and 1-to-1 only)
-async function loadChatRoomList(currentUserId) {
+export async function loadChatRoomList(currentUserId) {
 	const chatRoomListUl = document.getElementById('chatRoomList');
 	if (!chatRoomListUl) {
 		console.error('Chat room list element not found!');
@@ -427,6 +428,7 @@ async function loadChatRoomList(currentUserId) {
 		const response = await fetchWithRefresh(`/chat/?t=${Date.now()}`, {
 			method: 'GET',
 			headers: {
+				'X-CSRFToken': getCookie('csrftoken'),
 				'Content-Type': 'application/json',
 			},
 			credentials: 'include',
@@ -599,7 +601,6 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 							// Enable message input and send button
 							document.getElementById('messageInput-active').disabled = false;
 							document.getElementById('sendMessageBtn').disabled = false;
-							initEventSource(newgroupId, currentUserId);
 							// Focus on message input
 							const messageInput = document.getElementById(
 								'messageInput-active'
@@ -638,7 +639,6 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		// Enable message input and send button
 		document.getElementById('messageInput-active').disabled = false;
 		document.getElementById('sendMessageBtn').disabled = false;
-		initEventSource(newgroupId, currentUserId);
 		// Focus on message input
 
     // Focus on message input
@@ -928,6 +928,7 @@ function setupUserSearchAutocomplete() {
 					method: 'GET',
 					credentials: 'include',
 					headers: {
+						'X-CSRFToken': getCookie('csrftoken'),
 						'Content-Type': 'application/json',
 						'Cache-Control': 'no-cache', // Disable caching
 					},
@@ -1148,5 +1149,77 @@ export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 		if (mainChatToggleButton) {
 			mainChatToggleButton.style.display = 'none';
 		}
+	}
+}
+
+/**
+ * Function to refresh chat status when block/unblock status changes
+ * This function can be called from other modules like card_profile.js
+ */
+export async function refreshChatAfterBlockStatusChange(targetUserId) {
+	console.log('Refreshing chat after block status change for user:', targetUserId);
+	
+	// Get current user info
+	const userData = await fetchWithRefresh('/user-service/infoUser/', {
+		method: 'GET',
+		credentials: 'include',
+	})
+		.then((response) => response.json())
+		.then((data) => ({
+			id: data.id,
+			username: data.user_name,
+		}))
+		.catch((error) => {
+			console.error('Error fetching user info:', error);
+			return null;
+		});
+
+	if (!userData || !userData.id) {
+		console.error('User data not found for chat refresh');
+		return;
+	}
+
+	// If the chat is currently active and the modal is open
+	const mainChatWindowElement = document.getElementById('mainChatWindow');
+	if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
+		console.log('Chat modal is open, refreshing chat list and active chat');
+		
+		// Refresh the chat room list
+		await loadChatRoomList(userData.id);
+		
+		// If we're currently chatting with the user whose block status changed, refresh that conversation
+		if (currentTargetId && currentTargetId.toString() === targetUserId.toString()) {
+			console.log('Currently chatting with affected user, refreshing conversation state');
+			
+			// Re-check block status and update input state
+			const targetBlockedStatus = await getBlockedStatus(targetUserId);
+			let block_reason = null;
+			
+			if (targetBlockedStatus.hasBlocked) {
+				block_reason = 'this user blocked you';
+			} else if (targetBlockedStatus.isBlocked) {
+				block_reason = 'you blocked this user';
+			}
+			
+			const messageInput = document.getElementById('messageInput-active');
+			const sendBtn = document.getElementById('sendMessageBtn');
+			
+			if (block_reason != null) {
+				// Disable chat input
+				if (messageInput) messageInput.disabled = true;
+				if (sendBtn) sendBtn.disabled = true;
+				console.log('Chat input disabled due to blocking:', block_reason);
+			} else {
+				// Enable chat input
+				if (messageInput) {
+					messageInput.disabled = false;
+					messageInput.focus();
+				}
+				if (sendBtn) sendBtn.disabled = false;
+				console.log('Chat input enabled - no blocking detected');
+			}
+		}
+	} else {
+		console.log('Chat modal is not open, no refresh needed');
 	}
 }

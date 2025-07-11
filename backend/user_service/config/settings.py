@@ -20,6 +20,11 @@ APP_NAME = 'user_service'
 #ALLOWED_HOSTS = ['transcendence.42.fr', 'access_postgresql']
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://transcendence.42.fr:8443',
+	'https://localhost:8443',
+]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR.parent

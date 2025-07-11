@@ -114,12 +114,17 @@ function setupLoginClick(toggleLogin, isAuth) {
 
 export async function getBlockedStatus(targetUserId) {
 	try {
+		const timestamp = Date.now();
+		const random = Math.random(); // Ajouter encore plus d'unicité
 		const response = await fetchWithRefresh(
-			`/chat/${targetUserId}/blockedStatus/`,
+			`/chat/${targetUserId}/blockedStatus/?t=${timestamp}&r=${random}`,
 			{
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					'Pragma': 'no-cache',
+					'Expires': '0'
 				},
 				credentials: 'include',
 			}
@@ -133,13 +138,17 @@ export async function getBlockedStatus(targetUserId) {
 			alert(
 				'error loading blocked status' + (errorData.message || 'unknown error')
 			);
-			return;
+			return null;
 		}
-		const data = response.json();
-		return data;
+		const data = await response.json(); // Ajout de 'await' manquant
+		// Extraire le vrai blockedStatus de la réponse
+		let blockedStatus = data.blockedStatus || data;
+		console.log('Extracted blockedStatus:', blockedStatus);
+		return blockedStatus;
 	} catch (error) {
 		console.error('Network error loading blocked status :', error);
 		alert('network error: could not load blocked status');
+		return null;
 	}
 }
 

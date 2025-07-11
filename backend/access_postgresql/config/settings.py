@@ -35,6 +35,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://transcendence.42.fr:8443',
+	'https://localhost:8443',
+]
+
 # HTTP settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
@@ -146,7 +151,7 @@ STATIC_ROOT = FRONTEND_DIR
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# For my user 
+# For my user
 AUTH_USER_MODEL = 'api.USER'
 
 SIMPLE_JWT = {
