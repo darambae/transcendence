@@ -82,7 +82,7 @@ class	send_temp_password(APIView):
 		try:
 			data = request.data
 			subject = 'PongPong temporary password'
-			message = f"Hello {data.get('user_name')},\n\nPlease find below your temporary password : {data.get('temp_password')}\n\nYou can now use it to log in to your account and change you password in your personnal settings"
+			message = f"Hello {data.get('user_name')},\n\nPlease find below your temporary password : {data.get('temp_password')}\n\nYou can now use it to log in to your account and change your password in your personnal settings"
 			from_email = settings.DEFAULT_FROM_EMAIL
 			recipient_list = [data.get('mail')]
 			logger.info(f"temporary password sent to {data.get('user_name')}")

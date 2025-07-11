@@ -260,6 +260,13 @@ export async function navigate() {
 		).innerHTML = `<div class='route-error-msg'>You need to be logged in to access this page.</div>`;
 		history.replaceState(null, '', '/');
 		return;
+	} else if (userIsAuth && routeName === 'signup') {
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.innerHTML = `<div class='route-error-msg'>You cannot access this page while logged in. Please log out first</div>`;
+			history.replaceState(null, '', '/'); // clean URL
+		}
+		return;
 	}
 
 	// Render the view
