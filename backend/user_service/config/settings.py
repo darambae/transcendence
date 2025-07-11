@@ -133,8 +133,9 @@ APPEND_SLASH = True
 CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
     "https://localhost:8443",
+    "https://192.168.1.34:8443"
 ]
-
+# CSRF_TRUSTED_ORIGINS = ["*"]
 # MEDIA FOR IMG
 
 MEDIA_URL = '/app/api/media/'

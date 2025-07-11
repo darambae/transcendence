@@ -6,3 +6,6 @@
     3. conda activate mail_api_dev_env(the name you set for env at the step 2)
     4. pip install -r requirements.txt
     5. DJANGO_SETTINGS_MODULE=config.settings_test python manage.py test api
+
+## How to find your local IP address
+ifconfig | grep "inet " | grep -v 127.0.0.1
