@@ -96,19 +96,33 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
 
 		if (response.ok && data.status === 'success') {
 			if (data.messages.length > 0) {
+				// Get existing message contents to avoid duplicates
+				const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map(msgEl => {
+					const sender = msgEl.querySelector('.message-sender')?.textContent || '';
+					const content = msgEl.textContent.replace(msgEl.querySelector('.message-sender')?.textContent || '', '').replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '').trim();
+					const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
+					return `${sender}-${content}-${timestamp}`;
+				});
+
 				const fragment = document.createDocumentFragment();
 				const orderedMessages = [...data.messages].reverse();
 				orderedMessages.forEach((msgData) => {
-					const msgElement = createMessageElement(msgData, currentUserId);
-					fragment.appendChild(msgElement);
+					// Create a unique identifier for the message
+					const messageIdentifier = `${msgData.sender_username}-${msgData.content}-${new Date(msgData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+					
+					// Check if this message already exists in the chat log
+					if (!existingMessages.includes(messageIdentifier)) {
+						const msgElement = createMessageElement(msgData, currentUserId);
+						fragment.appendChild(msgElement);
+					}
 				});
 
-				if (prepend) {
+				if (prepend && fragment.children.length > 0) {
 					const oldScrollHeight = chatLog.scrollHeight;
 					chatLog.insertBefore(fragment, chatLog.firstChild);
 					const newScrollHeight = chatLog.scrollHeight;
 					chatLog.scrollTop = newScrollHeight - oldScrollHeight;
-				} else {
+				} else if (fragment.children.length > 0) {
 					chatLog.appendChild(fragment);
 					chatLog.scrollTop = chatLog.scrollHeight;
 				}
@@ -301,9 +315,10 @@ async function initEventSource(groupId, currentUserId) {
 					console.log('Skipping own message from SSE');
 					return;
 				}
-				const messageId = `${messageData.id || ''}-${messageData.timestamp}-${
-					messageData.sender_id
-				}-${messageData.content}`;
+
+				// Create a unique identifier that matches the one used in loadMessageHistory
+				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+				const messageId = `${messageData.sender_username}-${messageData.content}-${messageTimestamp}`;
 
 				// Skip if we've seen this message recently (deduplication)
 				if (recentlyReceivedMessages.has(messageId)) {
@@ -314,10 +329,11 @@ async function initEventSource(groupId, currentUserId) {
 				// Add to recently seen messages
 				recentlyReceivedMessages.add(messageId);
 
-				// Remove old entries after 5 seconds to prevent set from growing too large
+				// Remove old entries after 10 seconds to prevent set from growing too large
 				setTimeout(() => {
 					recentlyReceivedMessages.delete(messageId);
-				}, 5000);
+				}, 10000);
+
 				// Only append if the message is for the currently active chat group
 				if (messageData.group_id === currentActiveChatGroup) {
 					const chatLog = document.getElementById('chatLog-active');
@@ -325,6 +341,20 @@ async function initEventSource(groupId, currentUserId) {
 						console.error(`chatLog-active not found for initEventSource.`);
 						return;
 					}
+
+					// Check if this message already exists in the chat log
+					const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map(msgEl => {
+						const sender = msgEl.querySelector('.message-sender')?.textContent || '';
+						const content = msgEl.textContent.replace(msgEl.querySelector('.message-sender')?.textContent || '', '').replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '').trim();
+						const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
+						return `${sender}-${content}-${timestamp}`;
+					});
+
+					if (existingMessages.includes(messageId)) {
+						console.log('Message already exists in chat log, skipping:', messageId);
+						return;
+					}
+
 					// Remove "No messages yet" if a new message arrives
 					const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
 					if (noMessagesDiv) {
