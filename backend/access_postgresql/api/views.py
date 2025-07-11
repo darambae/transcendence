@@ -366,7 +366,6 @@ class infoOtherUser(APIView):
 
 class addResultGames(APIView):
 	permission_classes = [AllowAny]
-	permission_classes = [AllowAny]
 
 	def post(self, request):
 		
@@ -387,23 +386,7 @@ class addResultGames(APIView):
 					username2=user2,
 					winner=winnergame
 				)
-				match = MATCHTABLE.objects.create(
-					matchKey=data['matchKey'],
-					username1=user1,
-					score1=data['score1'],
-					score2=data['score2'],
-					username2=user2,
-					winner=winnergame
-				)
 
-		except USER.DoesNotExist as e:
-			return JsonResponse({'error': 'User not found', 'details': str(e)}, status=400)
-		except IntegrityError as e:
-			err_msg = str(e)
-			if 'matchKey' in err_msg:
-				return JsonResponse({'error': 'matchKey already exists'}, status=400)
-			else:
-				return JsonResponse({'error': 'Integrity error', 'details': str(e)}, status=400)
 		except USER.DoesNotExist as e:
 			return JsonResponse({'error': 'User not found', 'details': str(e)}, status=400)
 		except IntegrityError as e:
