@@ -175,7 +175,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			else :
 				user = match.p2.username
 				playerId = 2
-            if (self.name == match.p1.username or self.name == match.p2.username) :
+			if (self.name == match.p1.username or self.name == match.p2.username) :
 				await self.send(text_data=json.dumps({
 					"t_state" : "game-start",
 					"mode" : "remote",
