@@ -1,0 +1,20 @@
+--------------------------
+Beginning : 9:15:23 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMjI2MjU3LCJpYXQiOjE3NTIyMjUwMzUsImp0aSI6ImExNzg5NjMyMDdlMjQwNDlhNmM4NTgwNDRiOWZjZmQ4IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6W119.x-cJDJZ9G_GIo1nlvq65NiY9kMSaiwbWfaUy0M3CsSo
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752226257, 'iat': 1752225035, 'jti': 'a178963207e24049a6c858044b9fcfd8', 'user_id': 3, 'username': 'gautier', 'invites': []}}
+--------------------------
+Beginning : 9:15:30 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMjI2MjU3LCJpYXQiOjE3NTIyMjUwMzUsImp0aSI6ImExNzg5NjMyMDdlMjQwNDlhNmM4NTgwNDRiOWZjZmQ4IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6W119.x-cJDJZ9G_GIo1nlvq65NiY9kMSaiwbWfaUy0M3CsSo
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752226257, 'iat': 1752225035, 'jti': 'a178963207e24049a6c858044b9fcfd8', 'user_id': 3, 'username': 'gautier', 'invites': []}}
+--------------------------
+Beginning : 9:15:36 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMjI2MjU3LCJpYXQiOjE3NTIyMjUwMzUsImp0aSI6ImExNzg5NjMyMDdlMjQwNDlhNmM4NTgwNDRiOWZjZmQ4IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6W119.x-cJDJZ9G_GIo1nlvq65NiY9kMSaiwbWfaUy0M3CsSo
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752226257, 'iat': 1752225035, 'jti': 'a178963207e24049a6c858044b9fcfd8', 'user_id': 3, 'username': 'gautier', 'invites': []}}
+--------------------------
+Beginning : 9:15:41 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyMjI2MjU3LCJpYXQiOjE3NTIyMjUwMzUsImp0aSI6ImExNzg5NjMyMDdlMjQwNDlhNmM4NTgwNDRiOWZjZmQ4IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6W119.x-cJDJZ9G_GIo1nlvq65NiY9kMSaiwbWfaUy0M3CsSo
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752226257, 'iat': 1752225035, 'jti': 'a178963207e24049a6c858044b9fcfd8', 'user_id': 3, 'username': 'gautier', 'invites': []}}
