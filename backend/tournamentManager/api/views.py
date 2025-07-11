@@ -446,7 +446,8 @@ async def amIinTournament(request) :
 		for elem in trnmtDict : 
 			lsJwt = trnmtDict[elem].listJWTPlayers()
 			if (jwt["username"] in lsJwt) :
-				return JsonResponse({"Tournament" : elem})
+				lsPlayer = trnmtDict[elem].listUsr()			
+				return JsonResponse({"Tournament" : elem, "number" : trnmtDict[elem].nbPl, "players" : lsPlayer})
 		return JsonResponse({"Tournament" : "None"})
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)

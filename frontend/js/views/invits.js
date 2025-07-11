@@ -1,7 +1,6 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
 
-
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
 	const content = document.getElementById("invits-form");

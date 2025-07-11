@@ -11,7 +11,7 @@ import { card_profileController } from './views/card_profile.js';
 import { dashboardsController } from './views/dashboards.js';
 import { forgotPasswordController } from './views/forgotPassword.js';
 import { invitsController } from './views/tournament.js';
-
+import { waintTournamentController } from './views/waintTournament.js'
 
 export const routes = {
 
@@ -74,5 +74,9 @@ export const routes = {
 		template: 'invits',
 		controller: invitsController,
 	},
+	waintTournament: {
+		template: "waintTournament",
+		controller: waintTournamentController,
+	}
 };
 		

@@ -30,7 +30,7 @@ export async function localGameTr() {
         const data = JSON.parse(event.data);
         console.log(data);
         if (data.t_state == "game-finished") {
-          actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+          actualizeIndexPage("contentTournementPage", routesTr['tournament'])
         }
       }
       catch(error) {

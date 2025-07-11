@@ -151,7 +151,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   let mul = await fetchWithRefresh('./templates/localGame.html')
   let mulTxt = await mul.text()
   
-  let gameState  = document.getElementById("idfooterCanvas");
+  let gameState  = document.getElementById("contentTournementPage");
   gameState.innerHTML = mulTxt;
   
   await fetchWithRefresh(`server-pong/check-sse`, {

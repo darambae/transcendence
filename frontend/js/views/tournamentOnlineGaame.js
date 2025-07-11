@@ -12,7 +12,7 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
       const data = JSON.parse(event.data);
 
       if (data.t_state == "game-finished") {
-        actualizeIndexPage("Tournament-Lobby", routesTr['tournament'])
+        actualizeIndexPage("contentTournementPage", routesTr['tournament'])
       }
     }
     catch(error){
