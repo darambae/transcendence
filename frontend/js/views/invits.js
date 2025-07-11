@@ -1,5 +1,7 @@
 import { routes } from "../routes.js";
 import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
+import { affichUserTournament } from "./tournament.js"
+import { sleep } from "./utils/commonFunctions.js";
 
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
@@ -39,6 +41,7 @@ async function double_authenticate(data) {
 
 			if (response.ok) {
 				resolve(true);
+
 			} else {
 				const errorDiv = document.querySelector('.double-auth .error-msg');
 				if (errorDiv) {
@@ -91,9 +94,9 @@ export async function handleInvitSubmit(event) {
 					},
 					credentials: 'include',
 				})
-
 				await actualizeIndexPage('guest-add', routes['guest']);
 				console.log("User successfully connected");
+				affichUserTournament();
 			} catch (error) {
 				console.log("Double auth error: ", error);
 			}

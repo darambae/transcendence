@@ -54,9 +54,9 @@ function displayUserInfo(data) {
 	  statusBadge.textContent = '🔴 Offline';
 	  statusBadge.classList.add('badge-ofline');
 	  statusBadge.classList.remove('badge-online');
-		if (lastOne) {
-			lastOne.textContent = "";
-		}
+	//  if (lastOne) {
+	//	lastOne.textContent = "";
+    //  }
 	}
 
 	if (!data.friend_status) {

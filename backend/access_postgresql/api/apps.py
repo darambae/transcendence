@@ -54,7 +54,7 @@ class ApiConfig(AppConfig):
                     "first_name": "guest",
                     "last_name": "guest",
                     "mail": "guest@example.com",
-                    "password": "Guest1234",
+                    "password": "guest1234",
                     "activated": True,
                     "avatar": "default.png"
                 },

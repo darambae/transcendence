@@ -158,6 +158,8 @@ export function loginController() {
 
 	const form = document.getElementById("log-form");
 	if (form) {
-		form.addEventListener("submit", handleLoginSubmit);
+		form.addEventListener("submit", function (event) {
+			event.preventDefault();
+		});
 	}
 }
