@@ -1,4 +1,6 @@
-import { closeModal, fetchWithRefresh, getBlockedStatus } from "../utils.js";
+import { closeModal, fetchWithRefresh, getBlockedStatus, getCookie } from "../utils.js";
+import { refreshChatAfterBlockStatusChange } from "./chat.js";
+import eventBus, { EVENTS } from "../eventBus.js";
 
 export async function card_profileController(username) {
 
@@ -77,25 +79,41 @@ async function gestFooter(friend_status, blockedStatus) {
 	const sep = document.getElementById('separation')
 	const btnAddBlock = document.getElementById('blockUserId')
 
-	console.log(blockedStatus)
+	console.log('gestFooter - blockedStatus:', blockedStatus)
+	console.log('gestFooter - friend_status:', friend_status)
+	console.log('gestFooter - isBlocked:', blockedStatus?.isBlocked)
+	console.log('gestFooter - hasBlocked:', blockedStatus?.hasBlocked)
+
+	// Vérifier si blockedStatus est un objet valide
+	if (!blockedStatus) {
+		console.log('blockedStatus is null/undefined - treating as no blocking')
+		blockedStatus = { isBlocked: false, hasBlocked: false };
+	}
+
 	if (blockedStatus.isBlocked) {
 		sep.style.display = "none"
 		btnAdd.style.display = "none"
 		btnAddBlock.textContent = "unblock"//to unblock
 		btnAddBlock.style.display = "block"
+		console.log('Case 1: User is blocked - showing unblock button')
 	} else {
 		btnAddBlock.style.display = "block"
 		if (blockedStatus.hasBlocked) {
 			sep.style.display = "none"
 			btnAdd.style.display = "none"
+			btnAddBlock.textContent = "block"
+			console.log('Case 2: User has blocked - showing block button')
 		} else {
-			console.log(friend_status)
+			console.log('Case 3: No blocking - friend_status:', friend_status)
+			btnAddBlock.textContent = "block"
 			if (friend_status === null) {
 				btnAdd.style.display = "block"
 				sep.style.display = "block"
+				console.log('Case 3a: No friend relation - showing both buttons')
 			} else if (friend_status === "pending") {
 				sep.style.display = "none"
 				btnAdd.style.display = "none"
+				console.log('Case 3b: Friend pending - hiding add friend button')
 			}
 		}
 	}
@@ -122,6 +140,7 @@ async function getOtherUserInfo(userName) {
 		}
 		const data = await response.json();
 		let blockedStatus = await getBlockedStatus(data.id);
+
 		gestFooter(data.friend_status, blockedStatus)
 		displayUserInfo(data)
 		console.log(data)
@@ -164,6 +183,7 @@ function addFriend() {
 					credentials: 'include',
 					headers: {
 						'Content-Type': 'application/json',
+						'X-CSRFToken': getCookie('csrftoken'),
 					},
 					body: JSON.stringify({
 						userName: userName,
@@ -187,33 +207,116 @@ function changeBlockedStatus(userName) {
 
 	try {
 		const blockBtn = document.getElementById('blockUserId');
+		console.log('Block button found:', blockBtn); // Debug log
 		if (blockBtn) {
 			blockBtn.addEventListener('click', async () => {
-				const userId = blockBtn.dataset.userId;
+				// Vérifier si le bouton est déjà en cours de traitement
+				if (blockBtn.disabled) {
+					console.log('Button is already processing, ignoring click');
+					return;
+				}
 
-				const response = await fetchWithRefresh(`/chat/${userId}/blockedStatus`, {
-				method : 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials : 'include',
-				body: JSON.stringify({}),
-			})
-				const data = await response.json();
-				console.log(data);
-				if (data.message) {
-					// Mettre à jour le texte du bouton selon l'action effectuée
-					if (blockBtn.textContent === "block") {
-						blockBtn.textContent = "unblock";
-					} else {
-						blockBtn.textContent = "block";
+				console.log('Block button clicked!'); // Debug log
+				const userId = blockBtn.dataset.userId;
+				console.log('User ID:', userId); // Debug log
+
+				// Désactiver le bouton pendant le traitement
+				blockBtn.disabled = true;
+				const originalText = blockBtn.textContent;
+				blockBtn.textContent = 'Processing...';
+
+				try {
+					const response = await fetchWithRefresh(`chat/${userId}/blockedStatus/`, {
+						method : 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': getCookie('csrftoken'),
+						},
+						credentials : 'include',
+						body: JSON.stringify({}),
+					});
+
+					if (!response.ok) {
+						console.error(`HTTP Error: ${response.status}`);
+						// Restaurer le bouton en cas d'erreur
+						blockBtn.disabled = false;
+						blockBtn.textContent = originalText;
+						return;
 					}
-					getOtherUserInfo(userName);
+
+					const data = await response.json();
+					console.log('Response data:', data);
+
+					// Vérifier plusieurs conditions possibles de succès
+					if (data.status === 'success' || data.message) {
+						console.log('Action réussie - mise à jour locale optimiste');
+
+						const wasBlocking = originalText === "block";
+						const nowBlocked = wasBlocking;
+
+						// Mettre à jour le texte du bouton selon l'action effectuée
+						if (originalText === "block") {
+							blockBtn.textContent = "unblock";
+							// Émettre l'événement de blocage
+							eventBus.emit(EVENTS.USER_BLOCKED, {
+								userId: userId,
+								userName: userName,
+								timestamp: Date.now()
+							});
+							console.log('Événement USER_BLOCKED émis');
+						} else {
+							blockBtn.textContent = "block";
+							// Émettre l'événement de déblocage
+							eventBus.emit(EVENTS.USER_UNBLOCKED, {
+								userId: userId,
+								userName: userName,
+								timestamp: Date.now()
+							});
+							console.log('Événement USER_UNBLOCKED émis');
+						}
+
+						// Émettre l'événement générique de changement de statut de blocage
+						eventBus.emit(EVENTS.BLOCK_STATUS_CHANGED, {
+							userId: userId,
+							userName: userName,
+							isBlocked: nowBlocked,
+							timestamp: Date.now()
+						});
+						console.log('Événement BLOCK_STATUS_CHANGED émis');
+
+						// Réactiver le bouton immédiatement pour une meilleure UX
+						blockBtn.disabled = false;
+
+						// Rafraîchir l'état du chat immédiatement
+						try {
+							await refreshChatAfterBlockStatusChange(userId);
+							console.log('Chat status refreshed after block/unblock action');
+						} catch (chatError) {
+							console.error('Error refreshing chat status:', chatError);
+						}
+
+						// Vérifier le statut côté serveur après un délai pour la cohérence
+						setTimeout(async () => {
+							console.log('Vérification différée du statut côté serveur...');
+							await getOtherUserInfo(userName);
+						}, 2000); // 2 secondes de délai
+					} else {
+						// Restaurer le bouton si l'action a échoué
+						blockBtn.disabled = false;
+						blockBtn.textContent = originalText;
+					}
+				} catch (fetchError) {
+					console.error("Error in fetch request:", fetchError);
+					// Restaurer le bouton en cas d'erreur
+					blockBtn.disabled = false;
+					blockBtn.textContent = originalText;
 				}
 			});
+		} else {
+			console.error('Block button not found!'); // Debug log
 		}
 	} catch (error) {
-		console.error("Error add friend :", error);
+		console.error("Error in changeBlockedStatus:", error);
 	}
 }
 
