@@ -169,6 +169,9 @@ export async function localGameController() {
 	let b;
 	let c;
 
+	document.addEventListener('keydown', keydownHandler);
+	document.addEventListener('keyup', keyupHandler);
+
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	let score1 = document.getElementById('player1score');
@@ -420,11 +423,11 @@ export async function localGameController() {
 		replayButton.addEventListener('click', replayHandler);
 	}
 
-	// Clear any existing interval before starting a new one
+		// Clear any existing interval before starting a new one
 	if (gameInterval) {
 		clearInterval(gameInterval);
 	}
-
+	
 	gameInterval = setInterval(async () => {
 		checkwin();
 		const now = Date.now();
@@ -474,11 +477,12 @@ export async function localGameController() {
 						await fetchWithRefresh(
 							`/server-pong/forfait-game?apikey=${currentApiKey}&idplayer=${2}`,
 							{
-								headers: {
-									Authorization: `bearer ${sessionStorage.getItem(
-										'accessToken'
-									)}`,
-								},
+								// headers: {
+								// 	Authorization: `bearer ${sessionStorage.getItem(
+								// 		'accessToken'
+								// 	)}`,
+								// },
+								credentials: 'include'
 							}
 						);
 					}

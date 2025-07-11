@@ -234,6 +234,9 @@
     background-color: #f8f9fa;
     padding: 10px;
     border-bottom: 1px solid #dee2e6;
+	display:flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .chat-display-header h5 {
@@ -242,6 +245,12 @@
     color: #333;
     word-wrap: break-word;
     white-space: normal;
+	margin: 0;
+}
+
+#gameInvitationBtn {
+	flex-shrink: 0;
+	margin-left: 10px;
 }
 
 /* --- Chat Body --- */
@@ -430,11 +439,20 @@
 
     .chat-display-header {
         padding: 15px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
     }
 
     .chat-display-header h5 {
         font-size: 1.1rem;
+		margin: 0;
     }
+
+	#gameInvationBtn {
+		margin-left: 15px;
+	}
 
     .chat-body {
         max-height: calc(100% - 130px); /* Slightly larger for desktop */
