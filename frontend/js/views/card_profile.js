@@ -204,13 +204,11 @@ function addFriend() {
 }
 
 function changeBlockedStatus(userName) {
-
 	try {
 		const blockBtn = document.getElementById('blockUserId');
 		console.log('Block button found:', blockBtn); // Debug log
 		if (blockBtn) {
 			blockBtn.addEventListener('click', async () => {
-				// Vérifier si le bouton est déjà en cours de traitement
 				if (blockBtn.disabled) {
 					console.log('Button is already processing, ignoring click');
 					return;
@@ -220,25 +218,27 @@ function changeBlockedStatus(userName) {
 				const userId = blockBtn.dataset.userId;
 				console.log('User ID:', userId); // Debug log
 
-				// Désactiver le bouton pendant le traitement
+				// Disable the button during processing
 				blockBtn.disabled = true;
 				const originalText = blockBtn.textContent;
 				blockBtn.textContent = 'Processing...';
 
 				try {
-					const response = await fetchWithRefresh(`chat/${userId}/blockedStatus/`, {
-						method : 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'X-CSRFToken': getCookie('csrftoken'),
-						},
-						credentials : 'include',
-						body: JSON.stringify({}),
-					});
+					const response = await fetchWithRefresh(
+						`chat/${userId}/blockedStatus/`,
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': getCookie('csrftoken'),
+							},
+							credentials: 'include',
+							body: JSON.stringify({}),
+						}
+					);
 
 					if (!response.ok) {
 						console.error(`HTTP Error: ${response.status}`);
-						// Restaurer le bouton en cas d'erreur
 						blockBtn.disabled = false;
 						blockBtn.textContent = originalText;
 						return;
@@ -247,67 +247,49 @@ function changeBlockedStatus(userName) {
 					const data = await response.json();
 					console.log('Response data:', data);
 
-					// Vérifier plusieurs conditions possibles de succès
 					if (data.status === 'success' || data.message) {
 						console.log('Action réussie - mise à jour locale optimiste');
 
-						const wasBlocking = originalText === "block";
+						// Emit events (optional, if you use them elsewhere)
+						const wasBlocking = originalText === 'block';
 						const nowBlocked = wasBlocking;
-
-						// Mettre à jour le texte du bouton selon l'action effectuée
-						if (originalText === "block") {
-							blockBtn.textContent = "unblock";
-							// Émettre l'événement de blocage
+						if (originalText === 'block') {
 							eventBus.emit(EVENTS.USER_BLOCKED, {
 								userId: userId,
 								userName: userName,
-								timestamp: Date.now()
+								timestamp: Date.now(),
 							});
 							console.log('Événement USER_BLOCKED émis');
 						} else {
-							blockBtn.textContent = "block";
-							// Émettre l'événement de déblocage
 							eventBus.emit(EVENTS.USER_UNBLOCKED, {
 								userId: userId,
 								userName: userName,
-								timestamp: Date.now()
+								timestamp: Date.now(),
 							});
 							console.log('Événement USER_UNBLOCKED émis');
 						}
-
-						// Émettre l'événement générique de changement de statut de blocage
 						eventBus.emit(EVENTS.BLOCK_STATUS_CHANGED, {
 							userId: userId,
 							userName: userName,
 							isBlocked: nowBlocked,
-							timestamp: Date.now()
+							timestamp: Date.now(),
 						});
 						console.log('Événement BLOCK_STATUS_CHANGED émis');
 
-						// Réactiver le bouton immédiatement pour une meilleure UX
+						// Re-enable the button, but don't change its text/UI here
 						blockBtn.disabled = false;
 
-						// Rafraîchir l'état du chat immédiatement
-						try {
-							await refreshChatAfterBlockStatusChange(userId);
-							console.log('Chat status refreshed after block/unblock action');
-						} catch (chatError) {
-							console.error('Error refreshing chat status:', chatError);
-						}
-
-						// Vérifier le statut côté serveur après un délai pour la cohérence
+						// Let gestFooter (via getOtherUserInfo) handle all UI updates
 						setTimeout(async () => {
-							console.log('Vérification différée du statut côté serveur...');
 							await getOtherUserInfo(userName);
-						}, 2000); // 2 secondes de délai
+							await refreshChatAfterBlockStatusChange(userId);
+						}, 400);
 					} else {
-						// Restaurer le bouton si l'action a échoué
 						blockBtn.disabled = false;
 						blockBtn.textContent = originalText;
 					}
 				} catch (fetchError) {
-					console.error("Error in fetch request:", fetchError);
-					// Restaurer le bouton en cas d'erreur
+					console.error('Error in fetch request:', fetchError);
 					blockBtn.disabled = false;
 					blockBtn.textContent = originalText;
 				}
@@ -316,7 +298,6 @@ function changeBlockedStatus(userName) {
 			console.error('Block button not found!'); // Debug log
 		}
 	} catch (error) {
-		console.error("Error in changeBlockedStatus:", error);
+		console.error('Error in changeBlockedStatus:', error);
 	}
 }
-
