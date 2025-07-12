@@ -432,10 +432,11 @@ export async function tournamentController() {
           },
           credentials: "include",
         })
-          .then(response => {
+          .then(async response => {
             if (!response.ok) throw new Error("https Error: " + response.status);
-            jwtInfo = response.json();
-            console.log(jwtInfo);
+            console.log("response : ", response)
+            jwtInfo = await response.json();
+            console.log("------------------------->>> ", jwtInfo);
             usernameJwt = jwtInfo["key"];
             guestJwt = jwtInfo["guests"]
           })

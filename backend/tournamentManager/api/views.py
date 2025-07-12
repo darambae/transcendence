@@ -118,6 +118,19 @@ async def launchMatch(request) :
 			print("lm-1-end3", file=sys.stderr)
 			return JsonResponse({"Info" : trStart[1]})
 		print(f"lm-1, tkey : -{tkey}-", file=sys.stderr)
+		try :
+			lsTrnmtJwt = trnmtDict[tkey].listJWT()
+		except Exception as e :
+			print(f"Error : {e}", file=sys.stderr)
+		print(f"lm-1, lsTrnmtJwt : -{lsTrnmtJwt}-", file=sys.stderr)
+
+		await channel_layer.group_send(
+			tkey,
+			{
+				"type": "tempReceived",
+				"text_data": {"action" : "update-guest", "jwt-list" : lsTrnmtJwt}
+			}
+		)
 
 		await channel_layer.group_send(
 			tkey,
@@ -300,9 +313,8 @@ async def joinTournament(request):
 async def sse(request) :
 	tKey = request.GET.get("tKey", None)
 	print(f"sse - tKey : {tKey}", file=sys.stderr)
-	jwt = request.GET.get("jwt", None)
-	jwt = dictJwt.get(jwt, None)
-	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt}'), content_type='text/event-stream')
+	name = request.GET.get("name", None)
+	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&name={name}'), content_type='text/event-stream')
 
 
 @csrf_exempt
@@ -452,4 +464,3 @@ async def amIinTournament(request) :
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)
 	
-

@@ -25,25 +25,26 @@ async def setResults(trnmt, username, roundMatch, mKey) :
 			print(f"=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=> :  winner bracket : {trnmt.matchWinnerBracket.p1} | {trnmt.matchWinnerBracket.p2}", file=sys.stderr)
 			if (trnmt.matchWinnerBracket.p1 == None) :
 				print(f"========================================================================> WINNERBRACEKT P1", file=sys.stderr)
-				if username == trnmt.match1.p1 :
+				if username == trnmt.match1.p1.username :
 					trnmt.matchWinnerBracket.p1 = trnmt.match1.p1
 				else :
 					trnmt.matchWinnerBracket.p1 = trnmt.match1.p2
 			else :
 				print(f"========================================================================> WINNERBRACEKT P2", file=sys.stderr)
-				if username == trnmt.match1.p1 :
+
+				if username == trnmt.match1.p1.username :
 					trnmt.matchWinnerBracket.p2 = trnmt.match1.p1
 				else :
 					trnmt.matchWinnerBracket.p2 = trnmt.match1.p2
 			if (trnmt.matchLoserBracket.p1 == None) :
 				print(f"========================================================================> LOSER BRACEKT P1", file=sys.stderr)
-				if username == trnmt.match1.p1 :
+				if username == trnmt.match1.p1.username :
 					trnmt.matchLoserBracket.p1 = trnmt.match1.p2
 				else : 
 					trnmt.matchLoserBracket.p1 = trnmt.match1.p1
 			else :
 				print(f"========================================================================> LOSER BRACEKT P2", file=sys.stderr)
-				if username == trnmt.match1.p1 :
+				if username == trnmt.match1.p1.username :
 					trnmt.matchLoserBracket.p2 = trnmt.match1.p2
 				else : 
 					trnmt.matchLoserBracket.p2 = trnmt.match1.p1
@@ -59,25 +60,25 @@ async def setResults(trnmt, username, roundMatch, mKey) :
 			print(f"=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=> :  winner bracket : {trnmt.matchWinnerBracket.p1} | {trnmt.matchWinnerBracket.p2}", file=sys.stderr)
 			if (trnmt.matchWinnerBracket.p1 == None) :
 				print(f"========================================================================> WINNERBRACEKT P1", file=sys.stderr)
-				if username == trnmt.match2.p1 :
+				if username == trnmt.match2.p1.username :
 					trnmt.matchWinnerBracket.p1 = trnmt.match2.p1
 				else :
 					trnmt.matchWinnerBracket.p1 = trnmt.match2.p2
 			else :
 				print(f"========================================================================> WINNERBRACEKT P2", file=sys.stderr)
-				if username == trnmt.match2.p1 :
+				if username == trnmt.match2.p1.username :
 					trnmt.matchWinnerBracket.p2 = trnmt.match2.p1
 				else :
 					trnmt.matchWinnerBracket.p2 = trnmt.match2.p2
 			if (trnmt.matchLoserBracket.p1 == None) :
 				print(f"========================================================================> LOSER BRACEKT P1", file=sys.stderr)
-				if username == trnmt.match2.p1 :
+				if username == trnmt.match2.p1.username :
 					trnmt.matchLoserBracket.p1 = trnmt.match2.p2
 				else : 
 					trnmt.matchLoserBracket.p1 = trnmt.match2.p1
 			else :
 				print(f"========================================================================> LOSER BRACEKT P2", file=sys.stderr)
-				if username == trnmt.match2.p1 :
+				if username == trnmt.match2.p1.username :
 					trnmt.matchLoserBracket.p2 = trnmt.match2.p2
 				else : 
 					trnmt.matchLoserBracket.p2 = trnmt.match2.p1
@@ -165,6 +166,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		print(f"roundMatch lauchGame : {roundM}", file=sys.stderr)
 		if match.gameMode == REMOTE :
 			userLst = sorted([match.p1.username, match.p2.username])
+			with open("response.txt", 'a+') as f :
+				print(f"--=REMOTE=--\n\nself.name : {self.name} | self.guests : {self.guests}\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\n", file=f)
 
 			if self.name == match.p1.username or match.p1.username in self.guests:
 				user = match.p1.username
@@ -172,17 +175,19 @@ class GameConsumer(AsyncWebsocketConsumer):
 			else :
 				user = match.p2.username
 				playerId = 2
-			await self.send(text_data=json.dumps({
-				"t_state" : "game-start",
-				"mode" : "remote",
-				"tkey" : self.room_group_name,
-				"playerId" : playerId,
-				"player" : user,
-				"key" : match.key,
-				"round" : roundM,
-			}))
+			if (self.name == match.p1.username or self.name == match.p2.username) :
+				await self.send(text_data=json.dumps({
+					"t_state" : "game-start",
+					"mode" : "remote",
+					"tkey" : self.room_group_name,
+					"playerId" : playerId,
+					"player" : user,
+					"key" : match.key,
+					"round" : roundM,
+				}))
 		else :
-			print(f"match.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}", file=sys.stderr)
+			with open("response.txt", 'a+') as f :
+				print(f"--=LOCAL=--\n\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}\n", file=f)
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-start",
 				"mode" : "local",
@@ -200,7 +205,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 		action = data.get("action")
 		print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
-			print(f"self.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=sys.stderr)
+			with open("response.txt", 'a+') as f:
+				print(f"--=Create-Bracket=--\nself.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=f)
+				print(f"\nMatch 1 launchable : {trnmtDict[self.room_group_name].match1.launchable}\nPlayed : {trnmtDict[self.room_group_name].match1.played}\n", file=f)
+				print(f"\nMatch 2 launchable : {trnmtDict[self.room_group_name].match2.launchable}\nPlayed : {trnmtDict[self.room_group_name].match2.played}\n\n", file=f)
 			if trnmtDict[self.room_group_name].match1.launchable and not trnmtDict[self.room_group_name].match1.played:
 				await self.launchGame(trnmtDict[self.room_group_name].match1, 1)
 			if trnmtDict[self.room_group_name].match2.launchable and not trnmtDict[self.room_group_name].match2.played:
@@ -213,6 +221,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			if trnmtDict[self.room_group_name].matchLoserBracket.launchable and not trnmtDict[self.room_group_name].matchLoserBracket.played:
 				await self.launchGame(trnmtDict[self.room_group_name].matchLoserBracket, 2)
 	
+		elif action == "update-guest": 
+			jwt_l = data.get("jwt-list")
+			with open("response.txt", 'a+') as f :
+				print(f"--=Update guest=--\nguests : {jwt_l} , type : {type(jwt_l).__name__}\n\n", file=f)
+			
+			for elem in jwt_l :
+				with open("response.txt", 'a+') as f :
+					print(f'--=LOOP jwt_l=--\nself.name : {self.name}\nelem["username"] : {elem["username"]}\nelem["invites"] : {elem["invites"]}\n\nCondition : {self.name == elem["username"] or self.name in elem["invites"]}', file=f)
+				if (self.name == elem["username"] or self.name in elem["invites"]) :
+					self.guests == elem["invites"]
 		elif action == "supervise" :
 			print(f"A0 - {action}", file=sys.stderr)
 			roundMatch = data.get("round", 1)
@@ -230,7 +248,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			task = asyncio.create_task(supervise_match(mKey))
 			results = await task
 			print(f"A6 - {results}", file=sys.stderr)
-			if results["score1"] == 200 : ########################################################################################################################################################################################################################################################################################################################################################################
+			if results["score1"] == 5 : ########################################################################################################################################################################################################################################################################################################################################################################
 				print(f"A7 - res1 [{results} | {trnmt}]", file=sys.stderr)
 				matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
 			else :
