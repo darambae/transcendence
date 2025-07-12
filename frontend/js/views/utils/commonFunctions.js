@@ -136,6 +136,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   let c = undefined;
   let username;
   const csrf = getCookie('csrftoken');
+  await setCanvasAndContext();
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
   if (playerID === 2) {
@@ -148,11 +149,11 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
   }
 
 
-  let mul = await fetchWithRefresh('./templates/localGame.html')
-  let mulTxt = await mul.text()
+  // let mul = await fetchWithRefresh('./templates/localGame.html')
+  // let mulTxt = await mul.text()
   
-  let gameState  = document.getElementById("contentTournementPage");
-  gameState.innerHTML = mulTxt;
+  // let gameState  = document.getElementById("contentTournementPage");
+  // gameState.innerHTML = mulTxt;
   
   await fetchWithRefresh(`server-pong/check-sse`, {
     headers: {
@@ -187,6 +188,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     console.log("url_sse ->->-> ", url_sse);
 
     const SSEStream = new EventSource(url_sse);
+
+    console.log("dd");
   
   SSEStream.onerror = function(event) {
     console.error("Erreur SSE :", event);
@@ -202,6 +205,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
         console.warn("État inconnu :", SSEStream.readyState);
     }
 };
+
+  console.log("cc");
 
   SSEStream.onmessage = function (event) {
       try {
@@ -247,6 +252,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
       }
   }
 
+  console.log("bb");
+
   window.onbeforeunload = function(event) {
     // console.log("Détection du rechargement ou fermeture de la page");
     if (SSEStream.readyState !== EventSource.CLOSED) {
@@ -259,7 +266,10 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
     }
   };
 
-document.addEventListener('keydown', function (event) {
+
+  console.log("aa");
+
+  document.addEventListener('keydown', function (event) {
     const keysToPrevent = ['ArrowUp', 'ArrowDown', "p", "q"];
     if (keysToPrevent.includes(event.key)) {
       event.preventDefault();

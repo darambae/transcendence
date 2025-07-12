@@ -10,17 +10,17 @@ import { routes } from "../routes.js"
 const csrf = getCookie('csrftoken');
 
 export let routesTr = {
-  matchSp: {
-    template: "tournamentMatch",
-    controller: localGameTr
+  matchSp : {
+    template : "singlePlayTournament",
+    controller : localGameTr
   },
-  matchOnline: (key, playerID, isAiGame, JWTid, tkey) => ({
-    template: "tournamentMatch",
-    controller: () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey)
+  matchOnline : (key, playerID, isAiGame, JWTid, tkey) => ({
+    template : "multiplayerTournament",
+    controller : () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey)
   }),
-  tournament: {
-    template: "tournament",
-    controller: tournamentController
+  tournament : { 
+    template : "tournament",
+    controller : tournamentController
   }
 }
 

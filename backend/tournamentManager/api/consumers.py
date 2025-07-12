@@ -256,9 +256,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 				matchId, nextToLaunch = await setResults(trnmt, results["username2"], roundMatch, results['matchKey'])
 			
 			print("TOURNAMENT MATCH FINISHED !!!!!!!!!!!!!!!!!!!!!!!!!!!", file=sys.stderr)
+			# if self.name == 
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-finished",
 				"matchId" : matchId,
+                "mkey": results['matchKey'],
 				"next" : nextToLaunch,
 				"tkey" : self.room_group_name
 			}))
