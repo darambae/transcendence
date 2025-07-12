@@ -1,6 +1,5 @@
 import { closeModal, fetchWithRefresh, getBlockedStatus, getCookie } from "../utils.js";
 import { refreshChatAfterBlockStatusChange } from "./chat.js";
-import eventBus, { EVENTS } from "../eventBus.js";
 
 export async function card_profileController(username) {
 
@@ -238,56 +237,20 @@ function changeBlockedStatus(userName) {
 
 					if (!response.ok) {
 						console.error(`HTTP Error: ${response.status}`);
-						// Restaurer le bouton en cas d'erreur
 						blockBtn.disabled = false;
 						blockBtn.textContent = originalText;
 						return;
 					}
-
 					const data = await response.json();
 					console.log('Response data:', data);
-
-					// Vérifier plusieurs conditions possibles de succès
 					if (data.status === 'success' || data.message) {
 						console.log('Action réussie - mise à jour locale optimiste');
-
-						const wasBlocking = originalText === "block";
-						const nowBlocked = wasBlocking;
-
-						// Mettre à jour le texte du bouton selon l'action effectuée
 						if (originalText === "block") {
 							blockBtn.textContent = "unblock";
-							// Émettre l'événement de blocage
-							eventBus.emit(EVENTS.USER_BLOCKED, {
-								userId: userId,
-								userName: userName,
-								timestamp: Date.now()
-							});
-							console.log('Événement USER_BLOCKED émis');
 						} else {
 							blockBtn.textContent = "block";
-							// Émettre l'événement de déblocage
-							eventBus.emit(EVENTS.USER_UNBLOCKED, {
-								userId: userId,
-								userName: userName,
-								timestamp: Date.now()
-							});
-							console.log('Événement USER_UNBLOCKED émis');
 						}
-
-						// Émettre l'événement générique de changement de statut de blocage
-						eventBus.emit(EVENTS.BLOCK_STATUS_CHANGED, {
-							userId: userId,
-							userName: userName,
-							isBlocked: nowBlocked,
-							timestamp: Date.now()
-						});
-						console.log('Événement BLOCK_STATUS_CHANGED émis');
-
-						// Réactiver le bouton immédiatement pour une meilleure UX
 						blockBtn.disabled = false;
-
-						// Rafraîchir l'état du chat immédiatement
 						try {
 							await refreshChatAfterBlockStatusChange(userId);
 							console.log('Chat status refreshed after block/unblock action');
@@ -296,10 +259,10 @@ function changeBlockedStatus(userName) {
 						}
 
 						// Vérifier le statut côté serveur après un délai pour la cohérence
-						setTimeout(async () => {
-							console.log('Vérification différée du statut côté serveur...');
-							await getOtherUserInfo(userName);
-						}, 2000); // 2 secondes de délai
+						// setTimeout(async () => {
+						// 	console.log('Vérification différée du statut côté serveur...');
+						// 	await getOtherUserInfo(userName);
+						// }, 2000); // 2 secondes de délai
 					} else {
 						// Restaurer le bouton si l'action a échoué
 						blockBtn.disabled = false;

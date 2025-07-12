@@ -7,7 +7,6 @@ import {
 } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
-import eventBus, { EVENTS } from "../eventBus.js";
 
 let hasOverallUnreadMessages = false;
 let mainChatBootstrapModal; // Bootstrap Modal instance
@@ -557,18 +556,9 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 					}))
 				)
 				.then(({ data, ok, status, statusText }) => {
-					if (ok) {
-						if (data.status === 'success') {
+					if (ok) {						if (data.status === 'success') {
 							// Enable message input and send button
-							document.getElementById('messageInput-active').disabled = false;
-							document.getElementById('sendMessageBtn').disabled = false;
-							// Focus on message input
-							const messageInput = document.getElementById(
-								'messageInput-active'
-							);
-							if (messageInput) {
-								messageInput.focus();
-							}
+							updateMessageInputState(null, true);
 							return;
 						} else {
 							console.error('Server error unblocking the user:', targetUserId);
@@ -590,168 +580,80 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		} else {
 			//user doesn't want to unblock
 			block_reason = 'you blocked this user';
-		}
-	}
+		}	}
 	if (block_reason != null) {
-		document.getElementById('messageInput-active').disabled = true;
-		document.getElementById('sendMessageBtn').disabled = true;
+		updateMessageInputState(targetbBlockedStatus, false);
 		alert(block_reason);
 	} else {
 		// Enable message input and send button
-		document.getElementById('messageInput-active').disabled = false;
-		document.getElementById('sendMessageBtn').disabled = false;
-		// Focus on message input
-		const messageInput = document.getElementById('messageInput-active');
-		if (messageInput) {
-			messageInput.focus();
+		updateMessageInputState(targetbBlockedStatus, true);
+	}
+}
+
+/**
+ * Updates the message input placeholder and state based on blocking status
+ * @param {Object} blockStatus - The blocking status object with isBlocked and hasBlocked properties
+ * @param {boolean} enabled - Whether the input should be enabled or disabled
+ */
+function updateMessageInputState(blockStatus, enabled = true) {
+	const messageInput = document.getElementById('messageInput-active');
+	const sendBtn = document.getElementById('sendMessageBtn');
+
+	if (!messageInput || !sendBtn) return;
+
+	if (enabled && (!blockStatus || (!blockStatus.isBlocked && !blockStatus.hasBlocked))) {
+		// Normal state - no blocking
+		messageInput.disabled = false;
+		messageInput.placeholder = "Type your message...";
+		sendBtn.disabled = false;
+		messageInput.focus();
+	} else {
+		// Blocked state
+		messageInput.disabled = true;
+		sendBtn.disabled = true;
+
+		if (blockStatus?.hasBlocked) {
+			messageInput.placeholder = "This user blocked you, you can't send a message";
+		} else if (blockStatus?.isBlocked) {
+			messageInput.placeholder = "Blocked user, you can't send a message";
+		} else {
+			messageInput.placeholder = "Type your message...";
 		}
 	}
 }
 
-async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
-	console.log(
-		`Requesting private chat with ${targetUsername} for user ${currentUserId}`
-	);
-	if (!currentUserId) {
-		alert('Please log in to start a new chat.');
-		return;
-	}
-
-	if (currentUserId === targetUserId) {
-		alert('You cannot start a chat with yourself.');
-		return;
-	}
-
-	// Check if chat with this user already exists in the list
-	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
-	let existinggroupId = null;
-	chatRooms.forEach((room) => {
-		if (room.dataset.targetUserId === targetUserId) {
-			existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
+// Function to initialize the chat module
+export async function initChatModule(currentUserId) {
+	// Close any open EventSource connections for the current user
+	for (const key in eventSources) {
+		if (eventSources[key].readyState === EventSource.OPEN) {
+			eventSources[key].close();
+			delete eventSources[key];
+			console.log(`Closed SSE for group: ${key}`);
 		}
-	});
-
-	if (existinggroupId) {
-		console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
-		await switchChatRoom(currentUserId, existinggroupId, targetUserId);
-		return;
 	}
 
-	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
-		fetchWithRefresh('/chat/', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-CSRFToken': getCookie('csrftoken'),
-			},
-			body: JSON.stringify({
-				current_user_id: currentUserId,
-				target_user_id: targetUserId,
-			}),
-			credentials: 'include',
-		})
-			.then((response) =>
-				response.json().then((data) => ({ data, ok: response.ok }))
-			)
-			.then(({ data, ok }) => {
-				if (ok && data.status === 'success' && data.group_id) {
-					console.log(`Chat group ${data.group_id} created/retrieved.`);
-					loadChatRoomList(currentUserId).then(() => {
-						async () => {
-							await switchChatRoom(currentUserId, data.group_id, targetUserId);
-						};
-					});
-				} else {
-					console.error('Server error creating chat group:', data.message);
-					alert('Error creating chat group: ' + data.message);
-				}
-			})
-			.catch((error) => {
-				console.error('Network error creating chat group:', error);
-				alert('Cannot connect to server to create chat group.');
-			});
-	}
-}
+	// Reset global state
+	hasOverallUnreadMessages = false;
+	currentActiveChatGroup = null;
+	currentTargetId = null;
+	messageOffsets = {};
 
-// Event handler for "Start New Chat" button in the modal
-function handleStartNewChat(currentUserId, currentUsername) {
-	const targetUserInput = document.getElementById('targetUserInput');
-	const targetUsername = targetUserInput.value.trim();
-	const targetUserId = targetUserInput.dataset.userId || null;
-
-	if (!targetUsername || !targetUserId) {
-		alert('Please select a valid user from the search results.');
-		return;
+	const chatLog = document.getElementById('chatLog-active');
+	if (chatLog) {
+		chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
 	}
 
-	if (targetUserId === currentUserId) {
-		alert('You cannot start a chat with yourself.');
-		return;
+	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+	if (mainChatToggleButton) {
+		mainChatToggleButton.classList.remove('has-unread-overall');
 	}
 
-	promptPrivateChat(currentUserId, targetUserId, targetUsername);
-	targetUserInput.value = ''; // Clear input field
-	targetUserInput.dataset.userId = '';
-}
+	// Load chat room list
+	await loadChatRoomList(currentUserId);
 
-function setupUserSearchAutocomplete() {
-	const userInput = document.getElementById('targetUserInput');
-	const resultsBox = document.getElementById('chat-user-search');
-	if (!userInput || !resultsBox) {
-		console.error('Could not find search elements:', {
-			userInput: !!userInput,
-			resultsBox: !!resultsBox,
-		});
-		return;
-	}
-	userInput.addEventListener('input', async (event) => {
-		const query = event.target.value.trim();
-		if (!query) {
-			resultsBox.innerHTML = '';
-			return;
-		}
-		// Add debug logging
-		console.log('Searching for users with query:', query);
-
-		try {
-			const response = await fetch(
-				`/user-service/searchUsers/?t=${Date.now()}&q=${encodeURIComponent(
-					query
-				)}`,
-				{
-					method: 'GET',
-					credentials: 'include',
-					headers: {
-						'X-CSRFToken': getCookie('csrftoken'),
-						'Content-Type': 'application/json',
-						'Cache-Control': 'no-cache', // Disable caching
-					},
-				}
-			);
-
-			const data = await response.json();
-			const users = data.results ?? [];
-			resultsBox.innerHTML = users
-				.map(
-					(user) =>
-						`<li class="list-group-item user-link" data-user-id="${user.id}">${user.username}</li>`
-				)
-				.join('');
-
-			// When a user is clicked, fill the input and clear the results
-			resultsBox.querySelectorAll('.user-link').forEach((item) => {
-				item.addEventListener('click', () => {
-					userInput.value = item.textContent.trim();
-					userInput.dataset.userId = item.getAttribute('data-user-id');
-					console.log('Selected user ID:', item.getAttribute('data-user-id'));
-					resultsBox.innerHTML = ''; // Clear results after selection
-				});
-			});
-		} catch (error) {
-			console.error('Error fetching user search results:', error);
-			resultsBox.innerHTML = `<li class="list-group-item text-danger">Error loading users</li>`;
-		}
-	});
+	// Setup user search autocomplete
+	setupUserSearchAutocomplete();
 }
 
 // Main chat controller function, called after login
@@ -893,6 +795,91 @@ export function chatController(userId, username) {
 	}
 }
 
+// Event handler for "Start New Chat" button in the modal
+function handleStartNewChat(currentUserId, currentUsername) {
+	const targetUserInput = document.getElementById('targetUserInput');
+	const targetUsername = targetUserInput.value.trim();
+	const targetUserId = targetUserInput.dataset.userId || null;
+
+	if (!targetUsername || !targetUserId) {
+		alert('Please select a valid user from the search results.');
+		return;
+	}
+
+	if (targetUserId === currentUserId) {
+		alert('You cannot start a chat with yourself.');
+		return;
+	}
+
+	promptPrivateChat(currentUserId, targetUserId, targetUsername);
+	targetUserInput.value = ''; // Clear input field
+	targetUserInput.dataset.userId = '';
+}
+
+async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
+	console.log(
+		`Requesting private chat with ${targetUsername} for user ${currentUserId}`
+	);
+	if (!currentUserId) {
+		alert('Please log in to start a new chat.');
+		return;
+	}
+
+	if (currentUserId === targetUserId) {
+		alert('You cannot start a chat with yourself.');
+		return;
+	}
+
+	// Check if chat with this user already exists in the list
+	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
+	let existinggroupId = null;
+	chatRooms.forEach((room) => {
+		if (room.dataset.targetUserId === targetUserId) {
+			existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
+		}
+	});
+
+	if (existinggroupId) {
+		console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
+		await switchChatRoom(currentUserId, existinggroupId, targetUserId);
+		return;
+	}
+
+	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
+		fetchWithRefresh('/chat/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCookie('csrftoken'),
+			},
+			body: JSON.stringify({
+				current_user_id: currentUserId,
+				target_user_id: targetUserId,
+			}),
+			credentials: 'include',
+		})
+			.then((response) =>
+				response.json().then((data) => ({ data, ok: response.ok }))
+			)
+			.then(({ data, ok }) => {
+				if (ok && data.status === 'success' && data.group_id) {
+					console.log(`Chat group ${data.group_id} created/retrieved.`);
+					loadChatRoomList(currentUserId).then(() => {
+						async () => {
+							await switchChatRoom(currentUserId, data.group_id, targetUserId);
+						};
+					});
+				} else {
+					console.error('Server error creating chat group:', data.message);
+					alert('Error creating chat group: ' + data.message);
+				}
+			})
+			.catch((error) => {
+				console.error('Network error creating chat group:', error);
+				alert('Cannot connect to server to create chat group.');
+			});
+	}
+}
 export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 	// Only check authentication if status wasn't provided
 	if (userIsAuth === null) {
@@ -947,7 +934,7 @@ export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
  */
 export async function refreshChatAfterBlockStatusChange(targetUserId) {
 	console.log('Refreshing chat after block status change for user:', targetUserId);
-	
+
 	// Get current user info
 	const userData = await fetchWithRefresh('/user-service/infoUser/', {
 		method: 'GET',
@@ -972,43 +959,92 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
 	if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
 		console.log('Chat modal is open, refreshing chat list and active chat');
-		
+
 		// Refresh the chat room list
 		await loadChatRoomList(userData.id);
-		
+
 		// If we're currently chatting with the user whose block status changed, refresh that conversation
 		if (currentTargetId && currentTargetId.toString() === targetUserId.toString()) {
-			console.log('Currently chatting with affected user, refreshing conversation state');
-			
-			// Re-check block status and update input state
+			console.log('Currently chatting with affected user, refreshing conversation state');			// Re-check block status and update input state
 			const targetBlockedStatus = await getBlockedStatus(targetUserId);
 			let block_reason = null;
-			
+
 			if (targetBlockedStatus.hasBlocked) {
 				block_reason = 'this user blocked you';
 			} else if (targetBlockedStatus.isBlocked) {
 				block_reason = 'you blocked this user';
 			}
-			
-			const messageInput = document.getElementById('messageInput-active');
-			const sendBtn = document.getElementById('sendMessageBtn');
-			
-			if (block_reason != null) {
-				// Disable chat input
-				if (messageInput) messageInput.disabled = true;
-				if (sendBtn) sendBtn.disabled = true;
+
+			// Update message input state based on blocking status
+			const isEnabled = block_reason === null;
+			updateMessageInputState(targetBlockedStatus, isEnabled);
+
+			if (block_reason) {
 				console.log('Chat input disabled due to blocking:', block_reason);
 			} else {
-				// Enable chat input
-				if (messageInput) {
-					messageInput.disabled = false;
-					messageInput.focus();
-				}
-				if (sendBtn) sendBtn.disabled = false;
 				console.log('Chat input enabled - no blocking detected');
 			}
 		}
 	} else {
 		console.log('Chat modal is not open, no refresh needed');
 	}
+}
+
+function setupUserSearchAutocomplete() {
+	const userInput = document.getElementById('targetUserInput');
+	const resultsBox = document.getElementById('chat-user-search');
+	if (!userInput || !resultsBox) {
+		console.error('Could not find search elements:', {
+			userInput: !!userInput,
+			resultsBox: !!resultsBox,
+		});
+		return;
+	}
+	userInput.addEventListener('input', async (event) => {
+		const query = event.target.value.trim();
+		if (!query) {
+			resultsBox.innerHTML = '';
+			return;
+		}
+		// Add debug logging
+		console.log('Searching for users with query:', query);
+
+		try {
+			const response = await fetch(
+				`/user-service/searchUsers/?t=${Date.now()}&q=${encodeURIComponent(
+					query
+				)}`,
+				{
+					method: 'GET',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'Cache-Control': 'no-cache', // Disable caching
+					},
+				}
+			);
+
+			const data = await response.json();
+			const users = data.results ?? [];
+			resultsBox.innerHTML = users
+				.map(
+					(user) =>
+						`<li class="list-group-item user-link" data-user-id="${user.id}">${user.username}</li>`
+				)
+				.join('');
+
+			// When a user is clicked, fill the input and clear the results
+			resultsBox.querySelectorAll('.user-link').forEach((item) => {
+				item.addEventListener('click', () => {
+					userInput.value = item.textContent.trim();
+					userInput.dataset.userId = item.getAttribute('data-user-id');
+					console.log('Selected user ID:', item.getAttribute('data-user-id'));
+					resultsBox.innerHTML = ''; // Clear results after selection
+				});
+			});
+		} catch (error) {
+			console.error('Error fetching user search results:', error);
+			resultsBox.innerHTML = `<li class="list-group-item text-danger">Error loading users</li>`;
+		}
+	});
 }
