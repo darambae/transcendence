@@ -631,16 +631,22 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 			block_reason = 'you blocked this user';
 		}
 	}
+	const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 	if (block_reason != null) {
 		document.getElementById('messageInput-active').disabled = true;
 		document.getElementById('sendMessageBtn').disabled = true;
+		if (gameInvitationBtn) {
+			gameInvitationBtn.classList.add('d-none');
+			gameInvitationBtn.disabled = true;
+		}
 		alert(block_reason);
 	} else {
 		// Enable message input and send button
 		document.getElementById('messageInput-active').disabled = false;
-		document.getElementById('sendMessageBtn').disabled = false;
-		// Focus on message input
-
+		document.getElementById('sendMessageBtn').disabled = false;if (gameInvitationBtn) {
+			gameInvitationBtn.classList.remove('d-none');
+			gameInvitationBtn.disabled = false;
+		}
     // Focus on message input
     const messageInput = document.getElementById('messageInput-active');
 	if (messageInput) {
@@ -1203,11 +1209,15 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 			
 			const messageInput = document.getElementById('messageInput-active');
 			const sendBtn = document.getElementById('sendMessageBtn');
-			
+			const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 			if (block_reason != null) {
 				// Disable chat input
 				if (messageInput) messageInput.disabled = true;
 				if (sendBtn) sendBtn.disabled = true;
+				if (gameInvitationBtn) {
+					gameInvitationBtn.classList.add('d-none');
+					gameInvitationBtn.disabled = true;
+				}
 				console.log('Chat input disabled due to blocking:', block_reason);
 			} else {
 				// Enable chat input
@@ -1216,6 +1226,10 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 					messageInput.focus();
 				}
 				if (sendBtn) sendBtn.disabled = false;
+				if (gameInvitationBtn) {
+					gameInvitationBtn.classList.remove('d-none');
+					gameInvitationBtn.disabled = false;
+				}
 				console.log('Chat input enabled - no blocking detected');
 			}
 		}
