@@ -25,20 +25,42 @@ export async function sendGameJoining() {
 
 		try {
 			txtApiKey = document.getElementById('myTextInput').value;
+
+			if (!txtApiKey.trim()) {
+				alert('Please enter a valid invitation code');
+				return;
+			}
+
 			isGamePlayable = await setApiKeyWeb(txtApiKey);
-			// console.log(`api key : ${txtApiKey}`)
-			// console.log(`state : ${isGamePlayable}`)
-			if (isGamePlayable == 'Game can start') {
+			console.log('Game status:', isGamePlayable);
+
+			if (isGamePlayable === 'Game can start') {
+				btnJoin.textContent = 'Starting Game...';
+				return handleGame2Players(txtApiKey, 2, 0, -1);
+			} else if (isGamePlayable === 'Need more player') {
+				// Player registered successfully, now wait for game to be ready
+				btnJoin.textContent = 'Waiting for Host...';
+				// Directly call handleGame2Players which will wait for the game to be ready
 				return handleGame2Players(txtApiKey, 2, 0, -1);
 			} else {
-				console.log('Game status:', isGamePlayable);
+				// Handle other error cases
+				alert(`Unable to join game: ${isGamePlayable}`);
 			}
 		} catch (error) {
 			console.error('Error joining game:', error);
+			alert(
+				'Error joining game. Please check the invitation code and try again.'
+			);
 		} finally {
-			isJoining = false;
-			btnJoin.disabled = false;
-			btnJoin.textContent = 'Join Game';
+			// Only reset if we're not proceeding to the game
+			if (
+				isGamePlayable !== 'Game can start' &&
+				isGamePlayable !== 'Need more player'
+			) {
+				isJoining = false;
+				btnJoin.disabled = false;
+				btnJoin.textContent = 'Join Game';
+			}
 		}
 	});
 }

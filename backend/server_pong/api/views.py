@@ -232,7 +232,27 @@ def setApiKey(request):
     user_data = JWT[0]['payload']
     user_id = user_data.get('user_id') or user_data.get('username') or 'anonymous'
     
+    # Debug logging
+    try:
+        with open("/app/setApiKey_decodeJWT.txt", "a+") as f:
+            print(f"[DEBUG] setApiKey called - apikey: {apikey}, user_id: {user_id}, user_data: {user_data}", file=f)
+            print(f"[DEBUG] Current dictApiPlayers: {dictApiPlayers}", file=f)
+            print(f"[DEBUG] Current apiKeys: {apiKeys}", file=f)
+            print(f"[DEBUG] Current apiKeysUnplayable: {apiKeysUnplayable}", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+    
     if apikey not in apiKeysUnplayable:
+        # Debug: Check if it's in other states
+        try:
+            with open("/app/setApiKey_decodeJWT.txt", "a+") as f:
+                print(f"[DEBUG] API key {apikey} not in apiKeysUnplayable!", file=f)
+                print(f"[DEBUG] Is in apiKeys: {apikey in apiKeys}", file=f)
+                print(f"[DEBUG] Is in dictApiPlayers: {apikey in dictApiPlayers}", file=f)
+                if apikey in dictApiPlayers:
+                    print(f"[DEBUG] Players in room: {dictApiPlayers[apikey]}", file=f)
+        except Exception as e:
+            print(f"Debug logging error: {e}", file=sys.stderr)
         return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
     
     # Check if this room already has enough players
@@ -255,6 +275,13 @@ def setApiKey(request):
         # Update dictApi for backward compatibility
         dictApi[apikey] = current_count
 
+    # Debug logging
+    try:
+        with open("/app/setApiKey_decodeJWT.txt", "a+") as f:
+            print(f"[DEBUG] After processing - current_count: {current_count}, dictApiPlayers[{apikey}]: {dictApiPlayers.get(apikey, [])}", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+
     if current_count >= 2 :
         # Room is full, move to playable
         if apikey in apiKeysUnplayable:
@@ -273,23 +300,55 @@ def isGamePlayable(request) :
     JWT = decodeJWT(request, "isGamePlayable")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    #print(f" Jwt : {JWT[0]}", file=sys.stderr)
+    
     apikey = json.loads(request.body).get('apiKey')
-    if (dictApi[apikey] > 1) :
-        apiKeys.append(apikey)
+    
+    # Debug logging
+    try:
+        with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
+            print(f"[DEBUG] isGamePlayable called - apikey: {apikey}", file=f)
+            print(f"[DEBUG] dictApiPlayers: {dictApiPlayers}", file=f)
+            print(f"[DEBUG] apiKeys: {apiKeys}", file=f)
+            print(f"[DEBUG] apiKeysUnplayable: {apiKeysUnplayable}", file=f)
+            if apikey in dictApiPlayers:
+                print(f"[DEBUG] dictApiPlayers[{apikey}]: {dictApiPlayers[apikey]} (length: {len(dictApiPlayers[apikey])})", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+    
+    # Check if this room is already playable
+    if apikey in apiKeys:
+        return JsonResponse({"playable": "Game can start"})
+    
+    # Use the new player tracking logic
+    if apikey in dictApiPlayers and len(dictApiPlayers[apikey]) >= 2:
+        # Move to playable if not already there
+        if apikey in apiKeysUnplayable:
+            apiKeysUnplayable.remove(apikey)
+        if apikey not in apiKeys:
+            apiKeys.append(apikey)
         playable = "Game can start"
-    else :
+    else:
         playable = "Need more player"
-    #print(f"playable : {playable}", file=sys.stderr)
+    
+    # Debug logging
+    try:
+        with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
+            print(f"[DEBUG] Returning playable: {playable}", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+    
     return JsonResponse({"playable": playable})
 
 
 def get_api_key(request):
     JWT = decodeJWT(request, "getApiKey")
-    # fil = open('test.txt', 'w+')
-    fil = open('/app/test.txt', 'a+')
-    print(f" Jwt : {JWT[0]}", file=fil)
-    fil.close()
+    try:
+        with open("/app/test.txt", "a+") as f:
+            print(f"[DEBUG] get_api_key called - JWT: {JWT[0]}", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+    
+
     if not JWT[0] :
         return HttpResponseNoContent() # Set an error 
     api_key = str(uuid.uuid4())

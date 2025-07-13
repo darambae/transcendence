@@ -433,14 +433,26 @@ async function initEventSource(groupId, currentUserId) {
 
 		source.onerror = async function (err) {
 			console.error('EventSource failed for group ' + groupId + ':', err);
+
+			// Check if this connection was intentionally closed (cleanup)
+			if (!eventSources[groupId] || eventSources[groupId] !== source) {
+				console.log(
+					'SSE connection was intentionally closed, not reconnecting'
+				);
+				return;
+			}
+
 			source.close();
 			delete eventSources[groupId];
-			await new Promise((resolve) => setTimeout(resolve, 3000));
+
 			// Only attempt reconnect if currentActiveChatGroup is still this groupId
-			// Otherwise, it means user switched chat, and we shouldn't reconnect here
+			// and the connection wasn't intentionally closed
 			if (currentActiveChatGroup === groupId) {
 				console.log('Refreshing token and reconnecting SSE...');
+				await new Promise((resolve) => setTimeout(resolve, 3000));
 				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
+			} else {
+				console.log('Not reconnecting SSE - chat group no longer active');
 			}
 		};
 		console.log(`Opened SSE for group: ${groupId}`);
@@ -1065,11 +1077,9 @@ export function chatController(userId, username) {
 		});
 		mainChatWindowElement.addEventListener('hidden.bs.modal', () => {
 			console.log('Main Chat Window is hidden');
-			// Close active SSE connection when modal closes
-			// if (currentActiveChatGroup && eventSources[currentActiveChatGroup]) {
-			// 	eventSources[currentActiveChatGroup].close();
-			// 	delete eventSources[currentActiveChatGroup];
-			// }
+			// Close all SSE connections when modal closes
+			cleanupAllChatConnections();
+
 			currentActiveChatGroup = null; // Reset active chat group when closing modal
 			currentTargetId = null;
 			// Clear chat log and reset UI state
@@ -1156,6 +1166,54 @@ export function chatController(userId, username) {
 	}
 }
 
+// Function to clean up all chat SSE connections
+function cleanupAllChatConnections() {
+	console.log('Cleaning up all chat SSE connections...');
+
+	// Close all active EventSources
+	for (const groupId in eventSources) {
+		if (
+			eventSources[groupId] &&
+			eventSources[groupId].readyState !== EventSource.CLOSED
+		) {
+			console.log(`Closing SSE connection for group: ${groupId}`);
+			eventSources[groupId].close();
+		}
+		delete eventSources[groupId];
+	}
+
+	// Clear message offsets
+	for (const groupId in messageOffsets) {
+		delete messageOffsets[groupId];
+	}
+
+	console.log('All chat SSE connections cleaned up');
+}
+
+// Export cleanup function for use by other modules (like logout)
+export function cleanupChatOnLogout() {
+	console.log('Chat cleanup on logout called');
+	cleanupAllChatConnections();
+
+	// Reset global state
+	hasOverallUnreadMessages = false;
+	currentActiveChatGroup = null;
+	currentTargetId = null;
+
+	// Hide chat button
+	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+	if (mainChatToggleButton) {
+		mainChatToggleButton.style.display = 'none';
+		mainChatToggleButton.classList.remove('has-unread-overall');
+	}
+
+	// Close modal if open
+	if (mainChatBootstrapModal) {
+		mainChatBootstrapModal.hide();
+	}
+}
+
+// Function to render the chat button if the user is authenticated
 export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 	// Only check authentication if status wasn't provided
 	if (userIsAuth === null) {
