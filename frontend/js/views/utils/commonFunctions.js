@@ -163,6 +163,10 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	currentMultiplayerPostUrl = `server-pong/send-message`;
 	multiplayerGameStarted = false;
 	multiplayerGameEnded = false;
+	
+	// Variables pour vérifier la connexion des joueurs
+	let bothPlayersConnected = false;
+	let playersConnectedCount = 0;
 
 	let game_stats;
 	let a, b, c, username;
@@ -175,11 +179,11 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	// Show initial game state
 	if (playerID === 2) {
-		drawCenterText('waiting for the player to start the match');
+		drawCenterText('Connecting to game...');
 		guideTouch();
 	} else {
+		drawCenterText('Connecting to game...');
 		guideTouch();
-		drawCenterTextP();
 	}
 
 	// Load game state UI
@@ -249,10 +253,66 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');
 
-			console.log('Multiplayer SSE data:', data);
 			game_stats = data['game_stats'];
 
-			if (game_stats['State'] !== 'Waiting for start') {
+			// Debug: Afficher les données reçues pour identifier la structure
+			console.log('SSE data received:', data);
+			console.log('Game stats:', game_stats);
+
+			// Vérifier si la partie est terminée
+			if (game_stats['State'] === 'Game Over' || game_stats['State'] === 'GameOver' || 
+				game_stats['State'] === 'Finished' || game_stats['gameEnded'] === true) {
+				console.log('Game ended, cleaning up multiplayer game...');
+				multiplayerGameEnded = true;
+				
+				// Afficher le message de fin de partie
+				if (game_stats['winner']) {
+					drawCenterText(`Game Over! Winner: ${game_stats['winner']}`);
+				} else {
+					drawCenterText('Game Over!');
+				}
+				
+				// Nettoyer la connexion après un délai pour laisser le temps de voir le résultat
+				setTimeout(() => {
+					cleanupMultiplayerGame();
+					// Rediriger vers la page multiplayer après le nettoyage
+					window.location.hash = '#multiplayer';
+				}, 3000);
+				
+				return;
+			}
+
+			// Vérification du nombre de joueurs connectés - essayer différentes propriétés possibles
+			if (game_stats['playersConnected'] !== undefined) {
+				playersConnectedCount = game_stats['playersConnected'];
+				bothPlayersConnected = playersConnectedCount >= 2;
+			} else if (game_stats['player1'] && game_stats['player2']) {
+				// Si les données des deux joueurs sont présentes, considérer qu'ils sont connectés
+				bothPlayersConnected = true;
+				playersConnectedCount = 2;
+			} else {
+				// Par défaut, considérer que les joueurs sont connectés si on reçoit des données de jeu
+				bothPlayersConnected = true;
+				playersConnectedCount = 2;
+				console.log('Assuming both players connected - no playersConnected field found');
+			}
+			
+			if (!bothPlayersConnected) {
+				drawCenterText(`waiting for players... (${playersConnectedCount}/2 connected)`);
+				return; // Ne pas traiter le reste si tous les joueurs ne sont pas connectés
+			}
+
+			// Afficher un message quand les deux joueurs sont connectés
+			if (bothPlayersConnected && game_stats['State'] === 'Waiting for start') {
+				if (playerID === 1) {
+					drawCenterText("Players are connected. Press 'P' to start");
+				} else {
+					drawCenterText('Players are connected ! Waiting for 1st player to start the game...');
+				}
+				guideTouch();
+			}
+
+			if (game_stats['State'] !== 'Waiting for start' && bothPlayersConnected) {
 				if (!multiplayerGameStarted) {
 					multiplayerGameStarted = true;
 					console.log('Multiplayer game started');
@@ -292,10 +352,31 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	// Add error handling for SSE connection (like localGame.js)
 	SSEStream.onerror = function (error) {
 		console.error('Multiplayer SSE connection error:', error);
+		
+		// Si la partie est terminée, ne pas essayer de reconnecter
+		if (multiplayerGameEnded) {
+			console.log('Game ended, not reconnecting SSE');
+			cleanupMultiplayerGame();
+			return;
+		}
+		
 		if (SSEStream.readyState === EventSource.CLOSED) {
 			console.log('Multiplayer SSE connection was closed');
 			multiplayerSSEConnection = null;
 			window.currentGameSSE = null;
+			
+			// Si on a eu trop d'erreurs de reconnexion, arrêter
+			if (!window.sseReconnectCount) {
+				window.sseReconnectCount = 0;
+			}
+			window.sseReconnectCount++;
+			
+			if (window.sseReconnectCount > 5) {
+				console.warn('Too many SSE reconnection attempts, stopping');
+				drawCenterText('Connection lost. Please refresh the page.');
+				cleanupMultiplayerGame();
+				return;
+			}
 		} else if (SSEStream.readyState === EventSource.CONNECTING) {
 			console.warn('Multiplayer SSE reconnecting...');
 		} else {
@@ -324,6 +405,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 			switch (event.key) {
 				case 'p':
+					// Vérification simplifiée - si on reçoit des données SSE, les joueurs sont connectés
 					if (playerID === 1 && !multiplayerGameStarted) {
 						multiplayerGameStarted = true;
 						console.log('Starting multiplayer game with P key');
@@ -342,6 +424,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 							console.error('Error starting multiplayer game:', error);
 							multiplayerGameStarted = false;
 						});
+					} else if (playerID !== 1) {
+						drawCenterText('Only player 1 can start the game');
 					}
 					break;
 				case 'q':
@@ -359,6 +443,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 					}
 					break;
 				case 'ArrowUp':
+					// Permettre les mouvements dès que la connexion SSE est établie
 					if (playerID === 1) {
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
@@ -390,6 +475,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 					}
 					break;
 				case 'ArrowDown':
+					// Permettre les mouvements dès que la connexion SSE est établie
 					if (playerID === 1) {
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
@@ -523,6 +609,11 @@ export function cleanupMultiplayerGame() {
 	multiplayerGameEnded = false;
 	currentMultiplayerApiKey = null;
 	currentMultiplayerPostUrl = null;
+
+	// Reset SSE reconnection counter
+	if (window.sseReconnectCount) {
+		window.sseReconnectCount = 0;
+	}
 
 	// Close SSE connection
 	if (
