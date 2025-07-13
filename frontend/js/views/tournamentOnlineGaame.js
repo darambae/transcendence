@@ -1,4 +1,4 @@
-import { actualizeIndexPage, getCookie } from "../utils.js";
+import { actualizeIndexPage, fetchWithRefresh, getCookie } from "../utils.js";
 import { drawCenterTextP, guideTouch } from "./localGame.js";
 import { drawCenterText } from "./multiplayer.js";
 import { routesTr } from "./tournament.js";
@@ -22,7 +22,9 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
     }
   }
 
-  await fetch(`tournament/supervise?round=${round}&tkey=${tkey}&key=${key}`, {
+  console.log("key, playerID, isAiGame, JWTid, tkey, round <->", key, playerID, isAiGame, JWTid, tkey, round)
+
+  await fetchWithRefresh(`tournament/supervise?key=${key}&tkey=${tkey}&round=${round}`, {
     credentials: 'include'
   })
 

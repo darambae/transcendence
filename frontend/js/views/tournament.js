@@ -14,9 +14,9 @@ export let routesTr = {
     template : "singlePlayTournament",
     controller : localGameTr
   },
-  matchOnline : (key, playerID, isAiGame, JWTid, tkey) => ({
+  matchOnline : (key, playerID, isAiGame, JWTid, tkey, round) => ({
     template : "multiplayerTournament",
-    controller : () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey)
+    controller : () => onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round)
   }),
   tournament : { 
     template : "tournament",
@@ -660,18 +660,7 @@ export async function tournamentController() {
         return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
       }
       else {
-        fetchWithRefresh(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
-          credentials: "include",
-        })
-          .then(response => {
-            if (!response.ok) throw new Error("https Error: " + response.status);
-            return response.json();
-          })
-          .then(data => {
-            console.log(data);
-          })
-
-        return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, -1, target.dataset.tkey));
+        return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, -1, target.dataset.tkey, target.dataset.round));
       }
     }
   })
