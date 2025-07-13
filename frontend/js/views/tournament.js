@@ -660,7 +660,42 @@ export async function tournamentController() {
         return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
       }
       else {
-        return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, -1, target.dataset.tkey, target.dataset.round));
+        let idJWT;
+        try {
+          const response = fetchWithRefresh('server-pong/check-sse', {
+            headers: { 'X-CSRFToken': csrf },
+            credentials: 'include',
+          });
+      
+          if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+      
+          const data = response.json();
+          console.log('data', data);
+      
+          // Safely extract values with defaults
+          const guestArray = Array.isArray(data.guest) ? data.guest : [];
+          [a, b, c] = guestArray;
+          username = data.username || 'anonymous';
+
+          if (target.dataset.player == username) {
+            idJWT = -1
+          }
+          else if (target.dataset.player == a) {
+            idJWT = 0
+          }
+          else if (target.dataset.player == b) {
+            idJWT = 1
+          }
+          else {
+            idJWT = 2
+          }
+        } catch (error) {
+          console.error('Request error:', error);
+          // Set default values to prevent undefined issues
+          username = 'anonymous';
+          // Could set default values for a, b, c if needed
+        }
+        return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));
       }
     }
   })
