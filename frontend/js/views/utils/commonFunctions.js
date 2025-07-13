@@ -126,232 +126,289 @@ export function sleep(ms) {
 }
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
+	console.log('Starting handleGame2Players with:', {
+		key,
+		playerID,
+		isAiGame,
+		JWTid,
+	});
 
-  // console.log(adress);
-  let url_post = `server-pong/send-message`;
-  let started = false;
-  let game_stats;
-  let a = undefined;
-  let b = undefined;
-  let c = undefined;
-  let username;
-  const csrf = getCookie('csrftoken');
-  await setCanvasAndContext();
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+	// Store multiplayer game globals (similar to localGame.js)
+	currentMultiplayerApiKey = key;
+	currentMultiplayerPostUrl = `server-pong/send-message`;
+	multiplayerGameStarted = false;
+	multiplayerGameEnded = false;
 
-  if (playerID === 2) {
-    drawCenterText("waiting for the player  to start the match");
-    guideTouch()
-  } else 
-  {
-    guideTouch()
-    drawCenterTextP()
-  }
+	let game_stats;
+	let a, b, c, username;
+	const csrf = getCookie('csrftoken');
 
+	// Clear canvas
+	if (ctx) {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
 
-  // let mul = await fetchWithRefresh('./templates/localGame.html')
-  // let mulTxt = await mul.text()
-  
-  // let gameState  = document.getElementById("contentTournementPage");
-  // gameState.innerHTML = mulTxt;
-  
-  await fetchWithRefresh(`server-pong/check-sse`, {
-    headers: {
-      'X-CSRFToken': csrf,
-    },
-    credentials: 'include',
-  })
-  .then(response => {
-      if (!response.ok) throw new Error("https Error: " + response.status);
-      return response.json();
-    })
-    .then(data => {
-      console.log("data", data);
-      ([a,b,c] = data["guest"])
-      username = data["username"]
-    })
-    .catch(error => {
-      console.error("Erreur de requête :", error);
-    })
-    console.log("results: ", username, a, b, c)
-    let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&username=${username}`;
-    if (a !== undefined) {
-      url_sse += `&guest1=${a}`
-    }
-    if (b !== undefined) {
-      url_sse += `&guest2=${b}`
-    }
-    if (c !== undefined) {
-      url_sse += `&guest3=${c}`
-    }
+	// Show initial game state
+	if (playerID === 2) {
+		drawCenterText('waiting for the player to start the match');
+		guideTouch();
+	} else {
+		guideTouch();
+		drawCenterTextP();
+	}
 
-    console.log("url_sse ->->-> ", url_sse);
+	// Load game state UI
+	// try {
+	// 	let mul = await fetch('./templates/localGame.html');
+	// 	let mulTxt = await mul.text();
+	// 	let gameState = document.getElementById('idfooterCanvas');
+	// 	if (gameState) {
+	// 		gameState.innerHTML = mulTxt;
+	// 	}
+	// } catch (error) {
+	// 	console.error('Error loading game UI:', error);
+	// }
 
-    const SSEStream = new EventSource(url_sse);
+	// Get player info (with error handling like localGame.js)
+	try {
+		const response = await fetchWithRefresh(`server-pong/check-sse`, {
+			headers: { 'X-CSRFToken': csrf },
+			credentials: 'include',
+		});
 
-    console.log("dd");
-  
-  SSEStream.onerror = function(event) {
-    console.error("Erreur SSE :", event);
+		if (!response.ok) throw new Error('HTTP Error: ' + response.status);
 
-    // L'objet "event" n'a pas de "reason" directement, mais tu peux diagnostiquer via :
-    // - source.readyState
-    // - vérification manuelle du serveur (logs backend)
-    if (SSEStream.readyState === EventSource.CLOSED) {
-        console.warn("Connexion SSE fermée.");
-    } else if (SSEStream.readyState === EventSource.CONNECTING) {
-        console.warn("Reconnexion en cours...");
-    } else {
-        console.warn("État inconnu :", SSEStream.readyState);
-    }
-};
+		const data = await response.json();
+		console.log('Player data:', data);
 
-  console.log("cc");
+		// Safely extract values with defaults
+		const guestArray = Array.isArray(data.guest) ? data.guest : [];
+		[a, b, c] = guestArray;
+		username = data.username || 'anonymous';
+	} catch (error) {
+		console.error('Error fetching player info:', error);
+		// Set default values to prevent undefined issues
+		username = 'anonymous';
+	}
 
-  SSEStream.onmessage = function (event) {
-      try {
-        // const data = JSON.parse(event.data);
-        // // console.log("Received data: ", data);
-        // console.log("Heyyo");
-        const data = JSON.parse(event.data);
+	// Build SSE URL
+	let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&username=${username}`;
+	if (a !== undefined) url_sse += `&guest1=${a}`;
+	if (b !== undefined) url_sse += `&guest2=${b}`;
+	if (c !== undefined) url_sse += `&guest3=${c}`;
 
-        let sc1 = document.getElementById("player1score");
-        let sc2 = document.getElementById("player2score");
+	console.log('Multiplayer SSE URL:', url_sse);
 
-        // console.log(data);
-        game_stats = data["game_stats"]
-        if (game_stats == "final-message") {
-          sleep(500);
-          console.log("Gonna close SSE");
-          SSEStream.close();
-          console.log("SSE closed");
-        }
-        if (game_stats["State"] != "Waiting for start" ) {  
-          if (started == false) {
-            started = true;
-          }
-          if (game_stats["State"] != "playersInfo") {
-            // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-            drawMap(game_stats["ball"]["position"], game_stats["player1"], game_stats["player2"]);
-            sc1.setAttribute("data-score", game_stats["team1Score"]);
-            sc2.setAttribute("data-score", game_stats["team2Score"]);
-            checkwin()
-          }
-          else {
-            // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-            let p1 = document.getElementById("player1Username");
-            let p2 = document.getElementById("player2Username");
+	// Close any existing SSE connection before creating a new one (like localGame.js)
+	if (
+		multiplayerSSEConnection &&
+		multiplayerSSEConnection.readyState !== EventSource.CLOSED
+	) {
+		multiplayerSSEConnection.close();
+		console.log('Closed existing multiplayer SSE connection');
+	}
 
-            p1.innerHTML = game_stats["p1"][0]
-            p2.innerHTML = game_stats["p2"][0]
+	// Also clean up global SSE if it exists
+	if (
+		window.currentGameSSE &&
+		window.currentGameSSE.readyState !== EventSource.CLOSED
+	) {
+		window.currentGameSSE.close();
+		console.log('Closed existing global SSE connection');
+	}
 
-          }
-        }
-      } catch (error) {
-        // console.log("ParsingError: ", error)
-      }
-  }
+	// Common SSE message handler function (like localGame.js)
+	const handleMultiplayerSSEMessage = (event) => {
+		try {
+			const data = JSON.parse(event.data);
+			let sc1 = document.getElementById('player1score');
+			let sc2 = document.getElementById('player2score');
 
-  console.log("bb");
+			console.log('Multiplayer SSE data:', data);
+			game_stats = data['game_stats'];
 
-  window.onbeforeunload = function(event) {
-    // console.log("Détection du rechargement ou fermeture de la page");
-    if (SSEStream.readyState !== EventSource.CLOSED) {
-        // console.log("La connexion SSE va être fermée lors du rechargement.");
-        logErrorToLocalStorage("La connexion SSE va être fermée lors du rechargement.");
-        SSEStream.close();
-    }
-    else {
-      // console.log("Yes");
-    }
-  };
+			if (game_stats['State'] !== 'Waiting for start') {
+				if (!multiplayerGameStarted) {
+					multiplayerGameStarted = true;
+					console.log('Multiplayer game started');
+				}
+				if (game_stats['State'] !== 'playersInfo') {
+					drawMap(
+						game_stats['ball']['position'],
+						game_stats['player1'],
+						game_stats['player2']
+					);
+					if (sc1) sc1.setAttribute('data-score', game_stats['team1Score']);
+					if (sc2) sc2.setAttribute('data-score', game_stats['team2Score']);
+					checkwin();
+				} else {
+					let p1 = document.getElementById('player1Username');
+					let p2 = document.getElementById('player2Username');
+					if (p1 && game_stats['p1'] && game_stats['p1'][0]) {
+						p1.innerHTML = game_stats['p1'][0];
+					}
+					if (p2 && game_stats['p2'] && game_stats['p2'][0]) {
+						p2.innerHTML = game_stats['p2'][0];
+					}
+				}
+			}
+		} catch (error) {
+			// Ignore parse errors silently like localGame.js
+		}
+	};
 
+	// Create new SSE connection
+	const SSEStream = new EventSource(url_sse);
+	multiplayerSSEConnection = SSEStream;
+	window.currentGameSSE = SSEStream; // Also store globally for compatibility
 
-  console.log("aa");
+	SSEStream.onmessage = handleMultiplayerSSEMessage;
 
-  document.addEventListener('keydown', function (event) {
-    const keysToPrevent = ['ArrowUp', 'ArrowDown', "p", "q"];
-    if (keysToPrevent.includes(event.key)) {
-      event.preventDefault();
-      switch(event.key) {
-        case "p" :
-          if (playerID == 1 && started == false) {
-            started = true;
-            fetch(url_post, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrf,
-                      },
-                      credentials: 'include',
-                      body: JSON.stringify({"apiKey": key, "message": '{"action": "start"}'})
-                    });
-              };
-              break;
-              case "q" :
-                // console.log("Started : ", started);
-                if (started == true) {
-                  fetch(`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`, {
-                  headers: {
-                    'X-CSRFToken': csrf,
-                  },
-                  credentials: 'include',
-                });
-              }
-              break;
-              case "ArrowUp" : 
-              if (playerID == 1) { 
-                fetch(url_post, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                  },
-                  credentials: 'include',
-                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "up"}', "player" : "1"})
-                });
-              }
-              else {
-                fetch(url_post, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrf,
-                      },
-                      credentials: 'include',
-                      body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "up"}', "player" : "2"})
-                    });
-              } ;
-              break;
-              case "ArrowDown" :
-              if (playerID == 1) { 
-                  fetch(url_post, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                  },
-                  credentials: 'include',
-                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player1": "down"}', "player" : "1"})
-                });
-              }
-              else {
-                fetch(url_post, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrf,
-                  },
-                  credentials: 'include',
-                  body: JSON.stringify({"apiKey": key, "message": '{"action": "move", "player2": "down"}', "player" : "2"})
-                });
-              } ;
-              break;
-            }
-    }
-  })
-  
+	// Add error handling for SSE connection (like localGame.js)
+	SSEStream.onerror = function (error) {
+		console.error('Multiplayer SSE connection error:', error);
+		if (SSEStream.readyState === EventSource.CLOSED) {
+			console.log('Multiplayer SSE connection was closed');
+			multiplayerSSEConnection = null;
+			window.currentGameSSE = null;
+		} else if (SSEStream.readyState === EventSource.CONNECTING) {
+			console.warn('Multiplayer SSE reconnecting...');
+		} else {
+			console.warn('Unknown multiplayer SSE state:', SSEStream.readyState);
+		}
+	};
+
+	// Add close handler
+	SSEStream.addEventListener('close', function () {
+		console.log('Multiplayer SSE connection closed by server');
+		multiplayerSSEConnection = null;
+		window.currentGameSSE = null;
+	});
+
+	// Clean up any existing event listeners before adding new ones (like localGame.js)
+	if (multiplayerKeydownHandler) {
+		document.removeEventListener('keydown', multiplayerKeydownHandler);
+	}
+
+	// Create and store reference to event handler
+	multiplayerKeydownHandler = (event) => {
+		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'p', 'q'];
+		if (keysToPrevent.includes(event.key)) {
+			console.log('Multiplayer keydown handler activated for key:', event.key);
+			event.preventDefault();
+
+			switch (event.key) {
+				case 'p':
+					if (playerID === 1 && !multiplayerGameStarted) {
+						multiplayerGameStarted = true;
+						console.log('Starting multiplayer game with P key');
+						fetch(currentMultiplayerPostUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': csrf,
+							},
+							credentials: 'include',
+							body: JSON.stringify({
+								apiKey: key,
+								message: '{"action": "start"}',
+							}),
+						}).catch((error) => {
+							console.error('Error starting multiplayer game:', error);
+							multiplayerGameStarted = false;
+						});
+					}
+					break;
+				case 'q':
+					if (multiplayerGameStarted) {
+						console.log('Player forfeit in multiplayer game');
+						fetch(
+							`server-pong/forfait-game?apikey=${key}&idplayer=${playerID}`,
+							{
+								headers: { 'X-CSRFToken': csrf },
+								credentials: 'include',
+							}
+						).catch((error) => {
+							console.error('Error forfeiting multiplayer game:', error);
+						});
+					}
+					break;
+				case 'ArrowUp':
+					if (playerID === 1) {
+						fetch(currentMultiplayerPostUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': csrf,
+							},
+							credentials: 'include',
+							body: JSON.stringify({
+								apiKey: key,
+								message: '{"action": "move", "player1": "up"}',
+								player: '1',
+							}),
+						});
+					} else {
+						fetch(currentMultiplayerPostUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': csrf,
+							},
+							credentials: 'include',
+							body: JSON.stringify({
+								apiKey: key,
+								message: '{"action": "move", "player2": "up"}',
+								player: '2',
+							}),
+						});
+					}
+					break;
+				case 'ArrowDown':
+					if (playerID === 1) {
+						fetch(currentMultiplayerPostUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': csrf,
+							},
+							credentials: 'include',
+							body: JSON.stringify({
+								apiKey: key,
+								message: '{"action": "move", "player1": "down"}',
+								player: '1',
+							}),
+						});
+					} else {
+						fetch(currentMultiplayerPostUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': csrf,
+							},
+							credentials: 'include',
+							body: JSON.stringify({
+								apiKey: key,
+								message: '{"action": "move", "player2": "down"}',
+								player: '2',
+							}),
+						});
+					}
+					break;
+			}
+		}
+	};
+
+	// Add event listener
+	document.addEventListener('keydown', multiplayerKeydownHandler);
+
+	// Add cleanup listeners for page unload/refresh (like localGame.js)
+	window.addEventListener('beforeunload', cleanupMultiplayerGame);
+	window.addEventListener('hashchange', cleanupMultiplayerGame);
+
+	console.log('Multiplayer game setup complete');
 }
+
 
 export async function loadGamePlayable(apikey) {
   let isPlayable;
