@@ -1,4 +1,5 @@
 import { attachLoginListener, fetchWithRefresh } from '../utils.js';
+import { resetAuthCache } from '../router.js';
 
 export function userController() {
 	userInfo();
@@ -43,6 +44,7 @@ export function userController() {
 					if (chatContainer) {
 						chatContainer.innerHTML = '';
 					}
+					resetAuthCache();
 					window.location.href = '/#home';
 				}
 			} catch (err) {

@@ -126,6 +126,7 @@ dictActivePlayer = {}
 apiKeysUnplayable = []
 dictApi = {}
 dictApiSp = {}
+dictApiPlayers = {}  # Track players per room: {apikey: [player1_id, player2_id]}
 apiKeys = []
 #print("VIEW IMPORTEEE", file=sys.stderr)
 
@@ -225,22 +226,44 @@ def setApiKey(request):
     JWT = decodeJWT(request, "setApiKey")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-    # fil = open('test.txt', 'w+')
-    # #print(f" Jwt : {JWT[0]}", file=fil)
-    # fil.close()
+    
     apikey = json.loads(request.body).get('apiKey')
+    # Get user identifier - use user_id if available, otherwise use username or a combination
+    user_data = JWT[0]['payload']
+    user_id = user_data.get('user_id') or user_data.get('username') or 'anonymous'
+    
     if apikey not in apiKeysUnplayable:
         return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
-    if apikey in dictApi :
-        dictApi[apikey] += 1
-    else :
-        dictApi[apikey] = 1
+    
+    # Check if this room already has enough players
+    if apikey in apiKeys:
+        return JsonResponse({"playable": "Game can start"})
+    
+    # Initialize player tracking for this room if not exists
+    if apikey not in dictApiPlayers:
+        dictApiPlayers[apikey] = []
+    
+    # Check if this user is already in the room (prevent duplicate joins)
+    if user_id in dictApiPlayers[apikey]:
+        # User already joined, return current status
+        current_count = len(dictApiPlayers[apikey])
+    else:
+        # Add new player to the room
+        dictApiPlayers[apikey].append(user_id)
+        current_count = len(dictApiPlayers[apikey])
+        
+        # Update dictApi for backward compatibility
+        dictApi[apikey] = current_count
 
-    if (dictApi[apikey] > 1) :
-        apiKeysUnplayable.remove(apikey)
-        apiKeys.append(apikey)
+    if current_count >= 2 :
+        # Room is full, move to playable
+        if apikey in apiKeysUnplayable:
+            apiKeysUnplayable.remove(apikey)
+        if apikey not in apiKeys:
+            apiKeys.append(apikey)
         playable = "Game can start"
-    else :
+    else:
+        # Waiting for more players
         playable = "Need more player"
 
     return JsonResponse({"playable": playable})
@@ -347,10 +370,20 @@ async def forfaitUser(request) :
                 dictApiSp.pop(apikey)
             except KeyError :
                 return HttpResponseNoContent()
+        
+        # Clean up player tracking
+        try:
+            dictApiPlayers.pop(apikey)
+        except KeyError:
+            pass
+            
         try :
             apiKeys.remove(apikey)
         except Exception :
-            apiKeysUnplayable.remove(apikey)
+            try:
+                apiKeysUnplayable.remove(apikey)
+            except ValueError:
+                pass
             return HttpResponseNoContent()
     return HttpResponseNoContent()
 
@@ -375,10 +408,20 @@ async def disconnectUsr(request) :
             dictApiSp.pop(apikey)
         except KeyError :
             return
+    
+    # Clean up player tracking
+    try:
+        dictApiPlayers.pop(apikey)
+    except KeyError:
+        pass
+        
     try :
         apiKeys.remove(apikey)
     except Exception :
-        apiKeysUnplayable.remove(apikey)
+        try:
+            apiKeysUnplayable.remove(apikey)
+        except ValueError:
+            pass
         return HttpResponseNoContent()
     return HttpResponseNoContent()
 

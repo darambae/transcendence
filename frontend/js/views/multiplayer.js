@@ -1,9 +1,7 @@
-import {
-	cleanupMultiplayerGame,
-	setCanvasAndContext,
-} from './utils/commonFunctions.js';
-import { sendGameCreation } from './utils/createGame.js';
-import { sendGameJoining } from './utils/joinGame.js';
+import { cleanupMultiplayerGame } from './multiplayerGameSession.js';
+import { setCanvasAndContext } from './gameCanvas.js';
+import { sendGameCreation } from './gameCreation.js';
+import { sendGameJoining } from './gameJoining.js';
 
 // Global variables to track multiplayer game state and event handlers
 let multiplayerGameActive = false;

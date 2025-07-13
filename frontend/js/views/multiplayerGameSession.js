@@ -1,15 +1,7 @@
-import { versusController } from '../versusGame.js';
-import { homeController } from '../home.js';
-import { loginController } from '../login.js';
-import { getCookie, fetchWithRefresh } from '../../utils.js';
-import {
-	checkwin,
-	guideTouch,
-	drawCenterTextP,
-	localGameController,
-} from '../localGame.js';
-import { drawCenterText, multiplayerController } from '../multiplayer.js';
-
+import { fetchWithRefresh, getCookie } from '../utils.js';
+import { checkwin, guideTouch, drawCenterTextP } from './localGame.js';
+import { drawCenterText } from './multiplayer.js';
+import { drawMap } from './gameCanvas.js';
 
 // Global variables for multiplayer game management
 let multiplayerGameInterval = null;
@@ -20,136 +12,6 @@ let multiplayerGameEnded = false;
 let currentMultiplayerApiKey = null;
 let currentMultiplayerPostUrl = null;
 
-export let sseTournament;
-export let adress = '10.18.161';
-let canvas;
-let ctx;
-
-export function setSSE(sseObj) {
-	sseTournament = sseObj;
-}
-
-export function getSSE() {
-	return sseTournament;
-}
-
-export const routesSp = {
-	home: {
-		template: 'home',
-		controller: homeController,
-	},
-	playerSelection: {
-		template: 'versusGame',
-		controller: versusController,
-	},
-	game: {
-		template: 'localGame',
-		controller: localGameController,
-	},
-	multiplayerGame: {
-		template: 'localGame',
-		controller: multiplayerController,
-	},
-	invit: {
-		template: 'login',
-		controller: loginController,
-	},
-};
-
-let keySp;
-export function setPlayersLocalName(apikey) {
-	keySp = apikey;
-}
-
-export function getPlayersLocalName() {
-	return keySp;
-}
-
-export function setCanvasAndContext() {
-	canvas = document.getElementById('gameCanvas');
-	ctx = canvas.getContext('2d');
-	ctx.font = '20px Arial';
-	ctx.fillStyle = 'blue';
-}
-
-function updateServerPosition(newX, newY) {
-	currentPos.x = targetPos.x;
-	currentPos.y = targetPos.y;
-	targetPos.x = newX;
-	targetPos.y = newY;
-	lastUpdateTime = performance.now();
-}
-
-function roundRect(ctx, x, y, width, height, radius) {
-	ctx.beginPath();
-	ctx.moveTo(x + radius, y);
-	ctx.lineTo(x + width - radius, y);
-	ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-	ctx.lineTo(x + width, y + height - radius);
-	ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-	ctx.lineTo(x + radius, y + height);
-	ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-	ctx.lineTo(x, y + radius);
-	ctx.quadraticCurveTo(x, y, x + radius, y);
-	ctx.closePath();
-	ctx.fill();
-}
-
-function fillCircle(ctx, x, y, r) {
-	ctx.beginPath();
-	ctx.arc(x, y, r, 0, Math.PI * 2);
-	ctx.fillStyle = 'white';
-	ctx.fill();
-	ctx.closePath();
-}
-
-export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
-	const canvas = document.getElementById('gameCanvas');
-	const ctx = canvas.getContext('2d');
-
-	const fieldWidth = 1000;
-	const fieldHeight = 600;
-	const offsetX = (canvas.width - fieldWidth) / 2;
-	const offsetY = (canvas.height - fieldHeight) / 2;
-
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	const dx1 = Racket1Pos[1][0] - Racket1Pos[0][0];
-	const dy1 = Racket1Pos[1][1] - Racket1Pos[0][1];
-	const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
-	ctx.fillStyle = 'white';
-	roundRect(
-		ctx,
-		Racket1Pos[0][0] + offsetX,
-		Racket1Pos[0][1] + offsetY,
-		4,
-		d1,
-		3
-	);
-
-	const dx2 = Racket2Pos[1][0] - Racket2Pos[0][0];
-	const dy2 = Racket2Pos[1][1] - Racket2Pos[0][1];
-	const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-	ctx.fillStyle = 'white';
-	roundRect(
-		ctx,
-		Racket2Pos[0][0] + offsetX,
-		Racket2Pos[0][1] + offsetY,
-		4,
-		d2,
-		3
-	);
-
-	let ballX = Math.min(Math.max(ballPos[0], 10), fieldWidth - 10);
-	let ballY = Math.min(Math.max(ballPos[1], 10), fieldHeight - 10);
-
-	fillCircle(ctx, ballX + offsetX, ballY + offsetY, 10);
-}
-
-export function sleep(ms) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	console.log('Starting handleGame2Players with:', {
 		key,
@@ -158,7 +20,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 		JWTid,
 	});
 
-	// Store multiplayer game globals (similar to localGame.js)
+	// Store multiplayer game globals
 	currentMultiplayerApiKey = key;
 	currentMultiplayerPostUrl = `server-pong/send-message`;
 	multiplayerGameStarted = false;
@@ -169,6 +31,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	const csrf = getCookie('csrftoken');
 
 	// Clear canvas
+	const canvas = document.getElementById('gameCanvas');
+	const ctx = canvas ? canvas.getContext('2d') : null;
 	if (ctx) {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
@@ -224,7 +88,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	console.log('Multiplayer SSE URL:', url_sse);
 
-	// Close any existing SSE connection before creating a new one (like localGame.js)
+	// Close any existing SSE connection before creating a new one
 	if (
 		multiplayerSSEConnection &&
 		multiplayerSSEConnection.readyState !== EventSource.CLOSED
@@ -242,7 +106,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 		console.log('Closed existing global SSE connection');
 	}
 
-	// Common SSE message handler function (like localGame.js)
+	// Common SSE message handler function
 	const handleMultiplayerSSEMessage = (event) => {
 		try {
 			const data = JSON.parse(event.data);
@@ -278,7 +142,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 				}
 			}
 		} catch (error) {
-			// Ignore parse errors silently like localGame.js
+			// Ignore parse errors silently
 		}
 	};
 
@@ -289,7 +153,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	SSEStream.onmessage = handleMultiplayerSSEMessage;
 
-	// Add error handling for SSE connection (like localGame.js)
+	// Add error handling for SSE connection
 	SSEStream.onerror = function (error) {
 		console.error('Multiplayer SSE connection error:', error);
 		if (SSEStream.readyState === EventSource.CLOSED) {
@@ -310,7 +174,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 		window.currentGameSSE = null;
 	});
 
-	// Clean up any existing event listeners before adding new ones (like localGame.js)
+	// Clean up any existing event listeners before adding new ones
 	if (multiplayerKeydownHandler) {
 		document.removeEventListener('keydown', multiplayerKeydownHandler);
 	}
@@ -427,94 +291,14 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	// Add event listener
 	document.addEventListener('keydown', multiplayerKeydownHandler);
 
-	// Add cleanup listeners for page unload/refresh (like localGame.js)
+	// Add cleanup listeners for page unload/refresh
 	window.addEventListener('beforeunload', cleanupMultiplayerGame);
 	window.addEventListener('hashchange', cleanupMultiplayerGame);
 
 	console.log('Multiplayer game setup complete');
 }
 
-export async function loadGamePlayable(apikey) {
-	let isPlayable;
-	const csrf = getCookie('csrftoken');
-
-	await fetchWithRefresh(`server-pong/game-status?apikey=${apikey}`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-CSRFToken': csrf,
-		},
-		credentials: 'include',
-		body: JSON.stringify({ apiKey: apikey }),
-	})
-		.then((response) => {
-			if (!response.ok) throw new Error('https Error: ' + response.status);
-			return response.json();
-		})
-		.then((data) => {
-			console.log('Données reçues loadPlayable:', data['playable']);
-			isPlayable = data['playable'];
-		})
-		.catch((error) => {
-			console.error('Erreur de requête :', error);
-		});
-	// console.log("isPlayable :", isPlayable);
-	return isPlayable;
-}
-
-export async function setApiKeyWeb(apikey) {
-	console.log('apikey Set : ', apikey);
-	const csrf = getCookie('csrftoken');
-	return await fetchWithRefresh(`server-pong/api-key`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-CSRFToken': csrf,
-		},
-		credentials: 'include',
-		body: JSON.stringify({ apiKey: apikey }),
-	})
-		.then((response) => {
-			if (!response.ok) throw new Error('https Error: ' + response.status);
-			return response.json();
-		})
-		.then((data) => {
-			console.log('Données reçues SetKey:', data['playable']);
-			return data['playable'];
-		})
-		.catch((error) => {
-			console.error('Erreur de requête :', error);
-			throw error;
-		});
-}
-
-export async function setApiKeyWebSP(apikey) {
-	// console.log("apikey Set : ", apikey);
-	const csrf = getCookie('csrftoken');
-	return fetchWithRefresh(`server-pong/api-key-alone`, {
-		method: 'POST',
-		headers: {
-			'X-CSRFToken': csrf,
-			'Content-Type': 'application/json',
-		},
-		credentials: 'include',
-		body: JSON.stringify({ apiKey: apikey }),
-	})
-		.then((response) => {
-			if (!response.ok) throw new Error('https Error: ' + response.status);
-			return response.json();
-		})
-		.then((data) => {
-			// console.log("Données reçues SetKey:", data["playable"]);
-			return data['playable'];
-		})
-		.catch((error) => {
-			console.error('Erreur de requête :', error);
-			throw error;
-		});
-}
-
-// Cleanup function for multiplayer games (similar to cleanupLocalGame)
+// Cleanup function for multiplayer games
 export function cleanupMultiplayerGame() {
 	console.log('cleanupMultiplayerGame() called');
 

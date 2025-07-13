@@ -1,7 +1,10 @@
 import { fetchWithRefresh, getCookie } from '../utils.js';
-import { getPlayersLocalName, setPlayersLocalName, setApiKeyWebSP } from './utils/commonFunctions.js';
-import { adress } from './utils/commonFunctions.js';
-import { drawMap } from './utils/commonFunctions.js';
+import {
+	getPlayersLocalName,
+	setPlayersLocalName,
+	setApiKeyWebSP,
+} from './gameApi.js';
+import { drawMap } from './gameCanvas.js';
 import { drawCenterText } from './multiplayer.js';
 
 // Global variables to track the game interval, event handlers, SSE connection, and game state
@@ -371,14 +374,17 @@ export async function localGameController() {
 				if (!response.ok) throw new Error('Failed to get new API key');
 				const data = await response.json();
 				const newApiKey = data.api_key;
-				
+
 				// Register the new API key with the backend for single player
 				await setApiKeyWebSP(newApiKey);
-				
+
 				// Set the new API key in our global state
 				setPlayersLocalName(newApiKey);
 				currentApiKey = newApiKey;
-				console.log('Generated and registered new API key for replay:', newApiKey);
+				console.log(
+					'Generated and registered new API key for replay:',
+					newApiKey
+				);
 
 				// Create new SSE connection with the new API key
 				let url_sse = `/server-pong/events?apikey=${newApiKey}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
@@ -411,7 +417,6 @@ export async function localGameController() {
 					console.log('SSE connection closed by server');
 					sseConnection = null;
 				});
-
 			} catch (error) {
 				console.error('Error setting up replay:', error);
 			}
@@ -423,11 +428,11 @@ export async function localGameController() {
 		replayButton.addEventListener('click', replayHandler);
 	}
 
-		// Clear any existing interval before starting a new one
+	// Clear any existing interval before starting a new one
 	if (gameInterval) {
 		clearInterval(gameInterval);
 	}
-	
+
 	gameInterval = setInterval(async () => {
 		checkwin();
 		const now = Date.now();
@@ -482,7 +487,7 @@ export async function localGameController() {
 								// 		'accessToken'
 								// 	)}`,
 								// },
-								credentials: 'include'
+								credentials: 'include',
 							}
 						);
 					}

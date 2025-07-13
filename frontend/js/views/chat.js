@@ -6,9 +6,9 @@ import {
 	getBlockedStatus,
 } from '../utils.js'; // Assuming getCookie is still needed for CSRF token
 import { routes } from '../routes.js';
-import { handleGame2Players } from './utils/commonFunctions.js';
+import { handleGame2Players } from './multiplayerGameSession.js'; // Assuming this is the correct import path
 import { card_profileController } from './card_profile.js';
-import eventBus, { EVENTS } from "../eventBus.js";
+import eventBus, { EVENTS } from '../eventBus.js';
 
 let hasOverallUnreadMessages = false;
 let mainChatBootstrapModal; // Bootstrap Modal instance
@@ -99,10 +99,23 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
 		if (response.ok && data.status === 'success') {
 			if (data.messages.length > 0) {
 				// Get existing message contents to avoid duplicates
-				const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map(msgEl => {
-					const sender = msgEl.querySelector('.message-sender')?.textContent || '';
-					const content = msgEl.textContent.replace(msgEl.querySelector('.message-sender')?.textContent || '', '').replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '').trim();
-					const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
+				const existingMessages = Array.from(
+					chatLog.querySelectorAll('.chat-message')
+				).map((msgEl) => {
+					const sender =
+						msgEl.querySelector('.message-sender')?.textContent || '';
+					const content = msgEl.textContent
+						.replace(
+							msgEl.querySelector('.message-sender')?.textContent || '',
+							''
+						)
+						.replace(
+							msgEl.querySelector('.message-timestamp')?.textContent || '',
+							''
+						)
+						.trim();
+					const timestamp =
+						msgEl.querySelector('.message-timestamp')?.textContent || '';
 					return `${sender}-${content}-${timestamp}`;
 				});
 
@@ -110,8 +123,13 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
 				const orderedMessages = [...data.messages].reverse();
 				orderedMessages.forEach((msgData) => {
 					// Create a unique identifier for the message
-					const messageIdentifier = `${msgData.sender_username}-${msgData.content}-${new Date(msgData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-					
+					const messageIdentifier = `${msgData.sender_username}-${
+						msgData.content
+					}-${new Date(msgData.timestamp).toLocaleTimeString([], {
+						hour: '2-digit',
+						minute: '2-digit',
+					})}`;
+
 					// Check if this message already exists in the chat log
 					if (!existingMessages.includes(messageIdentifier)) {
 						const msgElement = createMessageElement(msgData, currentUserId);
@@ -261,15 +279,17 @@ async function initEventSource(groupId, currentUserId) {
 	// 		console.log(`Closed SSE for group: ${key}`);
 	// 	}
 	// }
-    // if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
-    //     console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
-    //     return;
-    // }
+	// if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
+	//     console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
+	//     return;
+	// }
 	if (eventSources[groupId]) {
-        console.log(`Fermeture de la connexion SSE existante pour le groupe ${groupId}.`);
-        eventSources[groupId].close(); // <-- C'est la ligne magique !
-        delete eventSources[groupId]; // Facultatif mais bonne pratique pour nettoyer
-    }
+		console.log(
+			`Fermeture de la connexion SSE existante pour le groupe ${groupId}.`
+		);
+		eventSources[groupId].close(); // <-- C'est la ligne magique !
+		delete eventSources[groupId]; // Facultatif mais bonne pratique pour nettoyer
+	}
 	try {
 		// await fetchWithRefresh(`/chat/${groupId}/messages/`, {
 		// 	method: 'GET',
@@ -319,7 +339,9 @@ async function initEventSource(groupId, currentUserId) {
 				}
 
 				// Create a unique identifier that matches the one used in loadMessageHistory
-				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+				const messageTimestamp = new Date(
+					messageData.timestamp
+				).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 				const messageId = `${messageData.sender_username}-${messageData.content}-${messageTimestamp}`;
 
 				// Skip if we've seen this message recently (deduplication)
@@ -345,15 +367,31 @@ async function initEventSource(groupId, currentUserId) {
 					}
 
 					// Check if this message already exists in the chat log
-					const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map(msgEl => {
-						const sender = msgEl.querySelector('.message-sender')?.textContent || '';
-						const content = msgEl.textContent.replace(msgEl.querySelector('.message-sender')?.textContent || '', '').replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '').trim();
-						const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
+					const existingMessages = Array.from(
+						chatLog.querySelectorAll('.chat-message')
+					).map((msgEl) => {
+						const sender =
+							msgEl.querySelector('.message-sender')?.textContent || '';
+						const content = msgEl.textContent
+							.replace(
+								msgEl.querySelector('.message-sender')?.textContent || '',
+								''
+							)
+							.replace(
+								msgEl.querySelector('.message-timestamp')?.textContent || '',
+								''
+							)
+							.trim();
+						const timestamp =
+							msgEl.querySelector('.message-timestamp')?.textContent || '';
 						return `${sender}-${content}-${timestamp}`;
 					});
 
 					if (existingMessages.includes(messageId)) {
-						console.log('Message already exists in chat log, skipping:', messageId);
+						console.log(
+							'Message already exists in chat log, skipping:',
+							messageId
+						);
 						return;
 					}
 
@@ -529,25 +567,32 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		const receiverUsername = targetChatListItem.dataset.receiver;
 		activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
 
-        const profileLink = document.getElementById('receiverProfileLink');
-        if (profileLink) {
-            profileLink.addEventListener('click', async function (e) {
-                e.preventDefault();
-                await actualizeIndexPage('modal-container', routes['card_profile'](receiverUsername));
-            });
-        }
+		const profileLink = document.getElementById('receiverProfileLink');
+		if (profileLink) {
+			profileLink.addEventListener('click', async function (e) {
+				e.preventDefault();
+				await actualizeIndexPage(
+					'modal-container',
+					routes['card_profile'](receiverUsername)
+				);
+			});
+		}
 
 		//Invite friend to play the game
 		const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 		if (gameInvitationBtn) {
 			gameInvitationBtn.classList.remove('d-none');
-			gameInvitationBtn.onclick = function() {
-				if (confirm(`Do you want to invite ${receiverUsername} to play a game of PongPong ?`)) {
+			gameInvitationBtn.onclick = function () {
+				if (
+					confirm(
+						`Do you want to invite ${receiverUsername} to play a game of PongPong ?`
+					)
+				) {
 					inviteFriendToPlay(currentUserId);
 				}
-			}
+			};
 		}
-    }
+	}
 
 	// Update hidden input for sending messages
 	const groupIdInput = document.getElementById('groupIdInput-active');
@@ -564,11 +609,11 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		}, 0);
 	}
 
-    // Load history and initialize SSE for the new group
-    messageOffsets[newgroupId] = 0; // Reset offset for new room
-    loadMessageHistory(currentUserId, newgroupId);
+	// Load history and initialize SSE for the new group
+	messageOffsets[newgroupId] = 0; // Reset offset for new room
+	loadMessageHistory(currentUserId, newgroupId);
 	const targetbBlockedStatus = await getBlockedStatus(targetUserId);
-    let block_reason = null;
+	let block_reason = null;
 	if (targetbBlockedStatus.hasBlocked) {
 		block_reason = 'this user blocked you';
 	} else if (targetbBlockedStatus.isBlocked) {
@@ -643,102 +688,102 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	} else {
 		// Enable message input and send button
 		document.getElementById('messageInput-active').disabled = false;
-		document.getElementById('sendMessageBtn').disabled = false;if (gameInvitationBtn) {
+		document.getElementById('sendMessageBtn').disabled = false;
+		if (gameInvitationBtn) {
 			gameInvitationBtn.classList.remove('d-none');
 			gameInvitationBtn.disabled = false;
 		}
-    // Focus on message input
-    const messageInput = document.getElementById('messageInput-active');
-	if (messageInput) {
-		messageInput.focus();
+		// Focus on message input
+		const messageInput = document.getElementById('messageInput-active');
+		if (messageInput) {
+			messageInput.focus();
+		}
 	}
-}
 }
 
 async function createGameApiKey() {
-    try {
-        const csrf = getCookie('csrftoken');
-        const response = await fetch(`server-pong/api-key`, {
-            headers: {
-                'X-CSRFToken': csrf,
-            },
-            credentials: 'include',
-        });
-        
+	try {
+		const csrf = getCookie('csrftoken');
+		const response = await fetch(`server-pong/api-key`, {
+			headers: {
+				'X-CSRFToken': csrf,
+			},
+			credentials: 'include',
+		});
+
 		console.log('createGameApiKey Response status:', response.status);
-        console.log('createGameApiKey Response headers:', response.headers);
+		console.log('createGameApiKey Response headers:', response.headers);
 
-        if (!response.ok) {
-            throw new Error("HTTPS Error: " + response.status);
-        }
-        
+		if (!response.ok) {
+			throw new Error('HTTPS Error: ' + response.status);
+		}
+
 		const contentType = response.headers.get('content-type');
-        console.log('Content-Type:', contentType);
-        
-        if (!contentType || !contentType.includes('application/json')) {
-            const textResponse = await response.text();
-            console.error('Expected JSON but got:', textResponse);
-            throw new Error('Server returned non-JSON response: ' + textResponse);
-        }
+		console.log('Content-Type:', contentType);
 
-        const data = await response.json();
-        console.log('Game created with key:', data.api_key);
-        return data.api_key;
-        
-    } catch (error) {
-        console.error('Error creating game:', error);
-        return null;
-    }
+		if (!contentType || !contentType.includes('application/json')) {
+			const textResponse = await response.text();
+			console.error('Expected JSON but got:', textResponse);
+			throw new Error('Server returned non-JSON response: ' + textResponse);
+		}
+
+		const data = await response.json();
+		console.log('Game created with key:', data.api_key);
+		return data.api_key;
+	} catch (error) {
+		console.error('Error creating game:', error);
+		return null;
+	}
 }
 
 function waitForElement(elementId, timeout = 5000) {
-    return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-        
-        function checkElement() {
-            const element = document.getElementById(elementId);
-            if (element) {
-                resolve(element);
-                return;
-            }
-            
-            if (Date.now() - startTime > timeout) {
-                reject(new Error(`Element ${elementId} not found within ${timeout}ms`));
-                return;
-            }
-            
-            // Vérifier à nouveau dans 50ms
-            setTimeout(checkElement, 50);
-        }
-        
-        checkElement();
-    });
+	return new Promise((resolve, reject) => {
+		const startTime = Date.now();
+
+		function checkElement() {
+			const element = document.getElementById(elementId);
+			if (element) {
+				resolve(element);
+				return;
+			}
+
+			if (Date.now() - startTime > timeout) {
+				reject(new Error(`Element ${elementId} not found within ${timeout}ms`));
+				return;
+			}
+
+			// Vérifier à nouveau dans 50ms
+			setTimeout(checkElement, 50);
+		}
+
+		checkElement();
+	});
 }
 
 async function inviteFriendToPlay(currentUserId) {
-	console.log("here in inviteFriendToPlay");
+	console.log('here in inviteFriendToPlay');
 	//create API key for the game;
-	
+
 	let apiKey = await createGameApiKey();
-	
-    if (!apiKey) {
-        console.error('No API key generated');
-        alert('Failed to create game. Please try again.');
-        return;
-    }
+
+	if (!apiKey) {
+		console.error('No API key generated');
+		alert('Failed to create game. Please try again.');
+		return;
+	}
 
 	try {
 		//const userIdInput = document.getElementById('userIdInput-active');
-        //const currentUserId = parseInt(userIdInput.value);
-        const messageInput = document.getElementById('messageInput-active');
-		messageInput.value = `🎮 PongPong invitation: copy and paste this key to join my game : ${apiKey}.\n`
-        
+		//const currentUserId = parseInt(userIdInput.value);
+		const messageInput = document.getElementById('messageInput-active');
+		messageInput.value = `🎮 PongPong invitation: copy and paste this key to join my game : ${apiKey}.\n`;
+
 		sendMessage(currentUserId);
 
 		// const invitationMessage = `🎮 Game Invitation: Join my PongPong game with this key: ${apiKey}`;
-        // await sendInvitationMessage(invitationMessage, currentUserId);
-   
-		window.location.hash = "#multiplayer";
+		// await sendInvitationMessage(invitationMessage, currentUserId);
+
+		window.location.hash = '#multiplayer';
 
 		await waitForElement('gameCanvas');
 		const gameCanvas = document.getElementById('gameCanvas');
@@ -746,11 +791,12 @@ async function inviteFriendToPlay(currentUserId) {
 			handleGame2Players(apiKey, 1, 0, -1);
 		} else {
 			console.error('Game canvas not found after navigation');
-			alert('Could not initialize game. Please try manually navigating to multiplayer.');
+			alert(
+				'Could not initialize game. Please try manually navigating to multiplayer.'
+			);
 		}
-
 	} catch (error) {
-		console.error("error sending invitation : ", error);
+		console.error('error sending invitation : ', error);
 		alert('Failed to send game invitation. Please try again.');
 	}
 }
@@ -758,14 +804,14 @@ async function inviteFriendToPlay(currentUserId) {
 // async function sendInvitationMessage(content, currentUserId) {
 //     const groupIdInput = document.getElementById('groupIdInput-active');
 //     const usernameInput = document.getElementById('usernameInput-active');
-    
+
 //     const groupId = groupIdInput.value;
 //     const username = usernameInput.value;
-    
+
 //     if (!groupId || !username) {
 //         throw new Error('No active chat to send invitation');
 //     }
-    
+
 //     // Créer les données du message temporaire pour l'affichage immédiat
 //     const tempMessageData = {
 //         content: content,
@@ -788,7 +834,7 @@ async function inviteFriendToPlay(currentUserId) {
 //         chatLog.appendChild(msgElement);
 //         chatLog.scrollTop = chatLog.scrollHeight;
 //     }
-    
+
 //     try {
 //         const response = await fetchWithRefresh(`/chat/${groupId}/messages/`, {
 //             method: 'POST',
@@ -804,16 +850,16 @@ async function inviteFriendToPlay(currentUserId) {
 //                 sender_username: username,
 //             }),
 //         });
-        
+
 //         const data = await response.json();
-        
+
 //         if (!response.ok || data.status !== 'success') {
 //             throw new Error(data.message || 'Failed to send message');
 //         }
-        
+
 //         console.log('Invitation message sent successfully');
 //         return true;
-        
+
 //     } catch (error) {
 //         console.error('Error sending invitation message:', error);
 //         throw error;
@@ -1163,8 +1209,11 @@ export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
  * This function can be called from other modules like card_profile.js
  */
 export async function refreshChatAfterBlockStatusChange(targetUserId) {
-	console.log('Refreshing chat after block status change for user:', targetUserId);
-	
+	console.log(
+		'Refreshing chat after block status change for user:',
+		targetUserId
+	);
+
 	// Get current user info
 	const userData = await fetchWithRefresh('/user-service/infoUser/', {
 		method: 'GET',
@@ -1187,26 +1236,34 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 
 	// If the chat is currently active and the modal is open
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
-	if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
+	if (
+		mainChatWindowElement &&
+		mainChatWindowElement.classList.contains('show')
+	) {
 		console.log('Chat modal is open, refreshing chat list and active chat');
-		
+
 		// Refresh the chat room list
 		await loadChatRoomList(userData.id);
-		
+
 		// If we're currently chatting with the user whose block status changed, refresh that conversation
-		if (currentTargetId && currentTargetId.toString() === targetUserId.toString()) {
-			console.log('Currently chatting with affected user, refreshing conversation state');
-			
+		if (
+			currentTargetId &&
+			currentTargetId.toString() === targetUserId.toString()
+		) {
+			console.log(
+				'Currently chatting with affected user, refreshing conversation state'
+			);
+
 			// Re-check block status and update input state
 			const targetBlockedStatus = await getBlockedStatus(targetUserId);
 			let block_reason = null;
-			
+
 			if (targetBlockedStatus.hasBlocked) {
 				block_reason = 'this user blocked you';
 			} else if (targetBlockedStatus.isBlocked) {
 				block_reason = 'you blocked this user';
 			}
-			
+
 			const messageInput = document.getElementById('messageInput-active');
 			const sendBtn = document.getElementById('sendMessageBtn');
 			const gameInvitationBtn = document.getElementById('gameInvitationBtn');
