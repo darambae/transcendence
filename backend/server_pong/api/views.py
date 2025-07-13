@@ -279,6 +279,8 @@ async def sendNewJSON(request):
 
     else :
         rq = RequestParsed(api_key, message)
+        with open("TournamentOnlineBug.txt", 'a+') as f :
+            print(f"key before RequestParsed: {api_key}\nkey after RequestParsed: {rq.apiKey}\n\naction befor REquestParsed : {message}\naction after RequestParsed : {rq.action}\n---------------------------------------------------------------", file=f)
         await channel_layer.group_send(
             rq.apiKey,
             {

@@ -112,6 +112,8 @@ async def launchMatch(request) :
 			print("lm-1-end", file=sys.stderr)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		print("lm-1", file=sys.stderr)
+		if trnmtDict[tkey].launched :
+			return JsonResponse({"Error" : "Tournament already launched"}, status=403)
 		trStart = trnmtDict[tkey].launchTournament(request.COOKIES)
 		print("lm-1", file=sys.stderr)
 		if not trStart[0] :

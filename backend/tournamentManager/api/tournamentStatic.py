@@ -110,6 +110,7 @@ class Tournament() :
         self.second = None
         self.third = None
         self.fourth = None
+        self.launched = False
         
 
     def addPlayers(self, playerClass) :
@@ -155,6 +156,7 @@ class Tournament() :
         print("launch-tr", file=sys.stderr)
         self.matchLoserBracket = Match(cookies)
         print("launch-tr", file=sys.stderr)
+        self.launched = True
         return (True, None)
 
     def listJWT(self) :
