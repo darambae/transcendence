@@ -194,26 +194,26 @@ class checkTfa(APIView):
 	def post(self, request):
 
 		data = request.data
-		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
+		# print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
 		try:
 			if "jwt" in data :
-				print("JWT IN DATA !", file=sys.stderr)
-				print(f"invites : {data['jwt']}", file=sys.stderr)
+				# print("JWT IN DATA !", file=sys.stderr)
+				# print(f"invites : {data['jwt']}", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
+				# print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+				# print("user.activated", user.activated, file=sys.stderr)
 				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with JWT", file=sys.stderr)
+					# print("here in 2FA checking with JWT", file=sys.stderr)
 					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
-						print("checkPassword ok !", file=sys.stderr)
+						# print("checkPassword ok !", file=sys.stderr)
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-						print("JWT generated !", file=sys.stderr)
+						# print("JWT generated !", file=sys.stderr)
 						#user.two_factor_auth = False
-						print(666, file=sys.stderr)
+						# print(666, file=sys.stderr)
 						user.save()
-						print(7777, file=sys.stderr)
+						# print(7777, file=sys.stderr)
 						return JsonResponse({'success': 'authentication code send',
 							  				 'refresh': str(data_generate_jwt['refresh']),
 											 'access': str(data_generate_jwt['access'])},
@@ -224,19 +224,19 @@ class checkTfa(APIView):
 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
 			else :
 				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
+				# print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+				# print("user.activated", user.activated, file=sys.stderr)
 				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with no JWT", file=sys.stderr)
+					# print("here in 2FA checking with no JWT", file=sys.stderr)
 					if check_password(data.get('tfa'), user.two_factor_auth):
-						print("checkPassword ok !", file=sys.stderr)
+						# print("checkPassword ok !", file=sys.stderr)
 						#user.two_factor_auth = False
 						user.online = True
 						user.last_login = datetime.now()
 						user.save()
 
 						data_generate_jwt = generateJwt(user, user.toJson())
-						print("JWT generated !", file=sys.stderr)
+						# print("JWT generated !", file=sys.stderr)
 
 						return JsonResponse({'success': 'authentication code send',
 											 'refresh': str(data_generate_jwt['refresh']),
@@ -524,18 +524,18 @@ class DeleteGuest(APIView) :
 	permission_classes = [IsAuthenticated]
 
 	def delete(self, request) :
-		print("d-1", file=sys.stderr)
+		# print("d-1", file=sys.stderr)
 		user = request.user
-		print("d-2", file=sys.stderr)
+		# print("d-2", file=sys.stderr)
 		token = request.headers.get("Authorization", "Error Unknown").split(" ")[1]
-		print("d-3", file=sys.stderr)
+		# print("d-3", file=sys.stderr)
 
 		jwt_access = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-		print("d-4", file=sys.stderr)
+		# print("d-4", file=sys.stderr)
 		jwt_access["invites"] = []
-		print("d-5", file=sys.stderr)
+		# print("d-5", file=sys.stderr)
 		data_generate_jwt = generateJwt(user, jwt_access)
-		print("d-6", file=sys.stderr)
+		# print("d-6", file=sys.stderr)
 
 		return JsonResponse({'success': 'authentication code send',
 							 'refresh': str(data_generate_jwt['refresh']),

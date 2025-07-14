@@ -35,10 +35,10 @@ export const routes = {
 		template: 'versusGame',
 		controller: versusController,
 	},
-	game: {
+	game: (id1, id2) => ({
 		template: 'localGame',
-		controller: localGameController,
-	},
+		controller: () => localGameController(id1, id2),
+	}),
 	login: {
 		template: 'login',
 		controller: loginController,

@@ -21,60 +21,60 @@ user_ws_connections = {}
 
 class Match() :
     def __init__(self, cookies, p1=None, p2=None, matchBefore=None) :
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.key = getApiKeyTrnmt(cookies)
-        print(f"match-class : {self.key}", file=sys.stderr)
+        # print(f"match-class : {self.key}", file=sys.stderr)
         self.p1 = p1
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.p2 = p2
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.jwtP1 = None
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.jwtP2 = None
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.gameMode = REMOTE
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.launchable = True
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.mainAccount = -1
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.played = False
 
         self.first = None
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.second = None
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.third = None
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.fourth = None
-        print(f"match-class", file=sys.stderr)
+        # print(f"match-class", file=sys.stderr)
         self.matchBefore = matchBefore
 
     def initValues(self, previousM=None) :
         if previousM :
             self.matchBefore = previousM
-        print(f"self.p1 : {self.p1}\nself.p2 : {self.p2}", file=sys.stderr)
+        # print(f"self.p1 : {self.p1}\nself.p2 : {self.p2}", file=sys.stderr)
         if (not self.p1 or not self.p2) :
             return False
-        print("match-init", file=sys.stderr)
+        # print("match-init", file=sys.stderr)
         self.jwtP1 = self.p1.jwt
         self.jwtP2 = self.p2.jwt
 
         if self.jwtP1["username"] == self.jwtP2["username"] :
-            print("match-init", file=sys.stderr)
+            # print("match-init", file=sys.stderr)
             self.gameMode = LOCAL
-            print("match-init", file=sys.stderr)
+            # print("match-init", file=sys.stderr)
             if self.jwtP1["username"] == self.p1.username:
-                print("match-init-p1", file=sys.stderr)
+                # print("match-init-p1", file=sys.stderr)
                 self.mainAccount = self.p1
             else:
-                print("match-init-p2", file=sys.stderr)
+                # print("match-init-p2", file=sys.stderr)
                 self.mainAccount = self.p2
-        print("match-init", file=sys.stderr)
-        print(self.matchBefore, file=sys.stderr)
+        # print("match-init", file=sys.stderr)
+        # print(self.matchBefore, file=sys.stderr)
         if (self.matchBefore and ((self.matchBefore.p1.username in self.jwtP1["invites"]) or (self.matchBefore.p1.username in self.jwtP2["invites"]) or (self.matchBefore.p2.username in self.jwtP1["invites"]) or (self.matchBefore.p2.username in self.jwtP2["invites"]))) :
             self.launchable = False
-        print("match-init", file=sys.stderr)
+        # print("match-init", file=sys.stderr)
         return True
         
 
@@ -130,32 +130,32 @@ class Tournament() :
             return True
         return False
     def launchTournament(self, cookies) :
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         if self.nbPl != 4 :
-            print("launch-tr-end-1", file=sys.stderr)
+            # print("launch-tr-end-1", file=sys.stderr)
             return (False, "Tournament must contain 4 players")
-        print(f"launch-tr : {self.players}", file=sys.stderr)
+        # print(f"launch-tr : {self.players}", file=sys.stderr)
         lstTemp = [self.players.pop(random.randint(0, 3))]
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         lstTemp.append(self.players.pop(random.randint(0, 2)))
-        print("launch-tr", file=sys.stderr)
-        print(lstTemp, file=sys.stderr)
-        print(self.players, file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
+        # print(lstTemp, file=sys.stderr)
+        # print(self.players, file=sys.stderr)
         
         self.tournamentPl = [lstTemp, self.players]
-        print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
+        # print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
         self.match1 = Match(cookies,self.tournamentPl[0][0], self.tournamentPl[0][1])
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         self.match1.initValues()
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         self.match2 = Match(cookies,self.tournamentPl[1][0], self.tournamentPl[1][1], self.match1)
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         self.match2.initValues()
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         self.matchWinnerBracket = Match(cookies)
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         self.matchLoserBracket = Match(cookies)
-        print("launch-tr", file=sys.stderr)
+        # print("launch-tr", file=sys.stderr)
         self.launched = True
         return (True, None)
 
@@ -176,25 +176,25 @@ def playerUpdate(lstPlayer, jwt) :
     return lstPlayer
 
 def getApiKeyTrnmt(cookies) :
-    print("get-api-key-trnmt", file=sys.stderr)
+    # print("get-api-key-trnmt", file=sys.stderr)
     res = requests.get(f"{keygame}server-pong/api-key", verify=False, cookies=cookies, headers={"Host": "localhost"})
-    print(f"get-api-key-trnmt\nres status code : {res.status_code}\nres.content : {res.json()}", file=sys.stderr)
+    # print(f"get-api-key-trnmt\nres status code : {res.status_code}\nres.content : {res.json()}", file=sys.stderr)
     if (res.status_code == 200 or res.status_code == 204) :
-        print(f"get-api-key-trnmt", file=sys.stderr)
+        # print(f"get-api-key-trnmt", file=sys.stderr)
         return res.json()["api_key"]
-    print("get-api-key-trnmt", file=sys.stderr)
+    # print("get-api-key-trnmt", file=sys.stderr)
     return (JsonResponse({"Error" : f"Status code {res.status_code}"}, status=res.status_code))
 
 async def supervise_match(tkey) :
     infoResultsMatch = None
-    print(f"AAA : {infoResultsMatch} ", file=sys.stderr)
+    # print(f"AAA : {infoResultsMatch} ", file=sys.stderr)
     while not infoResultsMatch :
-        print("BBBB", file=sys.stderr)
+        # print("BBBB", file=sys.stderr)
         res = requests.get(f"{dbUri}api/game/{tkey}/", verify=False, headers={"Host": "localhost"})
-        print(f"CCCC : {res.status_code}", file=sys.stderr)
+        # print(f"CCCC : {res.status_code}", file=sys.stderr)
         if res.status_code == 200 :
             infoResultsMatch = res.json()
-            print(f"DDDDD : {infoResultsMatch}", file=sys.stderr)
+            # print(f"DDDDD : {infoResultsMatch}", file=sys.stderr)
         await asyncio.sleep(2)
-    print("EEEEEEEE", file=sys.stderr)
+    # print("EEEEEEEE", file=sys.stderr)
     return infoResultsMatch

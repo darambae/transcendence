@@ -20,7 +20,7 @@ def start_loop(loop):
 try :
     loopAi = asyncio.new_event_loop()
     threading.Thread(target=start_loop, args=(loopAi,), daemon=True).start()
-    print("Loop goes well !", file=sys.stderr)
+    # print("Loop goes well !", file=sys.stderr)
 except Exception as e:
     print(f"Errrror : {e}", file=sys.stderr)
 
@@ -53,7 +53,7 @@ async def sendInfo(apiKey) :
                     racketY[1][1] += 5
                 await asyncio.sleep(0.05)
             position = await getActualPosition(apiKey)
-            print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
+            # print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
             actualTime = time.time()
     except Exception as e:
         print(f"error : {e}", file=sys.stderr)

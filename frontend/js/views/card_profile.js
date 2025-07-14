@@ -120,7 +120,7 @@ async function gestFooter(friend_status, blockedStatus) {
 }
 
 
-async function getOtherUserInfo(userName) {
+export async function getOtherUserInfo(userName) {
 	try {
 		const timestamp = Date.now();
 		const response = await fetchWithRefresh(
@@ -151,7 +151,7 @@ async function getOtherUserInfo(userName) {
 }
 
 
-function getOtherUserAvatar(userName) {
+export function getOtherUserAvatar(userName) {
 	fetchWithRefresh(`user-service/avatarOther/${userName}`, {
 		method: "GET",
 		credentials: 'include',
