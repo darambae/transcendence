@@ -63,6 +63,7 @@ export function multiplayerController() {
 		if (joinButton) joinButton.disabled = true;
 
 		try {
+			drawCenterText("Waiting for player 2 to connect...")
 			await sendGameCreation();
 		} catch (error) {
 			console.error('Error creating game:', error);
