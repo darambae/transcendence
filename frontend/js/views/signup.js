@@ -177,7 +177,6 @@ export function signupController() {
 					usernameInput.title = '';
 				}
 			}
-
 			resetError();
 		});
 	}
@@ -291,10 +290,10 @@ export function signupController() {
 					errMsg.push(
 						'Password must contain at least one uppercase letter, one number, and one special character.'
 					);
-					inputErr = true;
+					inputErrRef.inputErr = true;
 				} else if (passwordConfirmationInput.value !== passwordInput.value) {
 					errMsg.push('Passwords do not match.');
-					inputErr = true;
+					inputErrRef.inputErr = true;
 				}
 
 				// Display validation errors if any

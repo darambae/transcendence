@@ -545,7 +545,7 @@ async function establishSSEConnection(
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');
 
-			console.log('Multiplayer SSE data:', data);
+			//console.log('Multiplayer SSE data:', data);
 			const game_stats = data['game_stats'];
 
 			if (game_stats['State'] !== 'Waiting for start') {
@@ -623,7 +623,7 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 	multiplayerKeydownHandler = (event) => {
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'p', 'q'];
 		if (keysToPrevent.includes(event.key)) {
-			console.log('Multiplayer keydown handler activated for key:', event.key);
+			//console.log('Multiplayer keydown handler activated for key:', event.key);
 			event.preventDefault();
 
 			switch (event.key) {

@@ -227,7 +227,7 @@ export async function localGameController() {
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');
 
-			console.log(data);
+			//console.log(data);
 			game_stats = data['game_stats'];
 			if (game_stats['State'] != 'Waiting for start') {
 				if (gameStarted == false) {
@@ -298,7 +298,7 @@ export async function localGameController() {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
-			console.log('Local game keydown handler activated for key:', key);
+			//console.log('Local game keydown handler activated for key:', key);
 			event.preventDefault();
 			keysPressed.add(key);
 		}
@@ -308,7 +308,7 @@ export async function localGameController() {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
-			console.log('Local game keyup handler activated for key:', key);
+			//console.log('Local game keyup handler activated for key:', key);
 		}
 		keysPressed.delete(event.key);
 	};

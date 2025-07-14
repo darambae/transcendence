@@ -13,6 +13,7 @@ import { forgotPasswordController } from './views/forgotPassword.js';
 import { invitsController } from './views/tournament.js';
 import { versusController } from './views/versusGame.js';
 import { localGameController } from './views/localGame.js';
+
 export const routes = {
 	home: {
 		template: 'home',
