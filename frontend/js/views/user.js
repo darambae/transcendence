@@ -1,4 +1,6 @@
 import { attachLoginListener, fetchWithRefresh } from '../utils.js';
+import { resetAuthCache } from '../router.js';
+import { cleanupChatOnLogout } from './chat.js';
 
 export function userController() {
 	userInfo();
@@ -19,6 +21,9 @@ export function userController() {
 
 				// Handle successful logout
 				if (response.ok) {
+					// Clean up chat connections before logout
+					cleanupChatOnLogout();
+
 					const toggleLogin = document.getElementById('toggle-login');
 					if (toggleLogin) {
 						toggleLogin.innerHTML =
@@ -33,6 +38,8 @@ export function userController() {
 				} else {
 					console.log('Logout error: ', respData);
 					// If logout fails for any reason, still clear local state and redirect
+					cleanupChatOnLogout();
+
 					const toggleLogin = document.getElementById('toggle-login');
 					if (toggleLogin) {
 						toggleLogin.innerHTML =
@@ -43,11 +50,14 @@ export function userController() {
 					if (chatContainer) {
 						chatContainer.innerHTML = '';
 					}
+					resetAuthCache();
 					window.location.href = '/#home';
 				}
 			} catch (err) {
 				// If there's any error, still clear local state and redirect
 				console.log('Logout error (network/auth issue): ', err);
+				cleanupChatOnLogout();
+
 				const toggleLogin = document.getElementById('toggle-login');
 				if (toggleLogin) {
 					toggleLogin.innerHTML =
