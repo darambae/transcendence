@@ -65,6 +65,29 @@ class ChatGroupListCreateView(View):
                     'target_user_id': target_user_id
                 }, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
+                # Envoyer une notification au destinataire du nouveau chat privé
+                response_data = resp.json()
+                if response_data.get('status') == 'success':
+                    # Récupérer les informations de l'utilisateur créateur pour la notification
+                    channel_layer = get_channel_layer()
+                    if channel_layer:
+                        # Notification pour le destinataire
+                        notification_group_name = f"notifications_{target_user_id}"
+                        async_to_sync(channel_layer.group_send)(
+                            notification_group_name,
+                            {
+                                "type": "chat_notification",
+                                "notification": {
+                                    "type": "new_chat_group",
+                                    "target_user_id": target_user_id,
+                                    "creator_id": current_user_id,
+                                    "creator_username": response_data.get('sender_name'),
+                                    "group_id": response_data.get('group_id'),
+                                    "timestamp": datetime.now().isoformat()
+                                }
+                            }
+                        )
+
                 return JsonResponse(resp.json(), status=resp.status_code)
             except requests.RequestException as exc:
                 logger.error(f"ChatGroupListCreateView POST request failed: {exc}")
@@ -174,6 +197,89 @@ class ChatMessageView(View):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
+async def sse_notification_stream(request, currentUserId):
+    response = StreamingHttpResponse(_generate_notification_events(request, currentUserId),
+                                    content_type="text/event-stream")
+    response['Cache-Control'] = 'no-cache'
+    response['X-Accel-Buffering'] = 'no'
+    return response
+
+async def _generate_notification_events(request, user_id):
+    """Internal generator for notification SSE events."""
+    channel_layer = get_channel_layer()
+    if channel_layer is None:
+        yield f"event: error\ndata: {json.dumps({'message': 'Channel layer not configured'})}\n\n"
+        return
+
+    # Channel group name pour les notifications utilisateur spécifique
+    channel_group_name = f"notifications_{user_id}"
+    client_channel_name = await channel_layer.new_channel()
+    await channel_layer.group_add(channel_group_name, client_channel_name)
+
+    # --- SSE Token Authentication ---
+    try:
+        access_token = request.COOKIES.get('access_token')
+        token_data = jwt.decode(access_token, verify=False)
+        expiry_time = token_data.get('exp')
+
+        current_time = time.time()
+        if expiry_time and (expiry_time - current_time < 300):
+            yield f"event: refresh_token\ndata: {{}}\n\n"
+
+    except Exception as e:
+        logger.error(f"Error checking token expiration: {e}")
+
+    # Validate token
+    try:
+        async with httpx.AsyncClient(verify=False) as client:
+            resp = await client.get(
+                f"{ACCESS_PG_BASE_URL}/api/DecodeJwt/",
+                headers={
+                    'Authorization': f'Bearer {access_token}',
+                    'Host': 'localhost'
+                },
+                timeout=10
+            )
+
+        if resp.status_code != 200:
+            logger.warning(f"live_chat (SSE): Invalid token for notifications user '{user_id}'")
+            await channel_layer.group_discard(channel_group_name, client_channel_name)
+            yield f"event: error\ndata: {json.dumps({'message': 'Unauthorized'})}\n\n"
+            return
+
+        user_data = resp.json()
+        logger.info(f"live_chat (SSE): Validated token for notifications user '{user_id}' - user data: {user_data}")
+
+    except httpx.RequestError as e:
+        logger.exception(f"live_chat (SSE): Error validating token: {e}")
+        await channel_layer.group_discard(channel_group_name, client_channel_name)
+        yield f"event: error\ndata: {json.dumps({'message': 'Authentication error'})}\n\n"
+        return
+
+    try:
+        while True:
+            try:
+                message = await asyncio.wait_for(
+                    channel_layer.receive(client_channel_name),
+                    timeout=20
+                )
+
+                if message and message["type"] == "chat_notification":
+                    sse_data = json.dumps(message["notification"])
+                    yield f"event: chat_notification\ndata: {sse_data}\n\n"
+                elif message and message["type"] == "block_notification":
+                    sse_data = json.dumps(message["notification"])
+                    yield f"event: block_notification\ndata: {sse_data}\n\n"
+                else:
+                    yield ":heartbeat\n\n"
+
+            except asyncio.TimeoutError:
+                yield ":heartbeat\n\n"
+
+    except Exception as e:
+        yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
+    finally:
+        await channel_layer.group_discard(channel_group_name, client_channel_name)
 
 async def sse_chat_stream(request, group_id):
     """
@@ -260,7 +366,7 @@ async def _generate_events(request, group_id):
         yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
     finally:
         await channel_layer.group_discard(channel_group_name, client_channel_name)
-		
+
 class blockedStatus(View):
     def get(self, request, targetUserId):
         access_token = request.COOKIES.get('access_token')
@@ -288,6 +394,30 @@ class blockedStatus(View):
             try:
                 resp = requests.post(url, json={}, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
+
+                # Envoyer une notification au destinataire du changement de statut de blocage
+                response_data = resp.json()
+                if response_data.get('status') == 'success':
+                    # Envoyer la notification au destinataire
+                    channel_layer = get_channel_layer()
+                    if channel_layer:
+                        notification_group_name = f"notifications_{targetUserId}"
+                        async_to_sync(channel_layer.group_send)(
+                            notification_group_name,
+                            {
+                                "type": "block_notification",
+                                "notification": {
+                                    "action": response_data.get('action'),  # 'blocked' ou 'unblocked'
+                                    "target_user_id": targetUserId,
+                                    "target_name": response_data.get('target_name'),
+                                    "actor_id": response_data.get('actor_id'),
+                                    "actor_name": response_data.get('actor_name'),
+                                    "timestamp": datetime.now().isoformat()
+                                }
+                            }
+                        )
+                        logger.info(f"Sent block notification: {response_data.get('action')} by {response_data.get('actor_name')} to user {targetUserId}")
+
                 return JsonResponse(resp.json(), status=resp.status_code)
             except requests.RequestException as exc:
                 logger.error(f"chat blockedStatus POST request failed: {exc}")

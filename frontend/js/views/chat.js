@@ -12,8 +12,180 @@ let hasOverallUnreadMessages = false;
 let mainChatBootstrapModal; // Bootstrap Modal instance
 let currentActiveChatGroup = null; // No default active group, will be set on selection
 let currentTargetId = null;
+let globalEventSource = null; // Global EventSource for general chat notifications
 const eventSources = {}; // Stores EventSource objects per groupId
 const messageOffsets = {}; // Stores the offset for message history for each group
+
+// Initialize global EventSource for chat notifications
+async function initGlobalChatNotifications(currentUserId) {
+	// Close existing global connection if any
+	if (globalEventSource) {
+		globalEventSource.close();
+		globalEventSource = null;
+	}
+
+	try {
+		// Refresh token before establishing connection
+		await fetchWithRefresh('/auth/refresh-token/', {
+			method: 'GET',
+			credentials: 'include',
+			headers: { 'X-CSRFToken': getCookie('csrftoken') },
+		});
+
+		globalEventSource = new EventSource(`/chat/stream/notification/${currentUserId}/`);
+
+		globalEventSource.addEventListener('chat_notification', function (e) {
+			try {
+				const notificationData = JSON.parse(e.data);
+				console.log('Global: Chat notification received:', notificationData);
+
+				// Vérifier le type de notification
+				if (notificationData.type === 'new_chat_group') {
+					// Only process if this user is the target (not the creator)
+					// Convert both to strings for comparison to handle type differences
+					if (notificationData.target_user_id.toString() === currentUserId.toString()) {
+						// Show toast notification
+						const message = `${notificationData.creator_username} started a new chat with you!`;
+						const toast = showChatNotification(message, 'info', 10000);
+
+						// Add click handler to toast for quick access
+						toast.style.cursor = 'pointer';
+						toast.addEventListener('click', async () => {
+							// Open chat modal and switch to the new chat
+							const mainChatWindowElement = document.getElementById('mainChatWindow');
+							if (!mainChatWindowElement.classList.contains('show')) {
+								mainChatBootstrapModal.show();
+								// Wait for modal to be shown
+								mainChatWindowElement.addEventListener('shown.bs.modal', async function onShown() {
+									mainChatWindowElement.removeEventListener('shown.bs.modal', onShown);
+									await loadChatRoomList(currentUserId);
+									await switchChatRoom(currentUserId, notificationData.group_id, notificationData.creator_id);
+								});
+							} else {
+								// Modal is already open, just switch
+								await loadChatRoomList(currentUserId);
+								await switchChatRoom(currentUserId, notificationData.group_id, notificationData.creator_id);
+							}
+							toast.remove();
+						});
+
+						// Refresh chat list if modal is open
+						const mainChatWindowElement = document.getElementById('mainChatWindow');
+						if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
+							loadChatRoomList(currentUserId);
+						}
+
+						// Add visual indication that there's a new chat
+						const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+						if (mainChatToggleButton && !hasOverallUnreadMessages) {
+							mainChatToggleButton.classList.add('has-unread-overall');
+							hasOverallUnreadMessages = true;
+						}
+					}
+				}
+			} catch (error) {
+				console.error('Error handling chat notification:', error, e.data);
+			}
+		});
+
+		// Ajouter l'écoute des notifications de blocage/déblocage
+		globalEventSource.addEventListener('block_notification', function (e) {
+			try {
+				const notificationData = JSON.parse(e.data);
+				console.log('Global: Block notification received:', notificationData);
+
+				// Vérifier si cette notification concerne l'utilisateur actuel
+				if (notificationData.target_user_id.toString() === currentUserId.toString()) {
+					let message, toastType;
+
+					if (notificationData.action === 'blocked') {
+						message = `${notificationData.actor_name} has blocked you`;
+						toastType = 'warning';
+					} else if (notificationData.action === 'unblocked') {
+						message = `${notificationData.actor_name} has unblocked you`;
+						toastType = 'info';
+					}
+
+					if (message) {
+						// Afficher la notification toast
+						showChatNotification(message, toastType, 8000);
+
+						// Rafraîchir le chat si l'utilisateur concerné est dans la conversation active
+						if (currentTargetId && currentTargetId.toString() === notificationData.actor_id.toString()) {
+							console.log('Block status changed for current chat partner, refreshing chat state');
+							// Utiliser la fonction existante pour rafraîchir le chat
+							refreshChatAfterBlockStatusChange(notificationData.actor_id);
+						}
+					}
+				}
+			} catch (error) {
+				console.error('Error handling block notification:', error, e.data);
+			}
+		});
+
+		globalEventSource.onerror = function (err) {
+			console.error('Global EventSource failed:', err);
+			globalEventSource.close();
+			globalEventSource = null;
+
+			// Attempt reconnect after 5 seconds
+			setTimeout(() => {
+				console.log('Attempting to reconnect global chat notifications...');
+				initGlobalChatNotifications(currentUserId);
+			}, 5000);
+		};
+
+		console.log('Global chat notifications initialized');
+	} catch (error) {
+		console.error('Error initializing global chat notifications:', error);
+	}
+}
+
+// Helper function to show toast notifications
+function showChatNotification(message, type = 'info', duration = 5000) {
+	// Create toast container if it doesn't exist
+	let toastContainer = document.getElementById('chat-toast-container');
+	if (!toastContainer) {
+		toastContainer = document.createElement('div');
+		toastContainer.id = 'chat-toast-container';
+		toastContainer.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			z-index: 9999;
+			max-width: 350px;
+		`;
+		document.body.appendChild(toastContainer);
+	}
+
+	// Create toast element
+	const toast = document.createElement('div');
+	toast.className = `alert alert-${type} alert-dismissible fade show`;
+	toast.style.cssText = `
+		margin-bottom: 10px;
+		box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+		border-radius: 8px;
+	`;
+
+	toast.innerHTML = `
+		<div style="display: flex; align-items: center;">
+			<i class="fas fa-comments" style="margin-right: 10px; font-size: 18px;"></i>
+			<span>${message}</span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	`;
+
+	toastContainer.appendChild(toast);
+
+	// Auto-remove after duration
+	setTimeout(() => {
+		if (toast.parentNode) {
+			toast.remove();
+		}
+	}, duration);
+
+	return toast;
+}
 
 // Helper to create an HTML message element
 function createMessageElement(messageData, currentUserId) {
@@ -290,6 +462,8 @@ async function initEventSource(groupId, currentUserId) {
 				console.error('Failed to refresh token:', error);
 			}
 		});
+
+
 
 		const recentlyReceivedMessages = new Set(); // For message deduplication
 		source.onmessage = function (e) {
@@ -633,11 +807,18 @@ export async function initChatModule(currentUserId) {
 		}
 	}
 
+	// Close global event source
+	if (globalEventSource) {
+		globalEventSource.close();
+		globalEventSource = null;
+		console.log('Closed global chat notifications');
+	}
+
 	// Reset global state
 	hasOverallUnreadMessages = false;
 	currentActiveChatGroup = null;
 	currentTargetId = null;
-	messageOffsets = {};
+	Object.keys(messageOffsets).forEach(key => delete messageOffsets[key]);
 
 	const chatLog = document.getElementById('chatLog-active');
 	if (chatLog) {
@@ -654,6 +835,11 @@ export async function initChatModule(currentUserId) {
 
 	// Setup user search autocomplete
 	setupUserSearchAutocomplete();
+
+	// Initialize global notifications
+	if (currentUserId) {
+		initGlobalChatNotifications(currentUserId);
+	}
 }
 
 // Main chat controller function, called after login
@@ -672,6 +858,9 @@ export function chatController(userId, username) {
 	if (usernameInputActive) {
 		usernameInputActive.value = username;
 	}
+
+	// Initialize global chat notifications
+	initGlobalChatNotifications(userId);
 
 	// 1. Initialize Bootstrap Modal
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
@@ -864,10 +1053,8 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 			.then(({ data, ok }) => {
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
-					loadChatRoomList(currentUserId).then(() => {
-						async () => {
-							await switchChatRoom(currentUserId, data.group_id, targetUserId);
-						};
+					loadChatRoomList(currentUserId).then(async () => {
+						await switchChatRoom(currentUserId, data.group_id, targetUserId);
 					});
 				} else {
 					console.error('Server error creating chat group:', data.message);
@@ -1048,3 +1235,5 @@ function setupUserSearchAutocomplete() {
 		}
 	});
 }
+
+
