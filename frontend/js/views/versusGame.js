@@ -1,8 +1,7 @@
-import { adress, routesSp } from './utils/commonFunctions.js';
-import { setApiKeyWebSP } from './utils/commonFunctions.js';
-import { setPlayersLocalName } from './utils/commonFunctions.js';
+import { setApiKeyWebSP, setPlayersLocalName } from './gameApi.js';
 import { actualizeIndexPage, fetchWithRefresh } from '../utils.js';
 import { drawCenterText } from './multiplayer.js';
+import { routes } from '../routes.js';
 
 export async function versusController() {
 	drawCenterText('click "GO"');
@@ -28,6 +27,6 @@ export async function versusController() {
 			});
 		await setApiKeyWebSP(apiKey);
 		setPlayersLocalName(apiKey);
-		await actualizeIndexPage('idfooterCanvas', routesSp['game']);
+		await actualizeIndexPage('idfooterCanvas', routes['game']);
 	});
 }
