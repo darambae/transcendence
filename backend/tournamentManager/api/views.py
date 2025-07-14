@@ -4,6 +4,7 @@ import sys
 import requests
 from django.http import HttpResponse
 from http import HTTPStatus
+from django.views.decorators.csrf import csrf_exempt
 import uuid
 import ssl
 import websockets
@@ -97,18 +98,8 @@ async def decodeJWT(request, func=None, encodedJwt=None) :
 		return [None] * 3
 	return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
-# # @csrf_exempt
-async def launchFinals(request) :
-	try:
-		body = json.loads(request.body)
-		tkey = body["tKey"]
-		if tkey not in trnmtDict:
-			return JsonResponse({"Error": "Tournament not found"}, status=404)
-		trnmtDict[tkey].launchTournament(request.COOKIES)
-	except Exception :
-		return JsonResponse({"error": "Internal server error"}, status=500)
 
-# # @csrf_exempt
+@csrf_exempt
 async def launchMatch(request) :
 	try:
 		print("lm-1", file=sys.stderr)
@@ -121,12 +112,27 @@ async def launchMatch(request) :
 			print("lm-1-end", file=sys.stderr)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		print("lm-1", file=sys.stderr)
+		if trnmtDict[tkey].launched :
+			return JsonResponse({"Error" : "Tournament already launched"}, status=403)
 		trStart = trnmtDict[tkey].launchTournament(request.COOKIES)
 		print("lm-1", file=sys.stderr)
 		if not trStart[0] :
 			print("lm-1-end3", file=sys.stderr)
 			return JsonResponse({"Info" : trStart[1]})
 		print(f"lm-1, tkey : -{tkey}-", file=sys.stderr)
+		try :
+			lsTrnmtJwt = trnmtDict[tkey].listJWT()
+		except Exception as e :
+			print(f"Error : {e}", file=sys.stderr)
+		print(f"lm-1, lsTrnmtJwt : -{lsTrnmtJwt}-", file=sys.stderr)
+
+		await channel_layer.group_send(
+			tkey,
+			{
+				"type": "tempReceived",
+				"text_data": {"action" : "update-guest", "jwt-list" : lsTrnmtJwt}
+			}
+		)
 
 		await channel_layer.group_send(
 			tkey,
@@ -143,25 +149,78 @@ async def launchMatch(request) :
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
-# @csrf_exempt
+@csrf_exempt
 async def launchFinals(request) :
-	try :
+	try:
+		print("lf-1", file=sys.stderr)
 		body = json.loads(request.body)
+		print("lf-1", file=sys.stderr)
 		tkey = body["tKey"]
-		if tkey not in trnmtDict :
+		print(f"tkey : {tkey}, tr : {trnmtDict[tkey]}", file=sys.stderr)
+		print("lf-1", file=sys.stderr)
+		if tkey not in trnmtDict:
+			print("lf-1-end", file=sys.stderr)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
-		print(f"tkey Join -{tkey}-")
+		print("lf-1", file=sys.stderr)
+		print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
+
 		await channel_layer.group_send(
 			tkey,
 			{
-				"type" : "tempReceived",
-				"text_data" : "final-matches"
+				"type": "tempReceived",
+				"text_data": {"action" : "final-matches"}
 			}
 		)
-	
+		return JsonResponse({"Info" : "Ready to start"})
+	except TournamentError as e:
+		print("lf-2-end", file=sys.stderr)
+		return JsonResponse({"Error": str(e)}, status=401)
 	except Exception as e:
-		return JsonResponse({"error": "Internal server error"}, status=500)
+		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
+@csrf_exempt
+async def launchNextMatch(request) :
+	try:
+		print("lf-1", file=sys.stderr)
+		body = json.loads(request.body)
+		print("lf-1", file=sys.stderr)
+		tkey = body["tKey"]
+		print(f"tkey : {tkey}, tr : {trnmtDict[tkey]}", file=sys.stderr)
+		print("lf-1", file=sys.stderr)
+		if tkey not in trnmtDict:
+			print("lf-1-end", file=sys.stderr)
+			return JsonResponse({"Error": "Tournament not found"}, status=404)
+		print("lf-1", file=sys.stderr)
+		if trnmtDict[tkey].nbPl != 4 :
+			return JsonResponse({"Error": "Forbidden"}, status=200)
+		print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
+		if (trnmtDict[tkey].first and trnmtDict[tkey].second and trnmtDict[tkey].third and trnmtDict[tkey].fourth) :
+			return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})
+		if not trnmtDict[tkey].match1.played or not trnmtDict[tkey].match2.played :
+			await channel_layer.group_send(
+				tkey,
+				{
+					"type": "tempReceived",
+					"text_data": {"action" : "create-bracket"}
+				}
+			)
+		else :
+			await channel_layer.group_send(
+				tkey,
+				{
+					"type": "tempReceived",
+					"text_data": {"action" : "final-matches"}
+				}
+			)
+		print("lf-1", file=sys.stderr)
+		return JsonResponse({"Info" : "Ready to start"})
+	except TournamentError as e:
+		print("lf-2-end", file=sys.stderr)
+		return JsonResponse({"Error": str(e)}, status=401)
+	except Exception as e:
+		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
+
+@csrf_exempt
 async def checkSSE(request) :
 	try:
 		print("111", file=sys.stderr)
@@ -178,7 +237,7 @@ async def checkSSE(request) :
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
 
 
-
+@csrf_exempt
 async def joinGuest(request) :
 	try:
 		print(f"111", file=sys.stderr)
@@ -212,7 +271,6 @@ async def joinGuest(request) :
 	except Exception as e :
 		print(f"Error : {e}", file=sys.stderr)
 
-# @csrf_exempt
 async def joinTournament(request):
 	try:
 		print(f"111", file=sys.stderr)
@@ -253,15 +311,15 @@ async def joinTournament(request):
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error {e}"}, status=500)
 
-
+@csrf_exempt
 async def sse(request) :
 	tKey = request.GET.get("tKey", None)
 	print(f"sse - tKey : {tKey}", file=sys.stderr)
-	jwt = request.GET.get("jwt", None)
-	jwt = dictJwt.get(jwt, None)
-	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&jwt={jwt}'), content_type='text/event-stream')
-# @csrf_exempt
+	name = request.GET.get("name", None)
+	return StreamingHttpResponse(checkForUpdates(f'{consumerUri}?tkey={tKey}&name={name}'), content_type='text/event-stream')
 
+
+@csrf_exempt
 async def getIds(request) :
 	jwt = await decodeJWT(request)
 	jwt = jwt[0]['payload']
@@ -349,7 +407,7 @@ async def listTournament(request) :
 	except Exception as e :
 		return JsonResponse({"error" : "Internal server error"}, status=500)
 
-
+@csrf_exempt
 async def tournamentManager(request) :
 	try :
 		print(f"action : {request.method}", file=sys.stderr)
@@ -369,8 +427,7 @@ async def tournamentManager(request) :
 	except Exception as e :
 		return JsonResponse({"error" : f"Internal server error {e}"}, status=500)
 
-
-
+@csrf_exempt
 async def Supervise(request) :
 	try :
 		channel_layer = get_channel_layer()
@@ -378,13 +435,14 @@ async def Supervise(request) :
 		tkey = request.GET.get("tkey")
 		print(f"- -{tkey}- | {tkey in trnmtDict}", file=sys.stderr)
 		mkey = request.GET.get("key")
+		roundM = request.GET.get("round", 1) 
 		print(f"- {mkey}", file=sys.stderr)
 
 		await channel_layer.group_send(
 			tkey,
 			{
 				"type": "tempReceived",
-				"text_data": {"action" : "supervise", "round" : 1, "mKey" : mkey, "tkey" : tkey}
+				"text_data": {"action" : "supervise", "round" : roundM, "mKey" : mkey, "tkey" : tkey}
 			}
 		)
 		print("-", file=sys.stderr)
@@ -393,6 +451,7 @@ async def Supervise(request) :
 		print("-_____----___--_-_-__---___", file=sys.stderr)
 		return HttpResponseNoContent()
 
+@csrf_exempt
 async def amIinTournament(request) :
 	try :
 		jwt = await decodeJWT(request)
@@ -401,7 +460,8 @@ async def amIinTournament(request) :
 		for elem in trnmtDict : 
 			lsJwt = trnmtDict[elem].listJWTPlayers()
 			if (jwt["username"] in lsJwt) :
-				return JsonResponse({"Tournament" : elem})
+				lsPlayer = trnmtDict[elem].listUsr()			
+				return JsonResponse({"Tournament" : elem, "number" : trnmtDict[elem].nbPl, "players" : lsPlayer})
 		return JsonResponse({"Tournament" : "None"})
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)

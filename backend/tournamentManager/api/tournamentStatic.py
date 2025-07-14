@@ -38,6 +38,7 @@ class Match() :
         print(f"match-class", file=sys.stderr)
         self.mainAccount = -1
         print(f"match-class", file=sys.stderr)
+        self.played = False
 
         self.first = None
         print(f"match-class", file=sys.stderr)
@@ -49,7 +50,12 @@ class Match() :
         print(f"match-class", file=sys.stderr)
         self.matchBefore = matchBefore
 
-    def initValues(self) :
+    def initValues(self, previousM=None) :
+        if previousM :
+            self.matchBefore = previousM
+        print(f"self.p1 : {self.p1}\nself.p2 : {self.p2}", file=sys.stderr)
+        if (not self.p1 or not self.p2) :
+            return False
         print("match-init", file=sys.stderr)
         self.jwtP1 = self.p1.jwt
         self.jwtP2 = self.p2.jwt
@@ -66,10 +72,10 @@ class Match() :
                 self.mainAccount = self.p2
         print("match-init", file=sys.stderr)
         print(self.matchBefore, file=sys.stderr)
-        # print
         if (self.matchBefore and ((self.matchBefore.p1.username in self.jwtP1["invites"]) or (self.matchBefore.p1.username in self.jwtP2["invites"]) or (self.matchBefore.p2.username in self.jwtP1["invites"]) or (self.matchBefore.p2.username in self.jwtP2["invites"]))) :
             self.launchable = False
         print("match-init", file=sys.stderr)
+        return True
         
 
 
@@ -100,6 +106,12 @@ class Tournament() :
         self.matchWinnerBracket = None
         self.matchLoserBracket = None
         self.finished = False
+        self.first = None
+        self.second = None
+        self.third = None
+        self.fourth = None
+        self.launched = False
+        
 
     def addPlayers(self, playerClass) :
         if self.nbPl < 4 :
@@ -144,6 +156,7 @@ class Tournament() :
         print("launch-tr", file=sys.stderr)
         self.matchLoserBracket = Match(cookies)
         print("launch-tr", file=sys.stderr)
+        self.launched = True
         return (True, None)
 
     def listJWT(self) :
@@ -177,7 +190,7 @@ async def supervise_match(tkey) :
     print(f"AAA : {infoResultsMatch} ", file=sys.stderr)
     while not infoResultsMatch :
         print("BBBB", file=sys.stderr)
-        res = requests.get(f"{dbUri}api/game/{tkey}/", verify=False)
+        res = requests.get(f"{dbUri}api/game/{tkey}/", verify=False, headers={"Host": "localhost"})
         print(f"CCCC : {res.status_code}", file=sys.stderr)
         if res.status_code == 200 :
             infoResultsMatch = res.json()
