@@ -410,10 +410,10 @@ class keyGame(APIView):
 			return JsonResponse({'succes': 'keu math found',
 								 'matchKey': game.matchKey,
 								 'dateMatch': game.dateMatch,
-								 'username1': game.username1,
+								 'username1': game.username1.user_name,
 								 'score1': game.score1,
 								 'score2': game.score2,
-								 'username2': game.username2,
+								 'username2': game.username2.user_name,
 								},
 					   			status=200)
 		except MATCHTABLE.DoesNotExist:

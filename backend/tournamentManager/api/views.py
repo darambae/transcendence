@@ -20,7 +20,7 @@ channel_layer = get_channel_layer()
 consumerUri = "wss://tournament:8050/ws/game/"
 
 class HttpResponseNoContent(HttpResponse):
-    status_code = HTTPStatus.NO_CONTENT
+	status_code = HTTPStatus.NO_CONTENT
 
 # Create your views here.
 
@@ -194,6 +194,9 @@ async def launchNextMatch(request) :
 		if trnmtDict[tkey].nbPl != 4 :
 			return JsonResponse({"Error": "Forbidden"}, status=200)
 		# print(f"lf-1, tkey : -{tkey}-", file=sys.stderr)
+		if trnmtDict[tkey].launched == False :
+			return JsonResponse({"Error": "Forbidden"}, status=403)
+		print(f"first : {trnmtDict[tkey].first}\nsecond : {trnmtDict[tkey].second}\nthird : {trnmtDict[tkey].third}\nfourth : {trnmtDict[tkey].fourth}", file=sys.stderr)
 		if (trnmtDict[tkey].first and trnmtDict[tkey].second and trnmtDict[tkey].third and trnmtDict[tkey].fourth) :
 			return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})
 		if not trnmtDict[tkey].match1.played or not trnmtDict[tkey].match2.played :
@@ -269,7 +272,7 @@ async def joinGuest(request) :
 		return JsonResponse({"Success" : f"{guest} added as a guest"})
 
 	except Exception as e :
-		# print(f"Error : {e}", file=sys.stderr)
+		 print(f"Error : {e}", file=sys.stderr)
 
 async def joinTournament(request):
 	try:
@@ -300,7 +303,7 @@ async def joinTournament(request):
 				if username in trnmtDict[elem].listUsr() : 
 					return JsonResponse({"Error" : "player already in a tournament"}, status=403)
 		except Exception as e :
-			# print(f"Error : {e}", file=sys.stderr)
+			print(f"Error : {e}", file=sys.stderr)
 		player = Player(jwt_token, username)
 		trnmtDict[tKey].addPlayers(player)
 
@@ -466,3 +469,6 @@ async def amIinTournament(request) :
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)
 	
+@csrf_exempt
+async def getResults(request, tkey) :
+	return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})

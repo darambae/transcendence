@@ -47,7 +47,7 @@ export function invitsController() {
 }
 
 
-export async function refreshTournament(csrf, ulElem) {
+export async function refreshTournament(csrf, ulDropdown, ulElem) {
   let trnmt;
   await fetchWithRefresh('tournament/tournament', {
     headers: {
@@ -110,7 +110,7 @@ async function createEvent(csrf, ulElem) {
       console.error("Erreur de requête :", error);
       throw error;
     });
-  refreshTournament(csrf, ulElem);
+  refreshTournament(csrf, ulDropdown, ulElem);
 }
 
 
@@ -139,7 +139,7 @@ function listTournament(csrf, ulDropdown, ulElem) {
   const createButton = document.getElementById("create-trnmt");
   const container = document.getElementById("listPlayerGameTournament");
 
-  refreshTournament(csrf, ulElem);
+  refreshTournament(csrf, ulDropdown, ulElem);
 
   const savedPos = localStorage.getItem("container-position-tournamentList");
 
@@ -293,7 +293,7 @@ export async function tournamentController() {
                 try {
                   // console.log("ggg", event.data);
                   const data = JSON.parse(event.data);
-                  // console.log("eee", data);
+                  console.log("eee :", data);
                   // console.log("fff", data.t_state);
                   if (data.t_state == "game-start") {
                     // console.log("SSE 1")
@@ -340,6 +340,12 @@ export async function tournamentController() {
                         body: JSON.stringify({ "tKey": data.tkey })
                       })
                     }
+                    //else if (data.next == "set-results") {
+                    //  SSEStream.close();
+                    //  fetchWithRefresh(`tournament/${data.tkey}/results/`, {
+                    //    credentials: 'include'
+                    //  })
+                    //}
                     else {
                       fetchWithRefresh("tournament/next", {
                         method: "POST",
@@ -558,7 +564,7 @@ export async function tournamentController() {
 
           tournamentLeave.appendChild(leaveButton)
           tournamentLaunch.appendChild(launchButton);
-          refreshTournament(csrf, ulElem)
+          refreshTournament(csrf, ulDropdown , ulElem)
 
           
           setPositionTournamentList("absolute")
@@ -640,7 +646,7 @@ export async function tournamentController() {
   })
 
 
-  tournamentGame.addEventListener('click', (event) => {
+  tournamentGame.addEventListener('click', async (event) => {
     const target = event.target;
 
     if (target.tagName === "BUTTON") {
@@ -655,7 +661,7 @@ export async function tournamentController() {
         localStorage.setItem("key", target.dataset.key);
         localStorage.setItem("tkey", target.dataset.tkey);
         // console.log("Target.dataset", target.dataset);
-        fetchWithRefresh(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
+        await fetchWithRefresh(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
           credentials: "include",
         })
           .then(response => {
@@ -671,20 +677,28 @@ export async function tournamentController() {
       else {
         let idJWT;
         try {
-          const response = fetchWithRefresh('server-pong/check-sse', {
+          const response = await fetchWithRefresh('server-pong/check-sse', {
             headers: { 'X-CSRFToken': csrf },
             credentials: 'include',
           });
       
+          console.log('data', response.status);
           if (!response.ok) throw new Error('HTTP Error: ' + response.status);
       
-          const data = response.json();
-          // console.log('data', data);
+          const data = await response.json();
+          let username;
+          let a;
+          let b;
+          let c;
       
           // Safely extract values with defaults
           const guestArray = Array.isArray(data.guest) ? data.guest : [];
           [a, b, c] = guestArray;
+          console.log(data)
           username = data.username || 'anonymous';
+
+          console.log(target.dataset)
+          console.log(username)
 
           if (target.dataset.player == username) {
             idJWT = -1
@@ -700,8 +714,6 @@ export async function tournamentController() {
           }
         } catch (error) {
           console.error('Request error:', error);
-          // Set default values to prevent undefined issues
-          username = 'anonymous';
           // Could set default values for a, b, c if needed
         }
         return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));

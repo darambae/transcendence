@@ -10,9 +10,16 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
       const data = JSON.parse(event.data);
 
       if (data.t_state == "game-finished") {
-          if (data.mkey == key) {
+        //if (data.next == "set-results") {
+        //  sseTournament.close();
+        //  fetchWithRefresh(`tournament/${data.tkey}/results/`, {
+        //    credentials: 'include'
+        //  })
+        //}  
+        if (data.mkey == key) {
             actualizeIndexPage("contentTournementPage", routesTr['tournament']);
           }
+          
       }
     }
     catch(error){
@@ -26,5 +33,5 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
     credentials: 'include'
   })
 
-  handleGame2Players(key, playerID, isAiGame, JWTid);
+  handleGame2Players(key, Number(playerID), isAiGame, JWTid);
 }

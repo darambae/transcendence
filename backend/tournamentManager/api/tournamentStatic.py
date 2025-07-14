@@ -60,10 +60,11 @@ class Match() :
         self.jwtP1 = self.p1.jwt
         self.jwtP2 = self.p2.jwt
 
+        print(f"p1 : {self.jwtP1}\np2 : {self.jwtP2}", file=sys.stderr)
+
         if self.jwtP1["username"] == self.jwtP2["username"] :
-            # print("match-init", file=sys.stderr)
+            print("match-init", file=sys.stderr)
             self.gameMode = LOCAL
-            # print("match-init", file=sys.stderr)
             if self.jwtP1["username"] == self.p1.username:
                 # print("match-init-p1", file=sys.stderr)
                 self.mainAccount = self.p1
@@ -143,6 +144,7 @@ class Tournament() :
         # print(self.players, file=sys.stderr)
         
         self.tournamentPl = [lstTemp, self.players]
+        self.players += lstTemp
         # print(f"self.tournament : {self.tournamentPl}", file=sys.stderr)
         self.match1 = Match(cookies,self.tournamentPl[0][0], self.tournamentPl[0][1])
         # print("launch-tr", file=sys.stderr)
