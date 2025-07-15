@@ -365,6 +365,9 @@ export async function tournamentController() {
                         // })
                     }
                   }
+                  if (data.t_state == "results") {
+                    console.log("===============--------=============>>", data);
+                  }
                 }
                 catch (error) {
                   console.log("Error", error);

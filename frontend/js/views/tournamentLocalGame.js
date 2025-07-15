@@ -27,6 +27,9 @@ export async function localGameTr() {
 				  actualizeIndexPage("contentTournementPage", routesTr['tournament'])
 			  }
 		  }
+		  if (data.t_state == "results") {
+			console.log("===============--------=============>>", data);
+		  }
 		}
 		catch(error) {
 		  console.log("Error sseTournament :", error);

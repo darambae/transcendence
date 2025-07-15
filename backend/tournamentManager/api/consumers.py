@@ -222,6 +222,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 			for elem in jwt_l :
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					self.guests == elem["invites"]
+		elif action == "ShowResults" :
+			dicoInfo = {
+				"t_state" : "results",
+				"tkey" : self.room_group_name,
+				"first" : trnmtDict[self.room_group_name].first,
+				"second" : trnmtDict[self.room_group_name].second,
+				"third" : trnmtDict[self.room_group_name].third,
+				"fourth" : trnmtDict[self.room_group_name].fourth
+			}
+
+			await self.send(text_data=json.dumps(dicoInfo))
+
 		elif action == "supervise" and self.name == data.get("player", None):
 			# print(f"A0 - {action}", file=sys.stderr)
 			roundMatch = data.get("round", 1)
@@ -262,10 +274,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 				"tkey" : self.room_group_name
 			}
 			if trnmt.first and trnmt.second and trnmt.third and trnmt.fourth :
-				dicoInfo["first"] = trnmt.first.username
-				dicoInfo["second"] = trnmt.second.username
-				dicoInfo["third"] = trnmt.third.username
-				dicoInfo["fourth"] = trnmt.fourth.username
+				print("SETING RESULTS !!", file=sys.stderr)
+				await self.channel_layer.group_send(
+					self.room_group_name,
+					{
+						"type": "tempReceived",
+						"text_data": {"action" : "ShowResults"}
+					}
+				)
+				# dicoInfo["first"] = trnmt.first.username
+				# dicoInfo["second"] = trnmt.second.username
+				# dicoInfo["third"] = trnmt.third.username
+				# dicoInfo["fourth"] = trnmt.fourth.username
 			await self.send(text_data=json.dumps(dicoInfo))
 		
 		# elif action == "leave" :
