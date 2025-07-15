@@ -12,11 +12,11 @@ export function getPlayersLocalName() {
 }
 
 // Game status API functions
-export async function loadGamePlayable(apikey) {
+export async function loadGamePlayable(apikey, signal = null) {
 	let isPlayable;
 	const csrf = getCookie('csrftoken');
 
-	await fetchWithRefresh(`server-pong/game-status?apikey=${apikey}`, {
+	const fetchOptions = {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -24,7 +24,14 @@ export async function loadGamePlayable(apikey) {
 		},
 		credentials: 'include',
 		body: JSON.stringify({ apiKey: apikey }),
-	})
+	};
+
+	// Add signal if provided
+	if (signal) {
+		fetchOptions.signal = signal;
+	}
+
+	await fetchWithRefresh(`server-pong/game-status?apikey=${apikey}`, fetchOptions)
 		.then((response) => {
 			if (!response.ok) throw new Error('HTTP Error: ' + response.status);
 			return response.json();

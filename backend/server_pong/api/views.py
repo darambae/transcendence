@@ -498,4 +498,4 @@ def destroyKey(request, key) :
         dictApi.pop(key)
         return JsonResponse({"Success" : "Key deleted"})
     except Exception as e :
-        return JsonResponse({"Error" : "Not found", status=404})
+        return JsonResponse({"Error" : "Not found"}, status=404)
