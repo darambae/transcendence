@@ -26,7 +26,9 @@ except Exception as e:
 
 async def getActualPosition(apiKey) :
     try :
-        res = requests.get(f"{urlRequests}server-pong/api/simulation?apikey={apiKey}")
+        print("trying get response", file=sys.stderr)
+        res = requests.get(f"{urlRequests}server-pong/api/simulation?apikey={apiKey}", verify=False, headers={'Host' : 'localhost'})
+        print(f"response : {res.status_code}", file=sys.stderr)
         if res.status_code != 200 :
             return
         else :
@@ -43,17 +45,17 @@ async def sendInfo(apiKey) :
             for j in range(20) :
                 posYAi = (racketY[1][1] + racketY[0][1]) / 2
                 resultStats = posYAi - position["ball"]["position"][1]
-                if resultStats < -5 :
-                    requests.post(f"{urlRequests}/server-pong/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "down"}'})
-                    racketY[0][1] -= 5
-                    racketY[1][1] -= 5
-                elif resultStats > 5 :
-                    requests.post(f"{urlRequests}/server-pong/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "up"}'})
-                    racketY[0][1] += 5
-                    racketY[1][1] += 5
+                if resultStats < -15 :
+                    requests.post(f"{urlRequests}/server-pong/send-message", verify=False, json={"apiKey": apiKey, "message": '{"action": "move", "player2": "down"}'}, headers={'Host' : 'localhost'})
+                    racketY[0][1] += 15
+                    racketY[1][1] += 15
+                elif resultStats > 15 :
+                    requests.post(f"{urlRequests}/server-pong/send-message", verify=False, json={"apiKey": apiKey, "message": '{"action": "move", "player2": "up"}'}, headers={'Host' : 'localhost'})
+                    racketY[0][1] -= 15
+                    racketY[1][1] -= 15
                 await asyncio.sleep(0.05)
             position = await getActualPosition(apiKey)
-            # print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
+            print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
             actualTime = time.time()
     except Exception as e:
         print(f"error : {e}", file=sys.stderr)

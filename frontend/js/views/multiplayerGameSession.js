@@ -106,17 +106,32 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	// Wait for game to be ready before establishing SSE connection
 	console.log('Waiting for game to be ready...');
-	await waitForGameReady(
-		key,
-		playerID,
-		isAiGame,
-		JWTid,
-		username,
-		a,
-		b,
-		c,
-		csrf
-	);
+	if (isAiGame == 0){
+		await waitForGameReady(
+			key,
+			playerID,
+			isAiGame,
+			JWTid,
+			username,
+			a,
+			b,
+			c,
+			csrf
+		);
+	}
+	else {
+		await establishSSEConnection(
+			key,
+			playerID,
+			isAiGame,
+			JWTid,
+			username,
+			a,
+			b,
+			c,
+			csrf
+		);
+	}
 }
 
 // Cleanup function for multiplayer games

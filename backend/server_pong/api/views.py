@@ -139,7 +139,7 @@ def getSimulationState(request):
         return JsonResponse({'error': 'API key manquante'}, status=400)
     
     data = cache.get(f'simulation_state_{apikey}')
-    #print(f"[DEBUG] Données récupérées du cache : {data}", file=sys.stderr)
+    print(f"[DEBUG] Données récupérées du cache : {data}", file=sys.stderr)
     
     if data:
         return JsonResponse(data)
@@ -498,4 +498,4 @@ def destroyKey(request, key) :
         dictApi.pop(key)
         return JsonResponse({"Success" : "Key deleted"})
     except Exception as e :
-        return JsonResponse({"Error" : "Not found", status=404})
+        return JsonResponse({"Error" : "Not found"}, status=404)

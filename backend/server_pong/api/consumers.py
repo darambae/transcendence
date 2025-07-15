@@ -26,7 +26,7 @@ def calcAllIntersections(walls, ptRacket1, ptRacket2) :
 async def launchAiGame(url) :
 	asyncio.sleep(0.5)
 	## print("ai game", file=sys.stderr)
-	requests.get(url)
+	requests.get(url, verify=False, headers={'Host' : 'localhost'})
 	## print("ai game2", file=sys.stderr)
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -186,11 +186,12 @@ class GameConsumer(AsyncWebsocketConsumer):
 					await asyncio.sleep(0.016)
 					try:
 						stats = cache.get(f"simulation_state_{self.room_group_name}")
-						## print(f"self.ai : {self.AI}", file=sys.stderr)
 						if self.AI :
-							## print("Create ai ;", file=sys.stderr)
+							print(f"self.ai : {self.AI}", file=sys.stderr)
+						if self.AI :
+							print("Create ai ;", file=sys.stderr)
 							asyncio.create_task(launchAiGame(f"{urlAI}init-ai?apikey={self.room_group_name}"))
-							#print("Task created, setting AI to false", file=sys.stderr)
+							# print("Task created, setting AI to false", file=sys.stderr)
 							self.AI = False
 							#print("Self.ai put to false", file=sys.stderr)
 						#print(f"11111111 : {stats}", file=sys.stderr)
@@ -231,7 +232,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 								}
 							)
 					except Exception as e:
-						print(f"!!! Failed to send update: {e}", file=sys.stderr)
+						pass
+						# print(f"!!! Failed to send update: {e}") #, file=sys.stderr)
 		except asyncio.CancelledError:
 			self.t2.cancel()
 			await self.t2
