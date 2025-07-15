@@ -15,7 +15,11 @@ import os
 import sys
 
 #### REQUIRED ELK LIBRARY ####
+from .jsonSocketHandler import JSONSocketHandler
+import dj_database_url
 import logging
+from logstash_async.formatter import LogstashFormatter
+from logstash_async.handler import AsynchronousLogstashHandler
 
 
 APP_NAME = 'tournament_manager'
@@ -23,10 +27,6 @@ APP_NAME = 'tournament_manager'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://transcendence.42.fr:8443',
-	'https://localhost:8443',
-]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -37,7 +37,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*'] 
 
 
 # Application definition
@@ -58,18 +58,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'channels',
     'api',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "*"
-    # "https://localhost:8443",
-    # "http://localhost:3000",
-    # "http://127.0.0.1:3000",
-]
+CSRF_TRUSTED_ORIGINS = ['*']
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,12 +78,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    # "http://localhost:3000",
-    # "https://localhost:8443",
-    # "http://127.0.0.1:3000",
-    "*"
-]
+CORS_ALLOWED_ORIGINS = ['*']
 
 TEMPLATES = [
     {
@@ -156,40 +148,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'simple': {
-#             'format': '[{levelname}] {asctime} {name}: {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple',
-#             'level': 'DEBUG',  # Show all logs
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG',  # Show all logs
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from Django
-#             'propagate': False,
-#         },
-#         'api': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from your app
-#             'propagate': False,
-#         },
-#     },
-# }
 
 # # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
 # class AddAppNameFilter(logging.Filter):

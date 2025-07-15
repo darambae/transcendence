@@ -10,6 +10,7 @@ let multiplayerGameStarted = false;
 let multiplayerGameEnded = false;
 let currentMultiplayerApiKey = null;
 let currentMultiplayerPostUrl = null;
+let gameReadyCheckAbortController = null;
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	console.log('Starting handleGame2Players with:', {
@@ -106,6 +107,12 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	// Wait for game to be ready before establishing SSE connection
 	console.log('Waiting for game to be ready...');
+	
+	// Set up cleanup listeners early
+	window.addEventListener('beforeunload', cleanupMultiplayerGame);
+	window.addEventListener('hashchange', cleanupMultiplayerGame);
+	window.addEventListener('pagehide', cleanupMultiplayerGame);
+	
 	await waitForGameReady(
 		key,
 		playerID,
@@ -122,6 +129,13 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 // Cleanup function for multiplayer games
 export function cleanupMultiplayerGame() {
 	console.log('cleanupMultiplayerGame() called');
+
+	// Abort any ongoing game ready check
+	if (gameReadyCheckAbortController) {
+		gameReadyCheckAbortController.abort();
+		gameReadyCheckAbortController = null;
+		console.log('Game ready check aborted');
+	}
 
 	// If game is in progress and we have an API key, forfeit the game
 	if (
@@ -158,11 +172,19 @@ export function cleanupMultiplayerGame() {
 		});
 	}
 
+	// Destroy the API key if we have one
+	if (currentMultiplayerApiKey) {
+		destroyApiKey(currentMultiplayerApiKey);
+	}
+
 	// Reset game state
 	multiplayerGameStarted = false;
 	multiplayerGameEnded = false;
 	currentMultiplayerApiKey = null;
 	currentMultiplayerPostUrl = null;
+
+	// Reset abort controller
+	gameReadyCheckAbortController = null;
 
 	// Close SSE connection
 	if (
@@ -225,10 +247,20 @@ async function waitForGameReady(
 ) {
 	console.log(`Player ${playerID} waiting for game to be ready...`);
 
+	// Create an AbortController to stop the polling when user leaves
+	gameReadyCheckAbortController = new AbortController();
+	const signal = gameReadyCheckAbortController.signal;
+
 	const maxAttempts = 90; // Maximum 90 attempts (90 seconds)
 	let attempts = 0;
 
 	while (attempts < maxAttempts) {
+		// Check if the operation was aborted
+		if (signal.aborted) {
+			console.log('Game ready check was aborted');
+			return;
+		}
+
 		try {
 			// Use a shorter delay for the first few attempts
 			const delay = attempts < 5 ? 500 : 1000;
@@ -244,6 +276,7 @@ async function waitForGameReady(
 					},
 					credentials: 'include',
 					body: JSON.stringify({ apiKey: key }),
+					signal: signal, // Add abort signal to fetch
 				}
 			);
 
@@ -276,6 +309,11 @@ async function waitForGameReady(
 				}
 			}
 		} catch (error) {
+			// Check if error is due to abort
+			if (error.name === 'AbortError') {
+				console.log('Game ready check was aborted due to page navigation');
+				return;
+			}
 			console.error('Error checking game status:', error);
 		}
 
@@ -291,9 +329,22 @@ async function waitForGameReady(
 			);
 		}
 
-		// Wait before next attempt (shorter for first few attempts)
+		// Wait before next attempt with abort check
 		const delay = attempts < 5 ? 500 : 1000;
-		await new Promise((resolve) => setTimeout(resolve, delay));
+		try {
+			await new Promise((resolve, reject) => {
+				const timeout = setTimeout(resolve, delay);
+				signal.addEventListener('abort', () => {
+					clearTimeout(timeout);
+					reject(new Error('AbortError'));
+				});
+			});
+		} catch (error) {
+			if (error.message === 'AbortError') {
+				console.log('Game ready check timeout was aborted');
+				return;
+			}
+		}
 	}
 
 	// If we reach here, the game never became ready
@@ -396,7 +447,7 @@ function setupMultiplayerKeyHandler(apiKey) {
 						try {
 							await fetch(currentMultiplayerPostUrl, {
 								method: 'POST',
-								headers: {
+							 headers: {
 									'Content-Type': 'application/json',
 								},
 								body: JSON.stringify({
@@ -731,10 +782,8 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 	// Add event listener
 	document.addEventListener('keydown', multiplayerKeydownHandler);
 
-	// Add cleanup listeners for page unload/refresh
-	window.addEventListener('beforeunload', cleanupMultiplayerGame);
-	window.addEventListener('hashchange', cleanupMultiplayerGame);
-	window.addEventListener('pagehide', cleanupMultiplayerGame);
+	// Note: We don't add cleanup listeners here anymore since they're added earlier in handleGame2Players
+	// This prevents duplicate listeners and ensures they're active during the waiting phase
 
 	// Also add visibility change detection for when user switches tabs
 	document.addEventListener('visibilitychange', () => {
@@ -753,4 +802,35 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 			}, 5000); // 5 second grace period
 		}
 	});
+}
+
+// Function to destroy API key on the backend
+async function destroyApiKey(apiKey) {
+	if (!apiKey) {
+		console.log('No API key to destroy');
+		return;
+	}
+
+	const csrf = getCookie('csrftoken');
+	
+	try {
+		console.log(`Destroying API key: ${apiKey}`);
+		const response = await fetchWithRefresh(`server-pong/${apiKey}/delete-key/`, {
+			method: 'POST',
+			headers: {
+				'X-CSRFToken': csrf,
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			console.log('API key destroyed successfully:', result);
+		} else {
+			console.warn('Failed to destroy API key:', response.status);
+		}
+	} catch (error) {
+		console.error('Error destroying API key:', error);
+	}
 }

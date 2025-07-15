@@ -120,7 +120,7 @@ async function gestFooter(friend_status, blockedStatus) {
 }
 
 
-async function getOtherUserInfo(userName) {
+export async function getOtherUserInfo(userName) {
 	try {
 		const timestamp = Date.now();
 		const response = await fetchWithRefresh(
@@ -151,7 +151,7 @@ async function getOtherUserInfo(userName) {
 }
 
 
-function getOtherUserAvatar(userName) {
+export function getOtherUserAvatar(userName, i = "") {
 	fetchWithRefresh(`user-service/avatarOther/${userName}`, {
 		method: "GET",
 		credentials: 'include',
@@ -162,7 +162,7 @@ function getOtherUserAvatar(userName) {
 	})
 	.then(blob => {
 		const imgUrl = URL.createObjectURL(blob);
-		document.getElementById("avatarother").src = imgUrl;
+		document.getElementById("avatarother" + i).src = imgUrl;
 	})
 	.catch(err => {
 		console.error("Error loading other avatar :", err);

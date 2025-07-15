@@ -1,53 +1,40 @@
-<div id="Tournament-Lobby">
-    <div class="container">
-        <div class="row">
-        <div class="col">
-            <h2>TOURNAMENT LIST</h2>
-            <div class="row">
-                <div class="col">
-                    <button id="refresh-trnmt" type="button" class="btn btn-outline-secondary" aria-label="Close">Refresh</button>
-                </div>
-                <div class="col">
-                    <button id="create-trnmt" type="button" class="btn btn-outline-secondary" aria-label="Close">Create</button>
-                </div>
-                <div class="col">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="trnmt-list" data-bs-toggle="dropdown" aria-expanded="false">
-                            Join
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="trnmt-list" id="trnmt-list-ul">
-                            
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col" id="list">
-                <ul id="list-tr">
-                    
-                </ul>
-            </div>
+<div id="contentTournementPage">
+
+    <div id="divlistTournament" class="container mt-5 mb-5 p-5" style="position: relative;">
+        <h2 class="mb-4 text-center">TOURNAMENT LIST</h2>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>TOURNAMENT</th>
+                    </tr>
+                </thead>
+                <tbody id="trnmt-list-ul"></tbody>
+            </table>
         </div>
-        <div class="col">
-            <h2>ACTUAL INFORMATIONS</h2>
-            <div class="col" id="Tournament-info">
-                <h4>No tournament joined</h4>
+        <div class="section">
+            <button id="create-trnmt" type="button" class="btn btn-outline-secondary" aria-label="Close">Create</button>
+        </div>
+
+        <div id="listPlayerGameTournament" class="PlayerGameTournament container">
+            <h4 id="idtournament" class="mb-4 mt-4 text-center">TOURNAMENT</h4>
+            <h4 id="idNBtournament" class="mb-4 mt-4 text-center">0</h4>
+            
+            <div id="idplayerInTournament" class="footerCanvas">
+
             </div>
+          </div>
+    </div>
+
+    <div id="Tournament-info" class="footerCanvas">
+
+        <div class="section">
             <div id="Tournament-leave"></div>
             <div id="Tournament-launch"></div>
             <div id="Tournament-game"></div>
         </div>
-        <div class="col">
-            <h2>GUEST</h2>
-            <div id="guest-add">
-                <h4>Waiting for tournament</h4>
-            </div>
-                
+        <div id="guest-add" class="section">
+
         </div>
-    </div>
-    <!-- <div class="container"> -->
-        <div class="row" id="Information">
-        </div>
-    <!-- </div> -->
     </div>
 </div>
-
