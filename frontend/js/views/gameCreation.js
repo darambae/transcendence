@@ -80,7 +80,6 @@ export async function sendGameCreation() {
 			copySeckeyGame();
 			console.log('key get : ', data['api_key']);
 			apiKey = data['api_key'];
-			currentCreatedApiKey = apiKey; // Track the current API key
 		})
 		.catch((error) => {
 			// Check if error is due to abort
