@@ -850,9 +850,9 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		} else {
 			//user doesn't want to unblock
 			block_reason = 'you blocked this user';
-		}	}
 		}
 	}
+
 	const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 	if (block_reason != null) {
 		updateMessageInputState(targetbBlockedStatus, false);
@@ -866,6 +866,10 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	} else {
 		// Enable message input and send button
 		updateMessageInputState(targetbBlockedStatus, true);
+		if (gameInvitationBtn) {
+			gameInvitationBtn.classList.remove('d-none');
+			gameInvitationBtn.disabled = false;
+		}
 	}
 }
 
@@ -883,10 +887,22 @@ function updateMessageInputState(blockStatus, enabled = true) {
 			gameInvitationBtn.classList.remove('d-none');
 			gameInvitationBtn.disabled = false;
 		}
-		// Focus on message input
-		const messageInput = document.getElementById('messageInput-active');
-		if (messageInput) {
-			messageInput.focus();
+		messageInput.focus();
+	} else {
+		// Blocked state
+		messageInput.disabled = true;
+		sendBtn.disabled = true;
+		if (gameInvitationBtn) {
+			gameInvitationBtn.classList.add('d-none');
+			gameInvitationBtn.disabled = true;
+		}
+
+		if (blockStatus?.hasBlocked) {
+			messageInput.placeholder = "This user blocked you, you can't send a message";
+		} else if (blockStatus?.isBlocked) {
+			messageInput.placeholder = "Blocked user, you can't send a message";
+		} else {
+			messageInput.placeholder = "Type your message...";
 		}
 	}
 }
@@ -1479,11 +1495,6 @@ export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 export async function refreshChatAfterBlockStatusChange(targetUserId) {
 	console.log('Refreshing chat after block status change for user:', targetUserId);
 
-	console.log(
-		'Refreshing chat after block status change for user:',
-		targetUserId
-	);
-
 	// Get current user info
 	const userData = await fetchWithRefresh('/user-service/infoUser/', {
 		method: 'GET',
@@ -1512,26 +1523,16 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 	) {
 		console.log('Chat modal is open, refreshing chat list and active chat');
 
-
 		// Refresh the chat room list
 		await loadChatRoomList(userData.id);
 
-
 		// If we're currently chatting with the user whose block status changed, refresh that conversation
 		if (currentTargetId && currentTargetId.toString() === targetUserId.toString()) {
-			console.log('Currently chatting with affected user, refreshing conversation state');			// Re-check block status and update input state
-		if (
-			currentTargetId &&
-			currentTargetId.toString() === targetUserId.toString()
-		) {
-			console.log(
-				'Currently chatting with affected user, refreshing conversation state'
-			);
+			console.log('Currently chatting with affected user, refreshing conversation state');
 
 			// Re-check block status and update input state
 			const targetBlockedStatus = await getBlockedStatus(targetUserId);
 			let block_reason = null;
-
 
 			if (targetBlockedStatus.hasBlocked) {
 				block_reason = 'this user blocked you';
