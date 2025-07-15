@@ -160,7 +160,35 @@ function listTournament(csrf, ulElem) {
 }
 
 
+async function startTournament(data) {
+
+  const view = data.Tournament
+
+  await fetchWithRefresh("tournament/match", {
+    method: "POST",
+    headers: {
+      'X-CSRFToken': csrf,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ "tKey": view })
+  })
+  .then(response => {
+    if (!response.ok) throw new Error("https Error: " + response.status);
+    console.log("entreeeeeeeeokoko")
+    return response.json();
+  })
+  .then(data => {
+    //tournamentInfo.innerHTML = `<h6>${data["Info"]}</h6>`;
+    })
+    .catch(error => {
+      console.error("Erreur de requête :", error);
+      throw error;
+    });
+}
+
 export async function affichUserTournament() {
+  const tournamentLaunch = document.getElementById("Tournament-launch");
   const idtournament = document.getElementById("idtournament");
   const idNBtournament = document.getElementById("idNBtournament");
   const idplayerInTournament = document.getElementById("idplayerInTournament")
@@ -184,6 +212,13 @@ export async function affichUserTournament() {
   if (data.number == 4) {
     divGuest.innerHTML = ""
     divGuest.style.display = "none";
+    if (tournamentLaunch) {
+      startTournament(data);
+      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
+    } else {
+      console.log('error tournamentLaunch not found')
+    }
   }
   else if (data.number >= 1) {
     let text = await fetch('./templates/invits.html')
@@ -206,7 +241,12 @@ export async function affichUserTournament() {
               <button
                 class="profile-btn section"
                 data-username="${pl}"
-                style="cursor: pointer; background-color: rgba(0, 33, 83, 0); border: none; padding: 0; color: rgb(255, 255, 255);">
+                style="cursor: pointer;
+                      background-color: rgba(0, 33, 83, 0);
+                      border: none; padding: 0;
+                      color: rgb(255, 255, 255);
+                      order: ${i}; 
+                ">
                 
                 <h6 class="mb-2">${pl}</h6>
                 <img
@@ -391,13 +431,13 @@ export async function tournamentController() {
               leaveButton.className = "btn btn-outline-secondary";
               leaveButton.textContent = "Leave";
 
-              launchButton = document.createElement("button");
-              launchButton.id = trId;
-              launchButton.className = "btn btn-outline-secondary";
-              launchButton.textContent = "Start";
+              //launchButton = document.createElement("button");
+              //launchButton.id = trId;
+              //launchButton.className = "btn btn-outline-secondary";
+              //launchButton.textContent = "Start";
 
               tournamentLeave.appendChild(leaveButton)
-              tournamentLaunch.appendChild(launchButton);
+              //tournamentLaunch.appendChild(launchButton);
 
 
 
@@ -578,13 +618,13 @@ export async function tournamentController() {
           leaveButton.className = "btn btn-outline-secondary";
           leaveButton.textContent = "Leave";
 
-          launchButton = document.createElement("button");
-          launchButton.id = view;
-          launchButton.className = "btn btn-outline-secondary";
-          launchButton.textContent = "Start";
+          //launchButton = document.createElement("button");
+          //launchButton.id = view;
+          //launchButton.className = "btn btn-outline-secondary";
+          //launchButton.textContent = "Start";
 
           tournamentLeave.appendChild(leaveButton)
-          tournamentLaunch.appendChild(launchButton);
+          //tournamentLaunch.appendChild(launchButton);
           refreshTournament()
 
           
@@ -622,7 +662,7 @@ export async function tournamentController() {
         .then(data => {
           SSEStream.close();
           //tournamentInfo.innerHTML = "";
-          tournamentLaunch.innerHTML = ""
+          //tournamentLaunch.innerHTML = ""
           tournamentLeave.innerHTML = ""
           divGuest.innerHTML = "";
           listTournament(csrf, ulElem)
@@ -636,35 +676,39 @@ export async function tournamentController() {
   })
 
 
-  tournamentLaunch.addEventListener('click', async (event) => {
-    const target = event.target;
-
-    if (target.tagName === "BUTTON") {
-      event.preventDefault();
-      const view = target.id;
-
-      await fetchWithRefresh("tournament/match", {
-        method: "POST",
-        headers: {
-          'X-CSRFToken': csrf,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ "tKey": view })
-      })
-        .then(response => {
-          if (!response.ok) throw new Error("https Error: " + response.status);
-          return response.json();
-        })
-        .then(data => {
-          //tournamentInfo.innerHTML = `<h6>${data["Info"]}</h6>`;
-        })
-        .catch(error => {
-          console.error("Erreur de requête :", error);
-          throw error;
-        });
-    }
-  })
+  //tournamentLaunch.addEventListener('click', async (event) => {
+  //  const target = event.target;
+  //  console.log("===================")
+  //  console.log(target)
+  //  console.log("===================")
+    
+  //  if (target.tagName === "BUTTON") {
+  //    event.preventDefault();
+  //    const view = target.id;
+      
+  //    await fetchWithRefresh("tournament/match", {
+  //      method: "POST",
+  //      headers: {
+  //        'X-CSRFToken': csrf,
+  //        'Content-Type': 'application/json',
+  //      },
+  //      credentials: 'include',
+  //      body: JSON.stringify({ "tKey": view })
+  //    })
+  //    .then(response => {
+  //      if (!response.ok) throw new Error("https Error: " + response.status);
+  //      console.log("entreeeeeeeeokoko")
+  //      return response.json();
+  //    })
+  //    .then(data => {
+  //      //tournamentInfo.innerHTML = `<h6>${data["Info"]}</h6>`;
+  //      })
+  //      .catch(error => {
+  //        console.error("Erreur de requête :", error);
+  //        throw error;
+  //      });
+  //  }
+  //})
 
 
   tournamentGame.addEventListener('click', async (event) => {
