@@ -63,7 +63,7 @@ class ApiConfig(AppConfig):
                     user.set_password(u["password"])
                     try:
                         user.save()
-                        print(f"Created test user: {u['user_name']}")
+                        # print(f"Created test user: {u['user_name']}")
                     except IntegrityError:
                         pass
 
@@ -247,7 +247,7 @@ class ApiConfig(AppConfig):
                             winner=winner
                         )
                         match.save()
-                        print(f"Created test match: {m['matchKey']}")
+                        # print(f"Created test match: {m['matchKey']}")
                     except IntegrityError:
                         print(f"Match already exists: {m['matchKey']}")
 

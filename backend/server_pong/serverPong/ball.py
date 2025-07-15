@@ -113,21 +113,21 @@ def calcBouncePlayer(wallHit, hitPoint : Point, vectorMovement : Vector) -> Vect
 	ratio = vecAM.norm / vecAB.norm 
 	# #print(f"ratio : {ratio}", file=sys.stderr)
 	if (ratio < 0.125) : 
-		return addSpeed(-90, vectorMovement)
+		return addSpeed(-90 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.250) :
-		return addSpeed(-60, vectorMovement)
+		return addSpeed(-60 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.375) :
-		return addSpeed(-30, vectorMovement)
+		return addSpeed(-30 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.500) :
-		return addSpeed(-10, vectorMovement)
+		return addSpeed(-10 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.625) :
-		return addSpeed(10, vectorMovement)
+		return addSpeed(10 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.750) :
-		return addSpeed(30, vectorMovement)
+		return addSpeed(30 + random.randint(-5, 5), vectorMovement)
 	elif (ratio < 0.875) :
-		return addSpeed(60, vectorMovement)
+		return addSpeed(60 + random.randint(-5, 5), vectorMovement)
 	else :
-		return addSpeed(90, vectorMovement)
+		return addSpeed(90 + random.randint(-5, 5), vectorMovement)
 
 
 class	BallData() :

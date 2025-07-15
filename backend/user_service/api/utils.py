@@ -16,7 +16,7 @@ def decodeJWT(request, encodedJwt=None) :
     # res = requests.get(f'{uriJwt}api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'access_postgresql'}, verify=False)
     res = requests.get(f'{uriJwt}api/DecodeJwt/', headers={"Authorization" : f"{encodedJwt}", 'Host': 'localhost'}, verify=False)
     if res.status_code != 200 :
-        print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
+        # print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
         return [None]
     return [res.json()]
 
@@ -36,5 +36,5 @@ def setTheCookie(response, access=None, refresh=None) :
 			samesite='Lax'
 		)
 	# with open("log-auth-cookie.txt", "w+") as f :
-	# 	print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
+	# 	# print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
 	return response
