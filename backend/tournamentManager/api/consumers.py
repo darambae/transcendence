@@ -12,8 +12,6 @@ from .tournamentStatic import Tournament, Player, trnmtDict, getApiKeyTrnmt, LOC
 async def setResults(trnmt, username, roundMatch, mKey) :
 	# print(f"RoundM : {roundMatch} | type : {type(roundMatch).__name__}", file=sys.stderr)
 	if (int(roundMatch) == 1) :
-		with open("debugConsumer.log", 'a+') as f:
-			print("trnmt.match1.key, mkey, trnmt.match2.key: ", trnmt.match1.key, mKey, trnmt.match2.key, file=f)
 		# print("---------------------------------! Firsts match !---------------------------------")
 		if trnmt.match1.key == mKey :
 			# print("Soooo -> ", trnmt.match2.launchable, file=sys.stderr)
@@ -171,8 +169,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			match.gameMode = REMOTE
 		if match.gameMode == REMOTE :
 			userLst = sorted([match.p1.username, match.p2.username])
-			# with open("response.txt", 'a+') as f :
-				# print(f"--=REMOTE=--\n\nself.name : {self.name} | self.guests : {self.guests}\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\n", file=f)
 
 			if self.name == match.p1.username or match.p1.username in self.guests:
 				user = match.p1.username
@@ -191,8 +187,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 					"round" : roundM,
 				}))
 		else :
-			# with open("response.txt", 'a+') as f :
-				# print(f"--=LOCAL=--\n\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}\n", file=f)
 			await self.send(text_data=json.dumps({
 				"t_state" : "game-start",
 				"mode" : "local",
@@ -210,10 +204,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 		action = data.get("action")
 		# print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
-			# with open("response.txt", 'a+') as f:
-				# print(f"--=Create-Bracket=--\nself.myJWT : {self.myJWT}\ntrnmtDict[self.room_group_name].match1.p1.jwt : {trnmtDict[self.room_group_name].match1.p1.jwt}\ntrnmtDict[self.room_group_name].match1.p2.jwt : {trnmtDict[self.room_group_name].match1.p2.jwt}", file=f)
-				# print(f"\nMatch 1 launchable : {trnmtDict[self.room_group_name].match1.launchable}\nPlayed : {trnmtDict[self.room_group_name].match1.played}\n", file=f)
-				# print(f"\nMatch 2 launchable : {trnmtDict[self.room_group_name].match2.launchable}\nPlayed : {trnmtDict[self.room_group_name].match2.played}\n\n", file=f)
 			if trnmtDict[self.room_group_name].match1.launchable and not trnmtDict[self.room_group_name].match1.played:
 				await self.launchGame(trnmtDict[self.room_group_name].match1, 1)
 			if trnmtDict[self.room_group_name].match2.launchable and not trnmtDict[self.room_group_name].match2.played:
@@ -228,12 +218,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 	
 		elif action == "update-guest": 
 			jwt_l = data.get("jwt-list")
-			# with open("response.txt", 'a+') as f :
-				# print(f"--=Update guest=--\nguests : {jwt_l} , type : {type(jwt_l).__name__}\n\n", file=f)
 			
 			for elem in jwt_l :
-				# with open("response.txt", 'a+') as f :
-					# print(f'--=LOOP jwt_l=--\nself.name : {self.name}\nelem["username"] : {elem["username"]}\nelem["invites"] : {elem["invites"]}\n\nCondition : {self.name == elem["username"] or self.name in elem["invites"]}', file=f)
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					self.guests == elem["invites"]
 		elif action == "supervise" and self.name == data.get("player", None):
@@ -242,8 +228,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			# print(f"A1 - {roundMatch}", file=sys.stderr)
 			mKey = data.get("mKey", None)
 			tkey = data.get("tkey", None)
-			with open("debugConsumer.log", 'a+') as f:
-				print(f"name : {self.name}\n\nround : {roundMatch}\nmkey:  {mKey}\n------------------------\n\n", file=f)
 			# print(f"A2 - {mKey}", file=sys.stderr)
 			if not mKey:
 				# print(f"A3 - END", file=sys.stderr)
@@ -255,23 +239,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 			task = asyncio.create_task(supervise_match(mKey))
 			results = await task
 			# print(f"A6 - {results}", file=sys.stderr)
-			with open("debugConsumer.log", 'a+') as f:
-				print(f"name : {self.name}\n\nresults: {results}\n------------------------\n\n", file=f)
 			if int(roundMatch) == 1 : 
-				with open("debugConsumer.log", 'a+') as f:
-					print(f"Yes roundMatch = 1", file=f)
 				if int(results["score1"]) == 5 : 
-					with open("debugConsumer.log", 'a+') as f:
-						print(f"Yes score1 = 5", file=f)
 					matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
 				else :
-					with open("debugConsumer.log", 'a+') as f:
-						print(f"No score2 = 5", file=f)
 					# print(f"A8 - res2", file=sys.stderr)
 					matchId, nextToLaunch = await setResults(trnmt, results["username2"], roundMatch, results['matchKey'])
 			elif int(roundMatch) == 2 :
-				with open("debugConsumer.log", 'a+') as f:
-					print(f"No roundMatch = 2", file=f)
 				if int(results["score1"]) == 5 : 
 					matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
 				else :
