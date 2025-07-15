@@ -19,7 +19,6 @@ CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access_postgresql serv
 COMPOSE=docker compose -f ${DOCKER_FILE}
 
 CA=./elk/setup/certs/ca/
-CA=./elk/setup/certs/ca/
 CA_CRT=$(CA)ca.crt
 CA_KEY=$(CA)ca.key
 

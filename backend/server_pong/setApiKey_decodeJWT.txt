@@ -1,0 +1,20 @@
+--------------------------
+Beginning : 7:22:48 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNTY1MzU5LCJpYXQiOjE3NTI1NjQxMzIsImp0aSI6ImYwNzEzYzcyMDU2MTQzNDY4Zjc1ODhmYWFkYmY4NTIxIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.wxYs998TIhBujpBewMr255KP7XvqQC-CM7ZrSvqjR2s
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752565359, 'iat': 1752564132, 'jti': 'f0713c72056143468f7588faadbf8521', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] setApiKey called - apikey: f61b01a8-ddea-4dfc-9f12-422175341c6b, user_id: 2, user_data: {'token_type': 'access', 'exp': 1752565359, 'iat': 1752564132, 'jti': 'f0713c72056143468f7588faadbf8521', 'user_id': 2, 'username': 'omar', 'invites': []}
+[DEBUG] Current dictApiPlayers: {}
+[DEBUG] Current apiKeys: []
+[DEBUG] Current apiKeysUnplayable: ['f61b01a8-ddea-4dfc-9f12-422175341c6b']
+[DEBUG] After processing - current_count: 1, dictApiPlayers[f61b01a8-ddea-4dfc-9f12-422175341c6b]: [2]
+--------------------------
+Beginning : 7:23:8 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNTY1MzQzLCJpYXQiOjE3NTI1NjQxMjksImp0aSI6ImIyMjNkYTZiYjI2OTQ5Yjc5Mzg4Njk3ODljNzE3OGViIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.JRG6caZ5tA1XWBD5azwXfuyZZV9a07mOwKHeW94kdGY
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752565343, 'iat': 1752564129, 'jti': 'b223da6bb26949b7938869789c7178eb', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] setApiKey called - apikey: f61b01a8-ddea-4dfc-9f12-422175341c6b, user_id: 1, user_data: {'token_type': 'access', 'exp': 1752565343, 'iat': 1752564129, 'jti': 'b223da6bb26949b7938869789c7178eb', 'user_id': 1, 'username': 'kelly', 'invites': []}
+[DEBUG] Current dictApiPlayers: {'f61b01a8-ddea-4dfc-9f12-422175341c6b': [2]}
+[DEBUG] Current apiKeys: []
+[DEBUG] Current apiKeysUnplayable: ['f61b01a8-ddea-4dfc-9f12-422175341c6b']
+[DEBUG] After processing - current_count: 2, dictApiPlayers[f61b01a8-ddea-4dfc-9f12-422175341c6b]: [2, 1]
