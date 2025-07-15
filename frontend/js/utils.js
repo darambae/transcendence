@@ -152,34 +152,36 @@ export async function getBlockedStatus(targetUserId) {
 	}
 }
 
-// export async function fetchWithRefresh(url, options = {}) {
+ export async function fetchWithRefreshNoCash(url, options = {}) {
 
-// 	let response = await fetch(url, options);
+ 	let response = await fetch(url, options);
 
-// 	if (response.status === 401) {
-// 		const refreshResponse = await fetch('auth/refresh-token/', {
-// 			method: 'GET',
-// 			credentials: 'include',
-// 			headers: {
-// 				'Content-Type': 'application/json',
-// 			},
-// 		});
-// 		if (refreshResponse.ok) {
-// 			response = await fetch(url, options);
-// 		} else {
-// 			window.location.href = '/#home';
-// 		}
-// 	} else if (response.status === 413) {
-// 		return new Response(
-// 			JSON.stringify({
-// 				status: 'error',
-// 				message: 'The image file is too large',
-// 			}),
-// 			{ status: 413 }
-// 		);
-// 	}
-// 	return response;
-// }
+ 	if (response.status === 401) {
+ 		const refreshResponse = await fetch('auth/refresh-token/', {
+ 			method: 'GET',
+ 			credentials: 'include',
+ 			headers: {
+ 				'Content-Type': 'application/json',
+ 			},
+ 		});
+ 		if (refreshResponse.ok) {
+ 			response = await fetch(url, options);
+ 		} else {
+ 			window.location.href = '/#home';
+ 		}
+ 	} else if (response.status === 413) {
+ 		return new Response(
+ 			JSON.stringify({
+ 				status: 'error',
+ 				message: 'The image file is too large',
+ 			}),
+ 			{ status: 413 }
+ 		);
+ 	}
+ 	return response;
+ }
+
+
 const requestCache = new Map(); // Stores cached responses
 const inFlightRequests = new Map(); // Tracks pending requests
 let refreshPromise = null; // Holds the single refresh token operation

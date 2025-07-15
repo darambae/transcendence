@@ -6,6 +6,8 @@ import {
 	closeModal,
 } from '../utils.js';
 
+import { refreshTournament, affichUserTournament } from "./tournament.js"
+
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
 	const content = document.getElementById('invits-form');
@@ -97,6 +99,7 @@ export async function handleInvitSubmit(event) {
 
 				await actualizeIndexPage('guest-add', routes['guest']);
 				console.log('User successfully connected');
+				affichUserTournament()
 			} catch (error) {
 				console.log('Double auth error: ', error);
 			}

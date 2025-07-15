@@ -929,6 +929,36 @@ class acceptInvite(APIView):
 			status=200
 		)
 
+
+class deletteFriends(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+		from_user = request.user
+		to_username = request.data.get("username")
+
+		to_user = get_object_or_404(USER, user_name=to_username)
+
+		friend_relation = FRIEND.objects.filter(
+            Q(from_user=from_user, to_user=to_user) |
+            Q(from_user=to_user, to_user=from_user),
+            status="accepted"
+        ).first()
+
+		if not friend_relation:
+			return Response(
+				{"error": "error friend_relation dont existed"},
+				status=404
+			)
+
+		friend_relation.delete()
+
+		return Response(
+			{"message": f"friends with {to_user.user_name} delete"},
+			status=200
+		)
+
+
 class logout(APIView):
 	permission_classes = [IsAuthenticated]
 
