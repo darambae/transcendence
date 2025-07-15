@@ -19,7 +19,7 @@ from django.urls import path
 from api import views
 from api.views import infoUser, avatar
 from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
-from api.views import searchUsers, infoOtherUser, avatarOther, listennerFriends, addFriend, acceptInvite, declineInvite
+from api.views import searchUsers, infoOtherUser, avatarOther, listennerFriends, addFriend, acceptInvite, declineInvite, deletteFriends
 from api.views import matchHistory
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -37,6 +37,7 @@ urlpatterns = [
 	path('user-service/add/friend/', addFriend.as_view(), name='addFriend'),
 	path('user-service/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
 	path('user-service/declineInvite/', declineInvite.as_view(), name='declineInvite'),
+	path('user-service/deletteFriends/', deletteFriends.as_view(), name='deletteFriends'),
 	path('user-service/matchHistory/', matchHistory.as_view(), name='matchHistory'),
 	path('user-service/listennerFriends/', listennerFriends.as_view(), name='listennerFriends'),
 ]

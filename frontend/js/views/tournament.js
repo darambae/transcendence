@@ -1,4 +1,4 @@
-import { actualizeIndexPage, fetchWithRefresh } from "../utils.js"
+import { actualizeIndexPage, fetchWithRefresh, fetchWithRefreshNoCash } from "../utils.js"
 import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
 import { localGameTr } from "./tournamentLocalGame.js";
@@ -47,9 +47,14 @@ export function invitsController() {
 }
 
 
-export async function refreshTournament(csrf, ulDropdown, ulElem) {
+export async function refreshTournament() {
+  const ulElem = document.getElementById("trnmt-list-ul");
   let trnmt;
-  await fetchWithRefresh('tournament/tournament', {
+
+  if (!ulElem)
+    return;
+
+  await fetchWithRefreshNoCash('tournament/tournament', {
     headers: {
       'X-CSRFToken': csrf,
     },
@@ -72,6 +77,7 @@ export async function refreshTournament(csrf, ulDropdown, ulElem) {
   ulElem.innerHTML = "";
 
   for (const key in trnmt) {
+    console.log("entreee")
     const html = `
           <tr>
             <td id="${key}">
@@ -89,7 +95,7 @@ export async function refreshTournament(csrf, ulDropdown, ulElem) {
 async function createEvent(csrf, ulElem) {
   // // console.log("Hey 3")
 
-  await fetchWithRefresh('tournament/tournament', {
+  await fetchWithRefreshNoCash('tournament/tournament', {
     method: 'POST',
     headers: {
       'X-CSRFToken': csrf,
@@ -110,7 +116,7 @@ async function createEvent(csrf, ulElem) {
       console.error("Erreur de requête :", error);
       throw error;
     });
-  refreshTournament(csrf, ulDropdown, ulElem);
+  refreshTournament();
 }
 
 
@@ -135,11 +141,11 @@ function setPositionTournamentList(pos) {
 }
 
 
-function listTournament(csrf, ulDropdown, ulElem) {
+function listTournament(csrf, ulElem) {
   const createButton = document.getElementById("create-trnmt");
   const container = document.getElementById("listPlayerGameTournament");
 
-  refreshTournament(csrf, ulDropdown, ulElem);
+  refreshTournament();
 
   const savedPos = localStorage.getItem("container-position-tournamentList");
 
@@ -234,7 +240,7 @@ export async function affichUserTournament() {
 export async function tournamentController() {
   const ulDropdown = document.getElementById("trnmt-list-ul");
   const ulElem = document.getElementById("trnmt-list-ul");
-  listTournament(csrf, ulDropdown, ulElem)
+  listTournament(csrf, ulElem)
 
   let SSEStream;
   let leaveButton = undefined;
@@ -567,7 +573,7 @@ export async function tournamentController() {
 
           tournamentLeave.appendChild(leaveButton)
           tournamentLaunch.appendChild(launchButton);
-          refreshTournament(csrf, ulDropdown , ulElem)
+          refreshTournament()
 
           
           setPositionTournamentList("absolute")
@@ -607,7 +613,7 @@ export async function tournamentController() {
           tournamentLaunch.innerHTML = ""
           tournamentLeave.innerHTML = ""
           divGuest.innerHTML = "";
-          listTournament(csrf, ulDropdown, ulElem)
+          listTournament(csrf, ulElem)
           setPositionTournamentList("relative")
         })
         .catch(error => {
