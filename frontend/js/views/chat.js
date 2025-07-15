@@ -4,9 +4,9 @@ import {
 	isUserAuthenticated,
 	fetchWithRefresh,
 	getBlockedStatus,
-} from '../utils.js'; // Assuming getCookie is still needed for CSRF token
+} from '../utils.js';
+import { handleGame2Players } from './multiplayerGameSession.js';
 import { routes } from '../routes.js';
-import { handleGame2Players } from './multiplayerGameSession.js'; // Assuming this is the correct import path
 import { card_profileController } from './card_profile.js';
 
 let hasOverallUnreadMessages = false;
@@ -342,6 +342,7 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
 	}
 }
 
+
 function sendMessage(currentUserId) {
 	const messageInput = document.getElementById('messageInput-active');
 	const groupIdInput = document.getElementById('groupIdInput-active');
@@ -497,8 +498,6 @@ async function initEventSource(groupId, currentUserId) {
 				console.error('Failed to refresh token:', error);
 			}
 		});
-
-
 
 		const recentlyReceivedMessages = new Set(); // For message deduplication
 		source.onmessage = function (e) {
@@ -826,9 +825,18 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 					}))
 				)
 				.then(({ data, ok, status, statusText }) => {
-					if (ok) {						if (data.status === 'success') {
+					if (ok) {
+						if (data.status === 'success') {
 							// Enable message input and send button
-							updateMessageInputState(null, true);
+							document.getElementById('messageInput-active').disabled = false;
+							document.getElementById('sendMessageBtn').disabled = false;
+							// Focus on message input
+							const messageInput = document.getElementById(
+								'messageInput-active'
+							);
+							if (messageInput) {
+								messageInput.focus();
+							}
 							return;
 						} else {
 							console.error('Server error unblocking the user:', targetUserId);
@@ -852,10 +860,8 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 			block_reason = 'you blocked this user';
 		}
 	}
-
 	const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 	if (block_reason != null) {
-		updateMessageInputState(targetbBlockedStatus, false);
 		document.getElementById('messageInput-active').disabled = true;
 		document.getElementById('sendMessageBtn').disabled = true;
 		if (gameInvitationBtn) {
@@ -865,44 +871,16 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		alert(block_reason);
 	} else {
 		// Enable message input and send button
-		updateMessageInputState(targetbBlockedStatus, true);
-		if (gameInvitationBtn) {
-			gameInvitationBtn.classList.remove('d-none');
-			gameInvitationBtn.disabled = false;
-		}
-	}
-}
-
-/**
- * Updates the message input placeholder and state based on blocking status
- * @param {Object} blockStatus - The blocking status object with isBlocked and hasBlocked properties
- * @param {boolean} enabled - Whether the input should be enabled or disabled
- */
-function updateMessageInputState(blockStatus, enabled = true) {
-	const messageInput = document.getElementById('messageInput-active');
-	const sendBtn = document.getElementById('sendMessageBtn');
 		document.getElementById('messageInput-active').disabled = false;
 		document.getElementById('sendMessageBtn').disabled = false;
 		if (gameInvitationBtn) {
 			gameInvitationBtn.classList.remove('d-none');
 			gameInvitationBtn.disabled = false;
 		}
-		messageInput.focus();
-	} else {
-		// Blocked state
-		messageInput.disabled = true;
-		sendBtn.disabled = true;
-		if (gameInvitationBtn) {
-			gameInvitationBtn.classList.add('d-none');
-			gameInvitationBtn.disabled = true;
-		}
-
-		if (blockStatus?.hasBlocked) {
-			messageInput.placeholder = "This user blocked you, you can't send a message";
-		} else if (blockStatus?.isBlocked) {
-			messageInput.placeholder = "Blocked user, you can't send a message";
-		} else {
-			messageInput.placeholder = "Type your message...";
+		// Focus on message input
+		const messageInput = document.getElementById('messageInput-active');
+		if (messageInput) {
+			messageInput.focus();
 		}
 	}
 }
@@ -1007,93 +985,14 @@ async function inviteFriendToPlay(currentUserId) {
 	}
 }
 
-// async function sendInvitationMessage(content, currentUserId) {
-//     const groupIdInput = document.getElementById('groupIdInput-active');
-//     const usernameInput = document.getElementById('usernameInput-active');
-
-//     const groupId = groupIdInput.value;
-//     const username = usernameInput.value;
-
-//     if (!groupId || !username) {
-//         throw new Error('No active chat to send invitation');
-//     }
-
-//     // Créer les données du message temporaire pour l'affichage immédiat
-//     const tempMessageData = {
-//         content: content,
-//         group_id: groupId,
-//         sender_id: currentUserId,
-//         sender_username: username,
-//         timestamp: new Date().toISOString(),
-//     };
-
-//     // Ajouter le message à l'UI immédiatement (comme dans sendMessage)
-//     const chatLog = document.getElementById('chatLog-active');
-//     if (chatLog) {
-//         // Supprimer "No messages yet" si présent
-//         const noMessagesDiv = chatLog.querySelector('.no-messages-yet');
-//         if (noMessagesDiv) {
-//             noMessagesDiv.remove();
-//         }
-
-//         const msgElement = createMessageElement(tempMessageData, currentUserId);
-//         chatLog.appendChild(msgElement);
-//         chatLog.scrollTop = chatLog.scrollHeight;
-//     }
-
-//     try {
-//         const response = await fetchWithRefresh(`/chat/${groupId}/messages/`, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'X-CSRFToken': getCookie('csrftoken'),
-//             },
-//             credentials: 'include',
-//             body: JSON.stringify({
-//                 content: content,
-//                 group_id: groupId,
-//                 sender_id: currentUserId,
-//                 sender_username: username,
-//             }),
-//         });
-
-//         const data = await response.json();
-
-//         if (!response.ok || data.status !== 'success') {
-//             throw new Error(data.message || 'Failed to send message');
-//         }
-
-//         console.log('Invitation message sent successfully');
-//         return true;
-
-//     } catch (error) {
-//         console.error('Error sending invitation message:', error);
-//         throw error;
-//     }
-// }
-
-async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
-	console.log(
-		`Requesting private chat with ${targetUsername} for user ${currentUserId}`
-	);
-	if (!currentUserId) {
-		alert('Please log in to start a new chat.');
-		return;
-	}
-
-	if (currentUserId === targetUserId) {
-		alert('You cannot start a chat with yourself.');
-		return;
-	}
-
-	// Check if chat with this user already exists in the list
-	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
-	let existinggroupId = null;
-	chatRooms.forEach((room) => {
-		if (room.dataset.targetUserId === targetUserId) {
-			existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
-		}
-	});
+/**
+ * Updates the message input placeholder and state based on blocking status
+ * @param {Object} blockStatus - The blocking status object with isBlocked and hasBlocked properties
+ * @param {boolean} enabled - Whether the input should be enabled or disabled
+ */
+function updateMessageInputState(blockStatus, enabled = true) {
+	const messageInput = document.getElementById('messageInput-active');
+	const sendBtn = document.getElementById('sendMessageBtn');
 
 	if (!messageInput || !sendBtn) return;
 
@@ -1163,6 +1062,7 @@ export async function initChatModule(currentUserId) {
 		initGlobalChatNotifications(currentUserId);
 	}
 }
+
 
 // Main chat controller function, called after login
 export function chatController(userId, username) {
@@ -1309,6 +1209,7 @@ export function chatController(userId, username) {
 	}
 }
 
+
 // Function to clean up all chat SSE connections
 function cleanupAllChatConnections() {
 	console.log('Cleaning up all chat SSE connections...');
@@ -1356,7 +1257,6 @@ export function cleanupChatOnLogout() {
 	}
 }
 
-// Function to render the chat button if the user is authenticated
 // Event handler for "Start New Chat" button in the modal
 function handleStartNewChat(currentUserId, currentUsername) {
 	const targetUserInput = document.getElementById('targetUserInput');
@@ -1440,6 +1340,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 			});
 	}
 }
+
 export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 	// Only check authentication if status wasn't provided
 	if (userIsAuth === null) {
@@ -1517,10 +1418,7 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 
 	// If the chat is currently active and the modal is open
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
-	if (
-		mainChatWindowElement &&
-		mainChatWindowElement.classList.contains('show')
-	) {
+	if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
 		console.log('Chat modal is open, refreshing chat list and active chat');
 
 		// Refresh the chat room list
@@ -1528,9 +1426,7 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 
 		// If we're currently chatting with the user whose block status changed, refresh that conversation
 		if (currentTargetId && currentTargetId.toString() === targetUserId.toString()) {
-			console.log('Currently chatting with affected user, refreshing conversation state');
-
-			// Re-check block status and update input state
+			console.log('Currently chatting with affected user, refreshing conversation state');			// Re-check block status and update input state
 			const targetBlockedStatus = await getBlockedStatus(targetUserId);
 			let block_reason = null;
 
@@ -1545,30 +1441,8 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 			updateMessageInputState(targetBlockedStatus, isEnabled);
 
 			if (block_reason) {
-
-			const messageInput = document.getElementById('messageInput-active');
-			const sendBtn = document.getElementById('sendMessageBtn');
-			const gameInvitationBtn = document.getElementById('gameInvitationBtn');
-			if (block_reason != null) {
-				// Disable chat input
-				if (messageInput) messageInput.disabled = true;
-				if (sendBtn) sendBtn.disabled = true;
-				if (gameInvitationBtn) {
-					gameInvitationBtn.classList.add('d-none');
-					gameInvitationBtn.disabled = true;
-				}
 				console.log('Chat input disabled due to blocking:', block_reason);
 			} else {
-				// Enable chat input
-				if (messageInput) {
-					messageInput.disabled = false;
-					messageInput.focus();
-				}
-				if (sendBtn) sendBtn.disabled = false;
-				if (gameInvitationBtn) {
-					gameInvitationBtn.classList.remove('d-none');
-					gameInvitationBtn.disabled = false;
-				}
 				console.log('Chat input enabled - no blocking detected');
 			}
 		}
@@ -1635,5 +1509,3 @@ function setupUserSearchAutocomplete() {
 		}
 	});
 }
-
-
