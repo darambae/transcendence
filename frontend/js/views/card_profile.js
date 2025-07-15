@@ -203,13 +203,11 @@ function addFriend() {
 }
 
 function changeBlockedStatus(userName) {
-
 	try {
 		const blockBtn = document.getElementById('blockUserId');
 		console.log('Block button found:', blockBtn); // Debug log
 		if (blockBtn) {
 			blockBtn.addEventListener('click', async () => {
-				// Vérifier si le bouton est déjà en cours de traitement
 				if (blockBtn.disabled) {
 					console.log('Button is already processing, ignoring click');
 					return;
@@ -219,21 +217,24 @@ function changeBlockedStatus(userName) {
 				const userId = blockBtn.dataset.userId;
 				console.log('User ID:', userId); // Debug log
 
-				// Désactiver le bouton pendant le traitement
+				// Disable the button during processing
 				blockBtn.disabled = true;
 				const originalText = blockBtn.textContent;
 				blockBtn.textContent = 'Processing...';
 
 				try {
-					const response = await fetchWithRefresh(`chat/${userId}/blockedStatus/`, {
-						method : 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'X-CSRFToken': getCookie('csrftoken'),
-						},
-						credentials : 'include',
-						body: JSON.stringify({}),
-					});
+					const response = await fetchWithRefresh(
+						`chat/${userId}/blockedStatus/`,
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': getCookie('csrftoken'),
+							},
+							credentials: 'include',
+							body: JSON.stringify({}),
+						}
+					);
 
 					if (!response.ok) {
 						console.error(`HTTP Error: ${response.status}`);
@@ -264,13 +265,11 @@ function changeBlockedStatus(userName) {
 						// 	await getOtherUserInfo(userName);
 						// }, 2000); // 2 secondes de délai
 					} else {
-						// Restaurer le bouton si l'action a échoué
 						blockBtn.disabled = false;
 						blockBtn.textContent = originalText;
 					}
 				} catch (fetchError) {
-					console.error("Error in fetch request:", fetchError);
-					// Restaurer le bouton en cas d'erreur
+					console.error('Error in fetch request:', fetchError);
 					blockBtn.disabled = false;
 					blockBtn.textContent = originalText;
 				}
@@ -279,7 +278,7 @@ function changeBlockedStatus(userName) {
 			console.error('Block button not found!'); // Debug log
 		}
 	} catch (error) {
-		console.error("Error in changeBlockedStatus:", error);
+		console.error('Error in changeBlockedStatus:', error);
 	}
 }
 

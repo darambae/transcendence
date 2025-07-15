@@ -151,6 +151,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
     "https://localhost:8443",
     "https://10.18.161.147:8443",
+    "https://192.168.1.34:8443",
 ]
 
 # MEDIA FOR IMG

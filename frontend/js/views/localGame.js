@@ -1,7 +1,10 @@
 import { fetchWithRefresh, getCookie } from '../utils.js';
-import { getPlayersLocalName, setPlayersLocalName, setApiKeyWebSP } from './utils/commonFunctions.js';
-import { adress } from './utils/commonFunctions.js';
-import { drawMap } from './utils/commonFunctions.js';
+import {
+	getPlayersLocalName,
+	setPlayersLocalName,
+	setApiKeyWebSP,
+} from './gameApi.js';
+import { drawMap } from './gameCanvas.js';
 import { drawCenterText } from './multiplayer.js';
 
 // Global variables to track the game interval, event handlers, SSE connection, and game state
@@ -169,6 +172,9 @@ export async function localGameController() {
 	let b;
 	let c;
 
+	document.addEventListener('keydown', keydownHandler);
+	document.addEventListener('keyup', keyupHandler);
+
 	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	let score1 = document.getElementById('player1score');
@@ -221,7 +227,7 @@ export async function localGameController() {
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');
 
-			console.log(data);
+			//console.log(data);
 			game_stats = data['game_stats'];
 			if (game_stats['State'] != 'Waiting for start') {
 				if (gameStarted == false) {
@@ -292,7 +298,7 @@ export async function localGameController() {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
-			console.log('Local game keydown handler activated for key:', key);
+			//console.log('Local game keydown handler activated for key:', key);
 			event.preventDefault();
 			keysPressed.add(key);
 		}
@@ -302,7 +308,7 @@ export async function localGameController() {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
-			console.log('Local game keyup handler activated for key:', key);
+			//console.log('Local game keyup handler activated for key:', key);
 		}
 		keysPressed.delete(event.key);
 	};
@@ -368,14 +374,17 @@ export async function localGameController() {
 				if (!response.ok) throw new Error('Failed to get new API key');
 				const data = await response.json();
 				const newApiKey = data.api_key;
-				
+
 				// Register the new API key with the backend for single player
 				await setApiKeyWebSP(newApiKey);
-				
+
 				// Set the new API key in our global state
 				setPlayersLocalName(newApiKey);
 				currentApiKey = newApiKey;
-				console.log('Generated and registered new API key for replay:', newApiKey);
+				console.log(
+					'Generated and registered new API key for replay:',
+					newApiKey
+				);
 
 				// Create new SSE connection with the new API key
 				let url_sse = `/server-pong/events?apikey=${newApiKey}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
@@ -408,7 +417,6 @@ export async function localGameController() {
 					console.log('SSE connection closed by server');
 					sseConnection = null;
 				});
-
 			} catch (error) {
 				console.error('Error setting up replay:', error);
 			}
@@ -474,11 +482,12 @@ export async function localGameController() {
 						await fetchWithRefresh(
 							`/server-pong/forfait-game?apikey=${currentApiKey}&idplayer=${2}`,
 							{
-								headers: {
-									Authorization: `bearer ${sessionStorage.getItem(
-										'accessToken'
-									)}`,
-								},
+								// headers: {
+								// 	Authorization: `bearer ${sessionStorage.getItem(
+								// 		'accessToken'
+								// 	)}`,
+								// },
+								credentials: 'include',
 							}
 						);
 					}
