@@ -25,3 +25,11 @@
 	align-items: center;
 	font-size: 2rem;
 }
+
+#idTableResponse {
+	height: 500px;
+}
+
+#idplayerInTournament {
+	margin-top: 7%;
+}
