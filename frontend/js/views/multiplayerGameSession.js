@@ -591,7 +591,10 @@ async function establishSSEConnection(
 
 	// Common SSE message handler function
 	const handleMultiplayerSSEMessage = (event) => {
-		try {
+        try {
+            if (event.data === 'heartbeat' || event.data.trim() === '') {
+                return;
+            }
 			const data = JSON.parse(event.data);
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');

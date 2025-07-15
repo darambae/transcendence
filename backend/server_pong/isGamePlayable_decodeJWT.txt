@@ -1,0 +1,33 @@
+--------------------------
+Beginning : 18:3:14 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjAzNzgwLCJpYXQiOjE3NTI2MDI1NDIsImp0aSI6ImQzM2QyNWEzOWQ5NDQ3NThiMTA3OTNiMjg4M2NhYjBmIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.NassimS5nhuiVKMscQAqwSQZuVUiCLTY7l5bszEsQpQ
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752603780, 'iat': 1752602542, 'jti': 'd33d25a39d944758b10793b2883cab0f', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 0f1cd229-bb69-445b-98eb-a333d1264af7
+[DEBUG] dictApiPlayers: {'0f1cd229-bb69-445b-98eb-a333d1264af7': [1]}
+[DEBUG] apiKeys: ['0c0908ca-0e39-41e2-9e48-400e983ca698']
+[DEBUG] apiKeysUnplayable: ['0c0908ca-0e39-41e2-9e48-400e983ca698', '0f1cd229-bb69-445b-98eb-a333d1264af7']
+[DEBUG] dictApiPlayers[0f1cd229-bb69-445b-98eb-a333d1264af7]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:3:20 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjAzNzgwLCJpYXQiOjE3NTI2MDI1NDIsImp0aSI6ImQzM2QyNWEzOWQ5NDQ3NThiMTA3OTNiMjg4M2NhYjBmIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.NassimS5nhuiVKMscQAqwSQZuVUiCLTY7l5bszEsQpQ
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752603780, 'iat': 1752602542, 'jti': 'd33d25a39d944758b10793b2883cab0f', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 0f1cd229-bb69-445b-98eb-a333d1264af7
+[DEBUG] dictApiPlayers: {'0f1cd229-bb69-445b-98eb-a333d1264af7': [1]}
+[DEBUG] apiKeys: ['0c0908ca-0e39-41e2-9e48-400e983ca698']
+[DEBUG] apiKeysUnplayable: ['0c0908ca-0e39-41e2-9e48-400e983ca698', '0f1cd229-bb69-445b-98eb-a333d1264af7']
+[DEBUG] dictApiPlayers[0f1cd229-bb69-445b-98eb-a333d1264af7]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:3:25 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjAzNzgwLCJpYXQiOjE3NTI2MDI1NDIsImp0aSI6ImQzM2QyNWEzOWQ5NDQ3NThiMTA3OTNiMjg4M2NhYjBmIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.NassimS5nhuiVKMscQAqwSQZuVUiCLTY7l5bszEsQpQ
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752603780, 'iat': 1752602542, 'jti': 'd33d25a39d944758b10793b2883cab0f', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 0f1cd229-bb69-445b-98eb-a333d1264af7
+[DEBUG] dictApiPlayers: {'0f1cd229-bb69-445b-98eb-a333d1264af7': [1]}
+[DEBUG] apiKeys: ['0c0908ca-0e39-41e2-9e48-400e983ca698']
+[DEBUG] apiKeysUnplayable: ['0c0908ca-0e39-41e2-9e48-400e983ca698', '0f1cd229-bb69-445b-98eb-a333d1264af7']
+[DEBUG] dictApiPlayers[0f1cd229-bb69-445b-98eb-a333d1264af7]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player

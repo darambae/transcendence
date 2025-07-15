@@ -4,6 +4,8 @@ import json
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views import View
 from channels.layers import get_channel_layer
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from asgiref.sync import async_to_sync
 import asyncio
 import logging
@@ -18,6 +20,7 @@ logger = logging.getLogger(__name__)
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
 class ChatGroupListCreateView(View):
+    @method_decorator(csrf_exempt)
     def get(self, request, *args, **kwargs):
         """
         Lists chat groups for the logged-in user by proxying to access_postgresql.
@@ -39,7 +42,8 @@ class ChatGroupListCreateView(View):
         except Exception as e:
             logger.error(f"Failed to decode JSON from backend: {e}")
             return JsonResponse({'status': 'error', 'message': 'Internal server error during chat list retrieval.'}, status=500)
-
+    
+    @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         """
         Creates or retrieves a private chat group by proxying to access_postgresql.
@@ -85,6 +89,7 @@ class ChatMessageView(View):
     Maps to: path('chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message')
     Communicates with access_postgresql's /api/chat/<int:group_id>/messages/ endpoint (GET).
     """
+    @method_decorator(csrf_exempt)
     def get(self, request, group_id):
         offset = request.GET.get('offset', 0)
         limit = request.GET.get('limit', 20)
@@ -110,6 +115,7 @@ class ChatMessageView(View):
     Maps to: path('chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message')
     Communicates with access_postgresql's /api/chat/<int:group_id>/messages/ endpoint (POST).
     """
+    @method_decorator(csrf_exempt)
     def post(self, request, group_id):
         try:
             data = json.loads(request.body)
@@ -262,6 +268,7 @@ async def _generate_events(request, group_id):
         await channel_layer.group_discard(channel_group_name, client_channel_name)
 		
 class blockedStatus(View):
+    @method_decorator(csrf_exempt)
     def get(self, request, targetUserId):
         access_token = request.COOKIES.get('access_token')
         if not access_token:
@@ -278,6 +285,8 @@ class blockedStatus(View):
         except Exception as e:
             logger.error(f"Failed to decode JSON from backend: {e}")
             return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
+    
+    @method_decorator(csrf_exempt)    
     def post (self, request, targetUserId):
         try:
             access_token = request.COOKIES.get('access_token')
