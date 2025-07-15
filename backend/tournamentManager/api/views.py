@@ -370,16 +370,19 @@ async def leaveTournament(request):
 				if listJWT[i]["username"] != username:
 					# print(f'333 : {listJWT[i]["username"]}', file=sys.stderr)
 					lsTmp.append(trnmtDict[tKey].players[i])
+			await channel_layer.group_send(
+				tKey,
+				{
+					"type" : "sendHB",
+					"text_data" : {"lorem" : "ipsum"}
+				}
+			)
 			ws = user_ws_connections.get(username)
 			if ws:
 				await ws.close()
 				user_ws_connections.pop(username, None)
-			# print("444", file=sys.stderr)
 			trnmtDict[tKey].players = lsTmp
-			# print("555", file=sys.stderr)
 			trnmtDict[tKey].nbPl = len(lsTmp)
-			# print("666", file=sys.stderr)
-			# print("777", file=sys.stderr)
 
 			response = requests.delete("https://access_postgresql:4000/api/guest/", headers={"Authorization" : f"bearer {encoded}", 'Host': 'localhost'}, verify=False)
 			# print("888", file=sys.stderr)
@@ -387,6 +390,7 @@ async def leaveTournament(request):
 				res_json = response.json()
 				access = res_json.get("access", "None")
 				refresh = res_json.get("refresh", "None")
+
 				return await setTheCookie(JsonResponse({"Result" : "Player removed from lobby"}), access, refresh)
 		return JsonResponse({"Error" : "Tournament not found"}, status=404)
 	except Exception as e:
