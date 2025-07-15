@@ -492,4 +492,10 @@ def apiKeyManager(request) :
         return setApiKey(request)
 
 
-
+@csrf_exempt
+def destroyKey(request, key) :
+    try :
+        dictApi.pop(key)
+        return JsonResponse({"Success" : "Key deleted"})
+    except Exception as e :
+        return JsonResponse({"Error" : "Not found", status=404})
