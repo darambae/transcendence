@@ -17,6 +17,75 @@ logger = logging.getLogger(__name__)
 
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
+class tournamentChat(View):
+    def post(self, request, *args, **kwargs):
+        """
+        Creates or retrieves a tournament chat group by proxying to access_postgresql.
+        Expects 'current_user_id' and 'tournament_id' in the JSON body.
+        Tournament chats are group chats (private=False) that allow multiple participants.
+        """
+        try:
+            data = json.loads(request.body)
+            tournament_id = data.get('tournament_id')
+            current_user_id = data.get('current_user_id')
+            
+            if not tournament_id or not current_user_id:
+                return JsonResponse({'status': 'error', 'message': 'tournament_id and current_user_id are required.'}, status=400)
+
+            logger.info(f"Creating tournament chat for user {current_user_id} with tournament {tournament_id}")
+            
+            access_token = request.COOKIES.get('access_token')
+            if not access_token:
+                return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
+            
+            headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
+            url = f"{ACCESS_PG_BASE_URL}/api/chat/tournament/"
+            
+            try:
+                resp = requests.post(url, json={
+                    'current_user_id': current_user_id,
+                    'tournament_id': tournament_id
+                }, headers=headers, timeout=10, verify=False)
+                resp.raise_for_status()
+                
+                # Envoyer une notification pour le nouveau chat de tournoi
+                response_data = resp.json()
+                if response_data.get('status') == 'success':
+                    # Récupérer les informations du tournoi pour la notification
+                    channel_layer = get_channel_layer()
+                    if channel_layer:
+                        # Notification pour le créateur du tournoi
+                        notification_group_name = f"notifications_{current_user_id}"
+                        async_to_sync(channel_layer.group_send)(
+                            notification_group_name,
+                            {
+                                "type": "chat_notification",
+                                "notification": {
+                                    "type": "new_chat_group",
+                                    "chat_type": "tournament",
+                                    "tournament_id": tournament_id,
+                                    "tournament_name": response_data.get('tournament_name'),
+                                    "group_id": response_data.get('group_id'),
+                                    "timestamp": datetime.now().isoformat()
+                                }
+                            }
+                        )
+
+                return JsonResponse(resp.json(), status=resp.status_code)
+                
+            except requests.RequestException as exc:
+                logger.error(f"tournamentChat POST request failed: {exc}")
+                return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for tournament chat.'}, status=502)
+            except Exception as e:
+                logger.error(f"Internal server error during tournament chat creation: {e}")
+                return JsonResponse({'status': 'error', 'message': 'Internal server error during tournament chat creation.'}, status=500)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
+        except Exception as e:
+            logger.error(f"Internal server error: {e}")
+            return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
+
 class ChatGroupListCreateView(View):
     def get(self, request, *args, **kwargs):
         """

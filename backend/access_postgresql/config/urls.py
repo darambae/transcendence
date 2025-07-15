@@ -20,7 +20,7 @@ from api.views import info_link, api_signup, activate_account, checkPassword, ch
 from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvite, acceptInvite, logout, disconnected
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
-from api.views import ChatGroupListCreateView, ChatMessageView, blockedStatus
+from api.views import ChatGroupListCreateView, ChatMessageView, blockedStatus, tournamentChat
 #, ChatMessageHistoryView, ChatMessageSendView
 from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
@@ -57,5 +57,6 @@ urlpatterns = [
     #### Live Chat API URLs
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
-	path('api/chat/<int:targetUserId>/blockedStatus/', blockedStatus.as_view(), name='blockedUser')
+	path('api/chat/<int:targetUserId>/blockedStatus/', blockedStatus.as_view(), name='blockedUser'),
+	path('api/chat/tournament/', tournamentChat.as_view(), name='tournament_chat')  # POST=create tournament chat
 ]

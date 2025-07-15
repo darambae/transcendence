@@ -1,7 +1,8 @@
-import { actualizeIndexPage, loadTemplate } from '../utils.js';
+import { actualizeIndexPage, loadTemplate, fetchWithRefresh } from '../utils.js';
 import { getCookie } from '../utils.js';
 import { handleInvitSubmit } from './invits.js';
 import { localGameTr } from './tournamentLocalGame.js';
+import { promptTournamentChat, sendTournamentDuelInvitation } from './chat.js';
 
 let sseTournament;
 
@@ -162,6 +163,10 @@ export async function tournamentController() {
 								console.log(data);
 								if (data.t_state == 'game-start') {
 									console.log('SSE 1');
+
+									// ** NOUVEAUTÉ : Envoyer le message d'invitation de duel dans le chat **
+									sendDuelInvitationToTournamentChat(data);
+
 									const buttonGame = document.createElement('button');
 									console.log('SSE 2');
 									buttonGame.className = 'btn btn-outline-primary';
@@ -278,6 +283,10 @@ export async function tournamentController() {
 							console.log(data);
 							if (data.t_state == 'game-start') {
 								console.log('SSE 1');
+
+								// ** NOUVEAUTÉ : Envoyer le message d'invitation de duel dans le chat **
+								sendDuelInvitationToTournamentChat(data);
+
 								const buttonGame = document.createElement('button');
 								console.log('SSE 2');
 								buttonGame.className = 'btn btn-outline-primary';
@@ -385,8 +394,33 @@ export async function tournamentController() {
 					if (!response.ok) throw new Error('https Error: ' + response.status);
 					return response.json();
 				})
-				.then((data) => {
+				.then(async (data) => {
 					tournamentInfo.innerHTML = `<h6>${data['Info']}</h6>`;
+
+					// Créer le chat de tournoi après le lancement réussi
+					try {
+						// Récupérer les infos utilisateur
+						const userResponse = await fetchWithRefresh('/user-service/infoUser/', {
+							method: 'GET',
+							credentials: 'include',
+						});
+
+						if (userResponse.ok) {
+							const userData = await userResponse.json();
+							const currentUserId = userData.id;
+							const tournamentId = view; // L'ID du tournoi est dans view
+							const tournamentName = `Tournament_${view}`;
+
+							// Créer le chat de tournoi
+							await promptTournamentChat(currentUserId, tournamentId, tournamentName);
+							console.log(`Tournament chat created for tournament ${tournamentId}`);
+						} else {
+							console.error('Failed to get user info for tournament chat');
+						}
+					} catch (error) {
+						console.error('Error creating tournament chat:', error);
+						// Ne pas empêcher le tournoi de continuer si le chat échoue
+					}
 				})
 				.catch((error) => {
 					console.error('Erreur de requête :', error);
@@ -428,4 +462,161 @@ export async function tournamentController() {
 
 	window.onbeforeunload(event);
 	SSEStream.close();
+}
+
+/**
+ * Helper function to send duel invitation message to tournament chat
+ * @param {Object} matchData - The match data from the tournament SSE
+ */
+async function sendDuelInvitationToTournamentChat(matchData) {
+	try {
+		// Get current user info for authentication
+		const userData = await fetchWithRefresh('/user-service/infoUser/', {
+			method: 'GET',
+			credentials: 'include',
+		})
+		.then((response) => response.json())
+		.then((data) => ({
+			id: data.id,
+			username: data.user_name,
+		}))
+		.catch((error) => {
+			console.error('Error fetching user info for duel invitation:', error);
+			return null;
+		});
+
+		if (!userData || !userData.id) {
+			console.error('User data not found, cannot send duel invitation');
+			return;
+		}
+
+		// Extract tournament and player information from match data
+		const tournamentId = matchData.tkey; // Tournament key from SSE data
+		const player1Name = matchData.player1;
+		const player2Name = matchData.player2;
+
+		// Determine round information if available
+		let roundInfo = '';
+		if (matchData.round) {
+			roundInfo = `Round ${matchData.round}`;
+		} else if (matchData.stage) {
+			roundInfo = matchData.stage;
+		}
+
+		console.log(`Sending duel invitation for tournament ${tournamentId}: ${player1Name} vs ${player2Name}`);
+
+		// Send the duel invitation to the tournament chat
+		const success = await sendTournamentDuelInvitation(
+			tournamentId,
+			player1Name,
+			player2Name,
+			roundInfo,
+			userData.id
+		);
+
+		if (success) {
+			console.log('Duel invitation sent successfully to tournament chat');
+		} else {
+			console.warn('Failed to send duel invitation to tournament chat');
+		}
+
+	} catch (error) {
+		console.error('Error in sendDuelInvitationToTournamentChat:', error);
+	}
+}
+
+/**
+ * Send a tournament progress message to the tournament chat
+ * @param {string} tournamentId - The tournament ID
+ * @param {string} message - The message to send
+ * @param {string} messageType - Type of message ('info', 'success', 'warning', etc.)
+ */
+async function sendTournamentProgressMessage(tournamentId, message, messageType = 'info') {
+	try {
+		// Get current user info for authentication
+		const userData = await fetchWithRefresh('/user-service/infoUser/', {
+			method: 'GET',
+			credentials: 'include',
+		})
+		.then((response) => response.json())
+		.then((data) => ({
+			id: data.id,
+			username: data.user_name,
+		}))
+		.catch((error) => {
+			console.error('Error fetching user info for tournament message:', error);
+			return null;
+		});
+
+		if (!userData || !userData.id) {
+			console.error('User data not found, cannot send tournament message');
+			return;
+		}
+
+		// Add appropriate emoji based on message type
+		let emoji = '📢';
+		switch (messageType) {
+			case 'success':
+				emoji = '🎉';
+				break;
+			case 'warning':
+				emoji = '⚠️';
+				break;
+			case 'info':
+				emoji = 'ℹ️';
+				break;
+			case 'trophy':
+				emoji = '🏆';
+				break;
+			default:
+				emoji = '📢';
+		}
+
+		const formattedMessage = `${emoji} ${message}`;
+
+		console.log(`Sending tournament progress message for tournament ${tournamentId}: ${message}`);
+
+		// Find the tournament chat group in the chat room list
+		const chatGroups = document.querySelectorAll('#chatRoomList .list-group-item');
+		let tournamentGroupId = null;
+
+		// Look for the tournament chat in the chat room list
+		chatGroups.forEach(room => {
+			const roomText = room.textContent;
+			if (roomText && roomText.includes(`tournament_${tournamentId}`)) {
+				tournamentGroupId = room.dataset.groupId;
+			}
+		});
+
+		if (!tournamentGroupId) {
+			console.warn(`Tournament chat group not found for tournament ${tournamentId}`);
+			return false;
+		}
+
+		// Send the message using the existing chat API
+		const response = await fetchWithRefresh(`/chat/${tournamentGroupId}/messages/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCookie('csrftoken'),
+			},
+			credentials: 'include',
+			body: JSON.stringify({
+				content: formattedMessage,
+				group_id: tournamentGroupId,
+			}),
+		});
+
+		if (response.ok) {
+			console.log(`Tournament progress message sent successfully: ${message}`);
+			return true;
+		} else {
+			console.error('Failed to send tournament progress message');
+			return false;
+		}
+
+	} catch (error) {
+		console.error('Error in sendTournamentProgressMessage:', error);
+		return false;
+	}
 }
