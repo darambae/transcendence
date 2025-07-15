@@ -10,7 +10,7 @@ export async function localGameTr() {
 	let id2 = localStorage.getItem("p2");
 	let key = localStorage.getItem("key");
 	// let tkey = localStorage.getItem("tkey");
-	// console.log(id1, id2, key, tkey);
+	console.log(id1, id2, key);
 	  let sseTournament = getSSE();
   
 	//   console.log("aaa");
@@ -19,6 +19,9 @@ export async function localGameTr() {
 		//   console.log(event.data);
 		  const data = JSON.parse(event.data);
 		//   console.log(data);
+			if (data.next == "set-results") {
+        	    console.log("results : ", data);
+        	}
 		  if (data.t_state == "game-finished") {
 			  if (data.mkey == key) {
 				  actualizeIndexPage("contentTournementPage", routesTr['tournament'])
