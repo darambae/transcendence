@@ -204,6 +204,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		action = data.get("action")
 		# print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
+			# if self.name == trnmtDict[self.room_group_name].match1.p1.username :
+			await self.send(text_data=json.dumps({"t_state" : "firsts-match-preview", "tkey" : self.room_group_name, "match1" : {"player1" : trnmtDict[self.room_group_name].match1.p1.username, "player2" : trnmtDict[self.room_group_name].match1.p2.username}, "match2" : {"player1" : trnmtDict[self.room_group_name].match2.p1.username, "player2" : trnmtDict[self.room_group_name].match2.p2.username}}))
 			if trnmtDict[self.room_group_name].match1.launchable and not trnmtDict[self.room_group_name].match1.played:
 				await self.launchGame(trnmtDict[self.room_group_name].match1, 1)
 			if trnmtDict[self.room_group_name].match2.launchable and not trnmtDict[self.room_group_name].match2.played:
@@ -211,6 +213,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 		
 		elif action == "final-matches" :
 			# print(f"finals matches consumer |\n trnmtDict[self.room_group_name].matchLoserBracket.launchable : {trnmtDict[self.room_group_name].matchLoserBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.launchable {trnmtDict[self.room_group_name].matchWinnerBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.played : {trnmtDict[self.room_group_name].matchWinnerBracket.played} ||\n trnmtDict[self.room_group_name].matchLoserBracket.played {trnmtDict[self.room_group_name].matchLoserBracket.played} ", file=sys.stderr)
+			# if self.name == trnmtDict[self.room_group_name].matchWinnerBracket.p1.username:
+			await self.send(text_data=json.dumps({"t_state" : "final-match-preview", "tkey" : self.room_group_name, "matchWinner" : {"player1" : trnmtDict[self.room_group_name].matchWinnerBracket.p1.username, "player2" : trnmtDict[self.room_group_name].matchWinnerBracket.p2.username}, "matchLooser" : {"player1" : trnmtDict[self.room_group_name].matchLoserBracket.p1.username, "player2" : trnmtDict[self.room_group_name].matchLoserBracket.p2.username}}))
 			if trnmtDict[self.room_group_name].matchWinnerBracket.launchable and not trnmtDict[self.room_group_name].matchWinnerBracket.played:
 				await self.launchGame(trnmtDict[self.room_group_name].matchWinnerBracket, 2)
 			if trnmtDict[self.room_group_name].matchLoserBracket.launchable and not trnmtDict[self.room_group_name].matchLoserBracket.played:
@@ -226,12 +230,12 @@ class GameConsumer(AsyncWebsocketConsumer):
 			dicoInfo = {
 				"t_state" : "results",
 				"tkey" : self.room_group_name,
-				"first" : trnmtDict[self.room_group_name].first,
-				"second" : trnmtDict[self.room_group_name].second,
-				"third" : trnmtDict[self.room_group_name].third,
-				"fourth" : trnmtDict[self.room_group_name].fourth
+				"first" : trnmtDict[self.room_group_name].first.username,
+				"second" : trnmtDict[self.room_group_name].second.username,
+				"third" : trnmtDict[self.room_group_name].third.username,
+				"fourth" : trnmtDict[self.room_group_name].fourth.username
 			}
-
+			
 			await self.send(text_data=json.dumps(dicoInfo))
 
 		elif action == "supervise" and self.name == data.get("player", None):
@@ -275,6 +279,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 			}
 			if trnmt.first and trnmt.second and trnmt.third and trnmt.fourth :
 				print("SETING RESULTS !!", file=sys.stderr)
+
+				dicoInfo2 = {
+					"t_state" : "results",
+					"tkey" : self.room_group_name,
+					"first" : trnmtDict[self.room_group_name].first.username,
+					"second" : trnmtDict[self.room_group_name].second.username,
+					"third" : trnmtDict[self.room_group_name].third.username,
+					"fourth" : trnmtDict[self.room_group_name].fourth.username
+				}
+
 				await self.channel_layer.group_send(
 					self.room_group_name,
 					{
@@ -282,6 +296,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 						"text_data": {"action" : "ShowResults"}
 					}
 				)
+
+
 				# dicoInfo["first"] = trnmt.first.username
 				# dicoInfo["second"] = trnmt.second.username
 				# dicoInfo["third"] = trnmt.third.username

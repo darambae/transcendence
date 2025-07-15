@@ -24,7 +24,7 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
           
       }
       if (data.t_state == "results") {
-        console.log("===============--------=============>>", data);
+        console.log("------------------------------->>", data);
       }
     }
     catch(error){

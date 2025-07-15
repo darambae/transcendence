@@ -372,7 +372,13 @@ export async function tournamentController() {
                     }
                   }
                   if (data.t_state == "results") {
-                    console.log("===============--------=============>>", data);
+                    console.log("============================>>", data);
+                  }
+                  if (data.t_state == "firsts-match-preview") {
+                    console.log("data firsts match : ", data);
+                  }
+                  if (data.t_state == "final-match-preview") {
+                    console.log("data final match : ", data);
                   }
                 }
                 catch (error) {
@@ -553,6 +559,12 @@ export async function tournamentController() {
                     body: JSON.stringify({ "tKey": data.tkey })
                   })
                 }
+              }
+              if (data.t_state == "firsts-match-preview") {
+                console.log("data firsts match : ", data);
+              }
+              if (data.t_state == "final-match-preview") {
+                console.log("data final match : ", data);
               }
             }
             catch (error) {
