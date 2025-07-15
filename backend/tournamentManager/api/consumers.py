@@ -12,6 +12,8 @@ from .tournamentStatic import Tournament, Player, trnmtDict, getApiKeyTrnmt, LOC
 async def setResults(trnmt, username, roundMatch, mKey) :
 	# print(f"RoundM : {roundMatch} | type : {type(roundMatch).__name__}", file=sys.stderr)
 	if (int(roundMatch) == 1) :
+		with open("debugConsumer.log", 'a+') as f:
+			print("trnmt.match1.key, mkey, trnmt.match2.key: ", trnmt.match1.key, mKey, trnmt.match2.key, file=f)
 		# print("---------------------------------! Firsts match !---------------------------------")
 		if trnmt.match1.key == mKey :
 			# print("Soooo -> ", trnmt.match2.launchable, file=sys.stderr)
@@ -234,12 +236,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 					# print(f'--=LOOP jwt_l=--\nself.name : {self.name}\nelem["username"] : {elem["username"]}\nelem["invites"] : {elem["invites"]}\n\nCondition : {self.name == elem["username"] or self.name in elem["invites"]}', file=f)
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					self.guests == elem["invites"]
-		elif action == "supervise" :
+		elif action == "supervise" and self.name == data.get("player", None):
 			# print(f"A0 - {action}", file=sys.stderr)
 			roundMatch = data.get("round", 1)
 			# print(f"A1 - {roundMatch}", file=sys.stderr)
 			mKey = data.get("mKey", None)
 			tkey = data.get("tkey", None)
+			with open("debugConsumer.log", 'a+') as f:
+				print(f"name : {self.name}\n\nround : {roundMatch}\nmkey:  {mKey}\n------------------------\n\n", file=f)
 			# print(f"A2 - {mKey}", file=sys.stderr)
 			if not mKey:
 				# print(f"A3 - END", file=sys.stderr)
@@ -251,13 +255,27 @@ class GameConsumer(AsyncWebsocketConsumer):
 			task = asyncio.create_task(supervise_match(mKey))
 			results = await task
 			# print(f"A6 - {results}", file=sys.stderr)
-			if results["score1"] == 5 : ########################################################################################################################################################################################################################################################################################################################################################################
-				# print(f"A7 - res1 [{results} | {trnmt}]", file=sys.stderr)
-				if results["username1"] != trnmt.matchWinnerBracket.p1 and results["username1"] != trnmt.matchLoserBracket.p1 :
+			with open("debugConsumer.log", 'a+') as f:
+				print(f"name : {self.name}\n\nresults: {results}\n------------------------\n\n", file=f)
+			if int(roundMatch) == 1 : 
+				with open("debugConsumer.log", 'a+') as f:
+					print(f"Yes roundMatch = 1", file=f)
+				if int(results["score1"]) == 5 : 
+					with open("debugConsumer.log", 'a+') as f:
+						print(f"Yes score1 = 5", file=f)
 					matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
-			else :
-				# print(f"A8 - res2", file=sys.stderr)
-				if results["username2"] != trnmt.matchWinnerBracket.p1 and results["username2"] != trnmt.matchLoserBracket.p1 :
+				else :
+					with open("debugConsumer.log", 'a+') as f:
+						print(f"No score2 = 5", file=f)
+					# print(f"A8 - res2", file=sys.stderr)
+					matchId, nextToLaunch = await setResults(trnmt, results["username2"], roundMatch, results['matchKey'])
+			elif int(roundMatch) == 2 :
+				with open("debugConsumer.log", 'a+') as f:
+					print(f"No roundMatch = 2", file=f)
+				if int(results["score1"]) == 5 : 
+					matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
+				else :
+					# print(f"A8 - res2", file=sys.stderr)
 					matchId, nextToLaunch = await setResults(trnmt, results["username2"], roundMatch, results['matchKey'])
 			
 			# print("TOURNAMENT MATCH FINISHED !!!!!!!!!!!!!!!!!!!!!!!!!!!", file=sys.stderr)

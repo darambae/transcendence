@@ -435,6 +435,8 @@ async def Supervise(request) :
 	try :
 		channel_layer = get_channel_layer()
 		# print("-", file=sys.stderr)
+		jwt = await decodeJWT(request)
+		jwt = jwt[0]['payload']
 		tkey = request.GET.get("tkey")
 		# print(f"- -{tkey}- | {tkey in trnmtDict}", file=sys.stderr)
 		mkey = request.GET.get("key")
@@ -445,7 +447,7 @@ async def Supervise(request) :
 			tkey,
 			{
 				"type": "tempReceived",
-				"text_data": {"action" : "supervise", "round" : roundM, "mKey" : mkey, "tkey" : tkey}
+				"text_data": {"action" : "supervise", "round" : roundM, "mKey" : mkey, "tkey" : tkey, "player" : jwt["username"]}
 			}
 		)
 		# print("-", file=sys.stderr)

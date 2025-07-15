@@ -10,7 +10,9 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
       const data = JSON.parse(event.data);
 
       if (data.t_state == "game-finished") {
-        //if (data.next == "set-results") {
+        if (data.next == "set-results") {
+            console.log("results : ", data);
+        }
         //  sseTournament.close();
         //  fetchWithRefresh(`tournament/${data.tkey}/results/`, {
         //    credentials: 'include'
