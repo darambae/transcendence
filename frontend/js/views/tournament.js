@@ -239,7 +239,9 @@ async function startTournament(data) {
 	})
 		.then((response) => {
 			if (!response.ok) {
-				console.error(`Tournament start failed: ${response.status} ${response.statusText}`);
+				console.error(
+					`Tournament start failed: ${response.status} ${response.statusText}`
+				);
 				console.error(`Request body: ${JSON.stringify({ tKey: view })}`);
 				console.error(`CSRF token: ${csrf}`);
 				throw new Error('https Error: ' + response.status);
@@ -388,7 +390,7 @@ export async function affichUserTournament() {
 export async function tournamentController() {
 	// Reset launch flag when entering tournament page
 	launchbool = false;
-	
+
 	const ulDropdown = document.getElementById('trnmt-list-ul');
 	const ulElem = document.getElementById('trnmt-list-ul');
 	listTournament(csrf, ulElem);
@@ -606,154 +608,158 @@ export async function tournamentController() {
 	}
 
 	ulDropdown.addEventListener('click', async (event) => {
-    const target = event.target;
-    let usernameJwt;
-    let jwtInfo;
-    let guestJwt;
+		const target = event.target;
+		let usernameJwt;
+		let jwtInfo;
+		let guestJwt;
 
-    if (target.tagName === 'BUTTON') {
-        event.preventDefault();
-        const view = target.dataset.view;
-        const btnId = document.getElementById(view);
+		if (target.tagName === 'BUTTON') {
+			event.preventDefault();
+			const view = target.dataset.view;
+			const btnId = document.getElementById(view);
 
-        try {
-            const response = await fetchWithRefresh('tournament/check-sse', {
-                headers: {
-                    'X-CSRFToken': csrf,
-                },
-                credentials: 'include',
-            });
-            
-            if (!response.ok) throw new Error('HTTP Error: ' + response.status);
-            
-            jwtInfo = await response.json();
-            usernameJwt = jwtInfo['key'];
-            guestJwt = jwtInfo['guests'];
-        } catch (error) {
-            console.log('Error getting JWT info:', error);
-            return; // Exit early if we can't get JWT info
-        }
+			try {
+				const response = await fetchWithRefresh('tournament/check-sse', {
+					headers: {
+						'X-CSRFToken': csrf,
+					},
+					credentials: 'include',
+				});
 
-        try {
-            const response = await fetchWithRefresh('tournament/tournament', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrf,
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({ action: 'join', tKey: view }),
-            });
+				if (!response.ok) throw new Error('HTTP Error: ' + response.status);
 
-            btnId.style.backgroundColor = 'red';
-            
-            if (!response.ok) throw new Error('HTTP Error: ' + response.status);
-            
-            const data = await response.json();
-            btnId.style.backgroundColor = 'green';
+				jwtInfo = await response.json();
+				usernameJwt = jwtInfo['key'];
+				guestJwt = jwtInfo['guests'];
+			} catch (error) {
+				console.log('Error getting JWT info:', error);
+				return; // Exit early if we can't get JWT info
+			}
 
-            // Close existing SSE connection if it exists
-            if (SSEStream && SSEStream.readyState !== EventSource.CLOSED) {
-                SSEStream.close();
-            }
+			try {
+				const response = await fetchWithRefresh('tournament/tournament', {
+					method: 'POST',
+					headers: {
+						'X-CSRFToken': csrf,
+						'Content-Type': 'application/json',
+					},
+					credentials: 'include',
+					body: JSON.stringify({ action: 'join', tKey: view }),
+				});
 
-            // Create new SSE connection
-            const url_sse = `tournament/events?tKey=${data['key']}&name=${usernameJwt}&guests=${guestJwt}`;
-            SSEStream = new EventSource(url_sse);
-            setSSE(SSEStream);
+				btnId.style.backgroundColor = 'red';
 
-            // Add error handler first
-            SSEStream.onerror = function(error) {
-                console.error('SSE connection error:', error);
-            };
+				if (!response.ok) throw new Error('HTTP Error: ' + response.status);
 
-            // Set up message handler only after SSE is created
-            SSEStream.onmessage = async function (event) {
-                try {
-                    // Skip heartbeat messages
-                    if (event.data === 'heartbeat' || event.data === 'hearthbeat' || event.data.trim() === '') {
-                        return;
-                    }
-                    
-                    const data = JSON.parse(event.data);
-                    console.log('SSE message received:', data);
-                    
-                    if (data.t_state == 'game-start') {
-                        const buttonGame = document.createElement('button');
-                        buttonGame.className = 'btn btn-outline-primary';
-                        buttonGame.textContent = 'Launch game';
-                        buttonGame.dataset.type = data.mode;
-                        
-                        if (data.mode == 'local') {
-                            buttonGame.dataset.p1 = data.player1;
-                            buttonGame.dataset.p2 = data.player2;
-                        } else {
-                            buttonGame.dataset.player = data.player;
-                            buttonGame.dataset.playerId = data.playerId;
-                        }
-                        
-                        buttonGame.dataset.round = data.round;
-                        buttonGame.dataset.key = data.key;
-                        buttonGame.dataset.tkey = data.tkey;
-                        
-                        tournamentGame.innerHTML = '';
-                        tournamentGame.appendChild(buttonGame);
-                        
-                    } else if (data.t_state == 'game-finished') {
-                        await actualizeIndexPage('contentTournementPage', routesTr['tournament']);
-                        
-                        if (data.next == 'final-rounds') {
-                            await fetchWithRefresh('tournament/finals', {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRFToken': csrf,
-                                    'Content-Type': 'application/json',
-                                },
-                                credentials: 'include',
-                                body: JSON.stringify({ tKey: data.tkey }),
-                            });
-                        } else {
-                            await fetchWithRefresh('tournament/match', {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRFToken': csrf,
-                                    'Content-Type': 'application/json',
-                                },
-                                credentials: 'include',
-                                body: JSON.stringify({ tKey: data.tkey }),
-                            });
-                        }
-                    }
-                    
-                    if (data.t_state == 'Someone-joined-left') {
-                        console.log('Someone joined/left:', data);
-                        await affichUserTournament();
-                    }
-                    
-                } catch (error) {
-                    console.error('Error processing SSE message:', error);
-                }
-            };
+				const data = await response.json();
+				btnId.style.backgroundColor = 'green';
 
-            // Create leave button
-            leaveButton = document.createElement('button');
-            leaveButton.id = view;
-            leaveButton.className = 'btn btn-outline-secondary';
-            leaveButton.textContent = 'Leave';
-            tournamentLeave.appendChild(leaveButton);
+				// Close existing SSE connection if it exists
+				if (SSEStream && SSEStream.readyState !== EventSource.CLOSED) {
+					SSEStream.close();
+				}
 
-            await refreshTournament();
-            stopAutoRefresh();
-            setPositionTournamentList('absolute');
-            
-            return invitsController();
-            
-        } catch (error) {
-            console.error('Error joining tournament:', error);
-            btnId.style.backgroundColor = ''; // Reset button color on error
-        }
-    }
-  });
+				// Create new SSE connection
+				const url_sse = `tournament/events?tKey=${data['key']}&name=${usernameJwt}&guests=${guestJwt}`;
+				SSEStream = new EventSource(url_sse);
+				setSSE(SSEStream);
+
+				// Add error handler first
+				SSEStream.onerror = function (error) {
+					console.error('SSE connection error:', error);
+				};
+
+				// Set up message handler only after SSE is created
+				SSEStream.onmessage = async function (event) {
+					try {
+						// Skip heartbeat messages
+						if (
+							event.data === 'heartbeat' ||
+							event.data === 'hearthbeat' ||
+							event.data.trim() === ''
+						) {
+							return;
+						}
+
+						const data = JSON.parse(event.data);
+						console.log('SSE message received:', data);
+
+						if (data.t_state == 'game-start') {
+							const buttonGame = document.createElement('button');
+							buttonGame.className = 'btn btn-outline-primary';
+							buttonGame.textContent = 'Launch game';
+							buttonGame.dataset.type = data.mode;
+
+							if (data.mode == 'local') {
+								buttonGame.dataset.p1 = data.player1;
+								buttonGame.dataset.p2 = data.player2;
+							} else {
+								buttonGame.dataset.player = data.player;
+								buttonGame.dataset.playerId = data.playerId;
+							}
+
+							buttonGame.dataset.round = data.round;
+							buttonGame.dataset.key = data.key;
+							buttonGame.dataset.tkey = data.tkey;
+
+							tournamentGame.innerHTML = '';
+							tournamentGame.appendChild(buttonGame);
+						} else if (data.t_state == 'game-finished') {
+							await actualizeIndexPage(
+								'contentTournementPage',
+								routesTr['tournament']
+							);
+
+							if (data.next == 'final-rounds') {
+								await fetchWithRefresh('tournament/finals', {
+									method: 'POST',
+									headers: {
+										'X-CSRFToken': csrf,
+										'Content-Type': 'application/json',
+									},
+									credentials: 'include',
+									body: JSON.stringify({ tKey: data.tkey }),
+								});
+							} else {
+								await fetchWithRefresh('tournament/match', {
+									method: 'POST',
+									headers: {
+										'X-CSRFToken': csrf,
+										'Content-Type': 'application/json',
+									},
+									credentials: 'include',
+									body: JSON.stringify({ tKey: data.tkey }),
+								});
+							}
+						}
+
+						if (data.t_state == 'Someone-joined-left') {
+							console.log('Someone joined/left:', data);
+							await affichUserTournament();
+						}
+					} catch (error) {
+						console.error('Error processing SSE message:', error);
+					}
+				};
+
+				// Create leave button
+				leaveButton = document.createElement('button');
+				leaveButton.id = view;
+				leaveButton.className = 'btn btn-outline-secondary';
+				leaveButton.textContent = 'Leave';
+				tournamentLeave.appendChild(leaveButton);
+
+				await refreshTournament();
+				stopAutoRefresh();
+				setPositionTournamentList('absolute');
+
+				return invitsController();
+			} catch (error) {
+				console.error('Error joining tournament:', error);
+				btnId.style.backgroundColor = ''; // Reset button color on error
+			}
+		}
+	});
 
 	tournamentLeave.addEventListener('click', async (event) => {
 		const target = event.target;
@@ -854,7 +860,10 @@ export async function tournamentController() {
 				//   console.log(data);
 				// })
 
-				return await actualizeIndexPage('contentTournementPage', routesTr['matchSp']);
+				return await actualizeIndexPage(
+					'contentTournementPage',
+					routesTr['matchSp']
+				);
 			} else {
 				let idJWT;
 				try {
