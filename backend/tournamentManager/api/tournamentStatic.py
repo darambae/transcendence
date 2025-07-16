@@ -60,7 +60,7 @@ class Match() :
         self.jwtP1 = self.p1.jwt
         self.jwtP2 = self.p2.jwt
 
-        print(f"p1 : {self.jwtP1}\np2 : {self.jwtP2}", file=sys.stderr)
+        print(f"p1Name: {self.p1.username}\np11 : {self.jwtP1}\n\np2Name: {self.p2.username}\np22 : {self.jwtP2}", file=sys.stderr)
 
         if self.jwtP1["username"] == self.jwtP2["username"] :
             print("match-init", file=sys.stderr)

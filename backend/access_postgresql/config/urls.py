@@ -19,7 +19,7 @@ from django.urls import path
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword, forgotPassword
 from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvite, acceptInvite, logout, disconnected
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
-from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
+from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend, deletteFriends
 from api.views import ChatGroupListCreateView, ChatMessageView, blockedStatus
 #, ChatMessageHistoryView, ChatMessageSendView
 from api.views import matchHistory
@@ -51,6 +51,7 @@ urlpatterns = [
 	path('api/add/friend/', addFriend.as_view(), name='addFriend'),
 	path('api/declineInvite/', declineInvite.as_view(), name='declineInvite'),
 	path('api/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
+	path('api/deletteFriends/', deletteFriends.as_view(), name='deletteFriends'),
 	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
 	path('api/logout/', logout.as_view(), name='logout'),
 	path('api/forgotPassword/', forgotPassword.as_view(), name='forgotPassword'),

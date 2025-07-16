@@ -13,6 +13,7 @@ import { forgotPasswordController } from './views/forgotPassword.js';
 import { invitsController } from './views/tournament.js';
 import { versusController } from './views/versusGame.js';
 import { localGameController } from './views/localGame.js';
+import { aiController } from './views/ai.js';
 
 export const routes = {
 	home: {
@@ -82,5 +83,9 @@ export const routes = {
 		template: 'invits',
 		controller: invitsController,
 	},
+	ai: (key) => ({
+		template : 'multiplayerTournament',
+		controller: () => aiController(key),
+	}) 
 };
 		

@@ -205,7 +205,8 @@ class checkTfa(APIView):
 				# print("user.activated", user.activated, file=sys.stderr)
 				if user.activated and user.two_factor_auth:
 					# print("here in 2FA checking with JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3 \
+					and user.user_name not in data["jwt"]["invites"] and user.user_name != data["jwt"]["username"] :
 						# print("checkPassword ok !", file=sys.stderr)
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
@@ -219,7 +220,7 @@ class checkTfa(APIView):
 											 'access': str(data_generate_jwt['access'])},
 											 status=200)
 					else :
-						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+						return JsonResponse({'error': 'account is already a guest / invalid account'}, status=401)
 				else:
 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
 			else :
@@ -928,6 +929,36 @@ class acceptInvite(APIView):
 			{"message": f"Friend request from {to_user.user_name} accepted"},
 			status=200
 		)
+
+
+class deletteFriends(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+		from_user = request.user
+		to_username = request.data.get("username")
+
+		to_user = get_object_or_404(USER, user_name=to_username)
+
+		friend_relation = FRIEND.objects.filter(
+            Q(from_user=from_user, to_user=to_user) |
+            Q(from_user=to_user, to_user=from_user),
+            status="accepted"
+        ).first()
+
+		if not friend_relation:
+			return Response(
+				{"error": "error friend_relation dont existed"},
+				status=404
+			)
+
+		friend_relation.delete()
+
+		return Response(
+			{"message": f"friends with {to_user.user_name} delete"},
+			status=200
+		)
+
 
 class logout(APIView):
 	permission_classes = [IsAuthenticated]

@@ -107,23 +107,37 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	// Wait for game to be ready before establishing SSE connection
 	console.log('Waiting for game to be ready...');
-	
+
 	// Set up cleanup listeners early
 	window.addEventListener('beforeunload', cleanupMultiplayerGame);
 	window.addEventListener('hashchange', cleanupMultiplayerGame);
 	window.addEventListener('pagehide', cleanupMultiplayerGame);
-	
-	await waitForGameReady(
-		key,
-		playerID,
-		isAiGame,
-		JWTid,
-		username,
-		a,
-		b,
-		c,
-		csrf
-	);
+
+	if (isAiGame == 0) {
+		await waitForGameReady(
+			key,
+			playerID,
+			isAiGame,
+			JWTid,
+			username,
+			a,
+			b,
+			c,
+			csrf
+		);
+	} else {
+		await establishSSEConnection(
+			key,
+			playerID,
+			isAiGame,
+			JWTid,
+			username,
+			a,
+			b,
+			c,
+			csrf
+		);
+	}
 }
 
 // Cleanup function for multiplayer games
@@ -447,7 +461,7 @@ function setupMultiplayerKeyHandler(apiKey) {
 						try {
 							await fetch(currentMultiplayerPostUrl, {
 								method: 'POST',
-							 headers: {
+								headers: {
 									'Content-Type': 'application/json',
 								},
 								body: JSON.stringify({
@@ -592,6 +606,12 @@ async function establishSSEConnection(
 	// Common SSE message handler function
 	const handleMultiplayerSSEMessage = (event) => {
 		try {
+			if (
+				event.data === 'heartbeat' ||
+				event.data.trim() === ''
+			) {
+				return;
+			}
 			const data = JSON.parse(event.data);
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');
@@ -812,17 +832,20 @@ async function destroyApiKey(apiKey) {
 	}
 
 	const csrf = getCookie('csrftoken');
-	
+
 	try {
 		console.log(`Destroying API key: ${apiKey}`);
-		const response = await fetchWithRefresh(`server-pong/${apiKey}/delete-key/`, {
-			method: 'POST',
-			headers: {
-				'X-CSRFToken': csrf,
-				'Content-Type': 'application/json',
-			},
-			credentials: 'include',
-		});
+		const response = await fetchWithRefresh(
+			`server-pong/${apiKey}/delete-key/`,
+			{
+				method: 'POST',
+				headers: {
+					'X-CSRFToken': csrf,
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+			}
+		);
 
 		if (response.ok) {
 			const result = await response.json();
