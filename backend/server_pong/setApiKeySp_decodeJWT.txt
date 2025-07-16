@@ -1,5 +1,0 @@
---------------------------
-Beginning : 18:2:38 
-encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjAzNzQyLCJpYXQiOjE3NTI2MDI1NDIsImp0aSI6ImY2YTdhZWQyM2Q3YzQ5N2RiZmIxYzI1Y2U0MzIyYTMwIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.wLUFxH7Os-EvfUErfWNcAQ-wlwxWaLhU88qTlbYcOSY
-res : <Response [200]>
-res.json() : {'payload': {'token_type': 'access', 'exp': 1752603742, 'iat': 1752602542, 'jti': 'f6a7aed23d7c497dbfb1c25ce4322a30', 'user_id': 1, 'username': 'kelly', 'invites': []}}
