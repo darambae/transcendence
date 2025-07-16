@@ -11,10 +11,11 @@ import { card_profileController } from './views/card_profile.js';
 import { dashboardsController } from './views/dashboards.js';
 import { forgotPasswordController } from './views/forgotPassword.js';
 import { invitsController } from './views/tournament.js';
-
+import { versusController } from './views/versusGame.js';
+import { localGameController } from './views/localGame.js';
+import { aiController } from './views/ai.js';
 
 export const routes = {
-
 	home: {
 		template: 'home',
 		controller: homeController,
@@ -31,6 +32,14 @@ export const routes = {
 		template: 'tournament',
 		controller: tournamentController,
 	},
+	playerSelection: {
+		template: 'versusGame',
+		controller: versusController,
+	},
+	game: (id1, id2) => ({
+		template: 'localGame',
+		controller: () => localGameController(id1, id2),
+	}),
 	login: {
 		template: 'login',
 		controller: loginController,
@@ -51,16 +60,16 @@ export const routes = {
 		template: 'card_profile',
 		controller: () => card_profileController(username),
 		isModal: true,
-		username: username
+		username: username,
 	}),
 	settings_profile: {
 		template: 'settings_profile',
 		controller: settingsProfileController,
 	},
-	chat: (userId ,username) => ({
+	chat: (userId, username) => ({
 		template: 'chat',
 		controller: () => chatController(userId, username),
-		username: username	
+		username: username,
 	}),
 	dashboards: {
 		template: 'dashboards',
@@ -68,11 +77,15 @@ export const routes = {
 	},
 	forgotPassword: {
 		template: 'forgotPassword',
-		controller: forgotPasswordController
+		controller: forgotPasswordController,
 	},
 	guest: {
 		template: 'invits',
 		controller: invitsController,
 	},
+	ai: (key) => ({
+		template : 'multiplayerTournament',
+		controller: () => aiController(key),
+	}) 
 };
 		

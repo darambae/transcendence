@@ -17,6 +17,7 @@ import requests
 import re
 from .utils import setTheCookie
 from .logging_utils import log_api_request, log_authentication_event, log_external_request, log_proxy_request, log_validation_error, api_logger as user_logger
+import re
 
 
 @ensure_csrf_cookie
@@ -50,10 +51,8 @@ def signup(request):
             return JsonResponse({'create_user': {'error': f'Field {field} is too long max size is {len_for_fields[field]} character'}}, status=400)
         if len(data['password']) < 8:
             return JsonResponse({'create_user': {'error': f'Field password is too short minimum body is 8 caracter'}}, status=400)
-
-    # Username validation - check for whitespace
-    if re.search(r'\s', data['username']):
-        return JsonResponse({'create_user': {'error': 'Username cannot contain spaces or whitespace characters'}}, status=400)
+        if re.search(r'\s', data['username']):
+            return JsonResponse({'create_user': {'error': 'Username cannot contain spaces or whitespace characters'}}, status=400)
 
     try:
         validate_email(data['mail'])
@@ -458,6 +457,36 @@ class declineInvite(APIView):
             )
 
 
+class deleteFriends(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.COOKIES.get('access_token')
+        username = request.data.get('username')
+
+        json_data = {
+            'username':username
+        }
+
+        try:
+            response = requests.patch(
+                'https://access_postgresql:4000/api/deleteFriends/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+                json=json_data,
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+
 class acceptInvite(APIView):
     permission_classes = [AllowAny]
 
@@ -503,7 +532,7 @@ class matchHistory(APIView):
                 },
             )
             res = requests.get('https://access_postgresql:4000/api/DecodeJwt/', headers={"Authorization" : f"bearer {token}", 'Host': 'localhost'}, verify=False)
-            print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
+            # print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
 
             return Response(response.json().get("result"), status=response.status_code)
 
@@ -512,3 +541,4 @@ class matchHistory(APIView):
                 {'error': f'Access to access_postgres for matchHistory: {str(e)}'},
                 status=500
             )
+

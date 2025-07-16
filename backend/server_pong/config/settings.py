@@ -17,6 +17,11 @@ import logging
 
 APP_NAME = 'server-pong'
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://transcendence.42.fr:8443',
+	'https://localhost:8443',
+]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR.parent
@@ -65,52 +70,15 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://localhost:8443",
-    "http://127.0.0.1:3000",
-    "https://server-pong:8030",
-    "https://transcendence.42.fr:8443",
-    "https://10.18.161.147:8443",
-]
-
-# Allow cookies to be sent in cross-origin requests
-CORS_ALLOW_CREDENTIALS = True
-
-# CSRF settings for trusted origins
-CSRF_TRUSTED_ORIGINS = [
-    "https://localhost:8443",
-    "https://server-pong:8030",
-    "https://transcendence.42.fr:8443",
-    "https://10.18.161.147:8443",
-]
-
-# If needed, allow specific HTTP methods
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
-
-# Allow all headers in requests
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-
-# For development, you can set this to True to allow all origins
-CORS_ALLOW_ALL_ORIGINS = True
-
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "https://localhost:8443",
+#     "http://127.0.0.1:3000",
+#     "https://server-pong:8030",
+#     "https://transcendence.42.fr:8443",
+#     "https://10.18.161.147:8443",
+# ]
+CORS_ALLOWED_ORIGINS = ["*"]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -137,7 +105,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

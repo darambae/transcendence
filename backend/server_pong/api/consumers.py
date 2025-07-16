@@ -17,7 +17,7 @@ from serverPong.ball import Movement, BallData, calcIntersections
 urlAI = "https://ai_pong:8020/"
 
 def calcAllIntersections(walls, ptRacket1, ptRacket2) :
-	print("Walls : ", len(walls), file=sys.stderr)
+	# print("Walls : ", len(walls), file=sys.stderr)
 	for w in walls:
 		if (calcIntersections(w[0], w[1], ptRacket1, ptRacket2) != (None, None)) :
 			return True
@@ -25,9 +25,9 @@ def calcAllIntersections(walls, ptRacket1, ptRacket2) :
 
 async def launchAiGame(url) :
 	asyncio.sleep(0.5)
-	#print("ai game", file=sys.stderr)
-	requests.get(url)
-	#print("ai game2", file=sys.stderr)
+	## print("ai game", file=sys.stderr)
+	requests.get(url, verify=False, headers={'Host' : 'localhost'})
+	## print("ai game2", file=sys.stderr)
 
 class GameConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -43,21 +43,21 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		self.map = Map() #None
 		self.gameSimulation = Movement(BallData(), self.room_group_name, map=self.map, plnb=2, usrID=self.usrID)
-		#print("room :", self.room_group_name, file=sys.stderr)
-		#print("user ID : ", self.usrID, file=sys.stderr)
+		## print("room :", self.room_group_name, file=sys.stderr)
+		## print("user ID : ", self.usrID, file=sys.stderr)
 
 		if not self.room_group_name:
 			await self.close()
 			return
 
 		cache.set(f'simulation_state_{self.room_group_name}', {"State" : "Waiting for start"}, timeout=None)
-		#print("6", file=sys.stderr)
+		## print("6", file=sys.stderr)
 		self.game_running = False
 		self.task = None
 		# self.scoring = False
 		self.matchReplay = []
 		if not self.room_group_name in dictInfoRackets :
-			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 300], [5,395]], "racket2" : [[995, 300], [995, 395]]}
+			dictInfoRackets[self.room_group_name] = {"playersUsernames" : [None, None], "scoring" : False, "racket1" : [[5, 280], [5,395]], "racket2" : [[995, 280], [995, 395]]}
 		
 		if self.usrID == 0 :
 			u1 = params.get("u1", "Guest")
@@ -72,7 +72,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			u = params.get("name", "Guest")
 			dictInfoRackets[self.room_group_name]["playersUsernames"][1] = u
 
-		# print(dictInfoRackets, file=sys.stderr)
+		# # print(dictInfoRackets, file=sys.stderr)
 
 		await self.channel_layer.group_add(
 			self.room_group_name,
@@ -105,7 +105,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			stats = cache.get(f'simulation_state_{self.room_group_name}')
 			stats[f"team{2 - (plId != 1)}Score"] = 5 ##########################################################################################################____________________________________
 			cache.set(f'simulation_state_{self.room_group_name}', stats, timeout=None)
-			# print(f"cache : {cache.get(f'simulation_state_{self.room_group_name}')}", file=sys.stderr)
+			# # print(f"cache : {cache.get(f'simulation_state_{self.room_group_name}')}", file=sys.stderr)
 		elif action == "start":
 			mapString = data.get("map", "default.json")
 			await self.send(text_data=json.dumps({
@@ -141,27 +141,27 @@ class GameConsumer(AsyncWebsocketConsumer):
 		# 				dictInfoRackets[self.room_group_name]["racket2"][0][1] -= 5
 		# 				dictInfoRackets[self.room_group_name]["racket2"][1][1] -= 5
 			# except Exception as e :
-			# 	print(f"ERROR : {e}")
+			# 	# print(f"ERROR : {e}")
 
 	async def tempReceived(self, event) :
-		print(f"tempReiceived server_pong : {event}", file=sys.stderr)
+		# print(f"tempReiceived server_pong : {event}", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	async def disconnectUser(self, event) :
 		if (self.usrID <= 1) :
-			#print("yikes", file=sys.stderr)
+			## print("yikes", file=sys.stderr)
 			await self.gameSimulation.stopSimulation()
-		#print("Disconnecteed from game !",file=sys.stderr)
+		## print("Disconnecteed from game !",file=sys.stderr)
 		if self.t2 is not None :
 			self.task.cancel()
-			#print("Yes t2 cancel", file=sys.stderr)
+			## print("Yes t2 cancel", file=sys.stderr)
 			await self.task
 			cache.delete(f"simulation_state_{self.room_group_name}")
 			await self.close()
 
 	async def game_update(self, event):
 		game_stats = event.get('game_stats', {})
-		# print("game_stats type: ", type(game_stats).__name__, file=sys.stderr)
+		# # print("game_stats type: ", type(game_stats).__name__, file=sys.stderr)
 		# self.matchReplay.append(game_stats)
 
 		await self.send(text_data=json.dumps({
@@ -170,27 +170,28 @@ class GameConsumer(AsyncWebsocketConsumer):
 	
 	async def run_simulation(self):
 		try:
-			# #print("==> Inside run_simulation()", file=sys.stderr)
+			# ## print("==> Inside run_simulation()", file=sys.stderr)
 			await self.gameSimulation.doSimulation()
 		except Exception as e:
 			print(f"Simulation crashed: {e}", file=sys.stderr)
 
 	async def send_game_updates(self) -> None:
 		try:
-			#print("usrID send_game_update :", type(self.usrID).__name__, file=sys.stderr)
+			## print("usrID send_game_update :", type(self.usrID).__name__, file=sys.stderr)
 			if (self.usrID <= 1) :
-				#print("Yes !!!", file=sys.stderr)
+				## print("Yes !!!", file=sys.stderr)
 				self.t2 = asyncio.create_task(self.run_simulation())
 
 				while self.game_running:
 					await asyncio.sleep(0.016)
 					try:
 						stats = cache.get(f"simulation_state_{self.room_group_name}")
-						#print(f"self.ai : {self.AI}", file=sys.stderr)
 						if self.AI :
-							#print("Create ai ;", file=sys.stderr)
+							print(f"self.ai : {self.AI}", file=sys.stderr)
+						if self.AI :
+							print("Create ai ;", file=sys.stderr)
 							asyncio.create_task(launchAiGame(f"{urlAI}init-ai?apikey={self.room_group_name}"))
-							#print("Task created, setting AI to false", file=sys.stderr)
+							# print("Task created, setting AI to false", file=sys.stderr)
 							self.AI = False
 							#print("Self.ai put to false", file=sys.stderr)
 						#print(f"11111111 : {stats}", file=sys.stderr)
@@ -231,7 +232,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 								}
 							)
 					except Exception as e:
-						print(f"!!! Failed to send update: {e}", file=sys.stderr)
+						pass
+						# print(f"!!! Failed to send update: {e}") #, file=sys.stderr)
 		except asyncio.CancelledError:
 			self.t2.cancel()
 			await self.t2

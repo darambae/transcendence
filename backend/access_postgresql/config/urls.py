@@ -19,8 +19,9 @@ from django.urls import path
 from api.views import info_link, api_signup, activate_account, checkPassword, checkTfa, checkCurrentPassword, forgotPassword
 from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvite, acceptInvite, logout, disconnected
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
-from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend
-from api.views import ChatGroupListCreateView, ChatMessageView
+from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend, deleteFriends
+from api.views import ChatGroupListCreateView, ChatMessageView, blockedStatus
+#, ChatMessageHistoryView, ChatMessageSendView
 from api.views import matchHistory
 from rest_framework_simplejwt.views import (TokenRefreshView)
 
@@ -50,11 +51,12 @@ urlpatterns = [
 	path('api/add/friend/', addFriend.as_view(), name='addFriend'),
 	path('api/declineInvite/', declineInvite.as_view(), name='declineInvite'),
 	path('api/acceptInvite/', acceptInvite.as_view(), name='acceptInvite'),
+	path('api/deleteFriends/', deleteFriends.as_view(), name='deleteFriends'),
 	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
 	path('api/logout/', logout.as_view(), name='logout'),
 	path('api/forgotPassword/', forgotPassword.as_view(), name='forgotPassword'),
     #### Live Chat API URLs
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
-
+	path('api/chat/<int:targetUserId>/blockedStatus/', blockedStatus.as_view(), name='blockedUser')
 ]

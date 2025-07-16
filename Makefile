@@ -19,7 +19,6 @@ CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access_postgresql serv
 COMPOSE=docker compose -f ${DOCKER_FILE}
 
 CA=./elk/setup/certs/ca/
-CA=./elk/setup/certs/ca/
 CA_CRT=$(CA)ca.crt
 CA_KEY=$(CA)ca.key
 
@@ -39,7 +38,7 @@ add-ca:
 	fi
 
 # Run only the 'certs_generator' contianer to generate the CA certificates
-certs_generator: add-ca
+certs_generator: #add-ca
 	@echo "Building certs_generator container..."
 	@${COMPOSE} build certs_generator
 	@echo "Generating CA..."

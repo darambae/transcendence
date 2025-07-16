@@ -1,4 +1,3 @@
-from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -20,15 +19,14 @@ from django.utils.dateformat import format
 import json
 import logging
 from datetime import datetime
-from django.core.paginator import Paginator, EmptyPage
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import sys
 import jwt
 import re
 from django.conf import settings
+import re
 # Create your views here.
-
 
 try:
 	from .models import USER, ChatGroup, Message, MATCHTABLE
@@ -47,7 +45,7 @@ except ImportError:
 		objects = None
 	class MATCHTABLE:
 		objects = None
-		
+
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]
@@ -56,6 +54,11 @@ class api_signup(APIView):
 	def post(self, request):
 
 		data = request.data
+		# Username validation - check for whitespace
+		username = data.get('user_name', '')
+		if re.search(r'\s', username):
+			log_user_action('SIGNUP_FAILED', None, reason='username_whitespace', username=username)
+			return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
 
 		# Username validation - check for whitespace
 		username = data.get('user_name', '')
@@ -198,7 +201,7 @@ class checkCurrentPassword(APIView):
 
 
 # url: /api/checkTfa/
-# 2FA validation for normal login or invitation 
+# 2FA validation for normal login or invitation
 
 class checkTfa(APIView):
 	permission_classes = [AllowAny]
@@ -206,49 +209,50 @@ class checkTfa(APIView):
 	def post(self, request):
 
 		data = request.data
-		print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
+		# print(f"data : {data}, type name : {type(data).__name__}", file=sys.stderr)
 
 		try:
 			if "jwt" in data :
-				print("JWT IN DATA !", file=sys.stderr)
-				print(f"invites : {data['jwt']}", file=sys.stderr)
+				# print("JWT IN DATA !", file=sys.stderr)
+				# print(f"invites : {data['jwt']}", file=sys.stderr)
 				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
+				# print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+				# print("user.activated", user.activated, file=sys.stderr)
 				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
-						print("checkPassword ok !", file=sys.stderr)
+					# print("here in 2FA checking with JWT", file=sys.stderr)
+					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3 \
+					and user.user_name not in data["jwt"]["invites"] and user.user_name != data["jwt"]["username"] :
+						# print("checkPassword ok !", file=sys.stderr)
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
-						print("JWT generated !", file=sys.stderr)
+						# print("JWT generated !", file=sys.stderr)
 						#user.two_factor_auth = False
-						print(666, file=sys.stderr)
+						# print(666, file=sys.stderr)
 						user.save()
-						print(7777, file=sys.stderr)
+						# print(7777, file=sys.stderr)
 						return JsonResponse({'success': 'authentication code send',
 							  				 'refresh': str(data_generate_jwt['refresh']),
 											 'access': str(data_generate_jwt['access'])},
 											 status=200)
 					else :
-						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+						return JsonResponse({'error': 'account is already a guest / invalid account'}, status=401)
 				else:
 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
 			else :
 				user = USER.objects.get(mail=data.get('mail'))
-				print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
-				print("user.activated", user.activated, file=sys.stderr)
+				# print("user.two_factor_auth: ", user.two_factor_auth, file=sys.stderr)
+				# print("user.activated", user.activated, file=sys.stderr)
 				if user.activated and user.two_factor_auth:
-					print("here in 2FA checking with no JWT", file=sys.stderr)
+					# print("here in 2FA checking with no JWT", file=sys.stderr)
 					if check_password(data.get('tfa'), user.two_factor_auth):
-						print("checkPassword ok !", file=sys.stderr)
+						# print("checkPassword ok !", file=sys.stderr)
 						#user.two_factor_auth = False
 						user.online = True
 						user.last_login = datetime.now()
 						user.save()
 
 						data_generate_jwt = generateJwt(user, user.toJson())
-						print("JWT generated !", file=sys.stderr)
+						# print("JWT generated !", file=sys.stderr)
 
 						return JsonResponse({'success': 'authentication code send',
 											 'refresh': str(data_generate_jwt['refresh']),
@@ -291,7 +295,7 @@ class disconnected(APIView):
 
 	def get(self, request, token):
 		decoded = jwt.decode(token, options={"verify_signature": False})
-		
+
 		user = get_object_or_404(USER, user_name=decoded.get('username'))
 		user.online = False
 		user.save()
@@ -422,10 +426,10 @@ class keyGame(APIView):
 			return JsonResponse({'succes': 'keu math found',
 								 'matchKey': game.matchKey,
 								 'dateMatch': game.dateMatch,
-								 'username1': game.username1,
+								 'username1': game.username1.user_name,
 								 'score1': game.score1,
 								 'score2': game.score2,
-								 'username2': game.username2,
+								 'username2': game.username2.user_name,
 								},
 					   			status=200)
 		except MATCHTABLE.DoesNotExist:
@@ -449,10 +453,10 @@ class uploadImgAvatar(APIView):
 			return JsonResponse({'success': 'Successfully saved avatar image'}, status=200)
 		except Exception as e:
 			return JsonResponse({'error': f'Error saving avatar image: {str(e)}'}, status=400)
-		
+
 class uploadPrivateInfoUser(APIView):
 	permission_classes = [IsAuthenticated]
-	
+
 	def patch(self, request):
 
 		try:
@@ -477,11 +481,8 @@ class uploadProfile(APIView):
 			user = request.user
 			data = request.data
 			new_username = data.get('userName')
-
-			# Username validation - check for whitespace
 			if re.search(r'\s', new_username):
 				return JsonResponse({'error': 'Username cannot contain spaces or whitespace characters'}, status=400)
-
 			User = get_user_model()
 
 			if User.objects.filter(Q(user_name=new_username) & ~Q(id=user.id)).exists():
@@ -490,7 +491,7 @@ class uploadProfile(APIView):
 			user.save()
 
 			data_generate_jwt = generateJwt(user, user.toJson())
-			
+
 			return JsonResponse({'success': 'Successfully changed username',
 								'refresh': str(data_generate_jwt['refresh']),
 								'access': str(data_generate_jwt['access'])}
@@ -535,22 +536,22 @@ class searchUsers(APIView):
 		return JsonResponse({'results': results}, status=200)
 
 
-class DeleteGuest(APIView) : 
+class DeleteGuest(APIView) :
 	permission_classes = [IsAuthenticated]
 
 	def delete(self, request) :
-		print("d-1", file=sys.stderr)
+		# print("d-1", file=sys.stderr)
 		user = request.user
-		print("d-2", file=sys.stderr)
+		# print("d-2", file=sys.stderr)
 		token = request.headers.get("Authorization", "Error Unknown").split(" ")[1]
-		print("d-3", file=sys.stderr)
+		# print("d-3", file=sys.stderr)
 
 		jwt_access = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-		print("d-4", file=sys.stderr)
+		# print("d-4", file=sys.stderr)
 		jwt_access["invites"] = []
-		print("d-5", file=sys.stderr)
+		# print("d-5", file=sys.stderr)
 		data_generate_jwt = generateJwt(user, jwt_access)
-		print("d-6", file=sys.stderr)
+		# print("d-6", file=sys.stderr)
 
 		return JsonResponse({'success': 'authentication code send',
 							 'refresh': str(data_generate_jwt['refresh']),
@@ -577,7 +578,7 @@ class ChatGroupListCreateView(APIView):
 		"""
 		current_user = request.user
 		chat_groups = current_user.chat_groups.all()
-	
+
 		chat_list = []
 		log_user_action('CHAT_GROUPS_RETRIEVED', current_user, group_count=len(chat_groups))
 		
@@ -587,21 +588,21 @@ class ChatGroupListCreateView(APIView):
 			other_members = group.members.exclude(id=current_user.id)
 			if other_members.exists():
 				other_member = other_members.first()
-					
+
 			chat_data = {
 				'group_id': group.id,
 				'group_name': group.name,
 			}
-			
+
 			# For private chats, add receiver details
 			if other_member:
 				chat_data.update({
 					'receiver_id': other_member.id,
 					'receiver_name': other_member.user_name
 				})
-			
+
 			chat_list.append(chat_data)
-		
+
 		return Response({
 			'status': 'success',
 			'chats': chat_list
@@ -618,10 +619,10 @@ class ChatGroupListCreateView(APIView):
 
 		if not target_user_id:
 			return Response({
-				'status': 'error', 
+				'status': 'error',
 				'message': 'Target user ID is required'
 			}, status=status.HTTP_400_BAD_REQUEST)
-			
+
 		try:
 			target_user = USER.objects.get(id=target_user_id)
 			if current_user.id == target_user.id:
@@ -630,7 +631,7 @@ class ChatGroupListCreateView(APIView):
 					'status': 'error',
 					'message': 'Cannot create chat with yourself'
 				}, status=status.HTTP_400_BAD_REQUEST)
-			 
+
 			# Create stable group name using IDs instead of usernames
 			user_ids = sorted([current_user.id, target_user.id])
 			chat_name = f"chat_{user_ids[0]}_{user_ids[1]}"
@@ -640,7 +641,7 @@ class ChatGroupListCreateView(APIView):
 			).filter(
 				members=target_user
 			).first()
-			
+
 			if existing_chat:
 				log_user_action('CHAT_GROUP_FOUND', current_user, 
 							  chat_id=existing_chat.id, target_user_id=target_user.id)
@@ -662,11 +663,11 @@ class ChatGroupListCreateView(APIView):
 				'receiver_id': target_user.id,
 				'receiver_name': target_user.user_name
 			}, status=status.HTTP_200_OK)
-			
+
 		except USER.DoesNotExist:
 			log_user_action('CHAT_CREATE_FAILED', current_user, reason='target_user_not_found', target_user_id=target_user_id)
 			return Response({
-				'status': 'error', 
+				'status': 'error',
 				'message': 'Target user not found'
 			}, status=status.HTTP_404_NOT_FOUND)
 		except Exception as e:
@@ -689,26 +690,26 @@ class ChatMessageView(APIView):
 	def get(self, request, group_id):
 		"""Get messages for a specific chat group"""
 		user = request.user
-		
+
 		try:
 			# First verify the user is a member of the chat group
 			chat_group = ChatGroup.objects.get(id=group_id)
-			
+
 			if not chat_group.members.filter(id=user.id).exists():
 				return Response({
 					'status': 'error',
 					'message': 'You are not a member of this chat group'
 				}, status=status.HTTP_403_FORBIDDEN)
-			
+
 			# Get messages for this group
 			messages = Message.objects.filter(group=chat_group).order_by('-timestamp')
-			
+
 			# Pagination
 			offset = int(request.query_params.get('offset', 0))
 			limit = int(request.query_params.get('limit', 20))
-			
+
 			messages = messages[offset:offset+limit]
-			
+
 			message_data = []
 			for msg in messages:
 				message_data.append({
@@ -718,13 +719,13 @@ class ChatMessageView(APIView):
 					'content': msg.content,
 					'timestamp': msg.timestamp.isoformat()
 				})
-			
+
 			return Response({
 				'status': 'success',
 				'messages': message_data,
 				'has_more': Message.objects.filter(group=chat_group).count() > offset + limit
 			})
-			
+
 		except ChatGroup.DoesNotExist:
 			return Response({
 				'status': 'error',
@@ -789,7 +790,7 @@ class ChatMessageView(APIView):
 				"timestamp": message.timestamp.isoformat(),
 				"group_id": group_id
 			}
-			
+
 			# Add receiver info for private chats
 			if receiver_id:
 				message_data["receiver_id"] = receiver_id
@@ -875,12 +876,12 @@ class addFriend(APIView):
 	def post(self, request):
 		from_user = request.user
 		username = request.data.get("userName")
-	
+
 		try:
 			to_user = USER.objects.get(user_name=username)
 		except USER.DoesNotExist:
 			return Response({"error": "User friend not found"}, status=404)
-	
+
 		if to_user == from_user:
 			return Response({"error": "You cannot add yourself as a friend"}, status=400)
 
@@ -911,17 +912,17 @@ class declineInvite(APIView):
 	def patch(self, request):
 		from_user = request.user
 		to_username = request.data.get("username")
-			
+
 		to_user = get_object_or_404(USER, user_name=to_username)
-		
+
 		friend_req = get_object_or_404(
 			FRIEND,
 			from_user=to_user,
 			to_user=from_user,
 			status="pending")
-			
+
 		friend_req.delete()
-		
+
 		return Response(
 			{"message": f"Friend request from {to_user.user_name} declined"},
 			status=200
@@ -934,22 +935,52 @@ class acceptInvite(APIView):
 	def patch(self, request):
 		from_user = request.user
 		to_username = request.data.get("username")
-	
+
 		to_user = get_object_or_404(USER, user_name=to_username)
-	
+
 		friend_req = get_object_or_404(
 			FRIEND,
 			from_user=to_user,
 			to_user=from_user,
 			status="pending")
-		
+
 		friend_req.status = "accepted"
 		friend_req.save()
-		
+
 		return Response(
 			{"message": f"Friend request from {to_user.user_name} accepted"},
 			status=200
 		)
+
+
+class deleteFriends(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def patch(self, request):
+		from_user = request.user
+		to_username = request.data.get("username")
+
+		to_user = get_object_or_404(USER, user_name=to_username)
+
+		friend_relation = FRIEND.objects.filter(
+            Q(from_user=from_user, to_user=to_user) |
+            Q(from_user=to_user, to_user=from_user),
+            status="accepted"
+        ).first()
+
+		if not friend_relation:
+			return Response(
+				{"error": "error friend_relation dont existed"},
+				status=404
+			)
+
+		friend_relation.delete()
+
+		return Response(
+			{"message": f"friends with {to_user.user_name} delete"},
+			status=200
+		)
+
 
 class logout(APIView):
 	permission_classes = [IsAuthenticated]
@@ -959,7 +990,7 @@ class logout(APIView):
 		user.online = False
 		user.save()
 		return Response({'message': 'User logged out successfully'}, status=200)
-	
+
 class matchHistory(APIView):
 	permission_classes = [IsAuthenticated]
 
@@ -1033,3 +1064,47 @@ class forgotPassword(APIView):
 			return JsonResponse({'error': 'User not found'}, status=404)
 		except Exception as e:
 			return JsonResponse({'error': f'Error uploading temporary password: {str(e)}'}, status=400)
+
+class blockedStatus(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can list/create chats
+
+    def get(self, request, targetUserId) -> Response:
+        current_user = request.user
+        logger.info(f"Retrieving blocked status for user {current_user.user_name}")
+        blockedState = {'isBlocked':False, 'hasBlocked':False}
+        try:
+              target_user = get_object_or_404(USER, id=targetUserId)
+              is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
+              blockedState['isBlocked'] = is_blocked
+              has_blocked = target_user.blocked_user.filter(id=current_user.id).exists()
+              blockedState['hasBlocked'] = has_blocked
+              return Response({'status': 'success', 'blockedStatus':blockedState}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception("Internal server error during blocked status retrieval.")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error during blocked status retrieval.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    def post(self, request, targetUserId) -> Response:
+          current_user = request.user
+          logger.info(f"Retrieving blocked status for user {current_user.user_name}")
+          if current_user.id == targetUserId:
+            return Response(
+                {'status': 'error', 'message': 'target User Id cannot be the same than current usser Id.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+          try:
+            target_user = get_object_or_404(USER, id=targetUserId)
+            is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
+            if is_blocked:
+                  current_user.blocked_user.remove(target_user)
+            else:
+                  current_user.blocked_user.add(target_user)
+            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+          except Exception as e:
+            logger.exception("Internal server error changing blocked status.")
+            return Response(
+                {'status': 'error', 'message': 'Internal server error changing blocked status.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+

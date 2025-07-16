@@ -22,6 +22,22 @@
     background-color: rgba(135, 5, 5, 1);
     transform: scale(1.05);
 }
+
+#mainChatToggleButton.has-unread-overall {
+    content: ''; /* Vide ou un nombre si vous voulez */
+    display: block;
+    width: 12px; /* Taille de la pastille */
+    height: 12px;
+    background-color: #dc3545; /* Rouge vif */
+    border-radius: 50%; /* Pour la rendre ronde */
+    position: absolute; /* Positionnement absolu par rapport au bouton */
+    top: -5px; /* Ajustez pour positionner en haut à droite */
+    right: -5px; /* Ajustez pour positionner en haut à droite */
+    border: 2px solid #fff; /* Petite bordure blanche pour la visibilité */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Légère ombre pour la faire ressortir */
+    z-index: 11; /* Assurez-vous qu'elle est au-dessus du bouton et de l'icône */
+}
+
 #mainChatWindow {
     z-index: 1100; /* Ensure the chat modal is above other content */
 }
@@ -108,6 +124,19 @@
     font-weight: bold;
 }
 
+.chat-rooms-list .has-unread-messages {
+    content: ''; /* ou content: attr(data-unread-count); si vous comptez les messages */
+    display: block;
+    width: 10px;
+    height: 10px;
+    background-color: #dc3545; /* Rouge vif */
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid #fff; /* Petite bordure blanche pour la visibilité */
+}
+
 /* --- Chat Display (Right Column, Mobile) --- */
 .chat-display {
     flex-grow: 1;
@@ -144,7 +173,7 @@
 
 /* Character counter styling */
 .char-counter {
-    position: absolute; 
+    position: absolute;
     bottom: 5px;
     right: 80px; /* Leave space for the Send button */
     font-size: 12px;
@@ -205,6 +234,9 @@
     background-color: #f8f9fa;
     padding: 10px;
     border-bottom: 1px solid #dee2e6;
+	display:flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .chat-display-header h5 {
@@ -213,6 +245,12 @@
     color: #333;
     word-wrap: break-word;
     white-space: normal;
+	margin: 0;
+}
+
+#gameInvitationBtn {
+	flex-shrink: 0;
+	margin-left: 10px;
 }
 
 /* --- Chat Body --- */
@@ -265,12 +303,12 @@
     min-width: 0;
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .chat-footer .btn-primary {
     flex-shrink: 0;
-    white-space: nowrap; 
+    white-space: nowrap;
     padding: 0.5rem 0.8rem;
     font-size: 0.9rem;
     line-height: 1.2;
@@ -346,7 +384,7 @@
 
     #mainChatWindow .modal-body {
         flex-direction: row;
-        width: 100%; 
+        width: 100%;
         overflow: hidden; /* Prevent double scrollbars */
     }
 
@@ -401,11 +439,20 @@
 
     .chat-display-header {
         padding: 15px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
     }
 
     .chat-display-header h5 {
         font-size: 1.1rem;
+		margin: 0;
     }
+
+	#gameInvationBtn {
+		margin-left: 15px;
+	}
 
     .chat-body {
         max-height: calc(100% - 130px); /* Slightly larger for desktop */
@@ -451,14 +498,14 @@
         min-height: 200px;
         overflow-y: auto !important; /* Force scrollbar when needed */
     }
-    
+
     /* Ensure modal content is tall enough */
     #mainChatWindow .modal-content {
         min-height: 400px;
         height: auto;
         max-height: 90vh;
     }
-    
+
     /* Make display area take full remaining height */
     .chat-display {
         flex: 1;
@@ -467,7 +514,7 @@
         height: 100%;
         overflow: hidden;
     }
-    
+
     /* Fix input area to stay visible */
     .chat-footer {
         position: sticky;

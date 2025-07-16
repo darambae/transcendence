@@ -25,7 +25,7 @@ export async function handleSignupSubmit(event) {
 		const { username, mail, firstName, lastName, password } = data;
 		const cleanData = { username, mail, firstName, lastName, password };
 
-		const response = await fetch('user-service/signup/', {
+		const response = await fetch('/user-service/signup/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -107,6 +107,37 @@ export function signupController() {
 		}
 	}
 
+	// Utility function to display validation errors with animation
+	function displayErrors(element, messages) {
+		console.log('Validation errors:', messages);
+		if (!element) return;
+
+		element.textContent = messages.join('\n');
+		element.style.display = 'block';
+		element.classList.remove('shake');
+		void element.offsetWidth; // Force reflow
+		element.classList.add('shake');
+	}
+
+	// Utility function to validate input length with a maximum of 15 characters
+	function validateMaxLength(inputElement, maxLength, fieldName) {
+		if (!inputElement) return;
+
+		inputElement.addEventListener('input', () => {
+			const value = inputElement.value;
+
+			if (value.length > maxLength) {
+				inputElement.style.borderColor = 'red';
+				inputElement.title = `${fieldName} cannot exceed ${maxLength} characters`;
+			} else {
+				inputElement.style.borderColor = '';
+				inputElement.title = '';
+			}
+
+			resetError();
+		});
+	}
+
 	const passwordConfirmationInput = document.getElementById(
 		'password-confirmation'
 	);
@@ -114,27 +145,45 @@ export function signupController() {
 		'passwordConfirmationError'
 	);
 
-	// Username validation - real-time feedback
+	// Get input elements
 	const usernameInput =
 		document.getElementById('inputUsername') ||
 		document.querySelector("input[name='username']");
 
+	const firstNameInput =
+		document.getElementById('inputFirstName') ||
+		document.querySelector("input[name='firstName']");
+
+	const lastNameInput =
+		document.getElementById('inputLastName') ||
+		document.querySelector("input[name='lastName']");
+
+	// Add custom validation for username (includes whitespace check)
 	if (usernameInput) {
 		usernameInput.addEventListener('input', () => {
 			const value = usernameInput.value;
 
-			// Check for whitespace
+			// Check for whitespace first
 			if (/\s/.test(value)) {
 				usernameInput.style.borderColor = 'red';
 				usernameInput.title = 'Username cannot contain spaces or whitespace';
 			} else {
-				usernameInput.style.borderColor = '';
-				usernameInput.title = '';
+				// Then use the length validation
+				if (value.length > 15) {
+					usernameInput.style.borderColor = 'red';
+					usernameInput.title = 'Username cannot exceed 15 characters';
+				} else {
+					usernameInput.style.borderColor = '';
+					usernameInput.title = '';
+				}
 			}
-
 			resetError();
 		});
 	}
+
+	// Apply length validation to first name and last name
+	validateMaxLength(firstNameInput, 15, 'First name');
+	validateMaxLength(lastNameInput, 15, 'Last name');
 
 	passwordInput.addEventListener('input', () => {
 		const value = passwordInput.value;
@@ -159,26 +208,75 @@ export function signupController() {
 	// 	}
 	// });
 
+	// Utility function to validate field length on form submission
+	function validateFieldLength(
+		value,
+		fieldName,
+		maxLength,
+		errMsg,
+		inputErrRef
+	) {
+		if (value && value.length > maxLength) {
+			errMsg.push(`${fieldName} cannot exceed ${maxLength} characters.`);
+			inputErrRef.inputErr = true;
+		}
+		return inputErrRef.inputErr;
+	}
+
 	const form = document.querySelector('#signup-form form');
 	if (form) {
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();
-			let inputErr = false;
+			const inputErrRef = { inputErr: false }; // Using an object to pass by reference
 			let errMsg = [];
 			if (invalidSpan) {
-				// Username validation
+				// Get input values
 				const usernameInput =
 					document.getElementById('inputUsername') ||
 					document.querySelector("input[name='username']");
 				const usernameValue = usernameInput ? usernameInput.value : '';
 
-				// Check for whitespace in username
+				const firstNameInput =
+					document.getElementById('inputFirstName') ||
+					document.querySelector("input[name='firstName']");
+				const firstNameValue = firstNameInput ? firstNameInput.value : '';
+
+				const lastNameInput =
+					document.getElementById('inputLastName') ||
+					document.querySelector("input[name='lastName']");
+				const lastNameValue = lastNameInput ? lastNameInput.value : '';
+
+				// Username validation (whitespace check + length check)
 				if (/\s/.test(usernameValue)) {
 					errMsg.push(
 						'Username cannot contain spaces or whitespace characters.'
 					);
-					inputErr = true;
+					inputErrRef.inputErr = true;
+				} else {
+					validateFieldLength(
+						usernameValue,
+						'Username',
+						15,
+						errMsg,
+						inputErrRef
+					);
 				}
+
+				// First name and last name validation
+				validateFieldLength(
+					firstNameValue,
+					'First name',
+					15,
+					errMsg,
+					inputErrRef
+				);
+				validateFieldLength(
+					lastNameValue,
+					'Last name',
+					15,
+					errMsg,
+					inputErrRef
+				);
 
 				// Password validation
 				const value = passwordInput.value;
@@ -192,20 +290,15 @@ export function signupController() {
 					errMsg.push(
 						'Password must contain at least one uppercase letter, one number, and one special character.'
 					);
-					inputErr = true;
+					inputErrRef.inputErr = true;
 				} else if (passwordConfirmationInput.value !== passwordInput.value) {
 					errMsg.push('Passwords do not match.');
-					inputErr = true;
+					inputErrRef.inputErr = true;
 				}
 
-				if (inputErr) {
-					console.log('inputErr : ', inputErr);
-					invalidSpan.textContent = errMsg.join('\n');
-					console.log('invalidSpan textContent: ', invalidSpan.textContent);
-					invalidSpan.style.display = 'block';
-					invalidSpan.classList.remove('shake');
-					void invalidSpan.offsetWidth;
-					invalidSpan.classList.add('shake');
+				// Display validation errors if any
+				if (inputErrRef.inputErr) {
+					displayErrors(invalidSpan, errMsg);
 					return;
 				} else {
 					invalidSpan.style.display = 'none';

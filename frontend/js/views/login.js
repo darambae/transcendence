@@ -1,18 +1,23 @@
-import { routes } from "../routes.js";
-import { actualizeIndexPage, getCookie, loadTemplate, closeModal } from "../utils.js";
-import { renderChatButtonIfAuthenticated } from "./chat.js";
-
+import { routes } from '../routes.js';
+import {
+	actualizeIndexPage,
+	getCookie,
+	loadTemplate,
+	closeModal,
+} from '../utils.js';
+import { renderChatButtonIfAuthenticated } from './chat.js';
+import { resetAuthCache } from '../router.js';
 
 export async function showDoubleAuthForm(data) {
 	const html = await loadTemplate('doubleAuth');
-	const content = document.getElementById("login-form");
+	const content = document.getElementById('login-form');
 	if (html && content) {
 		content.innerHTML = html;
 	}
 
 	const mail = data.mail;
 	if (!mail) {
-		throw new Error("No mail address provided for double authentication");
+		throw new Error('No mail address provided for double authentication');
 	}
 
 	const mailDiv = document.querySelector('.login-form .double-auth .user-mail');
@@ -23,33 +28,35 @@ export async function showDoubleAuthForm(data) {
 	return mail;
 }
 
-
 export function setupDoubleAuthHandler(mail, username) {
 	const form = document.getElementById('double-auth-form');
-	if (!form || form.dataset.listenerAttached === "true") return;
+	if (!form || form.dataset.listenerAttached === 'true') return;
 
-	form.dataset.listenerAttached = "true";
+	form.dataset.listenerAttached = 'true';
 	const csrf = getCookie('csrftoken');
 
-	form.addEventListener("submit", async (e) => {
+	form.addEventListener('submit', async (e) => {
 		e.preventDefault();
 
 		const code = document.getElementById('auth-code').value;
 
 		try {
-			const response = await fetch("auth/verifyTwofa/", {
-				method: "POST",
+			const response = await fetch('/auth/verifyTwofa/', {
+				method: 'POST',
 				credentials: 'include',
 				headers: {
-					"Content-Type": "application/json",
+					'Content-Type': 'application/json',
 					'X-CSRFToken': csrf,
 				},
-				body: JSON.stringify({ mail, code })
+				body: JSON.stringify({ mail, code }),
 			});
 
 			const responseData = await response.json();
 
 			if (response.ok) {
+				// Reset authentication cache immediately after successful login
+				resetAuthCache();
+
 				closeModal();
 				await actualizeIndexPage('toggle-login', routes['user']);
 				const hash = location.hash.slice(1);
@@ -64,9 +71,12 @@ export function setupDoubleAuthHandler(mail, username) {
 				let errorMsg = 'Authentication failed';
 
 				if (responseData.error) {
-					errorMsg = typeof responseData.error === 'object'
-						? responseData.error.detail || responseData.error.message || JSON.stringify(responseData.error)
-						: responseData.error;
+					errorMsg =
+						typeof responseData.error === 'object'
+							? responseData.error.detail ||
+							  responseData.error.message ||
+							  JSON.stringify(responseData.error)
+							: responseData.error;
 				}
 
 				if (errorDiv) {
@@ -75,7 +85,7 @@ export function setupDoubleAuthHandler(mail, username) {
 				}
 			}
 		} catch (error) {
-			console.error("2FA error: ", error);
+			console.error('2FA error: ', error);
 		}
 	});
 }
@@ -86,24 +96,24 @@ export async function handleLoginSubmit(event) {
 
 	const form = event.target;
 	const submitButton = form.querySelector("button[type='submit']");
-	const loadingMessage = form.querySelector("#loading-message");
+	const loadingMessage = form.querySelector('#loading-message');
 
 	const formData = new FormData(form);
 	const dataForm = Object.fromEntries(formData.entries());
 
 	try {
 		submitButton.disabled = true;
-		if (loadingMessage) loadingMessage.style.display = "inline";
+		if (loadingMessage) loadingMessage.style.display = 'inline';
 
 		const csrf = getCookie('csrftoken');
-		const response = await fetch("/auth/login/", {
-			method: "POST",
+		const response = await fetch('/auth/login/', {
+			method: 'POST',
 			headers: {
-				"Content-Type": "application/json",
+				'Content-Type': 'application/json',
 				'X-CSRFToken': csrf,
 			},
 			credentials: 'include',
-			body: JSON.stringify(dataForm)
+			body: JSON.stringify(dataForm),
 		});
 
 		const data = await response.json();
@@ -114,38 +124,37 @@ export async function handleLoginSubmit(event) {
 				const username = data.user_name || dataForm.username || dataForm.mail;
 				setupDoubleAuthHandler(mail, username);
 			} catch (error) {
-				console.error("Error setting up double authentication:", error);
+				console.error('Error setting up double authentication:', error);
 			}
 		} else {
 			const errorDiv = document.querySelector('.login-form .error-msg');
 			const errorMsg = data.error;
 			if (errorMsg && errorDiv) {
-				errorDiv.textContent = "ERROR: " + errorMsg.toUpperCase();
-				errorDiv.classList.remove("shake");
+				errorDiv.textContent = 'ERROR: ' + errorMsg.toUpperCase();
+				errorDiv.classList.remove('shake');
 				void errorDiv.offsetWidth;
-				errorDiv.classList.add("shake");
+				errorDiv.classList.add('shake');
 			}
 		}
 	} catch (error) {
-		console.error("Connection error: ", error);
+		console.error('Connection error: ', error);
 	} finally {
 		submitButton.disabled = false;
-		if (loadingMessage) loadingMessage.style.display = "none";
+		if (loadingMessage) loadingMessage.style.display = 'none';
 	}
 }
 
-
 export function loginController() {
-	const modalContainer = document.getElementById("modal-container");
-	const closeBtn = document.getElementById("close-login-form");
+	const modalContainer = document.getElementById('modal-container');
+	const closeBtn = document.getElementById('close-login-form');
 
 	if (closeBtn) {
-		closeBtn.addEventListener("click", () => closeModal());
+		closeBtn.addEventListener('click', () => closeModal());
 	}
 
 	if (modalContainer) {
-		modalContainer.addEventListener("click", (event) => {
-			if (event.target.id === "modal-container") {
+		modalContainer.addEventListener('click', (event) => {
+			if (event.target.id === 'modal-container') {
 				closeModal();
 			}
 		});
@@ -153,11 +162,12 @@ export function loginController() {
 
 	const forgotten = document.getElementById('forgotten-password');
 	if (forgotten) {
-		forgotten.onclick = async () => await actualizeIndexPage('modal-container', routes.forgotPassword);
+		forgotten.onclick = async () =>
+			await actualizeIndexPage('modal-container', routes.forgotPassword);
 	}
 
-	const form = document.getElementById("log-form");
+	const form = document.getElementById('log-form');
 	if (form) {
-		form.addEventListener("submit", handleLoginSubmit);
+		form.addEventListener('submit', handleLoginSubmit);
 	}
 }

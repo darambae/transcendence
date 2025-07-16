@@ -20,8 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8050
 # Remove the comment below so that you can run without elk
-ENTRYPOINT ["/entrypoint.sh"]
-
+#ENTRYPOINT ["/entrypoint.sh"]
 
 
 # CMD ["tail", "-f", "/dev/null"]

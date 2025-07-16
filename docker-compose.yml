@@ -13,8 +13,6 @@ services:
 
   postgres:
     image: postgres:latest
-    #ports:
-    #  - "5431:5431"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     container_name: postgres
@@ -42,7 +40,6 @@ services:
       - user_service
       - ai_pong
       - server_pong
-      #- auth
     networks:
       - nginx_network
     env_file:
@@ -293,17 +290,13 @@ services:
       certs_generator:
         condition: service_completed_successfully
     environment:
-      # - ELASTICSEARCH_HOSTS=https://elasticsearch:9200
-      # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+
       - NODE_OPTIONS=--openssl-legacy-provider
       - ES_JAVA_OPTS=-Xms2g -Xmx2g
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - elk_data:/usr/share/elasticsearch/data
       - ./elk/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-    # ports:
-    #   - ${ELASTICSEARCH_PORT}:9200
-    #   - 9300:9300
     env_file:
       - .env
     networks:
@@ -327,7 +320,6 @@ services:
       - ES_PATH_CONF=/usr/share/elasticsearch/config
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
-      # - ELASTICSEARCH_ENROLLMENT_TOKEN=$(cat /usr/share/elasticsearch/config/kibana_enrollment_token.txt)
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -375,6 +367,6 @@ networks:
   game_network:
     name: game_network
     driver: bridge
-  jwt_network:
-    name: jwt_network
-    driver: bridge
+  # jwt_network:
+  #   name: jwt_network
+  #   driver: bridge

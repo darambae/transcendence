@@ -22,6 +22,11 @@ PROJECT_DIR = BACKEND_DIR.parent
 FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
 DOMAIN = os.getenv('DOMAIN', 'localhost')
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://transcendence.42.fr:8443',
+	'https://localhost:8443',
+]
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -145,6 +150,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://transcendence.42.fr:8443",
     "https://localhost:8443",
     "https://10.18.161.147:8443",
+    "https://192.168.1.34:8443",
 ]
 
 # MEDIA FOR IMG

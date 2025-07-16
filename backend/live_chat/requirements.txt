@@ -12,4 +12,5 @@ dj-database-url
 httpx
 djangorestframework
 djangorestframework-simplejwt
-jwt
+PyJWT
+django-cors-headers

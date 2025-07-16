@@ -68,59 +68,70 @@ def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-    with open(f"/app/{func}_decodeJWT.txt", "a+") as f :
-        tm = datetime.now()
-        print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-    with open(f"/app/{func}_decodeJWT.txt", "a+") as f : 
+    # Use a default function name if none provided
+    log_func = func if func else "unknown"
+    
+    # Ensure the log file can be created, handle any potential errors
+    try:
+        with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f :
+            tm = datetime.now()
+            print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
+    except (OSError, IOError) as e:
+        # If file creation fails, print to stderr instead
+        print(f"Warning: Could not create log file for {log_func}: {e}", file=sys.stderr)
+    
+    try:
+        with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f : 
+            if not encodedJwt :
+                encodedJwt = request.COOKIES.get("access_token", None)
+            if not encodedJwt :
+                print("Error 1", file=f)
+                return [None] * 3
+            
+            print(f"encoded: {encodedJwt}", file=f)
+            res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+            print(f"res : {res}", file=f)
+            res_json = res.json()
+            print(f"res.json() : {res_json}", file=f)
+            if res.status_code != 200 :
+                print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
+                if (res_json.get('error') == "Token expired"):
+                    refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+                    if refresh_res.status_code == 200:
+                        new_access_token = refresh_res.json().get('access')
+                        res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+                        res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+                        return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+                    return [None] * 3
+                return [None] * 3
+            return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
+    except (OSError, IOError) as e:
+        # If file operations fail, continue without logging
+        print(f"Warning: Could not write to log file for {log_func}: {e}", file=sys.stderr)
+        # Continue with the JWT decoding logic without file logging
         if not encodedJwt :
             encodedJwt = request.COOKIES.get("access_token", None)
         if not encodedJwt :
-            print("Error 1", file=f)
             return [None] * 3
         
-        print(f"encoded: {encodedJwt}", file=f)
         res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-        print(f"res : {res}", file=f)
-        try:
-            res_json = res.json()
-            print(f"res.json() : {res_json}", file=f)
-            
-            if res.status_code != 200:
-                print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
-                if (res_json.get('error') == "Token expired"):
-                    try:
-                        refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-                        if refresh_res.status_code == 200:
-                            try:
-                                refresh_json = refresh_res.json()
-                                new_access_token = refresh_json.get('access')
-                                if new_access_token:
-                                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-                                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-                                    try:
-                                        return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-                                    except:
-                                        print(f"Error parsing JSON from res2", file=f)
-                                        return [None] * 3
-                                else:
-                                    print(f"No access token in refresh response", file=f)
-                                    return [None] * 3
-                            except:
-                                print(f"Error parsing refresh response JSON", file=f)
-                                return [None] * 3
-                    except Exception as e:
-                        print(f"Error refreshing token: {str(e)}", file=f)
-                        return [None] * 3
+        res_json = res.json()
+        if res.status_code != 200 :
+            if (res_json.get('error') == "Token expired"):
+                refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+                if refresh_res.status_code == 200:
+                    new_access_token = refresh_res.json().get('access')
+                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+                    return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
                 return [None] * 3
-        except Exception as e:
-            print(f"Error parsing JSON: {str(e)}, response text: {res.text[:200]}", file=f)
-            return [None] * 3
         return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
 dictApi = {}
 dictApiSp = {}
+dictApiPlayers = {}  # Track players per room: {apikey: [player1_id, player2_id]}
 apiKeys = []
 #print("VIEW IMPORTEEE", file=sys.stderr)
 
@@ -367,130 +378,105 @@ def setApiKeySp(request):
 @log_game_api_request(action_type='SET_API_KEY')
 def setApiKey(request):
     JWT = decodeJWT(request, "setApiKey")
-    
-    if not JWT[0]:
+    if not JWT[0] :
         log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
                      error_details='Missing or invalid JWT',
                      ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401() # Set an error
-        
+        return HttpResponse401() # Set an error 
+    # fil = open('test.txt', 'w+')
+    # #print(f" Jwt : {JWT[0]}", file=fil)
+    # fil.close()
     user_id = JWT[0]['payload'].get('username', 'unknown')
-    
-    try:
-        body = json.loads(request.body)
-        apikey = body.get('apiKey')
-        
-        if not apikey:
-            log_game_error('INVALID_API_KEY_REQUEST', 
-                         error_details='Missing API key in request body',
-                         user_id=user_id)
-            return JsonResponse({'error': 'Missing API key'}, status=400)
-            
-        if apikey not in apiKeysUnplayable:
-            log_game_error('ROOM_NOT_FOUND',
+    apikey = json.loads(request.body).get('apiKey')
+    if not apikey:
+        log_game_error('INVALID_API_KEY_REQUEST', 
+                        error_details='Missing API key in request body',
+                        user_id=user_id)
+        return JsonResponse({'error': 'Missing API key'}, status=400)
+
+    if apikey not in apiKeysUnplayable:
+        log_game_error('ROOM_NOT_FOUND',
                          error_details=f'Room {apikey} does not exist',
                          user_id=user_id, 
                          api_key=apikey)
-            return JsonResponse({"playable": f"Room {apikey} doesn't Exists"})
-            
-        # Update player count
-        if apikey in dictApi:
-            dictApi[apikey] += 1
-            log_game_event('PLAYER_JOINED_EXISTING_GAME',
+        return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
+    if apikey in dictApi :
+        dictApi[apikey] += 1
+        log_game_event('PLAYER_JOINED_EXISTING_GAME',
                          game_id=apikey,
                          player2_id=user_id,
                          player_count=dictApi[apikey])
-        else:
-            dictApi[apikey] = 1
-            log_game_event('PLAYER_JOINED_NEW_GAME',
-                         game_id=apikey,
-                         player1_id=user_id,
-                         player_count=1)
+    else :
+        dictApi[apikey] = 1
+        log_game_event('PLAYER_JOINED_NEW_GAME',
+                game_id=apikey,
+                player1_id=user_id,
+                player_count=1)
 
-        # Check if we have enough players
-        if (dictApi[apikey] > 1):
-            apiKeysUnplayable.remove(apikey)
-            apiKeys.append(apikey)
-            playable = "Game can start"
-            
-            log_matchmaking_event('GAME_READY',
-                                player_id=user_id,
-                                queue_time=None,
-                                game_id=apikey)
-        else:
-            playable = "Need more player"
-            
-            log_matchmaking_event('WAITING_FOR_OPPONENT',
-                                player_id=user_id,
-                                game_id=apikey)
 
-        return JsonResponse({"playable": playable})
-        
-    except json.JSONDecodeError:
-        log_game_error('MALFORMED_REQUEST', 
-                     error_details='Invalid JSON in request body',
-                     user_id=user_id)
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        log_game_error('API_KEY_REGISTRATION_FAILED',
-                     error_details=str(e),
-                     error_type=type(e).__name__,
-                     user_id=user_id)
-        return JsonResponse({'error': 'Internal server error'}, status=500)
+    if (dictApi[apikey] > 1) :
+        apiKeysUnplayable.remove(apikey)
+        apiKeys.append(apikey)
+        playable = "Game can start"
+    else :
+        playable = "Need more player"
 
+    return JsonResponse({"playable": playable})
 @csrf_exempt
 @log_game_api_request(action_type='CHECK_GAME_PLAYABLE')
 def isGamePlayable(request):
     JWT = decodeJWT(request, "isGamePlayable")
-    
-    if not JWT[0]:
+    if not JWT[0] :
         log_game_error('UNAUTHORIZED_GAME_CHECK', 
-                     error_details='Missing or invalid JWT',
-                     ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401() # Set an error
-        
-    user_id = JWT[0]['payload'].get('username', 'unknown')
+                error_details='Missing or invalid JWT',
+                ip=request.META.get('REMOTE_ADDR'))
+        return HttpResponse401() # Set an error 
     
+    apikey = json.loads(request.body).get('apiKey')
+    user_id = JWT[0]['payload'].get('username', 'unknown')
+
+    # Debug logging
     try:
-        body = json.loads(request.body)
-        apikey = body.get('apiKey')
-        
-        if not apikey:
-            log_game_error('INVALID_GAME_CHECK', 
-                         error_details='Missing API key in request body',
-                         user_id=user_id)
-            return JsonResponse({'error': 'Missing API key'}, status=400)
-            
-        # Check if we have enough players
-        if apikey in dictApi and dictApi[apikey] > 1:
+        with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
+            print(f"[DEBUG] isGamePlayable called - apikey: {apikey}", file=f)
+            print(f"[DEBUG] dictApiPlayers: {dictApiPlayers}", file=f)
+            print(f"[DEBUG] apiKeys: {apiKeys}", file=f)
+            print(f"[DEBUG] apiKeysUnplayable: {apiKeysUnplayable}", file=f)
+            if apikey in dictApiPlayers:
+                print(f"[DEBUG] dictApiPlayers[{apikey}]: {dictApiPlayers[apikey]} (length: {len(dictApiPlayers[apikey])})", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+    
+    # Check if this room is already playable
+    if apikey in apiKeys:
+        return JsonResponse({"playable": "Game can start"})
+    
+    # Use the new player tracking logic
+    if apikey in dictApiPlayers and len(dictApiPlayers[apikey]) >= 2:
+        # Move to playable if not already there
+        if apikey in apiKeysUnplayable:
+            apiKeysUnplayable.remove(apikey)
+        if apikey not in apiKeys:
             apiKeys.append(apikey)
-            playable = "Game can start"
+        playable = "Game can start"
+        log_game_event('GAME_READY_CHECK_SUCCESS',
+                game_id=apikey,
+                player_id=user_id,
+                player_count=dictApi[apikey])
+
+    else:
+        playable = "Need more player"
+        log_game_event('GAME_WAITING_FOR_PLAYERS',
+                game_id=apikey,
+                player_id=user_id,
+                player_count=dictApi.get(apikey, 0))
             
-            log_game_event('GAME_READY_CHECK_SUCCESS',
-                         game_id=apikey,
-                         player_id=user_id,
-                         player_count=dictApi[apikey])
-        else:
-            playable = "Need more player"
-            
-            log_game_event('GAME_WAITING_FOR_PLAYERS',
-                         game_id=apikey,
-                         player_id=user_id,
-                         player_count=dictApi.get(apikey, 0))
-            
-        return JsonResponse({"playable": playable})
-        
-    except json.JSONDecodeError:
-        log_game_error('MALFORMED_REQUEST', 
-                     error_details='Invalid JSON in request body',
-                     user_id=user_id)
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except KeyError:
-        log_game_error('GAME_NOT_FOUND',
-                     error_details=f'No game data for API key: {apikey}',
-                     user_id=user_id,
-                     api_key=apikey)
-        return JsonResponse({'error': f'Game with key {apikey} not found'}, status=404)
+
+    
+    # Debug logging
+    try:
+        with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
+            print(f"[DEBUG] Returning playable: {playable}", file=f)
     except Exception as e:
         log_game_error('GAME_CHECK_FAILED',
                      error_details=str(e),
@@ -498,14 +484,19 @@ def isGamePlayable(request):
                      user_id=user_id,
                      api_key=apikey if 'apikey' in locals() else None)
         return JsonResponse({'error': 'Internal server error'}, status=500)
+    
+    return JsonResponse({"playable": playable})
 
 
 def get_api_key(request):
     JWT = decodeJWT(request, "getApiKey")
-    # fil = open('test.txt', 'w+')
-    fil = open('/app/test.txt', 'a+')
-    print(f" Jwt : {JWT[0]}", file=fil)
-    fil.close()
+    try:
+        with open("/app/test.txt", "a+") as f:
+            print(f"[DEBUG] get_api_key called - JWT: {JWT[0]}", file=f)
+    except Exception as e:
+        print(f"Debug logging error: {e}", file=sys.stderr)
+    
+
     if not JWT[0] :
         return HttpResponseNoContent() # Set an error 
     api_key = str(uuid.uuid4())
@@ -586,15 +577,25 @@ async def forfaitUser(request) :
                 dictApiSp.pop(apikey)
             except KeyError :
                 return HttpResponseNoContent()
+        
+        # Clean up player tracking
+        try:
+            dictApiPlayers.pop(apikey)
+        except KeyError:
+            pass
+            
         try :
             apiKeys.remove(apikey)
         except Exception :
-            apiKeysUnplayable.remove(apikey)
+            try:
+                apiKeysUnplayable.remove(apikey)
+            except ValueError:
+                pass
             return HttpResponseNoContent()
     return HttpResponseNoContent()
 
 async def disconnectUsr(request) :
-    JWT = decodeJWT(request)
+    JWT = decodeJWT(request, "disconnectUsr")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
    # print(f" Jwt : {JWT[0]}", file=sys.stderr)
@@ -614,10 +615,20 @@ async def disconnectUsr(request) :
             dictApiSp.pop(apikey)
         except KeyError :
             return
+    
+    # Clean up player tracking
+    try:
+        dictApiPlayers.pop(apikey)
+    except KeyError:
+        pass
+        
     try :
         apiKeys.remove(apikey)
     except Exception :
-        apiKeysUnplayable.remove(apikey)
+        try:
+            apiKeysUnplayable.remove(apikey)
+        except ValueError:
+            pass
         return HttpResponseNoContent()
     return HttpResponseNoContent()
 
@@ -629,4 +640,10 @@ def apiKeyManager(request) :
         return setApiKey(request)
 
 
-
+@csrf_exempt
+def destroyKey(request, key) :
+    try :
+        dictApi.pop(key)
+        return JsonResponse({"Success" : "Key deleted"})
+    except Exception as e :
+        return JsonResponse({"Error" : "Not found"}, status=404)

@@ -422,10 +422,10 @@ class	forgotPassword(APIView):
 		try:
 			user_info_url = "https://access_postgresql:4000/api/info_link/"
 			user_info_data = {"mail": email}
-			print("forgot password, mail to find in DB : ", email)
+			# print("forgot password, mail to find in DB : ", email)
 			user_info_response = requests.post(user_info_url, json=user_info_data, verify=False, headers={'Host': 'localhost'})
 			if user_info_response.status_code == 404:
-				print("error: user does not exist")
+				# print("error: user does not exist")
 				return JsonResponse({'error': 'User does not exist'}, status=404)
 			if not user_info_response.ok:
 				return JsonResponse({'error': 'Failed to retrieve user info'}, status=500)
