@@ -23,6 +23,9 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
           }
           
       }
+      if (data.t_state == "results") {
+        console.log("------------------------------->>", data);
+      }
     }
     catch(error){
       console.log("Error sseTournament", error);

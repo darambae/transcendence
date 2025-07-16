@@ -201,6 +201,8 @@ export async function localGameController(id1, id2) {
 		// Could set default values for a, b, c if needed
 	}
 	console.log('results: ', username, a, b, c);
+	console.log(typeof(id1));
+	console.log(typeof(id2));
 	if (typeof(id1) != 'number') {
 		if (id1 == username) {
 			id1 = -1;
@@ -230,7 +232,7 @@ export async function localGameController(id1, id2) {
 			id2 = 2;
 		}
 	}
-	let url_sse = `/server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
+	let url_sse = `/server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=${id1}&JWTidP2=${id2}&username=${username}`;
 	if (a !== undefined) {
 		url_sse += `&guest1=${a}`;
 	}
