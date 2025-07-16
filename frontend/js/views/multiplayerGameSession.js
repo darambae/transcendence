@@ -642,6 +642,9 @@ async function establishSSEConnection(
 					if (p2 && game_stats['p2'] && game_stats['p2'][0]) {
 						p2.innerHTML = game_stats['p2'][0];
 					}
+					else if (p2 && !game_stats['p2']) {
+						p2.innerHTML = 'AI';
+					}
 				}
 			}
 		} catch (error) {

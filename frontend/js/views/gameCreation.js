@@ -124,8 +124,6 @@ export async function sendGameCreation() {
 				window.removeEventListener('hashchange', cleanupGameCreation);
 				window.removeEventListener('pagehide', cleanupGameCreation);
 				gameCreationAbortController = null;
-				// Clear the API key since we're transitioning to the game
-				currentCreatedApiKey = null;
 				return handleGame2Players(apiKey, 1, 0, -1);
 			}
 		} catch (error) {

@@ -931,7 +931,7 @@ class acceptInvite(APIView):
 		)
 
 
-class deletteFriends(APIView):
+class deleteFriends(APIView):
 	permission_classes = [IsAuthenticated]
 
 	def patch(self, request):
