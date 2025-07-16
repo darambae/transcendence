@@ -458,36 +458,36 @@ export async function tournamentController() {
                   console.log("eee :", data);
                   // console.log("fff", data.t_state);
                   if (data.t_state == "game-start") {
-                    LaunchGameIntournament(data)
-                    // console.log("SSE 1")
-                    //const buttonGame = document.createElement("button");
-                    // console.log("SSE 2")
-                    //buttonGame.className = "btn btn-outline-primary";
-                    // console.log("SSE 3")
-                    //buttonGame.textContent = "Launch game";
-                    // console.log("SSE 4")
-                    //buttonGame.dataset.type = data.mode;
-                    // console.log("SSE 5")
-                    //if (data.mode == "local") {
-                    // console.log("SSE 6")
-                    //buttonGame.dataset.p1 = data.player1;
-                    // console.log("SSE 7")
-                    //buttonGame.dataset.p2 = data.player2;
-                    //}
-                    //else {
-                    //buttonGame.dataset.player = data.player;
-                    //buttonGame.dataset.playerId = data.playerId;
-                    // console.log("done");
-                    //}
-                    // console.log("SSE 8")
-                    //buttonGame.dataset.key = data.key;
-                    //buttonGame.dataset.tkey = data.tkey
-                    //buttonGame.dataset.round = data.round;
-                    // console.log("SSE 9")
-                    //tournamentGame.innerHTML = "";
-                    // console.log("SSE 10")
-                    //tournamentGame.appendChild(buttonGame);
-                    // console.log("SSE 11")
+                    // LaunchGameIntournament(data)
+                    console.log("SSE 1")
+                    const buttonGame = document.createElement("button");
+                    console.log("SSE 2")
+                    buttonGame.className = "btn btn-outline-primary";
+                    console.log("SSE 3")
+                    buttonGame.textContent = "Launch game";
+                    console.log("SSE 4")
+                    buttonGame.dataset.type = data.mode;
+                    console.log("SSE 5")
+                    if (data.mode == "local") {
+                    console.log("SSE 6")
+                    buttonGame.dataset.p1 = data.player1;
+                    console.log("SSE 7")
+                    buttonGame.dataset.p2 = data.player2;
+                    }
+                    else {
+                    buttonGame.dataset.player = data.player;
+                    buttonGame.dataset.playerId = data.playerId;
+                    console.log("done");
+                    }
+                    console.log("SSE 8")
+                    buttonGame.dataset.key = data.key;
+                    buttonGame.dataset.tkey = data.tkey
+                    buttonGame.dataset.round = data.round;
+                    console.log("SSE 9")
+                    tournamentGame.innerHTML = "";
+                    console.log("SSE 10")
+                    tournamentGame.appendChild(buttonGame);
+                    console.log("SSE 11")
                   }
                   else if (data.t_state == "game-finished") {
                     actualizeIndexPage("contentTournementPage", routesTr['tournament'])
@@ -667,37 +667,37 @@ export async function tournamentController() {
               // console.log("kkk", data.t_state);
               if (data.t_state == "game-start") {
 
-                LaunchGameIntournament(data)
+                // LaunchGameIntournament(data)
 
-                // console.log("SSE 1")
-                //const buttonGame = document.createElement("button");
-                // console.log("SSE 2")
-                //buttonGame.className = "btn btn-outline-primary";
-                // console.log("SSE 3")
-                //buttonGame.textContent = "Launch game";
-                // console.log("SSE 4")
-                //buttonGame.dataset.type = data.mode;
-                // console.log("SSE 5")
-                //if (data.mode == "local") {
-                // console.log("SSE 6")
-                //buttonGame.dataset.p1 = data.player1;
-                // console.log("SSE 7")
-                //buttonGame.dataset.p2 = data.player2;
-                //}
-                //else {
-                //buttonGame.dataset.player = data.player;
-                //buttonGame.dataset.playerId = data.playerId;
-                // console.log("done");
-                //}
-                // console.log("SSE 8")
-                //buttonGame.dataset.round = data.round;
-                //buttonGame.dataset.key = data.key;
-                //buttonGame.dataset.tkey = data.tkey
-                // console.log("SSE 9")
-                //tournamentGame.innerHTML = "";
-                // console.log("SSE 10")
-                //tournamentGame.appendChild(buttonGame);
-                // console.log("SSE 11")
+                console.log("SSE 1")
+                const buttonGame = document.createElement("button");
+                console.log("SSE 2")
+                buttonGame.className = "btn btn-outline-primary";
+                console.log("SSE 3")
+                buttonGame.textContent = "Launch game";
+                console.log("SSE 4")
+                buttonGame.dataset.type = data.mode;
+                console.log("SSE 5")
+                if (data.mode == "local") {
+                console.log("SSE 6")
+                buttonGame.dataset.p1 = data.player1;
+                console.log("SSE 7")
+                buttonGame.dataset.p2 = data.player2;
+                }
+                else {
+                buttonGame.dataset.player = data.player;
+                buttonGame.dataset.playerId = data.playerId;
+                console.log("done");
+                }
+                console.log("SSE 8")
+                buttonGame.dataset.round = data.round;
+                buttonGame.dataset.key = data.key;
+                buttonGame.dataset.tkey = data.tkey
+                console.log("SSE 9")
+                tournamentGame.innerHTML = "";
+                console.log("SSE 10")
+                tournamentGame.appendChild(buttonGame);
+                console.log("SSE 11")
 
               }
               else if (data.t_state == "game-finished") {
@@ -843,80 +843,80 @@ export async function tournamentController() {
   //})
 
 
-  //tournamentGame.addEventListener('click', async (event) => {
-  //  const target = event.target;
+  tournamentGame.addEventListener('click', async (event) => {
+   const target = event.target;
 
-  //  if (target.tagName === "BUTTON") {
-  //    event.preventDefault();
+   if (target.tagName === "BUTTON") {
+     event.preventDefault();
 
-  //    const KeepInfo = document.getElementById("contentTournementPage");
-  //    // const contentInfo = KeepInfo.innerHTML;
+     const KeepInfo = document.getElementById("contentTournementPage");
+     // const contentInfo = KeepInfo.innerHTML;
 
-  //    if (target.dataset.type == "local") {
-  //      localStorage.setItem("p1", target.dataset.p1);
-  //      localStorage.setItem("p2", target.dataset.p2);
-  //      localStorage.setItem("key", target.dataset.key);
-  //      localStorage.setItem("tkey", target.dataset.tkey);
-  //      // console.log("Target.dataset", target.dataset);
-  //      await fetchWithRefresh(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
-  //        credentials: "include",
-  //      })
-  //        .then(response => {
-  //          if (!response.ok) throw new Error("https Error: " + response.status);
-  //          return response.json();
-  //        })
-  //      // .then(data => {
-  //      //   console.log(data);
-  //      // })
+     if (target.dataset.type == "local") {
+       localStorage.setItem("p1", target.dataset.p1);
+       localStorage.setItem("p2", target.dataset.p2);
+       localStorage.setItem("key", target.dataset.key);
+       localStorage.setItem("tkey", target.dataset.tkey);
+       // console.log("Target.dataset", target.dataset);
+       await fetchWithRefresh(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
+         credentials: "include",
+       })
+         .then(response => {
+           if (!response.ok) throw new Error("https Error: " + response.status);
+           return response.json();
+         })
+       // .then(data => {
+       //   console.log(data);
+       // })
 
-  //      return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
-  //    }
-  //    else {
-  //      let idJWT;
-  //      try {
-  //        const response = await fetchWithRefresh('server-pong/check-sse', {
-  //          headers: { 'X-CSRFToken': csrf },
-  //          credentials: 'include',
-  //        });
+       return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
+     }
+     else {
+       let idJWT;
+       try {
+         const response = await fetchWithRefresh('server-pong/check-sse', {
+           headers: { 'X-CSRFToken': csrf },
+           credentials: 'include',
+         });
 
-  //        console.log('data', response.status);
-  //        if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+         console.log('data', response.status);
+         if (!response.ok) throw new Error('HTTP Error: ' + response.status);
 
-  //        const data = await response.json();
-  //        let username;
-  //        let a;
-  //        let b;
-  //        let c;
+         const data = await response.json();
+         let username;
+         let a;
+         let b;
+         let c;
 
-  //        // Safely extract values with defaults
-  //        const guestArray = Array.isArray(data.guest) ? data.guest : [];
-  //        [a, b, c] = guestArray;
-  //        console.log(data)
-  //        username = data.username || 'anonymous';
+         // Safely extract values with defaults
+         const guestArray = Array.isArray(data.guest) ? data.guest : [];
+         [a, b, c] = guestArray;
+         console.log(data)
+         username = data.username || 'anonymous';
 
-  //        console.log(target.dataset)
-  //        console.log(username)
+         console.log(target.dataset)
+         console.log(username)
 
-  //        if (target.dataset.player == username) {
-  //          idJWT = -1
-  //        }
-  //        else if (target.dataset.player == a) {
-  //          idJWT = 0
-  //        }
-  //        else if (target.dataset.player == b) {
-  //          idJWT = 1
-  //        }
-  //        else {
-  //          idJWT = 2
-  //        }
-  //      } catch (error) {
-  //        console.error('Request error:', error);
-  //        // Could set default values for a, b, c if needed
-  //      }
-  //      return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));
-  //    }
-  //  }
-  //})
+         if (target.dataset.player == username) {
+           idJWT = -1
+         }
+         else if (target.dataset.player == a) {
+           idJWT = 0
+         }
+         else if (target.dataset.player == b) {
+           idJWT = 1
+         }
+         else {
+           idJWT = 2
+         }
+       } catch (error) {
+         console.error('Request error:', error);
+         // Could set default values for a, b, c if needed
+       }
+       return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));
+     }
+   }
+  })
 }
 
 

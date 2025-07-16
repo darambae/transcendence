@@ -224,7 +224,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 				await self.launchGame(trnmtDict[self.room_group_name].match2, 1)
 		
 		elif action == "final-matches" :
-			# print(f"finals matches consumer |\n trnmtDict[self.room_group_name].matchLoserBracket.launchable : {trnmtDict[self.room_group_name].matchLoserBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.launchable {trnmtDict[self.room_group_name].matchWinnerBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.played : {trnmtDict[self.room_group_name].matchWinnerBracket.played} ||\n trnmtDict[self.room_group_name].matchLoserBracket.played {trnmtDict[self.room_group_name].matchLoserBracket.played} ", file=sys.stderr)
+			trnmtDict[self.room_group_name].matchLoserBracket.initValues(trnmtDict[self.room_group_name].matchWinnerBracket)
+			print(f"finals matches consumer |\n trnmtDict[self.room_group_name].matchLoserBracket.launchable : {trnmtDict[self.room_group_name].matchLoserBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.launchable {trnmtDict[self.room_group_name].matchWinnerBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.played : {trnmtDict[self.room_group_name].matchWinnerBracket.played} ||\n trnmtDict[self.room_group_name].matchLoserBracket.played {trnmtDict[self.room_group_name].matchLoserBracket.played} ", file=sys.stderr)
 			# if self.name == trnmtDict[self.room_group_name].matchWinnerBracket.p1.username:
 			await self.send(text_data=json.dumps({"t_state" : "final-match-preview", "tkey" : self.room_group_name, "matchWinner" : {"player1" : trnmtDict[self.room_group_name].matchWinnerBracket.p1.username, "player2" : trnmtDict[self.room_group_name].matchWinnerBracket.p2.username}, "matchLooser" : {"player1" : trnmtDict[self.room_group_name].matchLoserBracket.p1.username, "player2" : trnmtDict[self.room_group_name].matchLoserBracket.p2.username}}))
 			if trnmtDict[self.room_group_name].matchWinnerBracket.launchable and not trnmtDict[self.room_group_name].matchWinnerBracket.played:
@@ -240,7 +241,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					print("Updated ", self.name, file=sys.stderr)
 					self.guests = elem["invites"]
-			await self.sendHB(text_data)
+			# await self.sendHB(text_data)
 		elif action == "ShowResults" :
 			dicoInfo = {
 				"t_state" : "results",

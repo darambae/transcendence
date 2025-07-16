@@ -256,6 +256,7 @@ async def joinGuest(request) :
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		# print(666, file=sys.stderr)
 		lsTrnmtJwt = trnmtDict[tKey].listJWT()
+		print("lsTrnmtJwt :", lsTrnmtJwt, file=sys.stderr)
 		await channel_layer.group_send(
 			tKey,
 			{
@@ -264,8 +265,9 @@ async def joinGuest(request) :
 			}
 		)
 
+		asyncio.sleep(0.5)
+
 		player = Player(jwt_token, guest)
-		# print(777, file=sys.stderr)
 		trnmtDict[tKey].addPlayers(player)
 		return JsonResponse({"Success" : f"{guest} added as a guest"})
 
