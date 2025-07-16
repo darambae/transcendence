@@ -23,6 +23,8 @@ export function userController() {
 				if (response.ok) {
 					// Clean up chat connections before logout
 					cleanupChatOnLogout();
+					// Reset authentication cache immediately
+					resetAuthCache();
 
 					const toggleLogin = document.getElementById('toggle-login');
 					if (toggleLogin) {

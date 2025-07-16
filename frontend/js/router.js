@@ -1,4 +1,3 @@
-
 import { routes } from './routes.js';
 import {
 	actualizeIndexPage,
@@ -9,6 +8,7 @@ import {
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 import { cleanupLocalGame } from './views/localGame.js';
 import { cleanupMultiplayerGame } from './views/multiplayerGameSession.js';
+// import { cleanupTournament } from './views/tournament.js';
 
 // State management
 let navigationBlocked = false;
@@ -21,8 +21,14 @@ let cachedAuthStatus = null;
 let authCacheTimestamp = 0;
 
 export function resetAuthCache() {
+	console.log('🔄 Authentication cache reset');
 	cachedAuthStatus = null;
 	authCacheTimestamp = 0;
+}
+
+export function forceAuthRefresh() {
+	resetAuthCache();
+	return getAuthStatus();
 }
 
 // Initialize routing
@@ -109,12 +115,33 @@ export async function navigate() {
 		history.replaceState(null, '', '/');
 	}
 
-	// Get auth status (uses cache if available)
-	let userIsAuth = await getAuthStatus();
+	// Get auth status (uses cache if available, but force fresh check for certain routes)
+	let userIsAuth;
+	if (
+		routeName === 'singlePlay' ||
+		routeName === 'multiplayer' ||
+		routeName === 'tournament'
+	) {
+		// Force fresh auth check for game routes to avoid stale cache after login
+		cachedAuthStatus = null;
+		userIsAuth = await getAuthStatus();
+	} else {
+		userIsAuth = await getAuthStatus();
+	}
 
 	// Update login/user display
 	if (userIsAuth) {
-		await actualizeIndexPage('toggle-login', routes['user']);
+		try {
+			await actualizeIndexPage('toggle-login', routes['user']);
+		} catch (error) {
+			// If updating user display fails (e.g., token expired), reset auth cache
+			console.warn(
+				'Failed to update user display, resetting auth cache:',
+				error
+			);
+			resetAuthCache();
+			userIsAuth = false; // Update local variable to reflect actual state
+		}
 	}
 
 	// Get view for the route
@@ -143,11 +170,19 @@ export async function navigate() {
 		return;
 	}
 
+	// Additional safety check: if user is not authenticated, don't try to load user view
+	if (!userIsAuth && view === routes['user']) {
+		console.log('Preventing user view load for unauthenticated user');
+		history.replaceState(null, '', '/#home');
+		return;
+	}
+
 	// Render the view
 	try {
 		// Cleanup any active game timers before navigating to a new page
 		cleanupLocalGame();
 		cleanupMultiplayerGame();
+		// cleanupTournament();
 		await actualizeIndexPage('main-content', view);
 	} catch (error) {
 		console.error('Error loading template:', error);

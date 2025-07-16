@@ -89,7 +89,7 @@ export async function listennerFriends() {
 				user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
 			html += `<span class="badge ${badgeClass}">${user.status}</span>`;
 			if (user.status === 'accepted') {
-            	html += `<button class="btn btn-sm btn-outline-danger ms-2 unfriend-btn" data-username="${user.username}" onclick="deletteFriends('${user.username}')" title="unfriend">delette</button>`;
+            	html += `<button class="btn btn-sm btn-outline-danger ms-2 unfriend-btn" data-username="${user.username}" onclick="deleteFriends('${user.username}')" title="unfriend">delete</button>`;
         	}
 		}
 
@@ -161,14 +161,18 @@ export async function declineInvite(username) {
 	}
 }
 
-export async function deletteFriends(username) {
+export async function deleteFriends(username) {
+	if(!confirm(`are you sure you want to unfriend ${username} ?`)) {
+		return;
+	}
+	
 	try {
 
 		const data_body = {
 			username: username,
 		};
 
-		const response = await fetchWithRefreshNoCash('/user-service/deletteFriends/', {
+		const response = await fetchWithRefreshNoCash('/user-service/deleteFriends/', {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: {
@@ -183,11 +187,11 @@ export async function deletteFriends(username) {
 			listennerFriends();
 		}
 	} catch (err) {
-		console.error('delette friends network error : ', err)
+		console.error('delete friends network error : ', err)
 	}
 }
 
 
 window.acceptInvite = acceptInvite;
 window.declineInvite = declineInvite;
-window.deletteFriends = deletteFriends;
+window.deleteFriends = deleteFriends;
