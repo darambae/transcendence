@@ -29,22 +29,15 @@ class TournamentError(Exception) :
 
 async def  checkForUpdates(uriKey) :
 	try :
-		# print("0", file=sys.stderr)
 		ssl_context = ssl.create_default_context()
-		# print("0.1", file=sys.stderr)
 		ssl_context.load_verify_locations('/certs/fullchain.crt')
-		# print(f"0.2 : {uriKey}", file=sys.stderr)
 		async with websockets.connect(uriKey, ssl=ssl_context) as ws:
-			# print("1", file=sys.stderr)
 			while True:
 				try:
 					message = await asyncio.wait_for(ws.recv(), timeout=20)
-					# print(f"data: {message}\n\n", file=sys.stderr)
 					yield f"data: {message}\n\n"
 				except asyncio.TimeoutError:
-					# Do something else on timeout
-					# print("No message received within timeout.", file=sys.stderr)
-					yield "data: hearthbeat\n\n"  # or any other fallback action
+					yield "data: hearthbeat-Tournament\n\n"  # or any other fallback action
 	except Exception as e :
 		# print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
 		yield f"data: WebSocket stop, error : {e}\n\n"
