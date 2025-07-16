@@ -185,7 +185,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 			else :
 				user = match.p2.username
 				playerId = 2
-			if (self.name == match.p1.username or self.name == match.p2.username) :
+			print(f"self.name : {self.name}\ns;ef.guests : {self.guests}\n\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}", file=sys.stderr)
+			if (self.name == match.p1.username or match.p1.username in self.guests or self.name == match.p2.username or match.p2.username in self.guests) :
 				await self.send(text_data=json.dumps({
 					"t_state" : "game-start",
 					"mode" : "remote",
@@ -196,15 +197,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 					"round" : roundM,
 				}))
 		else :
-			await self.send(text_data=json.dumps({
-				"t_state" : "game-start",
-				"mode" : "local",
-				"tkey" : self.room_group_name,
-				"player1" : match.p1.username,
-				"player2" : match.p2.username,
-				"key" : match.key,
-				"round" : roundM,
-			}))
+			if (self.name == match.p1.username or match.p1.username in self.guests or self.name == match.p2.username or match.p2.username in self.guests) :
+				await self.send(text_data=json.dumps({
+					"t_state" : "game-start",
+					"mode" : "local",
+					"tkey" : self.room_group_name,
+					"player1" : match.p1.username,
+					"player2" : match.p2.username,
+					"key" : match.key,
+					"round" : roundM,
+				}))
 
 							
 	async def receive(self, text_data):
@@ -233,8 +235,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 			jwt_l = data.get("jwt-list")
 			
 			for elem in jwt_l :
+				print("Updating ", self.name, "\nelem", elem, file=sys.stderr)
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
-					self.guests == elem["invites"]
+					print("Updated ", self.name, file=sys.stderr)
+					self.guests = elem["invites"]
 		elif action == "ShowResults" :
 			dicoInfo = {
 				"t_state" : "results",

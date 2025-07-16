@@ -205,7 +205,8 @@ class checkTfa(APIView):
 				# print("user.activated", user.activated, file=sys.stderr)
 				if user.activated and user.two_factor_auth:
 					# print("here in 2FA checking with JWT", file=sys.stderr)
-					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3:
+					if check_password(data.get('tfa'), user.two_factor_auth) and len(data["jwt"]["invites"]) < 3 \
+					and user.user_name not in data["jwt"]["invites"] and user.user_name != data["jwt"]["username"] :
 						# print("checkPassword ok !", file=sys.stderr)
 						data["jwt"]["invites"].append(user.user_name)
 						data_generate_jwt = generateJwt(USER.objects.get(user_name=data["jwt"]["username"]), data["jwt"])
@@ -219,7 +220,7 @@ class checkTfa(APIView):
 											 'access': str(data_generate_jwt['access'])},
 											 status=200)
 					else :
-						return JsonResponse({'error': 'account not activated or two factor auth not send'}, status=401)
+						return JsonResponse({'error': 'account is already a guest / invalid account'}, status=401)
 				else:
 					return JsonResponse({'error': 'user is not activated or 2FA is NULL'}, status=401)
 			else :

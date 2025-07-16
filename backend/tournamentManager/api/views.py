@@ -133,6 +133,8 @@ async def launchMatch(request) :
 				"text_data": {"action" : "update-guest", "jwt-list" : lsTrnmtJwt}
 			}
 		)
+		
+		asyncio.sleep(1000)
 
 		await channel_layer.group_send(
 			tkey,

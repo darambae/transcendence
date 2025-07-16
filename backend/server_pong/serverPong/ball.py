@@ -17,7 +17,7 @@ def determineRandomStart() :
 	startingAngle = random.choice([-90, -60, -30, -10, 10, 30, 60, 90])
 	angle = math.atan2(startingAngle, 90)
 
-	magnitude = math.hypot(120, startingAngle)
+	magnitude = math.hypot(110, startingAngle)
 
 	new_vx = magnitude * math.cos(angle)
 	new_vy = magnitude * math.sin(angle)
@@ -98,7 +98,7 @@ def addSpeed(ori : int, incidentVector : Vector) :
 	else :
 		m = -1
 	angle = math.atan2(90 * m, ori)
-	magnitude = math.hypot(120 * m, ori) + 30 * incidentVector.addedSpeed
+	magnitude = math.hypot(110 * m, ori) + 30 * incidentVector.addedSpeed
 	# #print("------------------------------->>> magnitude :", magnitude, file=sys.stderr)
 	return Vector(magnitude * math.sin(angle), magnitude * math.cos(angle), spdMultiplier=incidentVector.addedSpeed+1)
 
@@ -180,8 +180,8 @@ class	Movement() :
 		else :
 			self.scorePlayer2 += 1
 		self.ball.pos = self.map.center 
-		dictInfoRackets[self.roomName]["racket1"] = [[5, 300], [5,395]]
-		dictInfoRackets[self.roomName]["racket2"] = [[995, 300], [995, 395]]																												# Place it on center
+		dictInfoRackets[self.roomName]["racket1"] = [[5, 280], [5,395]]
+		dictInfoRackets[self.roomName]["racket2"] = [[995, 280], [995, 395]]																												# Place it on center
 		if (self.usrID <= 1) :
 			self.ball.spd = determineRandomStart()
 
