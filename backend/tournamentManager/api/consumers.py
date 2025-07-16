@@ -240,6 +240,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					print("Updated ", self.name, file=sys.stderr)
 					self.guests = elem["invites"]
+			await self.sendHB(text_data)
 		elif action == "ShowResults" :
 			dicoInfo = {
 				"t_state" : "results",
@@ -254,7 +255,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			await asyncio.sleep(5)
 
 			trnmtDict.pop(self.room_group_name)
-			
+
 			await asyncio.sleep(2)
 
 			await self.sendReload(text_data)

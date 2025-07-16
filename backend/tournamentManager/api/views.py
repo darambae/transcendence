@@ -113,11 +113,7 @@ async def launchMatch(request) :
 			# print("lm-1-end3", file=sys.stderr)
 			return JsonResponse({"Info" : trStart[1]})
 		# print(f"lm-1, tkey : -{tkey}-", file=sys.stderr)
-		try :
-			lsTrnmtJwt = trnmtDict[tkey].listJWT()
-		except Exception as e :
-			print(f"Error : {e}", file=sys.stderr)
-		# print(f"lm-1, lsTrnmtJwt : -{lsTrnmtJwt}-", file=sys.stderr)
+		lsTrnmtJwt = trnmtDict[tkey].listJWT()
 
 		await channel_layer.group_send(
 			tkey,
@@ -259,6 +255,15 @@ async def joinGuest(request) :
 		if tKey not in trnmtDict:
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		# print(666, file=sys.stderr)
+		lsTrnmtJwt = trnmtDict[tKey].listJWT()
+		await channel_layer.group_send(
+			tKey,
+			{
+				"type": "tempReceived",
+				"text_data": {"action" : "update-guest", "jwt-list" : lsTrnmtJwt}
+			}
+		)
+
 		player = Player(jwt_token, guest)
 		# print(777, file=sys.stderr)
 		trnmtDict[tKey].addPlayers(player)
