@@ -10,29 +10,39 @@ import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
 let hasOverallUnreadMessages = false;
-let mainChatBootstrapModal; // Bootstrap Modal instance
-let currentActiveChatGroup = null; // No default active group, will be set on selection
+let mainChatBootstrapModal;
+let currentActiveChatGroup = null;
 let currentTargetId = null;
-let globalEventSource = null; // Global EventSource for general chat notifications
-const eventSources = {}; // Stores EventSource objects per groupId
-const messageOffsets = {}; // Stores the offset for message history for each group
+let globalEventSource = null;
+const eventSources = {};
+const messageOffsets = {};
+
+async function forceRefreshToken() {
+	try {
+		const response = await fetchWithRefresh('/auth/refresh-token/', {
+				method: 'GET',
+				credentials: 'include',
+				headers: { 'X-CSRFToken': getCookie('csrftoken') },
+			});
+		if (!response.ok) {
+			console.error('Failed to refresh token:', response.statusText);
+			throw new Error('Token refresh failed');
+		}
+		console.log('Tokens refreshed successfully.');
+	} catch (error) {
+		console.error('Network or other error during token refresh:', error);
+		throw error;
+    }
+}
 
 // Initialize global EventSource for chat notifications
 async function initGlobalChatNotifications(currentUserId) {
-	// Close existing global connection if any
 	if (globalEventSource) {
 		globalEventSource.close();
 		globalEventSource = null;
 	}
-
 	try {
-		// Refresh token before establishing connection
-		await fetchWithRefresh('/auth/refresh-token/', {
-			method: 'GET',
-			credentials: 'include',
-			headers: { 'X-CSRFToken': getCookie('csrftoken') },
-		});
-
+		await forceRefreshToken();
 		globalEventSource = new EventSource(`/chat/stream/notification/${currentUserId}/`);
 
 		globalEventSource.addEventListener('chat_notification', function (e) {
