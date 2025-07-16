@@ -449,7 +449,7 @@ class declineInvite(APIView):
             )
 
 
-class deletteFriends(APIView):
+class deleteFriends(APIView):
     permission_classes = [AllowAny]
 
     def patch(self, request):
@@ -462,7 +462,7 @@ class deletteFriends(APIView):
 
         try:
             response = requests.patch(
-                'https://access_postgresql:4000/api/deletteFriends/',
+                'https://access_postgresql:4000/api/deleteFriends/',
                 verify=False,
                 headers={
                     'Authorization': f"bearer {token}",
