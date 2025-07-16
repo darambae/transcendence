@@ -33,3 +33,11 @@
 #idplayerInTournament {
 	margin-top: 7%;
 }
+
+#idDecontLunch {
+	font-size: 2rem;
+	font-weight: bold;
+	color: #0047ab;
+	text-align: center;
+	margin-top: 20px;
+  }
