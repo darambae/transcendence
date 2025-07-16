@@ -44,7 +44,7 @@ async def  checkForUpdates(uriKey) :
 				except asyncio.TimeoutError:
 					# Do something else on timeout
 					# print("No message received within timeout.", file=sys.stderr)
-					yield "data: hearthbeat\n\n"  # or any other fallback action
+					yield "data: heartbeat\n\n"  # or any other fallback action
 	except Exception as e :
 		# print(f"data: WebSocket stop, error : {e}\n\n", file=sys.stderr)
 		yield f"data: WebSocket stop, error : {e}\n\n"
