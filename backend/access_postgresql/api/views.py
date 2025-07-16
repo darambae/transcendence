@@ -147,6 +147,9 @@ class checkPassword(APIView):
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.activated:
+				if user.online:
+					return JsonResponse({'error': 'User is already logged in'}, status=409)
+				
 				if check_password(data.get('password'), user.password):
 					# opt = generate_otp_send_mail(user)
 					opt = "NZHK-GO7Q-9JSD-X9QI"
@@ -369,7 +372,7 @@ class addResultGames(APIView):
 	permission_classes = [AllowAny]
 
 	def post(self, request):
-		
+
 		data = request.data
 		#data_json = data.json()
 
@@ -641,7 +644,9 @@ class ChatGroupListCreateView(APIView):
 				'group_id': chat_group.id,
 				'group_name': chat_group.name,
 				'receiver_id': target_user.id,
-				'receiver_name': target_user.user_name
+				'receiver_name': target_user.user_name,
+				'sender_name': current_user.user_name,
+				'sender_id': current_user.id
 			}, status=status.HTTP_200_OK)
 
 		except USER.DoesNotExist:
@@ -1037,7 +1042,7 @@ class forgotPassword(APIView):
 			user.save()
 
 			return JsonResponse({'success': 'Temporary password uploaded'})
-		
+
 		except USER.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 		except Exception as e:
@@ -1074,15 +1079,24 @@ class blockedStatus(APIView):
           try:
             target_user = get_object_or_404(USER, id=targetUserId)
             is_blocked = current_user.blocked_user.filter(id=target_user.id).exists()
+            action = None
             if is_blocked:
-                  current_user.blocked_user.remove(target_user)
+                current_user.blocked_user.remove(target_user)
+                action = "unblocked"
             else:
-                  current_user.blocked_user.add(target_user)
-            return Response({'status': 'success'}, status=status.HTTP_200_OK)
+                current_user.blocked_user.add(target_user)
+                action = "blocked"
+            return Response({
+                'status': 'success',
+                'action': action,
+                'target_id': target_user.id,
+                'target_name': target_user.user_name,
+                'actor_name': current_user.user_name,
+                'actor_id': current_user.id
+            }, status=status.HTTP_200_OK)
           except Exception as e:
             logger.exception("Internal server error changing blocked status.")
             return Response(
                 {'status': 'error', 'message': 'Internal server error changing blocked status.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
