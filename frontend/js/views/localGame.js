@@ -155,7 +155,7 @@ export function checkwin() {
 	}
 }
 
-export async function localGameController() {
+export async function localGameController(id1, id2) {
 	guideTouch();
 	drawCenterTextP();
 
@@ -201,7 +201,38 @@ export async function localGameController() {
 		// Could set default values for a, b, c if needed
 	}
 	console.log('results: ', username, a, b, c);
-	let url_sse = `/server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=-1&JWTidP2=0&username=${username}`;
+	console.log(typeof(id1));
+	console.log(typeof(id2));
+	if (typeof(id1) != 'number') {
+		if (id1 == username) {
+			id1 = -1;
+		}
+		else if (id1 == a) {
+			id1 = 0;
+		}
+		else if (id1 == b) {
+			id1 = 1;
+		}
+		else {
+			id1 = 2;
+		}
+	}
+
+	if (typeof(id2) != 'number') {
+		if (id2 == username) {
+			id2 = -1;
+		}
+		else if (id2 == a) {
+			id2 = 0;
+		}
+		else if (id2 == b) {
+			id2 = 1;
+		}
+		else {
+			id2 = 2;
+		}
+	}
+	let url_sse = `/server-pong/events?apikey=${key_game}&idplayer=0&ai=0&JWTidP1=${id1}&JWTidP2=${id2}&username=${username}`;
 	if (a !== undefined) {
 		url_sse += `&guest1=${a}`;
 	}

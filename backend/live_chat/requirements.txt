@@ -13,3 +13,4 @@ httpx
 djangorestframework
 djangorestframework-simplejwt
 PyJWT
+django-cors-headers

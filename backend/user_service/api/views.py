@@ -449,6 +449,36 @@ class declineInvite(APIView):
             )
 
 
+class deleteFriends(APIView):
+    permission_classes = [AllowAny]
+
+    def patch(self, request):
+        token = request.COOKIES.get('access_token')
+        username = request.data.get('username')
+
+        json_data = {
+            'username':username
+        }
+
+        try:
+            response = requests.patch(
+                'https://access_postgresql:4000/api/deleteFriends/',
+                verify=False,
+                headers={
+                    'Authorization': f"bearer {token}",
+                    'Host': 'localhost'
+                },
+                json=json_data,
+            )
+            return Response(response.json(), status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            return Response(
+                {'error': f'Access to access_postgres for search friends: {str(e)}'},
+                status=500
+            )
+
+
 class acceptInvite(APIView):
     permission_classes = [AllowAny]
 
@@ -494,7 +524,7 @@ class matchHistory(APIView):
                 },
             )
             res = requests.get('https://access_postgresql:4000/api/DecodeJwt/', headers={"Authorization" : f"bearer {token}", 'Host': 'localhost'}, verify=False)
-            print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
+            # print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
 
             return Response(response.json().get("result"), status=response.status_code)
 
@@ -503,3 +533,4 @@ class matchHistory(APIView):
                 {'error': f'Access to access_postgres for matchHistory: {str(e)}'},
                 status=500
             )
+

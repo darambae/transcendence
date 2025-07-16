@@ -1,3 +1,4 @@
+import { resetAuthCache } from './router.js';
 import { routes } from './routes.js';
 
 export async function loadTemplate(viewName) {
@@ -105,7 +106,7 @@ export function attachLoginListener(userIsAuth = null) {
 function setupLoginClick(toggleLogin, isAuth) {
 	toggleLogin.addEventListener('click', async () => {
 		if (isAuth === false) {
-			await actualizeIndexPage('modal-container', routes.login);
+			await actualizeIndexPage('modal-container', routes['login']);
 		} else {
 			console.log('User is already authenticated, not showing login modal');
 		}
@@ -123,8 +124,8 @@ export async function getBlockedStatus(targetUserId) {
 				headers: {
 					'Content-Type': 'application/json',
 					'Cache-Control': 'no-cache, no-store, must-revalidate',
-					'Pragma': 'no-cache',
-					'Expires': '0'
+					Pragma: 'no-cache',
+					Expires: '0',
 				},
 				credentials: 'include',
 			}
@@ -152,34 +153,34 @@ export async function getBlockedStatus(targetUserId) {
 	}
 }
 
-// export async function fetchWithRefresh(url, options = {}) {
+export async function fetchWithRefreshNoCash(url, options = {}) {
+	let response = await fetch(url, options);
 
-// 	let response = await fetch(url, options);
+	if (response.status === 401) {
+		const refreshResponse = await fetch('auth/refresh-token/', {
+			method: 'GET',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+		if (refreshResponse.ok) {
+			response = await fetch(url, options);
+		} else {
+			window.location.href = '/#home';
+		}
+	} else if (response.status === 413) {
+		return new Response(
+			JSON.stringify({
+				status: 'error',
+				message: 'The image file is too large',
+			}),
+			{ status: 413 }
+		);
+	}
+	return response;
+}
 
-// 	if (response.status === 401) {
-// 		const refreshResponse = await fetch('auth/refresh-token/', {
-// 			method: 'GET',
-// 			credentials: 'include',
-// 			headers: {
-// 				'Content-Type': 'application/json',
-// 			},
-// 		});
-// 		if (refreshResponse.ok) {
-// 			response = await fetch(url, options);
-// 		} else {
-// 			window.location.href = '/#home';
-// 		}
-// 	} else if (response.status === 413) {
-// 		return new Response(
-// 			JSON.stringify({
-// 				status: 'error',
-// 				message: 'The image file is too large',
-// 			}),
-// 			{ status: 413 }
-// 		);
-// 	}
-// 	return response;
-// }
 const requestCache = new Map(); // Stores cached responses
 const inFlightRequests = new Map(); // Tracks pending requests
 let refreshPromise = null; // Holds the single refresh token operation
@@ -195,10 +196,8 @@ function clearAuthAndRedirect() {
 
 	console.log('Clearing authentication state and redirecting to home');
 
-	// Clear any cached authentication status
-	if (window.cachedAuthStatus !== undefined) {
-		window.cachedAuthStatus = null;
-	}
+	// Clear any cached authentication status using the proper function
+	resetAuthCache();
 
 	// Clear tokens from cookies if possible
 	document.cookie =

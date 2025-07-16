@@ -13,6 +13,7 @@ import { forgotPasswordController } from './views/forgotPassword.js';
 import { invitsController } from './views/tournament.js';
 import { versusController } from './views/versusGame.js';
 import { localGameController } from './views/localGame.js';
+import { aiController } from './views/ai.js';
 
 export const routes = {
 	home: {
@@ -35,10 +36,10 @@ export const routes = {
 		template: 'versusGame',
 		controller: versusController,
 	},
-	game: {
+	game: (id1, id2) => ({
 		template: 'localGame',
-		controller: localGameController,
-	},
+		controller: () => localGameController(id1, id2),
+	}),
 	login: {
 		template: 'login',
 		controller: loginController,
@@ -82,5 +83,9 @@ export const routes = {
 		template: 'invits',
 		controller: invitsController,
 	},
+	ai: (key) => ({
+		template : 'multiplayerTournament',
+		controller: () => aiController(key),
+	}) 
 };
 		

@@ -48,11 +48,11 @@ def decodeJWT(request, encodedJwt=None) :
 		# print("Error 1", file=f)
 		return [None] * 3
 	
-	print(f"encoded: {encodedJwt}", file=sys.stderr)
+	# print(f"encoded: {encodedJwt}", file=sys.stderr)
 	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
 	res_json = res.json()
 	if res.status_code != 200 :
-		print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
+		# print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=sys.stderr)
 		if (res_json.get('error') == "Token expired"):
 			refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
 			if refresh_res.status_code == 200:

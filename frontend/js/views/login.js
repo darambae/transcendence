@@ -6,6 +6,7 @@ import {
 	closeModal,
 } from '../utils.js';
 import { renderChatButtonIfAuthenticated } from './chat.js';
+import { resetAuthCache } from '../router.js';
 
 export async function showDoubleAuthForm(data) {
 	const html = await loadTemplate('doubleAuth');
@@ -53,6 +54,9 @@ export function setupDoubleAuthHandler(mail, username) {
 			const responseData = await response.json();
 
 			if (response.ok) {
+				// Reset authentication cache immediately after successful login
+				resetAuthCache();
+
 				closeModal();
 				await actualizeIndexPage('toggle-login', routes['user']);
 				const hash = location.hash.slice(1);

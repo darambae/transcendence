@@ -1,6 +1,6 @@
 import { cleanupMultiplayerGame } from './multiplayerGameSession.js';
 import { setCanvasAndContext } from './gameCanvas.js';
-import { sendGameCreation } from './gameCreation.js';
+import { sendGameCreation, cleanupGameCreation } from './gameCreation.js';
 import { sendGameJoining } from './gameJoining.js';
 
 // Global variables to track multiplayer game state and event handlers
@@ -113,8 +113,13 @@ export function multiplayerController() {
 	}
 
 	// Add cleanup listeners for page unload/refresh
-	window.addEventListener('beforeunload', cleanupMultiplayerGame);
-	window.addEventListener('hashchange', cleanupMultiplayerGame);
+	const cleanupAllMultiplayerOperations = () => {
+		cleanupMultiplayerGame();
+		cleanupGameCreation();
+	};
+	
+	window.addEventListener('beforeunload', cleanupAllMultiplayerOperations);
+	window.addEventListener('hashchange', cleanupAllMultiplayerOperations);
 
 	console.log('Multiplayer controller setup complete');
 }

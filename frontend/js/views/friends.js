@@ -1,4 +1,4 @@
-import { actualizeIndexPage, fetchWithRefresh } from '../utils.js';
+import { actualizeIndexPage, fetchWithRefresh, fetchWithRefreshNoCash } from '../utils.js';
 import { routes } from '../routes.js';
 
 export function searchFriends() {
@@ -44,11 +44,11 @@ export function searchFriends() {
 
 export async function listennerFriends() {
 	const resultsBox = document.getElementById('resultsListFriends');
-	resultsBox.innerHTML = ''; // CORRECTION ici
+	resultsBox.innerHTML = '';
 
 	let html = '';
 
-	const response = await fetchWithRefresh('/user-service/listennerFriends/', {
+	const response = await fetchWithRefreshNoCash('/user-service/listennerFriends/', {
 		method: 'GET',
 		credentials: 'include',
 		headers: {
@@ -89,7 +89,7 @@ export async function listennerFriends() {
 				user.status === 'accepted' ? 'bg-success' : 'bg-secondary';
 			html += `<span class="badge ${badgeClass}">${user.status}</span>`;
 			if (user.status === 'accepted') {
-            	html += `<button class="btn btn-sm btn-outline-danger ms-2 unfriend-btn" data-username="${user.username}" title="unfriend">&times;</button>`;
+            	html += `<button class="btn btn-sm btn-outline-danger ms-2 unfriend-btn" data-username="${user.username}" onclick="deleteFriends('${user.username}')" title="unfriend">delete</button>`;
         	}
 		}
 
@@ -117,7 +117,7 @@ export async function acceptInvite(username) {
 			username: username,
 		};
 
-		const response = await fetchWithRefresh('/user-service/acceptInvite/', {
+		const response = await fetchWithRefreshNoCash('/user-service/acceptInvite/', {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: {
@@ -142,7 +142,7 @@ export async function declineInvite(username) {
 			username: username,
 		};
 
-		const response = await fetchWithRefresh('/user-service/declineInvite/', {
+		const response = await fetchWithRefreshNoCash('/user-service/declineInvite/', {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: {
@@ -161,5 +161,37 @@ export async function declineInvite(username) {
 	}
 }
 
+export async function deleteFriends(username) {
+	if(!confirm(`are you sure you want to unfriend ${username} ?`)) {
+		return;
+	}
+	
+	try {
+
+		const data_body = {
+			username: username,
+		};
+
+		const response = await fetchWithRefreshNoCash('/user-service/deleteFriends/', {
+			method: 'PATCH',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data_body),
+		});
+
+		const data = await response.json()
+		console.log(data)
+		if (data.message) {
+			listennerFriends();
+		}
+	} catch (err) {
+		console.error('delete friends network error : ', err)
+	}
+}
+
+
 window.acceptInvite = acceptInvite;
 window.declineInvite = declineInvite;
+window.deleteFriends = deleteFriends;

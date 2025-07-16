@@ -27,6 +27,6 @@ export async function versusController() {
 			});
 		await setApiKeyWebSP(apiKey);
 		setPlayersLocalName(apiKey);
-		await actualizeIndexPage('idfooterCanvas', routes['game']);
+		await actualizeIndexPage('idfooterCanvas', routes['game'](-1, 0));
 	});
 }

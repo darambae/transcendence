@@ -5,6 +5,8 @@ import {
 	loadTemplate,
 	closeModal,
 } from '../utils.js';
+import { resetAuthCache } from '../router.js';
+import { refreshTournament, affichUserTournament } from './tournament.js';
 
 async function double_authenticate(data) {
 	const html = await loadTemplate('doubleAuth');
@@ -87,6 +89,9 @@ export async function handleInvitSubmit(event) {
 		console.log('response data: ', data);
 		if (response.ok) {
 			try {
+				// Reset authentication cache immediately after successful guest login
+				resetAuthCache();
+
 				await double_authenticate(dataForm);
 				await fetch('tournament/guest', {
 					headers: {
@@ -97,6 +102,7 @@ export async function handleInvitSubmit(event) {
 
 				await actualizeIndexPage('guest-add', routes['guest']);
 				console.log('User successfully connected');
+				affichUserTournament();
 			} catch (error) {
 				console.log('Double auth error: ', error);
 			}

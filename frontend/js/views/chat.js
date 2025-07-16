@@ -502,6 +502,13 @@ async function initEventSource(groupId, currentUserId) {
 		const recentlyReceivedMessages = new Set(); // For message deduplication
 		source.onmessage = function (e) {
 			try {
+				// Skip heartbeat messages
+				if (
+					e.data === 'heartbeat' ||
+					e.data.trim() === ''
+				) {
+					return;
+				}
 				const messageData = JSON.parse(e.data);
 
 				// Skip if this message is from the current user (we've already displayed it)

@@ -1,5 +1,5 @@
 from django.urls import path, include
-from api.views import getSimulationState, sse, setApiKeySp, get_api_key, sendNewJSON, setApiKey, forfaitUser, disconnectUsr, isGamePlayable, apiKeyManager, sseCheck
+from api.views import getSimulationState, sse, setApiKeySp, get_api_key, sendNewJSON, setApiKey, forfaitUser, disconnectUsr, isGamePlayable, apiKeyManager, sseCheck, destroyKey
 
 
 urlpatterns = [
@@ -11,7 +11,8 @@ urlpatterns = [
     path("server-pong/stop-game", disconnectUsr, name="disconnectUsr"),
     path("server-pong/game-status", isGamePlayable, name="isGamePlayable"),
     path('server-pong/events', sse, name="sse"),
-    path('server-pong/check-sse', sseCheck, name="sseCheck")
+    path('server-pong/check-sse', sseCheck, name="sseCheck"),
+    path('server-pong/<str:key>/delete-key/', destroyKey, name="destroyKey")
 ]
 
 # from django.urls import get_resolver
