@@ -24,13 +24,13 @@ class USER(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.user_name
-    
+
     def clean(self):
         super().clean()
         # Validate username doesn't contain whitespace
         if self.user_name and re.search(r'\s', self.user_name):
             raise ValidationError({'user_name': 'Username cannot contain spaces or whitespace characters.'})
-    
+
     def toJson(self):
         return {"user_id" : self.id, "username" : self.user_name, "avatar" : self.avatar, "invites" : []}
 
@@ -38,7 +38,11 @@ class USER(AbstractBaseUser, PermissionsMixin):
 
 class ChatGroup(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    # Champ pour indiquer si c'est un chat privé
+    # Champ pour indiquer si c'est un chat privé (True) ou groupe/tournoi (False)
+    private = models.BooleanField(default=True)
+    # Champs optionnels pour les chats de tournoi
+    tournament_id = models.IntegerField(null=True, blank=True)  # ID du tournoi externe
+    tournament_name = models.CharField(max_length=255, null=True, blank=True)  # Nom du tournoi
     # blank=True signifie que ce champ n'est pas obligatoire
     members = models.ManyToManyField(USER, related_name='chat_groups', blank=True)
     created_at = models.DateTimeField(auto_now_add=True) # Utile pour le tri ou l'historique des groupes

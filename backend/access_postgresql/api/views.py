@@ -149,7 +149,7 @@ class checkPassword(APIView):
 			if user.activated:
 				if user.online:
 					return JsonResponse({'error': 'User is already logged in'}, status=409)
-				
+
 				if check_password(data.get('password'), user.password):
 					# opt = generate_otp_send_mail(user)
 					opt = "NZHK-GO7Q-9JSD-X9QI"
@@ -373,6 +373,7 @@ class addResultGames(APIView):
 
 	def post(self, request):
 
+
 		data = request.data
 		#data_json = data.json()
 
@@ -570,22 +571,35 @@ class ChatGroupListCreateView(APIView):
 		logger.info(f"Retrieving chat groups for user {current_user.user_name}")
 
 		for group in chat_groups:
-			# For private chats (2 members), get the other user
-			other_member = None
-			other_members = group.members.exclude(id=current_user.id)
-			if other_members.exists():
-				other_member = other_members.first()
-
 			chat_data = {
 				'group_id': group.id,
 				'group_name': group.name,
 			}
 
-			# For private chats, add receiver details
-			if other_member:
+			# Utiliser le champ private pour déterminer le type de chat
+			if group.private:
+				# Chat privé (2 membres), get the other user
+				other_member = None
+				other_members = group.members.exclude(id=current_user.id)
+				if other_members.exists():
+					other_member = other_members.first()
+
 				chat_data.update({
-					'receiver_id': other_member.id,
-					'receiver_name': other_member.user_name
+					'chat_type': 'private'
+				})
+
+				# For private chats, add receiver details
+				if other_member:
+					chat_data.update({
+						'receiver_id': other_member.id,
+						'receiver_name': other_member.user_name
+					})
+			else:
+				# Chat de tournoi (groupe)
+				chat_data.update({
+					'chat_type': 'tournament',
+					'tournament_id': group.tournament_id,
+					'tournament_name': group.tournament_name
 				})
 
 			chat_list.append(chat_data)
@@ -1100,3 +1114,76 @@ class blockedStatus(APIView):
                 {'status': 'error', 'message': 'Internal server error changing blocked status.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class tournamentChat(APIView):
+    """
+    API endpoint to create or retrieve a tournament chat group.
+    Tournament chats are group chats that can have multiple participants.
+    """
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can create tournament chats
+
+    def post(self, request) -> Response:
+        """
+        Creates or retrieves a tournament chat group.
+        Expects 'tournament_id' and 'current_user_id' in the request data.
+        """
+        current_user = request.user  # Authenticated user
+        data = request.data
+        tournament_id = data.get('tournament_id')
+        current_user_id = data.get('current_user_id')
+
+        if not tournament_id:
+            return Response({
+                'status': 'error',
+                'message': 'Tournament ID is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not current_user_id or current_user_id != current_user.id:
+            return Response({
+                'status': 'error',
+                'message': 'Invalid user authentication'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Create a unique name for the tournament chat group
+            tournament_name = f"Tournament_{tournament_id}"
+            chat_name = f"tournament_{tournament_id}"
+
+            # Use get_or_create to handle race conditions - thread-safe operation
+            chat_group, created = ChatGroup.objects.get_or_create(
+                tournament_id=tournament_id,
+                private=False,
+                defaults={
+                    'name': chat_name,
+                    'tournament_name': tournament_name
+                }
+            )
+
+            if created:
+                # New group created - add the creator as first member
+                chat_group.members.add(current_user)
+                logger.info(f"Created new tournament chat group: {chat_group.id} for tournament {tournament_id}")
+            else:
+                # Group already exists - log that we found it
+                logger.info(f"Found existing tournament chat group: {chat_group.id} for tournament {tournament_id}")
+                # For existing tournament chats, only participants should be added through tournament logic
+                # Do not automatically add users here
+
+            # Return the chat group details
+            return Response({
+                'status': 'success',
+                'group_id': chat_group.id,
+                'group_name': chat_group.name,
+                'tournament_id': tournament_id,
+                'tournament_name': tournament_name,
+                'creator_id': current_user.id,
+                'creator_name': current_user.user_name
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.exception(f"Error creating tournament chat group: {e}")
+            return Response({
+                'status': 'error',
+                'message': f'Internal server error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
