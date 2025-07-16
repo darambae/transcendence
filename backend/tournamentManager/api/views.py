@@ -223,7 +223,7 @@ async def checkSSE(request) :
 		jwt = jwt[0]['payload']
 		# print(f"333 : {jwt}", file=sys.stderr)
 		# print({"key" : jwt["username"], "guests" : ','.join(jwt["invites"])}, file=sys.stderr)
-		return JsonResponse({"key" : jwt["username"], "guests" : ','.join(jwt["invites"])})
+		return JsonResponse({"userId" : jwt["user_id"], "key" : jwt["username"], "guests" : ','.join(jwt["invites"])})
 	except Exception as e :
 		# print(f"error : {e}", file=sys.stderr)
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)

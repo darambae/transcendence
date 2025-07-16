@@ -425,6 +425,7 @@ export async function tournamentController() {
           let usernameJwt;
           let jwtInfo;
           let guestJwt;
+          let userId;
           const trId = data.Tournament;
 
 
@@ -440,10 +441,17 @@ export async function tournamentController() {
               jwtInfo = await response.json();
               // console.log("inf : ", jwtInfo);
               usernameJwt = jwtInfo["key"];
-              guestJwt = jwtInfo["guests"]
+              guestJwt = jwtInfo["guests"];
+              userId = jwtInfo["userId"]
             })
             .then(async data => {
-              // console.log("Données reçues Join:", trId);
+              
+              // Put here !!!
+              //    -> ID               = userId
+              //    -> username         = usernameJwt
+              //    -> tournament key   = data["key"]
+
+
               const url_sse = `tournament/events?tKey=${trId}&name=${usernameJwt}&guests=${guestJwt}`;
               SSEStream = getSSE();
               // console.log(SSEStream);
@@ -606,6 +614,7 @@ export async function tournamentController() {
     let usernameJwt;
     let jwtInfo;
     let guestJwt;
+    let userId;
 
 
     // console.log("entree")
@@ -632,6 +641,7 @@ export async function tournamentController() {
             // console.log("------------------------->>> ", jwtInfo);
             usernameJwt = jwtInfo["key"];
             guestJwt = jwtInfo["guests"]
+            userId = jwtInfo["userId"]
           })
       }
       catch (error) {
@@ -655,7 +665,14 @@ export async function tournamentController() {
         })
         .then(async data => {
           btnId.style.backgroundColor = "green";
-          // console.log("Données reçues Join:", data["key"]);
+
+
+          // Put here !!!
+          //    -> ID               = userId
+          //    -> username         = usernameJwt
+          //    -> tournament key   = data["key"]
+
+
           const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
           SSEStream = new EventSource(url_sse);
           setSSE(SSEStream);
