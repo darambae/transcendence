@@ -198,6 +198,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				}))
 		else :
 			if (self.name == match.p1.username or match.p1.username in self.guests or self.name == match.p2.username or match.p2.username in self.guests) :
+				print(f"self.room_group_name : {self.room_group_name}\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}\nmatch.key : {match.key}\nroundM : {roundM}", file=sys.stderr)
 				await self.send(text_data=json.dumps({
 					"t_state" : "game-start",
 					"mode" : "local",
@@ -249,6 +250,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 				"fourth" : trnmtDict[self.room_group_name].fourth.username
 			}
 			await self.send(text_data=json.dumps(dicoInfo))
+
+			await asyncio.sleep(5)
+
+			trnmtDict.pop(self.room_group_name)
+			
+			await asyncio.sleep(2)
+
+			await self.sendReload(text_data)
 
 		elif action == "supervise" and self.name == data.get("player", None):
 			# print(f"A0 - {action}", file=sys.stderr)
@@ -324,6 +333,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def sendHB(self, event) :
 		await self.send(text_data=json.dumps({"t_state" : "Someone-joined-left"}))
+
+	async def sendReload(self, event) :
+		await self.send(text_data=json.dumps({"t_state" : "Back-to-main"}))
 
 	
 	

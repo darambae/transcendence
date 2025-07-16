@@ -136,10 +136,8 @@ async def launchMatch(request) :
 				"text_data": {"action" : "create-bracket"}
 			}
 		)
-		# print("lm-1", file=sys.stderr)
 		return JsonResponse({"Info" : "Ready to start"})
 	except TournamentError as e:
-		# print("lm-2-end", file=sys.stderr)
 		return JsonResponse({"Error": str(e)}, status=401)
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error : {e}"}, status=500)
@@ -393,6 +391,11 @@ async def leaveTournament(request):
 
 async def createTournament(request) :
 	try :
+
+		print("NB Tournaments :", len(list(trnmtDict.keys())), file=sys.stderr)
+
+		if (len(list(trnmtDict.keys())) > 9) :
+			return JsonResponse({"Error" : "Already 10 tournaments"}, status=403)
 		tr = Tournament()
 		trnmtDict[tr.tKey] = tr
 		return JsonResponse({"Result" : "Tournament succefully created"})

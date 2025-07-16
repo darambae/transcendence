@@ -155,7 +155,8 @@ async def  checkForUpdates(uriKey, key) :
 		ssl_context.load_verify_locations('/certs/fullchain.crt')
 		async with websockets.connect(uriKey, ssl=ssl_context) as ws:
 			while True:
-				message = await asyncio.wait_for(ws.recv(), timeout=20)
+				try :
+					message = await asyncio.wait_for(ws.recv(), timeout=20)
 					yield f"data: {message}\n\n"
 				except asyncio.TimeoutError:
 					yield "data: hearthbeat-ServerPong\n\n"
