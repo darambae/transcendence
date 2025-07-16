@@ -147,6 +147,9 @@ class checkPassword(APIView):
 		try:
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.activated:
+				if user.online:
+					return JsonResponse({'error': 'User is already logged in'}, status=409)
+				
 				if check_password(data.get('password'), user.password):
 					# opt = generate_otp_send_mail(user)
 					opt = "NZHK-GO7Q-9JSD-X9QI"

@@ -1,1 +1,0 @@
-[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752609982, 'iat': 1752608675, 'jti': 'a9277079e4c64242ad4331d14a79c6d9', 'user_id': 1, 'username': 'kelly', 'invites': []}}
