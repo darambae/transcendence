@@ -181,6 +181,7 @@ export function cleanupMultiplayerGame() {
 		const csrf = getCookie('csrftoken');
 
 		// Try to forfeit as player 1 first
+		console.log(`server-pong/forfait-game?apikey=${currentMultiplayerApiKey}&idplayer=${currentPlayerId}`)
 		fetch(
 			`server-pong/forfait-game?apikey=${currentMultiplayerApiKey}&idplayer=${currentPlayerId}`,
 			{
@@ -188,7 +189,7 @@ export function cleanupMultiplayerGame() {
 				credentials: 'include',
 			}
 		).catch((error) => {
-			console.error('Error forfeiting as player 1:', error);
+			console.error(`Error forfeiting as player ${currentPlayerId}:`, error);
 		});
 
 		// Also try as player 2 (one will succeed, one will fail, but that's ok)

@@ -744,6 +744,9 @@ export async function tournamentController() {
                 }
               }
               if (data.t_state == "firsts-match-preview") {
+                // SEND MESSAGE KELLY 
+                //    -> 
+                //    -> 
                 launchTournament(data)
 
                 console.log("data firsts match : ", data);
@@ -905,7 +908,6 @@ export async function tournamentController() {
          let b;
          let c;
 
-         // Safely extract values with defaults
          const guestArray = Array.isArray(data.guest) ? data.guest : [];
          [a, b, c] = guestArray;
          console.log(data)
