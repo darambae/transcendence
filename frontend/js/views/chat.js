@@ -569,13 +569,6 @@ async function initEventSource(groupId, currentUserId) {
 				
 				console.log('Modal state - isModalClosed:', isModalClosed, 'currentActiveChatGroup:', currentActiveChatGroup, 'messageGroupId:', messageData.group_id);
 
-				// const chatListItem = document.querySelector(`#chatRoomList [data-group-id="${messageData.group_id}"]`);
-				// if (chatListItem && messageData.group_id !== currentActiveChatGroup) {
-				// 	// Marquer ce chat comme ayant des messages non lus (sauf si c'est le chat actif)
-				// 	chatListItem.classList.add('has-unread-messages');
-				// 	console.log(`Marked chat ${messageData.group_id} as having unread messages`);
-				// }
-
 				if (isModalClosed || messageData.group_id !== currentActiveChatGroup) {
 					console.log('Marking global unread status - modal closed:', isModalClosed, 'different chat:', messageData.group_id !== currentActiveChatGroup);
 					updateGlobalUnreadStatus(true);
