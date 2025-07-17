@@ -14,13 +14,10 @@ export async function localGameTr() {
 	let sseTournament = getSSE();
 
 	//   console.log("aaa");
-	sseTournament.onmessage = function (event) {
+	sseTournament.onmessage = async function (event) {
 		try {
 			// Skip heartbeat messages
-			if (
-				event.data === 'heartbeat' ||
-				event.data.trim() === ''
-			) {
+			if (event.data === 'heartbeat' || event.data.trim() === '') {
 				return;
 			}
 			//   console.log(event.data);
@@ -31,7 +28,10 @@ export async function localGameTr() {
 			}
 			if (data.t_state == 'game-finished') {
 				if (data.mkey == key) {
-					actualizeIndexPage('contentTournementPage', routesTr['tournament']);
+					await actualizeIndexPage(
+						'contentTournementPage',
+						routesTr['tournament']
+					);
 				}
 			}
 			if (data.t_state == 'results') {
