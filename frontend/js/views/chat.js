@@ -593,9 +593,14 @@ async function initEventSource(groupId, currentUserId) {
 				}
 				const messageData = JSON.parse(e.data);
 
+				// Debug: Print messageData content
+				console.log('SSE messageData received:', messageData);
+				console.log('Current user ID:', currentUserId, 'type:', typeof currentUserId);
+				console.log('Message sender ID:', messageData.sender_id, 'type:', typeof messageData.sender_id);
+
 				// Skip if this message is from the current user (we've already displayed it)
 				if (messageData.sender_username != 'server') {
-					if (messageData.sender_id === currentUserId) {
+					if (messageData.sender_id.toString() === currentUserId.toString()) {
 						console.log('Skipping own message from SSE');
 						return;
 					}
@@ -622,7 +627,10 @@ async function initEventSource(groupId, currentUserId) {
 				}, 10000);
 
 				// Only append if the message is for the currently active chat group
-				if (messageData.group_id === currentActiveChatGroup.id) {
+				console.log('Checking group match - Message group_id:', messageData.group_id, 'type:', typeof messageData.group_id);
+				console.log('Current active chat group:', currentActiveChatGroup);
+				if (currentActiveChatGroup && currentActiveChatGroup.group_id && messageData.group_id.toString() === currentActiveChatGroup.group_id.toString()) {
+					console.log('✅ Message is for active chat group - displaying it');
 					const chatLog = document.getElementById('chatLog-active');
 					if (!chatLog) {
 						console.error(`chatLog-active not found for initEventSource.`);
@@ -668,6 +676,8 @@ async function initEventSource(groupId, currentUserId) {
 					chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
 				} else {
 					// *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
+					console.log('❌ Message NOT for active chat group');
+					console.log('Message group_id:', messageData.group_id, 'Active group id:', currentActiveChatGroup?.id);
 					console.log(
 						`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`
 					);
@@ -714,7 +724,7 @@ async function initEventSource(groupId, currentUserId) {
 
 			// Only attempt reconnect if currentActiveChatGroup is still this groupId
 			// and the connection wasn't intentionally closed
-			if (currentActiveChatGroup.id === groupId) {
+			if (currentActiveChatGroup && currentActiveChatGroup.id === groupId) {
 				console.log('Refreshing token and reconnecting SSE...');
 				await new Promise((resolve) => setTimeout(resolve, 3000));
 				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
@@ -841,7 +851,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 		console.error('No groupId provided for loading history.');
 		return;
 	}
-	if (currentActiveChatGroup.id === chatInfo.group_id) {
+	if (currentActiveChatGroup && currentActiveChatGroup.id === chatInfo.group_id) {
 		return;
 	}
 
