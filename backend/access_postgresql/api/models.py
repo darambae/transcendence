@@ -52,7 +52,7 @@ class ChatGroup(models.Model):
 class Message(models.Model):
     group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE, related_name='messages')
     # Assurez-vous que sender est une ForeignKey vers le modèle User
-    sender = models.ForeignKey(USER, on_delete=models.CASCADE, related_name='sent_messages', blank=True)
+    sender = models.ForeignKey(USER, on_delete=models.CASCADE, related_name='sent_messages', blank=True, null=True)
     private = models.BooleanField(default=True)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)

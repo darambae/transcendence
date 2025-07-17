@@ -756,11 +756,13 @@ export async function tournamentController() {
 					content: null,
 					group_id: null,
 					sender_username: 'server',
-					sender_id: data.key,
+					sender_id: data.tkey, // Utiliser l'ID du tournoi
 				};
-				message_1 = "⚠️ First matchs annoncement ⚠️";
-				message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
-				message_3 = `Match 1 : ${data.match2.player1} VS ${data.match2.player2}`
+
+				console.log("trying to send message for the first match");
+				const message_1 = "⚠️ First matchs annoncement ⚠️";
+				const message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
+				const message_3 = `Match 2 : ${data.match2.player1} VS ${data.match2.player2}`;
 				msgInfo.content = message_1;
 				sendMessage(msgInfo);
 				msgInfo.content = message_2;
@@ -778,16 +780,14 @@ export async function tournamentController() {
 					content: null,
 					group_id: null,
 					sender_username: 'server',
-					sender_id: data.key,
+					sender_id: data.tkey, // Utiliser l'ID du tournoi
 				};
-				message_1 = "⚠️ Final matchs annoncement ⚠️";
-				message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
-				message_3 = `Match 1 : ${data.match2.player1} VS ${data.match2.player2}`;
+				console.log("trying to send message for the final match");
+				const message_1 = "⚠️ Final match annoncement ⚠️";
+				const message_2 = `Final : ${data.match1.player1} VS ${data.match1.player2}`;
 				msgInfo.content = message_1;
 				sendMessage(msgInfo);
 				msgInfo.content = message_2;
-				sendMessage(msgInfo);
-				msgInfo.content = message_3;
 				sendMessage(msgInfo);
               }
               else if (data.t_state == "Someone-joined-left") {
