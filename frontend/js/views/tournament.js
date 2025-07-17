@@ -129,7 +129,6 @@ async function createEvent(csrf, ulElem) {
 function setPositionTournamentList(pos) {
   const container = document.getElementById("listPlayerGameTournament");
 
-
   container.style.position = pos;
   if (pos == "relative") {
     container.style.display = "none";
