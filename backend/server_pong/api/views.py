@@ -57,70 +57,28 @@ def setTheCookie(response, access=None, refresh=None) :
 			httponly=True,
 			samesite='Lax'
 		)
-	# with open("log-auth-cookie.txt", "w+") as f :
-	# 	print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-	# Use a default function name if none provided
-	log_func = func if func else "unknown"
+	# Continue with the JWT decoding logic without file logging
+	if not encodedJwt :
+		encodedJwt = request.COOKIES.get("access_token", None)
+	if not encodedJwt :
+		return [None] * 3
 	
-	# Ensure the log file can be created, handle any potential errors
-	try:
-		with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f :
-			tm = datetime.now()
-			print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-	except (OSError, IOError) as e:
-		# If file creation fails, print to stderr instead
-		print(f"Warning: Could not create log file for {log_func}: {e}", file=sys.stderr)
-	
-	try:
-		with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f : 
-			if not encodedJwt :
-				encodedJwt = request.COOKIES.get("access_token", None)
-			if not encodedJwt :
-				print("Error 1", file=f)
-				return [None] * 3
-			
-			print(f"encoded: {encodedJwt}", file=f)
-			res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-			print(f"res : {res}", file=f)
-			res_json = res.json()
-			print(f"res.json() : {res_json}", file=f)
-			if res.status_code != 200 :
-				print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
-				if (res_json.get('error') == "Token expired"):
-					refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-					if refresh_res.status_code == 200:
-						new_access_token = refresh_res.json().get('access')
-						res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-						res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-						return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-					return [None] * 3
-				return [None] * 3
-			return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
-	except (OSError, IOError) as e:
-		# If file operations fail, continue without logging
-		print(f"Warning: Could not write to log file for {log_func}: {e}", file=sys.stderr)
-		# Continue with the JWT decoding logic without file logging
-		if not encodedJwt :
-			encodedJwt = request.COOKIES.get("access_token", None)
-		if not encodedJwt :
+	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+	res_json = res.json()
+	if res.status_code != 200 :
+		if (res_json.get('error') == "Token expired"):
+			refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+			if refresh_res.status_code == 200:
+				new_access_token = refresh_res.json().get('access')
+				res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+				res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+				return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
 			return [None] * 3
-		
-		res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-		res_json = res.json()
-		if res.status_code != 200 :
-			if (res_json.get('error') == "Token expired"):
-				refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-				if refresh_res.status_code == 200:
-					new_access_token = refresh_res.json().get('access')
-					res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-					res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-					return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-				return [None] * 3
-			return [None] * 3
-		return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
+		return [None] * 3
+	return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
@@ -128,18 +86,14 @@ dictApi = {}
 dictApiSp = {}
 dictApiPlayers = {}  # Track players per room: {apikey: [player1_id, player2_id]}
 apiKeys = []
-#print("VIEW IMPORTEEE", file=sys.stderr)
 
 def getSimulationState(request):
-	#print(f"[DEBUG] En attente de l'apiKey", file=sys.stderr)
 	apikey = request.GET.get('apikey')
-	#print(f"[DEBUG] API Key reçue : {apikey}", file=sys.stderr)
 	
 	if not apikey:
 		return JsonResponse({'error': 'API key manquante'}, status=400)
 	
 	data = cache.get(f'simulation_state_{apikey}')
-	print(f"[DEBUG] Données récupérées du cache : {data}", file=sys.stderr)
 	
 	if data:
 		return JsonResponse(data)
@@ -216,7 +170,6 @@ def setApiKeySp(request):
 	JWT = decodeJWT(request, "setApiKeySp")
 	if not JWT[0] :
 		return HttpResponse401() # Set an error 
-	# print(f" Jwt : {JWT[0]}", file=sys.stderr)
 	body = json.loads(request.body)
 	apikey = body.get('apiKey')
 	dictApiSp[apikey] = 1
@@ -231,31 +184,10 @@ def setApiKey(request):
 		return HttpResponse401() # Set an error 
 	
 	apikey = json.loads(request.body).get('apiKey')
-	# Get user identifier - use user_id if available, otherwise use username or a combination
 	user_data = JWT[0]['payload']
 	user_id = user_data.get('user_id') or user_data.get('username') or 'anonymous'
 	
-	# Debug logging
-	try:
-		with open("/app/setApiKey_decodeJWT.txt", "a+") as f:
-			print(f"[DEBUG] setApiKey called - apikey: {apikey}, user_id: {user_id}, user_data: {user_data}", file=f)
-			print(f"[DEBUG] Current dictApiPlayers: {dictApiPlayers}", file=f)
-			print(f"[DEBUG] Current apiKeys: {apiKeys}", file=f)
-			print(f"[DEBUG] Current apiKeysUnplayable: {apiKeysUnplayable}", file=f)
-	except Exception as e:
-		print(f"Debug logging error: {e}", file=sys.stderr)
-	
 	if apikey not in apiKeysUnplayable:
-		# Debug: Check if it's in other states
-		try:
-			with open("/app/setApiKey_decodeJWT.txt", "a+") as f:
-				print(f"[DEBUG] API key {apikey} not in apiKeysUnplayable!", file=f)
-				print(f"[DEBUG] Is in apiKeys: {apikey in apiKeys}", file=f)
-				print(f"[DEBUG] Is in dictApiPlayers: {apikey in dictApiPlayers}", file=f)
-				if apikey in dictApiPlayers:
-					print(f"[DEBUG] Players in room: {dictApiPlayers[apikey]}", file=f)
-		except Exception as e:
-			print(f"Debug logging error: {e}", file=sys.stderr)
 		return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
 	
 	# Check if this room already has enough players
@@ -278,13 +210,6 @@ def setApiKey(request):
 		# Update dictApi for backward compatibility
 		dictApi[apikey] = current_count
 
-	# Debug logging
-	try:
-		with open("/app/setApiKey_decodeJWT.txt", "a+") as f:
-			print(f"[DEBUG] After processing - current_count: {current_count}, dictApiPlayers[{apikey}]: {dictApiPlayers.get(apikey, [])}", file=f)
-	except Exception as e:
-		print(f"Debug logging error: {e}", file=sys.stderr)
-
 	if current_count >= 2 :
 		# Room is full, move to playable
 		if apikey in apiKeysUnplayable:
@@ -306,18 +231,6 @@ def isGamePlayable(request) :
 	
 	apikey = json.loads(request.body).get('apiKey')
 	
-	# Debug logging
-	try:
-		with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
-			print(f"[DEBUG] isGamePlayable called - apikey: {apikey}", file=f)
-			print(f"[DEBUG] dictApiPlayers: {dictApiPlayers}", file=f)
-			print(f"[DEBUG] apiKeys: {apiKeys}", file=f)
-			print(f"[DEBUG] apiKeysUnplayable: {apiKeysUnplayable}", file=f)
-			if apikey in dictApiPlayers:
-				print(f"[DEBUG] dictApiPlayers[{apikey}]: {dictApiPlayers[apikey]} (length: {len(dictApiPlayers[apikey])})", file=f)
-	except Exception as e:
-		print(f"Debug logging error: {e}", file=sys.stderr)
-	
 	# Check if this room is already playable
 	if apikey in apiKeys:
 		return JsonResponse({"playable": "Game can start"})
@@ -333,24 +246,11 @@ def isGamePlayable(request) :
 	else:
 		playable = "Need more player"
 	
-	# Debug logging
-	try:
-		with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
-			print(f"[DEBUG] Returning playable: {playable}", file=f)
-	except Exception as e:
-		print(f"Debug logging error: {e}", file=sys.stderr)
-	
 	return JsonResponse({"playable": playable})
 
 
 def get_api_key(request):
-	JWT = decodeJWT(request, "getApiKey")
-	try:
-		with open("/app/test.txt", "a+") as f:
-			print(f"[DEBUG] get_api_key called - JWT: {JWT[0]}", file=f)
-	except Exception as e:
-		print(f"Debug logging error: {e}", file=sys.stderr)
-	
+	JWT = decodeJWT(request, "getApiKey")	
 
 	if not JWT[0] :
 		return HttpResponseNoContent() # Set an error 
@@ -371,9 +271,6 @@ async def sendNewJSON(request):
 		return HttpResponse(status=400)  # apiKey manquant
 
 	m2 = json.loads(message)
-	# Obtenir ou créer un lock pour cette apiKey
-
-	# print(f"message : {message}", file=sys.stderr)
 	speed = 15
 	if m2["action"] == 'move' :
 		try :
@@ -410,14 +307,11 @@ async def forfaitUser(request) :
 	
 	JWT = decodeJWT(request, "forfeitUser")
 	if not JWT[0] :
-		return HttpResponse401() # Set an error 
-   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
+		return HttpResponse401()
 	apikey = request.GET.get("apikey")
 	idplayer = request.GET.get("idplayer")
 	rq = RequestParsed(apikey, {})
-	#print("---------------------6>   ->  -> Trying to disconnect ", file=sys.stderr)
 	if (rq.apiKey) :
-	   # print("Yay", file=sys.stderr)
 		await channel_layer.group_send(
 			rq.apiKey,
 			{
@@ -452,10 +346,8 @@ async def forfaitUser(request) :
 async def disconnectUsr(request) :
 	JWT = decodeJWT(request, "disconnectUsr")
 	if not JWT[0] :
-		return HttpResponse401() # Set an error 
-   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
+		return HttpResponse401()
 	apikey = request.GET.get("apikey")
-	#print("disco usr", file=sys.stderr)
 	await channel_layer.group_send(
 		apikey,
 		{
