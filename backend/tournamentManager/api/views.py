@@ -127,7 +127,7 @@ async def launchMatch(request) :
 			}
 		)
 		
-		asyncio.sleep(1000)
+		#asyncio.sleep(1000)
 
 		await channel_layer.group_send(
 			tkey,

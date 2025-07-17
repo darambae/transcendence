@@ -165,6 +165,7 @@ async def  checkForUpdates(uriKey, key) :
 
 async def sseCheck(request) :
 	JWT = decodeJWT(request, "sseCheck")
+	print("JWT : ", JWT, file=sys.stderr)
 	if not JWT[0] :
 		return HttpResponse401()
 	return JsonResponse({"username" : JWT[0]['payload']["username"], "guest" : JWT[0]["payload"]["invites"]})

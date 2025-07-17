@@ -1,11 +1,12 @@
 import { actualizeIndexPage, fetchWithRefresh } from "../utils.js";
 import { routesTr, getSSE } from "./tournament.js";
 import { handleGame2Players } from "./multiplayerGameSession.js";
+import { afficheWinnerTournament, affichUserTournament } from "./tournament.js"
 
 export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) {
   let sseTournament = getSSE();
 
-  sseTournament.onmessage = function(event) {
+  sseTournament.onmessage = async function(event) {
     try {
       const data = JSON.parse(event.data);
 
@@ -24,6 +25,8 @@ export async function onlineGameTr(key, playerID, isAiGame, JWTid, tkey, round) 
           
       }
       if (data.t_state == "results") {
+        await affichUserTournament()
+        await afficheWinnerTournament(data)
         console.log("------------------------------->>", data);
       }
     }

@@ -1,0 +1,630 @@
+--------------------------
+Beginning : 14:29:51 
+--------------------------
+Beginning : 14:29:51 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzYzNzgxLCJpYXQiOjE3NTI3NjI1ODEsImp0aSI6ImM0Njg1OWQ1OWE3OTQ5NjI4NGRhNDFjOTMwOWVlNjJkIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6WyJrZWxseSJdfQ.N8ApuxFtp2ryfQ-7EuXkhS8N-zzPcNWFN5U--jrzEnM
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752763781, 'iat': 1752762581, 'jti': 'c46859d59a79496284da41c9309ee62d', 'user_id': 2, 'username': 'omar', 'invites': ['kelly']}}
+[DEBUG] isGamePlayable called - apikey: d06181f6-aeb2-481e-bf6f-4ce2089f153f
+[DEBUG] dictApiPlayers: {'d06181f6-aeb2-481e-bf6f-4ce2089f153f': [2, 3]}
+[DEBUG] apiKeys: ['d06181f6-aeb2-481e-bf6f-4ce2089f153f']
+[DEBUG] apiKeysUnplayable: ['9b4edec4-7aad-4163-a604-6433ae290751', '736edda8-9384-41f8-a10b-ee88add8d605', '35973102-2d11-40ef-8ca7-4816565fa3f3', '1a81ed1d-697f-4c00-af69-e7eee452e54d', 'b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a', 'c6cc0870-d522-47cc-95ff-26ac7ad340c2', 'd2cecb3e-84bb-4178-b595-48a95a8645e2']
+[DEBUG] dictApiPlayers[d06181f6-aeb2-481e-bf6f-4ce2089f153f]: [2, 3] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzYzNzU3LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImZiOTNiMWM1NzRmZDQxOGNhZmQwMWU1MDY3NzAwZTQxIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.dd0HQ5XDVsVvmLlyYekgh62sC6qr2T38oQ7jvivCLdQ
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752763757, 'iat': 1752762557, 'jti': 'fb93b1c574fd418cafd01e5067700e41', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: d06181f6-aeb2-481e-bf6f-4ce2089f153f
+[DEBUG] dictApiPlayers: {'d06181f6-aeb2-481e-bf6f-4ce2089f153f': [2, 3]}
+[DEBUG] apiKeys: ['d06181f6-aeb2-481e-bf6f-4ce2089f153f']
+[DEBUG] apiKeysUnplayable: ['9b4edec4-7aad-4163-a604-6433ae290751', '736edda8-9384-41f8-a10b-ee88add8d605', '35973102-2d11-40ef-8ca7-4816565fa3f3', '1a81ed1d-697f-4c00-af69-e7eee452e54d', 'b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a', 'c6cc0870-d522-47cc-95ff-26ac7ad340c2', 'd2cecb3e-84bb-4178-b595-48a95a8645e2']
+[DEBUG] dictApiPlayers[d06181f6-aeb2-481e-bf6f-4ce2089f153f]: [2, 3] (length: 2)
+--------------------------
+Beginning : 14:30:16 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzYzNzgxLCJpYXQiOjE3NTI3NjI1ODEsImp0aSI6ImM0Njg1OWQ1OWE3OTQ5NjI4NGRhNDFjOTMwOWVlNjJkIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6WyJrZWxseSJdfQ.N8ApuxFtp2ryfQ-7EuXkhS8N-zzPcNWFN5U--jrzEnM
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752763781, 'iat': 1752762581, 'jti': 'c46859d59a79496284da41c9309ee62d', 'user_id': 2, 'username': 'omar', 'invites': ['kelly']}}
+[DEBUG] isGamePlayable called - apikey: b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a
+[DEBUG] dictApiPlayers: {'b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a': [2]}
+[DEBUG] apiKeys: []
+[DEBUG] apiKeysUnplayable: ['9b4edec4-7aad-4163-a604-6433ae290751', '736edda8-9384-41f8-a10b-ee88add8d605', '35973102-2d11-40ef-8ca7-4816565fa3f3', '1a81ed1d-697f-4c00-af69-e7eee452e54d', 'b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a', 'c6cc0870-d522-47cc-95ff-26ac7ad340c2', 'd2cecb3e-84bb-4178-b595-48a95a8645e2']
+[DEBUG] dictApiPlayers[b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a]: [2] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 14:30:19 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzYzNzU3LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImZiOTNiMWM1NzRmZDQxOGNhZmQwMWU1MDY3NzAwZTQxIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.dd0HQ5XDVsVvmLlyYekgh62sC6qr2T38oQ7jvivCLdQ
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752763757, 'iat': 1752762557, 'jti': 'fb93b1c574fd418cafd01e5067700e41', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a
+[DEBUG] dictApiPlayers: {'b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a': [2, 3]}
+[DEBUG] apiKeys: ['b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a']
+[DEBUG] apiKeysUnplayable: ['9b4edec4-7aad-4163-a604-6433ae290751', '736edda8-9384-41f8-a10b-ee88add8d605', '35973102-2d11-40ef-8ca7-4816565fa3f3', '1a81ed1d-697f-4c00-af69-e7eee452e54d', 'c6cc0870-d522-47cc-95ff-26ac7ad340c2', 'd2cecb3e-84bb-4178-b595-48a95a8645e2']
+[DEBUG] dictApiPlayers[b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a]: [2, 3] (length: 2)
+--------------------------
+Beginning : 14:30:22 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzYzNzgxLCJpYXQiOjE3NTI3NjI1ODEsImp0aSI6ImM0Njg1OWQ1OWE3OTQ5NjI4NGRhNDFjOTMwOWVlNjJkIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6WyJrZWxseSJdfQ.N8ApuxFtp2ryfQ-7EuXkhS8N-zzPcNWFN5U--jrzEnM
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752763781, 'iat': 1752762581, 'jti': 'c46859d59a79496284da41c9309ee62d', 'user_id': 2, 'username': 'omar', 'invites': ['kelly']}}
+[DEBUG] isGamePlayable called - apikey: b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a
+[DEBUG] dictApiPlayers: {'b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a': [2, 3]}
+[DEBUG] apiKeys: ['b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a']
+[DEBUG] apiKeysUnplayable: ['9b4edec4-7aad-4163-a604-6433ae290751', '736edda8-9384-41f8-a10b-ee88add8d605', '35973102-2d11-40ef-8ca7-4816565fa3f3', '1a81ed1d-697f-4c00-af69-e7eee452e54d', 'c6cc0870-d522-47cc-95ff-26ac7ad340c2', 'd2cecb3e-84bb-4178-b595-48a95a8645e2']
+[DEBUG] dictApiPlayers[b9f710b2-bd2a-4a1b-ac1e-a936f4cc743a]: [2, 3] (length: 2)
+--------------------------
+Beginning : 16:58:36 
+--------------------------
+Beginning : 16:58:36 
+--------------------------
+Beginning : 16:58:36 
+--------------------------
+Beginning : 16:58:36 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjkyLCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6IjlhM2UwNjEwOGZhNjQ3NTU4MGJhNmU4OWVmYzIyNjVjIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.pH1NPaUzezgGORjZElFts-Lw7knbk3x-4cX2q0xwNCw
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772692, 'iat': 1752771492, 'jti': '9a3e06108fa6475580ba6e89efc2265c', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93
+[DEBUG] dictApiPlayers: {'cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93': [4, 2], '09260f51-1132-46c3-b0fa-5f1d606fce0b': [1, 3]}
+[DEBUG] apiKeys: ['cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93', '09260f51-1132-46c3-b0fa-5f1d606fce0b']
+[DEBUG] apiKeysUnplayable: ['ee504450-8707-4256-a830-2d3e649eb0a9', '72210cc5-d6f2-4917-a1e0-7c35fddbe5f8']
+[DEBUG] dictApiPlayers[cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93]: [4, 2] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjM4LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImEyNjIwNTM1NGRhYzRjZjk4YzY3ZGE3Y2RjNGFiNTQ2IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.hP624pXbiIQTsGe9lFM8OnNBs7Zb3FUgccB8wBBJfIU
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772638, 'iat': 1752771438, 'jti': 'a26205354dac4cf98c67da7cdc4ab546', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 09260f51-1132-46c3-b0fa-5f1d606fce0b
+[DEBUG] dictApiPlayers: {'cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93': [4, 2], '09260f51-1132-46c3-b0fa-5f1d606fce0b': [1, 3]}
+[DEBUG] apiKeys: ['cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93', '09260f51-1132-46c3-b0fa-5f1d606fce0b']
+[DEBUG] apiKeysUnplayable: ['ee504450-8707-4256-a830-2d3e649eb0a9', '72210cc5-d6f2-4917-a1e0-7c35fddbe5f8']
+[DEBUG] dictApiPlayers[09260f51-1132-46c3-b0fa-5f1d606fce0b]: [1, 3] (length: 2)
+--------------------------
+Beginning : 16:58:36 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcxOTg5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjNiMjRhNWJjZTRiMzQ3NWJhODY3M2I1MzhiZmQxNDExIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.yAna4GGEgPFiwgQmLxxj4UgDfWQkdhhqeD9d1Otr0n8
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752771989, 'iat': 1752762557, 'jti': '3b24a5bce4b3475ba8673b538bfd1411', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93
+[DEBUG] dictApiPlayers: {'cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93': [4, 2], '09260f51-1132-46c3-b0fa-5f1d606fce0b': [1, 3]}
+[DEBUG] apiKeys: ['cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93', '09260f51-1132-46c3-b0fa-5f1d606fce0b']
+[DEBUG] apiKeysUnplayable: ['ee504450-8707-4256-a830-2d3e649eb0a9', '72210cc5-d6f2-4917-a1e0-7c35fddbe5f8']
+[DEBUG] dictApiPlayers[cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93]: [4, 2] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNTQ3LCJpYXQiOjE3NTI3NzEzNDcsImp0aSI6ImYxNDE2NTlkMzc1YzQ0ODNiOTg1NDJkOGU4ZjUzNjlhIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.WmbxVXignSReqFCLR5_f8Chw3mJT9_XQd-jqoc7gIIA
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772547, 'iat': 1752771347, 'jti': 'f141659d375c4483b98542d8e8f5369a', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93
+[DEBUG] dictApiPlayers: {'cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93': [4, 2], '09260f51-1132-46c3-b0fa-5f1d606fce0b': [1, 3]}
+[DEBUG] apiKeys: ['cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93', '09260f51-1132-46c3-b0fa-5f1d606fce0b']
+[DEBUG] apiKeysUnplayable: ['ee504450-8707-4256-a830-2d3e649eb0a9', '72210cc5-d6f2-4917-a1e0-7c35fddbe5f8']
+[DEBUG] dictApiPlayers[cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93]: [4, 2] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcxOTg5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjNiMjRhNWJjZTRiMzQ3NWJhODY3M2I1MzhiZmQxNDExIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.yAna4GGEgPFiwgQmLxxj4UgDfWQkdhhqeD9d1Otr0n8
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752771989, 'iat': 1752762557, 'jti': '3b24a5bce4b3475ba8673b538bfd1411', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 09260f51-1132-46c3-b0fa-5f1d606fce0b
+[DEBUG] dictApiPlayers: {'cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93': [4, 2], '09260f51-1132-46c3-b0fa-5f1d606fce0b': [1, 3]}
+[DEBUG] apiKeys: ['cdaaae7a-57bd-4ad9-8e3f-bc37b23f5e93', '09260f51-1132-46c3-b0fa-5f1d606fce0b']
+[DEBUG] apiKeysUnplayable: ['ee504450-8707-4256-a830-2d3e649eb0a9', '72210cc5-d6f2-4917-a1e0-7c35fddbe5f8']
+[DEBUG] dictApiPlayers[09260f51-1132-46c3-b0fa-5f1d606fce0b]: [1, 3] (length: 2)
+--------------------------
+Beginning : 17:3:37 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjM4LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImEyNjIwNTM1NGRhYzRjZjk4YzY3ZGE3Y2RjNGFiNTQ2IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.hP624pXbiIQTsGe9lFM8OnNBs7Zb3FUgccB8wBBJfIU
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772638, 'iat': 1752771438, 'jti': 'a26205354dac4cf98c67da7cdc4ab546', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 78cbfe67-a637-414e-bda0-6d347a8eb953
+[DEBUG] dictApiPlayers: {'78cbfe67-a637-414e-bda0-6d347a8eb953': [1, 3]}
+[DEBUG] apiKeys: ['78cbfe67-a637-414e-bda0-6d347a8eb953']
+[DEBUG] apiKeysUnplayable: ['36daa824-ab0a-4001-9622-8799bf42671f', '66cb116d-47d1-478b-84ad-e6f946ac1e7d', 'b3fa52f2-7957-44ca-bbcf-0e49691bcc84']
+[DEBUG] dictApiPlayers[78cbfe67-a637-414e-bda0-6d347a8eb953]: [1, 3] (length: 2)
+--------------------------
+Beginning : 17:3:38 
+--------------------------
+Beginning : 17:3:38 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcxOTg5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjNiMjRhNWJjZTRiMzQ3NWJhODY3M2I1MzhiZmQxNDExIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.yAna4GGEgPFiwgQmLxxj4UgDfWQkdhhqeD9d1Otr0n8
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752771989, 'iat': 1752762557, 'jti': '3b24a5bce4b3475ba8673b538bfd1411', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjkyLCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6IjlhM2UwNjEwOGZhNjQ3NTU4MGJhNmU4OWVmYzIyNjVjIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.pH1NPaUzezgGORjZElFts-Lw7knbk3x-4cX2q0xwNCw
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772692, 'iat': 1752771492, 'jti': '9a3e06108fa6475580ba6e89efc2265c', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 78cbfe67-a637-414e-bda0-6d347a8eb953
+[DEBUG] dictApiPlayers: {'78cbfe67-a637-414e-bda0-6d347a8eb953': [1, 3]}
+[DEBUG] apiKeys: ['78cbfe67-a637-414e-bda0-6d347a8eb953']
+[DEBUG] apiKeysUnplayable: ['36daa824-ab0a-4001-9622-8799bf42671f', '66cb116d-47d1-478b-84ad-e6f946ac1e7d', 'b3fa52f2-7957-44ca-bbcf-0e49691bcc84']
+[DEBUG] dictApiPlayers[78cbfe67-a637-414e-bda0-6d347a8eb953]: [1, 3] (length: 2)
+[DEBUG] isGamePlayable called - apikey: 78cbfe67-a637-414e-bda0-6d347a8eb953
+[DEBUG] dictApiPlayers: {'78cbfe67-a637-414e-bda0-6d347a8eb953': [1, 3]}
+[DEBUG] apiKeys: ['78cbfe67-a637-414e-bda0-6d347a8eb953']
+[DEBUG] apiKeysUnplayable: ['36daa824-ab0a-4001-9622-8799bf42671f', '66cb116d-47d1-478b-84ad-e6f946ac1e7d', 'b3fa52f2-7957-44ca-bbcf-0e49691bcc84']
+[DEBUG] dictApiPlayers[78cbfe67-a637-414e-bda0-6d347a8eb953]: [1, 3] (length: 2)
+--------------------------
+Beginning : 17:6:40 
+--------------------------
+Beginning : 17:6:40 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjkyLCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6IjlhM2UwNjEwOGZhNjQ3NTU4MGJhNmU4OWVmYzIyNjVjIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.pH1NPaUzezgGORjZElFts-Lw7knbk3x-4cX2q0xwNCw
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772692, 'iat': 1752771492, 'jti': '9a3e06108fa6475580ba6e89efc2265c', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 5ac10b0d-1b29-4a76-94f6-bee3cabe1674
+[DEBUG] dictApiPlayers: {'5ac10b0d-1b29-4a76-94f6-bee3cabe1674': [1, 4]}
+[DEBUG] apiKeys: ['5ac10b0d-1b29-4a76-94f6-bee3cabe1674']
+[DEBUG] apiKeysUnplayable: ['72dcb01d-fe22-4b9f-89b3-888e0d0e2614', 'c0256370-59b3-4f6c-8f4a-f7b1c88552d0', 'f5cb65f0-e617-4cc1-8985-e86579b868e9']
+[DEBUG] dictApiPlayers[5ac10b0d-1b29-4a76-94f6-bee3cabe1674]: [1, 4] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjM4LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImEyNjIwNTM1NGRhYzRjZjk4YzY3ZGE3Y2RjNGFiNTQ2IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.hP624pXbiIQTsGe9lFM8OnNBs7Zb3FUgccB8wBBJfIU
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772638, 'iat': 1752771438, 'jti': 'a26205354dac4cf98c67da7cdc4ab546', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 5ac10b0d-1b29-4a76-94f6-bee3cabe1674
+[DEBUG] dictApiPlayers: {'5ac10b0d-1b29-4a76-94f6-bee3cabe1674': [1, 4]}
+[DEBUG] apiKeys: ['5ac10b0d-1b29-4a76-94f6-bee3cabe1674']
+[DEBUG] apiKeysUnplayable: ['72dcb01d-fe22-4b9f-89b3-888e0d0e2614', 'c0256370-59b3-4f6c-8f4a-f7b1c88552d0', 'f5cb65f0-e617-4cc1-8985-e86579b868e9']
+[DEBUG] dictApiPlayers[5ac10b0d-1b29-4a76-94f6-bee3cabe1674]: [1, 4] (length: 2)
+--------------------------
+Beginning : 17:6:41 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 5ac10b0d-1b29-4a76-94f6-bee3cabe1674
+[DEBUG] dictApiPlayers: {'5ac10b0d-1b29-4a76-94f6-bee3cabe1674': [1, 4]}
+[DEBUG] apiKeys: ['5ac10b0d-1b29-4a76-94f6-bee3cabe1674']
+[DEBUG] apiKeysUnplayable: ['72dcb01d-fe22-4b9f-89b3-888e0d0e2614', 'c0256370-59b3-4f6c-8f4a-f7b1c88552d0', 'f5cb65f0-e617-4cc1-8985-e86579b868e9']
+[DEBUG] dictApiPlayers[5ac10b0d-1b29-4a76-94f6-bee3cabe1674]: [1, 4] (length: 2)
+--------------------------
+Beginning : 17:13:12 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: cc965a72-a58c-4f95-ac8d-be62310d2d0f
+[DEBUG] dictApiPlayers: {'cc965a72-a58c-4f95-ac8d-be62310d2d0f': [3]}
+[DEBUG] apiKeys: []
+[DEBUG] apiKeysUnplayable: ['cc965a72-a58c-4f95-ac8d-be62310d2d0f', 'b0bed827-7e43-4f26-9f4f-c920696758c1', '7b460922-3fc1-48ca-bf29-ecbc03836c41', '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] dictApiPlayers[cc965a72-a58c-4f95-ac8d-be62310d2d0f]: [3] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 17:13:13 
+--------------------------
+Beginning : 17:13:13 
+--------------------------
+Beginning : 17:13:13 
+--------------------------
+Beginning : 17:13:13 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: b0bed827-7e43-4f26-9f4f-c920696758c1
+[DEBUG] dictApiPlayers: {'cc965a72-a58c-4f95-ac8d-be62310d2d0f': [3, 2], 'b0bed827-7e43-4f26-9f4f-c920696758c1': [3, 1, 4]}
+[DEBUG] apiKeys: ['b0bed827-7e43-4f26-9f4f-c920696758c1', 'cc965a72-a58c-4f95-ac8d-be62310d2d0f']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41', '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] dictApiPlayers[b0bed827-7e43-4f26-9f4f-c920696758c1]: [3, 1, 4] (length: 3)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyOTY4LCJpYXQiOjE3NTI3NzE3NjgsImp0aSI6IjZiZGIzMWJiNjU3MzQzNDk4YTBhMjVhZjBmMTRmOGZlIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.xWnDs6RFU47SjIaPjnJpRcOgxMsmtQsoBtjedtIzCAE
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772968, 'iat': 1752771768, 'jti': '6bdb31bb657343498a0a25af0f14f8fe', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: cc965a72-a58c-4f95-ac8d-be62310d2d0f
+[DEBUG] dictApiPlayers: {'cc965a72-a58c-4f95-ac8d-be62310d2d0f': [3, 2], 'b0bed827-7e43-4f26-9f4f-c920696758c1': [3, 1, 4]}
+[DEBUG] apiKeys: ['b0bed827-7e43-4f26-9f4f-c920696758c1', 'cc965a72-a58c-4f95-ac8d-be62310d2d0f']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41', '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] dictApiPlayers[cc965a72-a58c-4f95-ac8d-be62310d2d0f]: [3, 2] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjkyLCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6IjlhM2UwNjEwOGZhNjQ3NTU4MGJhNmU4OWVmYzIyNjVjIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.pH1NPaUzezgGORjZElFts-Lw7knbk3x-4cX2q0xwNCw
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772692, 'iat': 1752771492, 'jti': '9a3e06108fa6475580ba6e89efc2265c', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: b0bed827-7e43-4f26-9f4f-c920696758c1
+[DEBUG] dictApiPlayers: {'cc965a72-a58c-4f95-ac8d-be62310d2d0f': [3, 2], 'b0bed827-7e43-4f26-9f4f-c920696758c1': [3, 1, 4]}
+[DEBUG] apiKeys: ['b0bed827-7e43-4f26-9f4f-c920696758c1', 'cc965a72-a58c-4f95-ac8d-be62310d2d0f']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41', '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] dictApiPlayers[b0bed827-7e43-4f26-9f4f-c920696758c1]: [3, 1, 4] (length: 3)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjM4LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImEyNjIwNTM1NGRhYzRjZjk4YzY3ZGE3Y2RjNGFiNTQ2IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.hP624pXbiIQTsGe9lFM8OnNBs7Zb3FUgccB8wBBJfIU
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772638, 'iat': 1752771438, 'jti': 'a26205354dac4cf98c67da7cdc4ab546', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: b0bed827-7e43-4f26-9f4f-c920696758c1
+[DEBUG] dictApiPlayers: {'cc965a72-a58c-4f95-ac8d-be62310d2d0f': [3, 2], 'b0bed827-7e43-4f26-9f4f-c920696758c1': [3, 1, 4]}
+[DEBUG] apiKeys: ['b0bed827-7e43-4f26-9f4f-c920696758c1', 'cc965a72-a58c-4f95-ac8d-be62310d2d0f']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41', '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] dictApiPlayers[b0bed827-7e43-4f26-9f4f-c920696758c1]: [3, 1, 4] (length: 3)
+--------------------------
+Beginning : 17:13:18 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: cc965a72-a58c-4f95-ac8d-be62310d2d0f
+[DEBUG] dictApiPlayers: {'cc965a72-a58c-4f95-ac8d-be62310d2d0f': [3, 2], 'b0bed827-7e43-4f26-9f4f-c920696758c1': [3, 1, 4]}
+[DEBUG] apiKeys: ['b0bed827-7e43-4f26-9f4f-c920696758c1', 'cc965a72-a58c-4f95-ac8d-be62310d2d0f']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41', '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] dictApiPlayers[cc965a72-a58c-4f95-ac8d-be62310d2d0f]: [3, 2] (length: 2)
+--------------------------
+Beginning : 17:14:7 
+--------------------------
+Beginning : 17:14:7 
+--------------------------
+Beginning : 17:14:7 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 7b460922-3fc1-48ca-bf29-ecbc03836c41
+[DEBUG] dictApiPlayers: {'7b460922-3fc1-48ca-bf29-ecbc03836c41': [3], '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7': [2, 3]}
+[DEBUG] apiKeys: ['7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41']
+[DEBUG] dictApiPlayers[7b460922-3fc1-48ca-bf29-ecbc03836c41]: [3] (length: 1)
+[DEBUG] Returning playable: Need more player
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyOTY4LCJpYXQiOjE3NTI3NzE3NjgsImp0aSI6IjZiZGIzMWJiNjU3MzQzNDk4YTBhMjVhZjBmMTRmOGZlIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.xWnDs6RFU47SjIaPjnJpRcOgxMsmtQsoBtjedtIzCAE
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772968, 'iat': 1752771768, 'jti': '6bdb31bb657343498a0a25af0f14f8fe', 'user_id': 2, 'username': 'omar', 'invites': []}}
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 7747b0ad-74ff-4edf-8aa4-2d13f300f6b7
+[DEBUG] dictApiPlayers: {'7b460922-3fc1-48ca-bf29-ecbc03836c41': [3], '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7': [2, 3]}
+[DEBUG] apiKeys: ['7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41']
+[DEBUG] dictApiPlayers[7747b0ad-74ff-4edf-8aa4-2d13f300f6b7]: [2, 3] (length: 2)
+[DEBUG] isGamePlayable called - apikey: 7747b0ad-74ff-4edf-8aa4-2d13f300f6b7
+[DEBUG] dictApiPlayers: {'7b460922-3fc1-48ca-bf29-ecbc03836c41': [3], '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7': [2, 3]}
+[DEBUG] apiKeys: ['7747b0ad-74ff-4edf-8aa4-2d13f300f6b7']
+[DEBUG] apiKeysUnplayable: ['7b460922-3fc1-48ca-bf29-ecbc03836c41']
+[DEBUG] dictApiPlayers[7747b0ad-74ff-4edf-8aa4-2d13f300f6b7]: [2, 3] (length: 2)
+--------------------------
+Beginning : 17:14:10 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyNjM4LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImEyNjIwNTM1NGRhYzRjZjk4YzY3ZGE3Y2RjNGFiNTQ2IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.hP624pXbiIQTsGe9lFM8OnNBs7Zb3FUgccB8wBBJfIU
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772638, 'iat': 1752771438, 'jti': 'a26205354dac4cf98c67da7cdc4ab546', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 7b460922-3fc1-48ca-bf29-ecbc03836c41
+[DEBUG] dictApiPlayers: {'7b460922-3fc1-48ca-bf29-ecbc03836c41': [3, 1], '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7': [2, 3]}
+[DEBUG] apiKeys: ['7747b0ad-74ff-4edf-8aa4-2d13f300f6b7', '7b460922-3fc1-48ca-bf29-ecbc03836c41']
+[DEBUG] apiKeysUnplayable: []
+[DEBUG] dictApiPlayers[7b460922-3fc1-48ca-bf29-ecbc03836c41]: [3, 1] (length: 2)
+--------------------------
+Beginning : 17:14:13 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 7b460922-3fc1-48ca-bf29-ecbc03836c41
+[DEBUG] dictApiPlayers: {'7b460922-3fc1-48ca-bf29-ecbc03836c41': [3, 1], '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7': [2, 3]}
+[DEBUG] apiKeys: ['7747b0ad-74ff-4edf-8aa4-2d13f300f6b7', '7b460922-3fc1-48ca-bf29-ecbc03836c41']
+[DEBUG] apiKeysUnplayable: []
+[DEBUG] dictApiPlayers[7b460922-3fc1-48ca-bf29-ecbc03836c41]: [3, 1] (length: 2)
+--------------------------
+Beginning : 17:14:21 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyOTY4LCJpYXQiOjE3NTI3NzE3NjgsImp0aSI6IjZiZGIzMWJiNjU3MzQzNDk4YTBhMjVhZjBmMTRmOGZlIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.xWnDs6RFU47SjIaPjnJpRcOgxMsmtQsoBtjedtIzCAE
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772968, 'iat': 1752771768, 'jti': '6bdb31bb657343498a0a25af0f14f8fe', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 7747b0ad-74ff-4edf-8aa4-2d13f300f6b7
+[DEBUG] dictApiPlayers: {'7b460922-3fc1-48ca-bf29-ecbc03836c41': [3, 1], '7747b0ad-74ff-4edf-8aa4-2d13f300f6b7': [2, 3]}
+[DEBUG] apiKeys: ['7747b0ad-74ff-4edf-8aa4-2d13f300f6b7', '7b460922-3fc1-48ca-bf29-ecbc03836c41']
+[DEBUG] apiKeysUnplayable: []
+[DEBUG] dictApiPlayers[7747b0ad-74ff-4edf-8aa4-2d13f300f6b7]: [2, 3] (length: 2)
+--------------------------
+Beginning : 17:22:18 
+--------------------------
+Beginning : 17:22:18 
+--------------------------
+Beginning : 17:22:18 
+--------------------------
+Beginning : 17:22:18 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 412101cf-6361-4624-99c3-af985563d072
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072']
+[DEBUG] apiKeysUnplayable: ['be6c8499-03bf-443e-89cf-6d039f8b46fc', '44df381d-5bd9-4b58-95bf-24e59dae63fd']
+[DEBUG] dictApiPlayers[412101cf-6361-4624-99c3-af985563d072]: [3, 4] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc0MTIxLCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6IjE4OWZlMzU1ZTVjODRkNWQ4ZWJiNjRjMDhmNTZhZmQwIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.GX1y2iCgipkcI7uzUaZ-qp5nUguFy47_RWtPUGsMv94
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752774121, 'iat': 1752771438, 'jti': '189fe355e5c84d5d8ebb64c08f56afd0', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 0b341445-9e76-4f7a-9fad-48cfb4d8dbde
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072']
+[DEBUG] apiKeysUnplayable: ['be6c8499-03bf-443e-89cf-6d039f8b46fc', '44df381d-5bd9-4b58-95bf-24e59dae63fd']
+[DEBUG] dictApiPlayers[0b341445-9e76-4f7a-9fad-48cfb4d8dbde]: [1, 2] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc0MTA5LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImU4ZWFkZmY0M2Q4MzQ2MjE4NmY2MmVmMDQ1MzQ5OGU5IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.b7o8ai1bktITdDHLL_K4u5PB2EfKxPy1Mt7Fv1CRg1U
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752774109, 'iat': 1752771492, 'jti': 'e8eadff43d83462186f62ef0453498e9', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 412101cf-6361-4624-99c3-af985563d072
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072']
+[DEBUG] apiKeysUnplayable: ['be6c8499-03bf-443e-89cf-6d039f8b46fc', '44df381d-5bd9-4b58-95bf-24e59dae63fd']
+[DEBUG] dictApiPlayers[412101cf-6361-4624-99c3-af985563d072]: [3, 4] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzcyOTY4LCJpYXQiOjE3NTI3NzE3NjgsImp0aSI6IjZiZGIzMWJiNjU3MzQzNDk4YTBhMjVhZjBmMTRmOGZlIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.xWnDs6RFU47SjIaPjnJpRcOgxMsmtQsoBtjedtIzCAE
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752772968, 'iat': 1752771768, 'jti': '6bdb31bb657343498a0a25af0f14f8fe', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 0b341445-9e76-4f7a-9fad-48cfb4d8dbde
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072']
+[DEBUG] apiKeysUnplayable: ['be6c8499-03bf-443e-89cf-6d039f8b46fc', '44df381d-5bd9-4b58-95bf-24e59dae63fd']
+[DEBUG] dictApiPlayers[0b341445-9e76-4f7a-9fad-48cfb4d8dbde]: [1, 2] (length: 2)
+--------------------------
+Beginning : 17:23:41 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc0MTA5LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImU4ZWFkZmY0M2Q4MzQ2MjE4NmY2MmVmMDQ1MzQ5OGU5IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.b7o8ai1bktITdDHLL_K4u5PB2EfKxPy1Mt7Fv1CRg1U
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752774109, 'iat': 1752771492, 'jti': 'e8eadff43d83462186f62ef0453498e9', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 44df381d-5bd9-4b58-95bf-24e59dae63fd
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4], '44df381d-5bd9-4b58-95bf-24e59dae63fd': [3, 1], 'be6c8499-03bf-443e-89cf-6d039f8b46fc': [3, 2]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072', '44df381d-5bd9-4b58-95bf-24e59dae63fd', 'be6c8499-03bf-443e-89cf-6d039f8b46fc']
+[DEBUG] apiKeysUnplayable: []
+[DEBUG] dictApiPlayers[44df381d-5bd9-4b58-95bf-24e59dae63fd]: [3, 1] (length: 2)
+--------------------------
+Beginning : 17:23:54 
+--------------------------
+Beginning : 17:23:54 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 44df381d-5bd9-4b58-95bf-24e59dae63fd
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4], '44df381d-5bd9-4b58-95bf-24e59dae63fd': [3, 1], 'be6c8499-03bf-443e-89cf-6d039f8b46fc': [3, 2]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072', '44df381d-5bd9-4b58-95bf-24e59dae63fd', 'be6c8499-03bf-443e-89cf-6d039f8b46fc']
+[DEBUG] apiKeysUnplayable: []
+[DEBUG] dictApiPlayers[44df381d-5bd9-4b58-95bf-24e59dae63fd]: [3, 1] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzczMTk5LCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjYxNDFiNWVkYzRhMTQzODM4YTNlYzhkYTU3YzZlYWFhIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.ezCkPlRMkPrxV7bpinm0gYWnv_V-Cb2kihuOBhHlCSg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752773199, 'iat': 1752762557, 'jti': '6141b5edc4a143838a3ec8da57c6eaaa', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: be6c8499-03bf-443e-89cf-6d039f8b46fc
+[DEBUG] dictApiPlayers: {'0b341445-9e76-4f7a-9fad-48cfb4d8dbde': [1, 2], '412101cf-6361-4624-99c3-af985563d072': [3, 4], '44df381d-5bd9-4b58-95bf-24e59dae63fd': [3, 1], 'be6c8499-03bf-443e-89cf-6d039f8b46fc': [3, 2]}
+[DEBUG] apiKeys: ['0b341445-9e76-4f7a-9fad-48cfb4d8dbde', '412101cf-6361-4624-99c3-af985563d072', '44df381d-5bd9-4b58-95bf-24e59dae63fd', 'be6c8499-03bf-443e-89cf-6d039f8b46fc']
+[DEBUG] apiKeysUnplayable: []
+[DEBUG] dictApiPlayers[be6c8499-03bf-443e-89cf-6d039f8b46fc]: [3, 2] (length: 2)
+--------------------------
+Beginning : 17:45:37 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDI4LCJpYXQiOjE3NTI3NzE3NjgsImp0aSI6IjJjMjQ1ZjdjY2IyMjQzZDQ4ZjJiYzlmODNkYTU1NTRjIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.mMw0pRztM7ZU46S0nDDoVz0vLLzBLp1FXhlyJGSi1Sw
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775428, 'iat': 1752771768, 'jti': '2c245f7ccb2243d48f2bc9f83da5554c', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 671516dc-c0e4-4df6-abef-b6e41d264f51
+[DEBUG] dictApiPlayers: {'671516dc-c0e4-4df6-abef-b6e41d264f51': [2], '348a1500-b090-4a35-bcd9-0a3a572ac45e': [1, 4]}
+[DEBUG] apiKeys: ['348a1500-b090-4a35-bcd9-0a3a572ac45e']
+[DEBUG] apiKeysUnplayable: ['671516dc-c0e4-4df6-abef-b6e41d264f51', '8401ebb3-8c2b-4cc2-b6ba-dabe09f332c2', '64a3c0d7-e913-4ff8-a080-5f3f5b79a60e']
+[DEBUG] dictApiPlayers[671516dc-c0e4-4df6-abef-b6e41d264f51]: [2] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 17:45:37 
+--------------------------
+Beginning : 17:45:38 
+--------------------------
+Beginning : 17:45:38 
+--------------------------
+Beginning : 17:45:38 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTA1LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6IjY0YTA4NzBiNzdmOTQ5MWZhNTVkNmQxMWVmY2U1YzY0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.1QSa08hY83LmnaSsFlMbU8pRn_QfNKBgMskPwIWpIbY
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775505, 'iat': 1752771438, 'jti': '64a0870b77f9491fa55d6d11efce5c64', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 348a1500-b090-4a35-bcd9-0a3a572ac45e
+[DEBUG] dictApiPlayers: {'671516dc-c0e4-4df6-abef-b6e41d264f51': [2, 3], '348a1500-b090-4a35-bcd9-0a3a572ac45e': [1, 4]}
+[DEBUG] apiKeys: ['348a1500-b090-4a35-bcd9-0a3a572ac45e', '671516dc-c0e4-4df6-abef-b6e41d264f51']
+[DEBUG] apiKeysUnplayable: ['8401ebb3-8c2b-4cc2-b6ba-dabe09f332c2', '64a3c0d7-e913-4ff8-a080-5f3f5b79a60e']
+[DEBUG] dictApiPlayers[348a1500-b090-4a35-bcd9-0a3a572ac45e]: [1, 4] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 348a1500-b090-4a35-bcd9-0a3a572ac45e
+[DEBUG] dictApiPlayers: {'671516dc-c0e4-4df6-abef-b6e41d264f51': [2, 3], '348a1500-b090-4a35-bcd9-0a3a572ac45e': [1, 4]}
+[DEBUG] apiKeys: ['348a1500-b090-4a35-bcd9-0a3a572ac45e', '671516dc-c0e4-4df6-abef-b6e41d264f51']
+[DEBUG] apiKeysUnplayable: ['8401ebb3-8c2b-4cc2-b6ba-dabe09f332c2', '64a3c0d7-e913-4ff8-a080-5f3f5b79a60e']
+[DEBUG] dictApiPlayers[348a1500-b090-4a35-bcd9-0a3a572ac45e]: [1, 4] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTE5LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImFiNzQ3MjAzNzQzMjQyZDg5MjlkMTMwOWZjM2Y5NmRlIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.az3184l-QDgBOLmybT8nLpvLrNSKl1LQTN7tRIV-NMg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775519, 'iat': 1752771492, 'jti': 'ab747203743242d8929d1309fc3f96de', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 348a1500-b090-4a35-bcd9-0a3a572ac45e
+[DEBUG] dictApiPlayers: {'671516dc-c0e4-4df6-abef-b6e41d264f51': [2, 3], '348a1500-b090-4a35-bcd9-0a3a572ac45e': [1, 4]}
+[DEBUG] apiKeys: ['348a1500-b090-4a35-bcd9-0a3a572ac45e', '671516dc-c0e4-4df6-abef-b6e41d264f51']
+[DEBUG] apiKeysUnplayable: ['8401ebb3-8c2b-4cc2-b6ba-dabe09f332c2', '64a3c0d7-e913-4ff8-a080-5f3f5b79a60e']
+[DEBUG] dictApiPlayers[348a1500-b090-4a35-bcd9-0a3a572ac45e]: [1, 4] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 671516dc-c0e4-4df6-abef-b6e41d264f51
+[DEBUG] dictApiPlayers: {'671516dc-c0e4-4df6-abef-b6e41d264f51': [2, 3], '348a1500-b090-4a35-bcd9-0a3a572ac45e': [1, 4]}
+[DEBUG] apiKeys: ['348a1500-b090-4a35-bcd9-0a3a572ac45e', '671516dc-c0e4-4df6-abef-b6e41d264f51']
+[DEBUG] apiKeysUnplayable: ['8401ebb3-8c2b-4cc2-b6ba-dabe09f332c2', '64a3c0d7-e913-4ff8-a080-5f3f5b79a60e']
+[DEBUG] dictApiPlayers[671516dc-c0e4-4df6-abef-b6e41d264f51]: [2, 3] (length: 2)
+--------------------------
+Beginning : 17:45:43 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDI4LCJpYXQiOjE3NTI3NzE3NjgsImp0aSI6IjJjMjQ1ZjdjY2IyMjQzZDQ4ZjJiYzlmODNkYTU1NTRjIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.mMw0pRztM7ZU46S0nDDoVz0vLLzBLp1FXhlyJGSi1Sw
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775428, 'iat': 1752771768, 'jti': '2c245f7ccb2243d48f2bc9f83da5554c', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 671516dc-c0e4-4df6-abef-b6e41d264f51
+[DEBUG] dictApiPlayers: {'671516dc-c0e4-4df6-abef-b6e41d264f51': [2, 3], '348a1500-b090-4a35-bcd9-0a3a572ac45e': [1, 4]}
+[DEBUG] apiKeys: ['348a1500-b090-4a35-bcd9-0a3a572ac45e', '671516dc-c0e4-4df6-abef-b6e41d264f51']
+[DEBUG] apiKeysUnplayable: ['8401ebb3-8c2b-4cc2-b6ba-dabe09f332c2', '64a3c0d7-e913-4ff8-a080-5f3f5b79a60e']
+[DEBUG] dictApiPlayers[671516dc-c0e4-4df6-abef-b6e41d264f51]: [2, 3] (length: 2)
+--------------------------
+Beginning : 17:55:32 
+--------------------------
+Beginning : 17:55:32 
+--------------------------
+Beginning : 17:55:32 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: eb2a7c6d-f156-4716-b402-a1bb574298d2
+[DEBUG] dictApiPlayers: {'eb2a7c6d-f156-4716-b402-a1bb574298d2': [1, 3]}
+[DEBUG] apiKeys: ['eb2a7c6d-f156-4716-b402-a1bb574298d2']
+[DEBUG] apiKeysUnplayable: ['70a45f7f-95af-4e57-9123-503125322c2f', '50b5d991-7e3d-4111-a51a-ed2feaa3da70', '68ce29f2-29e9-45af-8f33-f81b7a244c3d']
+[DEBUG] dictApiPlayers[eb2a7c6d-f156-4716-b402-a1bb574298d2]: [1, 3] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTE5LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImFiNzQ3MjAzNzQzMjQyZDg5MjlkMTMwOWZjM2Y5NmRlIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.az3184l-QDgBOLmybT8nLpvLrNSKl1LQTN7tRIV-NMg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775519, 'iat': 1752771492, 'jti': 'ab747203743242d8929d1309fc3f96de', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTA1LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6IjY0YTA4NzBiNzdmOTQ5MWZhNTVkNmQxMWVmY2U1YzY0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.1QSa08hY83LmnaSsFlMbU8pRn_QfNKBgMskPwIWpIbY
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775505, 'iat': 1752771438, 'jti': '64a0870b77f9491fa55d6d11efce5c64', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: eb2a7c6d-f156-4716-b402-a1bb574298d2
+[DEBUG] dictApiPlayers: {'eb2a7c6d-f156-4716-b402-a1bb574298d2': [1, 3]}
+[DEBUG] apiKeys: ['eb2a7c6d-f156-4716-b402-a1bb574298d2']
+[DEBUG] apiKeysUnplayable: ['70a45f7f-95af-4e57-9123-503125322c2f', '50b5d991-7e3d-4111-a51a-ed2feaa3da70', '68ce29f2-29e9-45af-8f33-f81b7a244c3d']
+[DEBUG] dictApiPlayers[eb2a7c6d-f156-4716-b402-a1bb574298d2]: [1, 3] (length: 2)
+[DEBUG] isGamePlayable called - apikey: eb2a7c6d-f156-4716-b402-a1bb574298d2
+[DEBUG] dictApiPlayers: {'eb2a7c6d-f156-4716-b402-a1bb574298d2': [1, 3]}
+[DEBUG] apiKeys: ['eb2a7c6d-f156-4716-b402-a1bb574298d2']
+[DEBUG] apiKeysUnplayable: ['70a45f7f-95af-4e57-9123-503125322c2f', '50b5d991-7e3d-4111-a51a-ed2feaa3da70', '68ce29f2-29e9-45af-8f33-f81b7a244c3d']
+[DEBUG] dictApiPlayers[eb2a7c6d-f156-4716-b402-a1bb574298d2]: [1, 3] (length: 2)
+--------------------------
+Beginning : 17:57:36 
+--------------------------
+Beginning : 17:57:36 
+--------------------------
+Beginning : 17:57:36 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTA1LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6IjY0YTA4NzBiNzdmOTQ5MWZhNTVkNmQxMWVmY2U1YzY0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.1QSa08hY83LmnaSsFlMbU8pRn_QfNKBgMskPwIWpIbY
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775505, 'iat': 1752771438, 'jti': '64a0870b77f9491fa55d6d11efce5c64', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: c0e823d0-7e68-439d-afd4-0810383f66ee
+[DEBUG] dictApiPlayers: {'c0e823d0-7e68-439d-afd4-0810383f66ee': [4, 3]}
+[DEBUG] apiKeys: ['c0e823d0-7e68-439d-afd4-0810383f66ee']
+[DEBUG] apiKeysUnplayable: ['3f9c7d8d-25d2-4301-8dab-6f7425c0a442', 'e5d42f26-a073-47b7-9a26-0c9e3eb9cd5a', '641e5634-e848-43d9-acdd-3be8005e0d21']
+[DEBUG] dictApiPlayers[c0e823d0-7e68-439d-afd4-0810383f66ee]: [4, 3] (length: 2)
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTE5LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImFiNzQ3MjAzNzQzMjQyZDg5MjlkMTMwOWZjM2Y5NmRlIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.az3184l-QDgBOLmybT8nLpvLrNSKl1LQTN7tRIV-NMg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775519, 'iat': 1752771492, 'jti': 'ab747203743242d8929d1309fc3f96de', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: c0e823d0-7e68-439d-afd4-0810383f66ee
+[DEBUG] dictApiPlayers: {'c0e823d0-7e68-439d-afd4-0810383f66ee': [4, 3]}
+[DEBUG] apiKeys: ['c0e823d0-7e68-439d-afd4-0810383f66ee']
+[DEBUG] apiKeysUnplayable: ['3f9c7d8d-25d2-4301-8dab-6f7425c0a442', 'e5d42f26-a073-47b7-9a26-0c9e3eb9cd5a', '641e5634-e848-43d9-acdd-3be8005e0d21']
+[DEBUG] dictApiPlayers[c0e823d0-7e68-439d-afd4-0810383f66ee]: [4, 3] (length: 2)
+[DEBUG] isGamePlayable called - apikey: c0e823d0-7e68-439d-afd4-0810383f66ee
+[DEBUG] dictApiPlayers: {'c0e823d0-7e68-439d-afd4-0810383f66ee': [4, 3]}
+[DEBUG] apiKeys: ['c0e823d0-7e68-439d-afd4-0810383f66ee']
+[DEBUG] apiKeysUnplayable: ['3f9c7d8d-25d2-4301-8dab-6f7425c0a442', 'e5d42f26-a073-47b7-9a26-0c9e3eb9cd5a', '641e5634-e848-43d9-acdd-3be8005e0d21']
+[DEBUG] dictApiPlayers[c0e823d0-7e68-439d-afd4-0810383f66ee]: [4, 3] (length: 2)
+--------------------------
+Beginning : 18:1:26 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 4c00997e-e368-449f-8677-a71ad60d06da
+[DEBUG] dictApiPlayers: {'4c00997e-e368-449f-8677-a71ad60d06da': [3]}
+[DEBUG] apiKeys: []
+[DEBUG] apiKeysUnplayable: ['3c9d9da1-8a57-470c-a603-68f33c13e853', '4c00997e-e368-449f-8677-a71ad60d06da', 'ac9e213e-fa9e-4d58-9f1b-08fd1166ef85', '045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[4c00997e-e368-449f-8677-a71ad60d06da]: [3] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:1:27 
+--------------------------
+Beginning : 18:1:28 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTA1LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6IjY0YTA4NzBiNzdmOTQ5MWZhNTVkNmQxMWVmY2U1YzY0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.1QSa08hY83LmnaSsFlMbU8pRn_QfNKBgMskPwIWpIbY
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775505, 'iat': 1752771438, 'jti': '64a0870b77f9491fa55d6d11efce5c64', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 3c9d9da1-8a57-470c-a603-68f33c13e853
+[DEBUG] dictApiPlayers: {'4c00997e-e368-449f-8677-a71ad60d06da': [3, 4], '3c9d9da1-8a57-470c-a603-68f33c13e853': [1]}
+[DEBUG] apiKeys: ['4c00997e-e368-449f-8677-a71ad60d06da']
+[DEBUG] apiKeysUnplayable: ['3c9d9da1-8a57-470c-a603-68f33c13e853', 'ac9e213e-fa9e-4d58-9f1b-08fd1166ef85', '045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[3c9d9da1-8a57-470c-a603-68f33c13e853]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTE5LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImFiNzQ3MjAzNzQzMjQyZDg5MjlkMTMwOWZjM2Y5NmRlIiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.az3184l-QDgBOLmybT8nLpvLrNSKl1LQTN7tRIV-NMg
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775519, 'iat': 1752771492, 'jti': 'ab747203743242d8929d1309fc3f96de', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 4c00997e-e368-449f-8677-a71ad60d06da
+[DEBUG] dictApiPlayers: {'4c00997e-e368-449f-8677-a71ad60d06da': [3, 4], '3c9d9da1-8a57-470c-a603-68f33c13e853': [1, 2]}
+[DEBUG] apiKeys: ['4c00997e-e368-449f-8677-a71ad60d06da', '3c9d9da1-8a57-470c-a603-68f33c13e853']
+[DEBUG] apiKeysUnplayable: ['ac9e213e-fa9e-4d58-9f1b-08fd1166ef85', '045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[4c00997e-e368-449f-8677-a71ad60d06da]: [3, 4] (length: 2)
+--------------------------
+Beginning : 18:1:28 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NDM4LCJpYXQiOjE3NTI3NzUyMzgsImp0aSI6ImZhYmE3NzYyNzk3MDQ2NWZiZTM4YWQwMmU0NjZiMmIyIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.VSOjZoKvWBT8JJzVDNbj62SylFrPRWVVsBiPBtpuZb8
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776438, 'iat': 1752775238, 'jti': 'faba77627970465fbe38ad02e466b2b2', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 3c9d9da1-8a57-470c-a603-68f33c13e853
+[DEBUG] dictApiPlayers: {'4c00997e-e368-449f-8677-a71ad60d06da': [3, 4], '3c9d9da1-8a57-470c-a603-68f33c13e853': [1, 2]}
+[DEBUG] apiKeys: ['4c00997e-e368-449f-8677-a71ad60d06da', '3c9d9da1-8a57-470c-a603-68f33c13e853']
+[DEBUG] apiKeysUnplayable: ['ac9e213e-fa9e-4d58-9f1b-08fd1166ef85', '045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[3c9d9da1-8a57-470c-a603-68f33c13e853]: [1, 2] (length: 2)
+--------------------------
+Beginning : 18:1:31 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: 4c00997e-e368-449f-8677-a71ad60d06da
+[DEBUG] dictApiPlayers: {'4c00997e-e368-449f-8677-a71ad60d06da': [3, 4], '3c9d9da1-8a57-470c-a603-68f33c13e853': [1, 2]}
+[DEBUG] apiKeys: ['4c00997e-e368-449f-8677-a71ad60d06da', '3c9d9da1-8a57-470c-a603-68f33c13e853']
+[DEBUG] apiKeysUnplayable: ['ac9e213e-fa9e-4d58-9f1b-08fd1166ef85', '045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[4c00997e-e368-449f-8677-a71ad60d06da]: [3, 4] (length: 2)
+--------------------------
+Beginning : 18:1:33 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NTA1LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6IjY0YTA4NzBiNzdmOTQ5MWZhNTVkNmQxMWVmY2U1YzY0IiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.1QSa08hY83LmnaSsFlMbU8pRn_QfNKBgMskPwIWpIbY
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775505, 'iat': 1752771438, 'jti': '64a0870b77f9491fa55d6d11efce5c64', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: 3c9d9da1-8a57-470c-a603-68f33c13e853
+[DEBUG] dictApiPlayers: {'4c00997e-e368-449f-8677-a71ad60d06da': [3, 4], '3c9d9da1-8a57-470c-a603-68f33c13e853': [1, 2]}
+[DEBUG] apiKeys: ['4c00997e-e368-449f-8677-a71ad60d06da', '3c9d9da1-8a57-470c-a603-68f33c13e853']
+[DEBUG] apiKeysUnplayable: ['ac9e213e-fa9e-4d58-9f1b-08fd1166ef85', '045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[3c9d9da1-8a57-470c-a603-68f33c13e853]: [1, 2] (length: 2)
+--------------------------
+Beginning : 18:2:28 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc1NDgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6ImFjYzNiOGJmNGIzMTQxZDI4NzkyNDg1ODUzYjRmYTk3IiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.atVjjqvB6rjf4RwZuK7TXnxXyeSJI6OcIWZGUzdXmto
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752775483, 'iat': 1752762557, 'jti': 'acc3b8bf4b3141d28792485853b4fa97', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: ac9e213e-fa9e-4d58-9f1b-08fd1166ef85
+[DEBUG] dictApiPlayers: {'3c9d9da1-8a57-470c-a603-68f33c13e853': [1, 2], 'ac9e213e-fa9e-4d58-9f1b-08fd1166ef85': [2, 4]}
+[DEBUG] apiKeys: ['3c9d9da1-8a57-470c-a603-68f33c13e853', 'ac9e213e-fa9e-4d58-9f1b-08fd1166ef85']
+[DEBUG] apiKeysUnplayable: ['045d6411-f20b-4cbd-ab33-477e5f4dfbd8']
+[DEBUG] dictApiPlayers[ac9e213e-fa9e-4d58-9f1b-08fd1166ef85]: [2, 4] (length: 2)
+--------------------------
+Beginning : 18:5:57 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NzE5LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImQyYTc0NDc1YTI0YjRiNWZhMjA5MGZkMWE0NjdlZDlhIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.MKOMph4zaix7_f9Jii4y8KW-K8xN6cwgVJ-C-j1Ljfc
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776719, 'iat': 1752771438, 'jti': 'd2a74475a24b4b5fa2090fd1a467ed9a', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: ef50e9ff-5c2b-4c28-80f4-737d664e60c8
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1]}
+[DEBUG] apiKeys: []
+[DEBUG] apiKeysUnplayable: ['e1771308-b9bf-4e13-9e6c-bb24511d4711', 'ef50e9ff-5c2b-4c28-80f4-737d664e60c8', '3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[ef50e9ff-5c2b-4c28-80f4-737d664e60c8]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:6:1 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NzI1LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImJjYmViNzNhMDE3NzRmNDRiNWNiYWJhNTYwYjM4ODM4IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.QuA2ZtSIzBUQiPd_B-iIwlRMzl7OFm40R6FPiL7Li-E
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776725, 'iat': 1752771492, 'jti': 'bcbeb73a01774f44b5cbaba560b38838', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: e1771308-b9bf-4e13-9e6c-bb24511d4711
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4]}
+[DEBUG] apiKeys: []
+[DEBUG] apiKeysUnplayable: ['e1771308-b9bf-4e13-9e6c-bb24511d4711', 'ef50e9ff-5c2b-4c28-80f4-737d664e60c8', '3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[e1771308-b9bf-4e13-9e6c-bb24511d4711]: [4] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:6:2 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NzE5LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImQyYTc0NDc1YTI0YjRiNWZhMjA5MGZkMWE0NjdlZDlhIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.MKOMph4zaix7_f9Jii4y8KW-K8xN6cwgVJ-C-j1Ljfc
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776719, 'iat': 1752771438, 'jti': 'd2a74475a24b4b5fa2090fd1a467ed9a', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: ef50e9ff-5c2b-4c28-80f4-737d664e60c8
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4]}
+[DEBUG] apiKeys: []
+[DEBUG] apiKeysUnplayable: ['e1771308-b9bf-4e13-9e6c-bb24511d4711', 'ef50e9ff-5c2b-4c28-80f4-737d664e60c8', '3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[ef50e9ff-5c2b-4c28-80f4-737d664e60c8]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:6:6 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NjgzLCJpYXQiOjE3NTI3NjI1NTcsImp0aSI6IjRjYTM0NmE4ZjdhMjQ0ZmM5YTc0NjZkZmM0NzAzYzVlIiwidXNlcl9pZCI6MywidXNlcm5hbWUiOiJnYXV0aWVyIiwiaW52aXRlcyI6WyJHdWVzdCJdfQ.YbUwe-mcacgKSAqxlO06xTKMpV73_6Lr1dCPiG9Y-q4
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776683, 'iat': 1752762557, 'jti': '4ca346a8f7a244fc9a7466dfc4703c5e', 'user_id': 3, 'username': 'gautier', 'invites': ['Guest']}}
+[DEBUG] isGamePlayable called - apikey: e1771308-b9bf-4e13-9e6c-bb24511d4711
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4, 3]}
+[DEBUG] apiKeys: ['e1771308-b9bf-4e13-9e6c-bb24511d4711']
+[DEBUG] apiKeysUnplayable: ['ef50e9ff-5c2b-4c28-80f4-737d664e60c8', '3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[e1771308-b9bf-4e13-9e6c-bb24511d4711]: [4, 3] (length: 2)
+--------------------------
+Beginning : 18:6:6 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NzI1LCJpYXQiOjE3NTI3NzE0OTIsImp0aSI6ImJjYmViNzNhMDE3NzRmNDRiNWNiYWJhNTYwYjM4ODM4IiwidXNlcl9pZCI6NCwidXNlcm5hbWUiOiJHdWVzdCIsImludml0ZXMiOltdfQ.QuA2ZtSIzBUQiPd_B-iIwlRMzl7OFm40R6FPiL7Li-E
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776725, 'iat': 1752771492, 'jti': 'bcbeb73a01774f44b5cbaba560b38838', 'user_id': 4, 'username': 'Guest', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: e1771308-b9bf-4e13-9e6c-bb24511d4711
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4, 3]}
+[DEBUG] apiKeys: ['e1771308-b9bf-4e13-9e6c-bb24511d4711']
+[DEBUG] apiKeysUnplayable: ['ef50e9ff-5c2b-4c28-80f4-737d664e60c8', '3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[e1771308-b9bf-4e13-9e6c-bb24511d4711]: [4, 3] (length: 2)
+--------------------------
+Beginning : 18:6:8 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NzE5LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImQyYTc0NDc1YTI0YjRiNWZhMjA5MGZkMWE0NjdlZDlhIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.MKOMph4zaix7_f9Jii4y8KW-K8xN6cwgVJ-C-j1Ljfc
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776719, 'iat': 1752771438, 'jti': 'd2a74475a24b4b5fa2090fd1a467ed9a', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: ef50e9ff-5c2b-4c28-80f4-737d664e60c8
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4, 3]}
+[DEBUG] apiKeys: ['e1771308-b9bf-4e13-9e6c-bb24511d4711']
+[DEBUG] apiKeysUnplayable: ['ef50e9ff-5c2b-4c28-80f4-737d664e60c8', '3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[ef50e9ff-5c2b-4c28-80f4-737d664e60c8]: [1] (length: 1)
+[DEBUG] Returning playable: Need more player
+--------------------------
+Beginning : 18:6:9 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NDM4LCJpYXQiOjE3NTI3NzUyMzgsImp0aSI6ImZhYmE3NzYyNzk3MDQ2NWZiZTM4YWQwMmU0NjZiMmIyIiwidXNlcl9pZCI6MiwidXNlcm5hbWUiOiJvbWFyIiwiaW52aXRlcyI6W119.VSOjZoKvWBT8JJzVDNbj62SylFrPRWVVsBiPBtpuZb8
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776438, 'iat': 1752775238, 'jti': 'faba77627970465fbe38ad02e466b2b2', 'user_id': 2, 'username': 'omar', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: ef50e9ff-5c2b-4c28-80f4-737d664e60c8
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1, 2], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4, 3]}
+[DEBUG] apiKeys: ['e1771308-b9bf-4e13-9e6c-bb24511d4711', 'ef50e9ff-5c2b-4c28-80f4-737d664e60c8']
+[DEBUG] apiKeysUnplayable: ['3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[ef50e9ff-5c2b-4c28-80f4-737d664e60c8]: [1, 2] (length: 2)
+--------------------------
+Beginning : 18:6:13 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNzc2NzE5LCJpYXQiOjE3NTI3NzE0MzgsImp0aSI6ImQyYTc0NDc1YTI0YjRiNWZhMjA5MGZkMWE0NjdlZDlhIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOltdfQ.MKOMph4zaix7_f9Jii4y8KW-K8xN6cwgVJ-C-j1Ljfc
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752776719, 'iat': 1752771438, 'jti': 'd2a74475a24b4b5fa2090fd1a467ed9a', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] isGamePlayable called - apikey: ef50e9ff-5c2b-4c28-80f4-737d664e60c8
+[DEBUG] dictApiPlayers: {'ef50e9ff-5c2b-4c28-80f4-737d664e60c8': [1, 2], 'e1771308-b9bf-4e13-9e6c-bb24511d4711': [4, 3]}
+[DEBUG] apiKeys: ['e1771308-b9bf-4e13-9e6c-bb24511d4711', 'ef50e9ff-5c2b-4c28-80f4-737d664e60c8']
+[DEBUG] apiKeysUnplayable: ['3a2ce6af-a868-4db8-a9c9-cfa40e9951eb', 'ea7df0a2-697f-4f76-beb8-82b6d44a7f9f']
+[DEBUG] dictApiPlayers[ef50e9ff-5c2b-4c28-80f4-737d664e60c8]: [1, 2] (length: 2)
