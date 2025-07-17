@@ -426,7 +426,7 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
 
 
 
-function sendMessage(msgInfo) {
+export function sendMessage(msgInfo) {
 	const MIN_LENGTH = 1;
 	const MAX_LENGTH = 1000; // Set appropriate limit
 
@@ -917,7 +917,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	// Update hidden input for sending messages
 	const groupIdInput = document.getElementById('groupIdInput-active');
 	if (groupIdInput) {
-		groupIdInput.value = newgroupId;
+		groupIdInput.value = chatInfo.group_id;
 	}
 
 	// Clear current messages
@@ -930,8 +930,8 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	}
 
 	// Load history and initialize SSE for the new group
-	messageOffsets[newgroupId] = 0; // Reset offset for new room
-	loadMessageHistory(currentUserId, newgroupId);
+	messageOffsets[chatInfo.group_id] = 0; // Reset offset for new room
+	loadMessageHistory(currentUserId, chatInfo.group_id);
 
 	// Handle blocking logic only for private chats
 	if (chatInfo?.chat_type === 'private' && chatInfo.target_id) {
@@ -1439,8 +1439,9 @@ function handleStartNewChat(currentUserId, currentUsername) {
 	}
 	const chatInfo = {
 		chat_type : 'private',
-		id : targetUserId,
+		target_id : targetUserId,
 		name : targetUsername,
+		group_id : null
 	}
 	promptPrivateChat(currentUserId, chatInfo);
 	targetUserInput.value = ''; // Clear input field
@@ -1472,7 +1473,8 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 
 		if (existinggroupId) {
 			console.log(`Chat with ${chatInfo.name} already exists. Switching to it.`);
-			await switchChatRoom(currentUserId, existinggroupId, chatInfo);
+			chatInfo[group_id] = existinggroupId;
+			await switchChatRoom(currentUserId, chatInfo);
 			return;
 		}
 

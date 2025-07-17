@@ -205,10 +205,10 @@ class ChatMessageView(View):
 
                 # Si c'est un chat de tournoi, ajouter les informations supplémentaires
                 if private:
-					channel_group_name = f"chat_{group_id}"
-				else :
-					tournament_id = group_data.get("tournament_id")
-					channel_group_name = f"tournament_{tournament_id}"
+                    channel_group_name = f"chat_{group_id}"
+                else :
+                    tournament_id = group_data.get("tournament_id")
+                    channel_group_name = f"tournament_{tournament_id}"
 
                 # Use sync_to_async for group_send in a sync view
                 async_to_sync(channel_layer.group_send)(
