@@ -247,7 +247,6 @@ async function launchTournament(data) {
 }
 
 
-
 async function startTournament(data) {
   const tournamentLeave = document.getElementById("Tournament-leave");
 
@@ -540,12 +539,22 @@ export async function tournamentController() {
                     console.log("============================>>", data);
                   }
                   else if (data.t_state == "firsts-match-preview") {
+                    // SEND MESSAGE KELLY 
+                //    -> id       : data.tkey
+                //    -> content  : "⚠️ First matchs annoncement ⚠️
+                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
                     launchTournament(data)
 
                     console.log("data firsts match : ", data);
                   }
                   else if (data.t_state == "final-match-preview") {
                     console.log("data final match : ", data);
+                    // SEND MESSAGE KELLY 
+                //    -> id       : data.tkey
+                //    -> content  : "⚠️ Final matchs annoncement ⚠️
+                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
                   }
                   else if (data.t_state == "Someone-joined-left") {
                     console.log("Someone joined left : ", data);
@@ -745,14 +754,22 @@ export async function tournamentController() {
               }
               if (data.t_state == "firsts-match-preview") {
                 // SEND MESSAGE KELLY 
-                //    -> 
-                //    -> 
+                //    -> id       : data.tkey
+                //    -> content  : "⚠️ First matchs annoncement ⚠️
+                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
+
                 launchTournament(data)
 
                 console.log("data firsts match : ", data);
               }
               else if (data.t_state == "final-match-preview") {
                 console.log("data final match : ", data);
+                // SEND MESSAGE KELLY 
+                //    -> id       : data.tkey
+                //    -> content  : "⚠️ Final matchs annoncement ⚠️
+                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
               }
               else if (data.t_state == "Someone-joined-left") {
                 console.log("Someone joined left : ", data);
@@ -1013,3 +1030,21 @@ async function launchGame(data_game) {
     return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](data_game.key, data_game.playerId, 0, idJWT, data_game.tkey, data_game.round));
   }
 }
+
+
+
+//                      +-------------------+
+//                      |  TOURNAMENT INFO  |                   
+//                      +-------------------+
+//                      |                   |
+//                      |   MATCH PREVIEW   |
+// +--------------------+                   +--------------------+
+// |     Match 1        |   Firsts matchs   |       Match 2      |
+// +--------------------+-------------------+--------------------+
+// |      Player 1      |                   |      Player 1      |
+// |  Bob               |                   |  Bob               |
+// +--------------------+                   +--------------------+
+// |      Player 2      |                   |      Player 2      |
+// |  Bob2              |                   |  Bob2              |
+// +--------------------+                   +--------------------+
+// |  ${format_name(data.match1.player1)}|                   |  ${format_name(data.match1.player2)}|
