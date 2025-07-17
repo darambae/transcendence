@@ -1,4 +1,3 @@
-import { homeController } from './views/home.js';
 import { singlePlayController } from './views/singlePlay.js';
 import { multiplayerController } from './views/multiplayer.js';
 import { loginController } from './views/login.js';
@@ -18,7 +17,6 @@ import { aiController } from './views/ai.js';
 export const routes = {
 	home: {
 		template: 'home',
-		controller: homeController,
 	},
 	singlePlay: {
 		template: 'singlePlay',

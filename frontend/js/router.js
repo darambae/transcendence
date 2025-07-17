@@ -8,12 +8,13 @@ import {
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 import { cleanupLocalGame } from './views/localGame.js';
 import { cleanupMultiplayerGame } from './views/multiplayerGameSession.js';
-import { cleanupTournament } from './views/tournament.js';
+// import { cleanupTournament } from './views/tournament.js';
 
 // State management
 let navigationBlocked = false;
 let isNavigating = false;
 let csrfTokenFetched = false;
+let is404displayed = false;
 
 // Authentication caching
 const AUTH_CACHE_DURATION = 30000;
@@ -43,6 +44,7 @@ if (!location.hash) {
 				'main-content'
 			).innerHTML = `<h2>404 Page not found</h2>`;
 			history.replaceState(null, '', '/'); //Clean URL
+			is404displayed = true;
 		});
 	}
 }
@@ -84,8 +86,20 @@ async function getAuthStatus() {
 	return cachedAuthStatus;
 }
 
+const titleLink = document.getElementById('home-link')
+if (titleLink) {
+	titleLink.addEventListener('click', () => {
+		actualizeIndexPage('main-content', routes.home);
+	});
+}
+
 // Main navigation function
 export async function navigate() {
+	if (is404displayed) {
+		is404displayed = false;
+		history.replaceState(null, '', '/');
+		return;
+	}
 	if (navigationBlocked) {
 		navigationBlocked = false;
 		return;
@@ -182,7 +196,7 @@ export async function navigate() {
 		// Cleanup any active game timers before navigating to a new page
 		cleanupLocalGame();
 		cleanupMultiplayerGame();
-		cleanupTournament();
+		// cleanupTournament();
 		await actualizeIndexPage('main-content', view);
 	} catch (error) {
 		console.error('Error loading template:', error);

@@ -86,11 +86,9 @@ async def isWallIntersection(pos, spd, pointTrajectory, timeLeft : float) -> flo
 		pos = intersectionPoint																																# Set the new ballPosition to the intersection with the wall
 		spd[1] = -spd[1]
 		pos = await calculateLinearMovement(pos, spd, 2)
-		print("pos1 : ", pos, file=sys.stderr)
 		return (0.0, pos)																																					# Return the time to calculate after the reflexion
 	else :
 		pos = pointTrajectory				
-		print("pos2 : ", pos, file=sys.stderr)																											# No collision + No winning round --> Keep same vector and update value
 		return (0.0, pos)					
 
 async def getWallsHit(toReturn) -> None :
@@ -114,16 +112,12 @@ except Exception as e:
 
 async def getActualPosition(apiKey) :
 	try :
-		print("trying get response", file=sys.stderr)
 		res = requests.get(f"{urlRequests}server-pong/api/simulation?apikey={apiKey}", verify=False, headers={'Host' : 'localhost'})
-		print(f"response : {res.status_code}", file=sys.stderr)
 		if res.status_code != 200 :
 			return
 		else :
 			toReturn = res.json()
-			print("toreturn : ", toReturn, file=sys.stderr)
 			toReturn["ball"]["position"] = await getWallsHit(toReturn) #timeLeft = await self.isWallIntersection(linearMovementPoint, timeLeft)
-			print("toreturn222 : ", toReturn, file=sys.stderr)
 			return toReturn
 
 	except Exception as e :
@@ -148,7 +142,7 @@ async def sendInfo(apiKey) :
 					racketY[1][1] -= 15
 				await asyncio.sleep(0.025)
 			position = await getActualPosition(apiKey)
-			print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
+			# print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
 			actualTime = time.time()
 	except Exception as e:
 		print(f"error : {e}", file=sys.stderr)
