@@ -599,7 +599,7 @@ class ChatGroupListCreateView(APIView):
 				chat_data.update({
 					'chat_type': 'tournament',
 					'tournament_id': group.tournament_id,
-					'tournament_name': group.tournament_name
+					'tournament_name': f'tournament_{group.tournament_id}'
 				})
 
 			chat_list.append(chat_data)
@@ -629,6 +629,7 @@ class ChatGroupListCreateView(APIView):
 				if existing_chat:
 					logger.info(f"Found existing chat group: {existing_chat.id}")
 					chat_group = existing_chat
+					chat_group.members.add(current_user)
 				else:
 					# Create a new chat group
 					logger.info(f"Creating new tournament chat named {chat_name} with users {current_user.id}")
@@ -636,6 +637,7 @@ class ChatGroupListCreateView(APIView):
 					chat_group.private = False
 					chat_group.tournament_id = tournament_id
 					chat_group.members.add(current_user)
+					chat_group.save()
 					logger.info(f"Created new tournament chat: {chat_group.id}")
 				return Response({
 					'status': 'success',
@@ -685,6 +687,7 @@ class ChatGroupListCreateView(APIView):
 					logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
 					chat_group = ChatGroup.objects.create(name=chat_name)
 					chat_group.members.add(current_user, target_user)
+					chat_group.save()
 					logger.info(f"Created new chat group: {chat_group.id}")
 
 				# Return the chat group details

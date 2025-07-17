@@ -41,7 +41,7 @@ class ChatGroup(models.Model):
     # Champ pour indiquer si c'est un chat privé (True) ou groupe/tournoi (False)
     private = models.BooleanField(default=True)
     # Champs optionnels pour les chats de tournoi
-    tournament_id = models.IntegerField(null=True, blank=True)  # ID du tournoi externe
+    tournament_id =  models.CharField(max_length=255, null=True, blank=True)  # ID du tournoi externe
     # blank=True signifie que ce champ n'est pas obligatoire
     members = models.ManyToManyField(USER, related_name='chat_groups', blank=True)
     created_at = models.DateTimeField(auto_now_add=True) # Utile pour le tri ou l'historique des groupes

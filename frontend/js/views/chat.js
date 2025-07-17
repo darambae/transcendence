@@ -733,7 +733,7 @@ async function initEventSource(groupId, currentUserId) {
 				} else {
 					// *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
 					console.log('❌ Message NOT for active chat group');
-					console.log('Message group_id:', messageData.group_id, 'Active group id:', currentActiveChatGroup?.id);
+					console.log('Message group_id:', messageData.group_id, 'Active group id:', currentActiveChatGroup?.group_id);
 					console.log(
 						`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`
 					);
@@ -784,7 +784,7 @@ async function initEventSource(groupId, currentUserId) {
 
 			// Only attempt reconnect if currentActiveChatGroup is still this groupId
 			// and the connection wasn't intentionally closed
-			if (currentActiveChatGroup && currentActiveChatGroup.id === groupId) {
+			if (currentActiveChatGroup && currentActiveChatGroup.group_id === groupId) {
 				console.log('Refreshing token and reconnecting SSE...');
 				await new Promise((resolve) => setTimeout(resolve, 3000));
 				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
@@ -844,7 +844,7 @@ export async function loadChatRoomList(currentUserId) {
 				listItem.classList.add('list-group-item');
 				if (
 					currentActiveChatGroup &&
-					chat.group_id === currentActiveChatGroup.id
+					chat.group_id === currentActiveChatGroup.group_id
 				) {
 					listItem.classList.add('active');
 				}
@@ -872,15 +872,15 @@ export async function loadChatRoomList(currentUserId) {
 					};
 				} else if (chat.chat_type === 'tournament') {
 					listItem.dataset.tournamentId = chat.tournament_id;
-					listItem.dataset.tournamentName = chat.tournament_name;
-					listItem.textContent = `Tournament: ${chat.tournament_name}`;
+					listItem.dataset.tournamentName = chat.tournament_id;
+					listItem.textContent = chat.tournament_id;
 					listItem.onclick = async () => {
 						try {
 							const chatInfo = {
 								chat_type: 'tournament',
 								target_id: chat.tournament_id,
 								group_id: chat.group_id,
-								name: chat.tournament_name,
+								name: chat.tournament_id,
 							};
 							await switchChatRoom(currentUserId, chatInfo);
 							removeUnreadIndicator(listItem);
@@ -916,7 +916,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	}
 	if (
 		currentActiveChatGroup &&
-		currentActiveChatGroup.id === chatInfo.group_id
+		currentActiveChatGroup.group_id === chatInfo.group_id
 	) {
 		return;
 	}
@@ -955,19 +955,24 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	const activeChatRoomName = document.getElementById('activeChatRoomName');
 
 	if (activeChatRoomName) {
-		// Private chat header
-		const chatName =
-			chatInfo?.name || newActiveItem?.dataset.receiver || 'Unknown';
-		activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${chatName}</a>`;
-		const profileLink = document.getElementById('receiverProfileLink');
-		if (profileLink) {
-			profileLink.addEventListener('click', async function (e) {
-				e.preventDefault();
-				await actualizeIndexPage(
-					'modal-container',
-					routes['card_profile'](chatName)
-				);
-			});
+		if (chatInfo?.chat_type === 'tournament') {
+			// Tournament chat header - plain text without any clickable elements
+			activeChatRoomName.textContent = `Tournament_${chatInfo.targetGroupId}`;
+		} else {
+			// Private chat header
+			const chatName =
+				chatInfo?.name || newActiveItem?.dataset.receiver || 'Unknown';
+			activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${chatName}</a>`;
+			const profileLink = document.getElementById('receiverProfileLink');
+			if (profileLink) {
+				profileLink.addEventListener('click', async function (e) {
+					e.preventDefault();
+					await actualizeIndexPage(
+						'modal-container',
+						routes['card_profile'](chatName)
+					);
+				});
+			}
 		}
 	}
 
@@ -1102,12 +1107,12 @@ async function switchChatRoom(currentUserId, chatInfo) {
 			}
 		}
 	} else {
-		// For tournament chats, always enable messaging (no blocking logic)
-		document.getElementById('messageInput-active').disabled = false;
-		document.getElementById('sendMessageBtn').disabled = false;
+		// For tournament chats, disable messaging (only server can send messages)
+		document.getElementById('messageInput-active').disabled = true;
+		document.getElementById('sendMessageBtn').disabled = true;
 		const messageInput = document.getElementById('messageInput-active');
 		if (messageInput) {
-			messageInput.focus();
+			messageInput.placeholder = 'Only tournament updates are shown here';
 		}
 	}
 }
@@ -1569,7 +1574,7 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 		);
 		let existinggroupId = null;
 		chatRooms.forEach((room) => {
-			if (room.dataset.targetUserId === chatInfo.target_id) {
+			if (room.dataset.targetUserId === chatInfo.target_id || room.dataset.tournamentId === chatInfo.target_id) {
 				existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
 			}
 		});
@@ -1721,7 +1726,7 @@ export async function launchTournamentChat(tournament_id) {
 	const chatInfo = {
 		chat_type: 'tournament',
 		target_id: tournament_id,
-		name: 'tournament_' + tournament_id,
+		name: null,
 	};
 	promptPrivateChat(userData.id, chatInfo);
 }
@@ -1862,55 +1867,6 @@ function setupUserSearchAutocomplete() {
 		}
 	});
 }
-
-// export async function promptTournamentChat(currentUserName, tournamentId) {
-// 	console.log(
-// 		`Requesting tournament chat for user ${currentUserName}, tournament: ${tournamentId}`
-// 	);
-// 	if (!currentUserName) {
-// 		alert('Please log in to start a tournament chat.');
-// 		return;
-// 	}
-
-// 	const chatInfoTournament = {
-// 		chat_type: 'tournament',
-// 		Id: tournamentId,
-// 	};
-
-// 	// Pas de vérification locale - le backend gère tout
-// 	// Le backend ajoutera l'utilisateur au groupe existant ou créera un nouveau groupe
-// 	fetchWithRefresh('/chat/tournament/', {
-// 		method: 'POST',
-// 		headers: {
-// 			'Content-Type': 'application/json',
-// 			'X-CSRFToken': getCookie('csrftoken'),
-// 		},
-// 		body: JSON.stringify({
-// 			tournament_id: tournamentId,
-// 			current_username : currentUserName,
-// 		}),
-// 		credentials: 'include',
-// 	})
-// 		.then((response) =>
-// 			response.json().then((data) => ({ data, ok: response.ok }))
-// 		)
-// 		.then(({ data, ok }) => {
-// 			if (ok && data.status === 'success' && data.group_id) {
-// 				console.log(`Tournament chat group ${data.group_id} handled successfully.`);
-// 				// Recharger la liste des chats pour afficher le nouveau chat
-// 				loadChatRoomList(data.current_user_id).then(async () => {
-// 					await switchChatRoom(data.current_user_id, data.group_id, chatInfoTournament);
-// 				});
-// 			} else {
-// 				console.error('Server error with tournament chat:', data.message);
-// 				alert('Error with tournament chat: ' + data.message);
-// 			}
-// 		})
-// 		.catch((error) => {
-// 			console.error('Network error with tournament chat:', error);
-// 			alert('Cannot connect to server for tournament chat.');
-// 		});
-// }
 
 function addUnreadIndicator(chatItem) {
 	let element;
