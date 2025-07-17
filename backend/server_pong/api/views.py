@@ -266,11 +266,14 @@ async def sendNewJSON(request):
 	dictionnaryJson = json.loads(request.body)
 	api_key = dictionnaryJson.get("apiKey", None)
 	message = dictionnaryJson.get("message", {})
+	print("api Key", api_key, file=sys.stderr)
+	print("message", message, file=sys.stderr)
 
 	if not api_key:
 		return HttpResponse(status=400)  # apiKey manquant
 
 	m2 = json.loads(message)
+	print("m2", m2, file=sys.stderr)
 	speed = 15
 	if m2["action"] == 'move' :
 		try :
@@ -292,6 +295,7 @@ async def sendNewJSON(request):
 				return HttpResponse(status=500)
 
 	else :
+		print("in else", file=sys.stderr)
 		rq = RequestParsed(api_key, message)
 		await channel_layer.group_send(
 			rq.apiKey,
@@ -301,6 +305,7 @@ async def sendNewJSON(request):
 			}
 		)
 
+	print("returning", file=sys.stderr)
 	return HttpResponse(status=204)
 
 async def forfaitUser(request) :

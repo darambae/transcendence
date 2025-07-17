@@ -1,4 +1,4 @@
-import { fetchWithRefresh, getCookie } from '../utils.js';
+import { fetchWithRefresh, fetchWithRefreshNoCash, getCookie } from '../utils.js';
 import { checkwin, guideTouch, drawCenterTextP } from './localGame.js';
 import { drawCenterText } from './multiplayer.js';
 import { drawMap } from './gameCanvas.js';
@@ -55,7 +55,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	}
 
 	// Show initial game state
-	if (playerID === 2) {
+	if (playerID == 2) {
 		drawCenterText('waiting for the player to start the match');
 		guideTouch();
 	} else {
@@ -351,7 +351,7 @@ async function waitForGameReady(
 
 		attempts++;
 		// Show waiting message
-		if (playerID === 1) {
+		if (playerID == 1) {
 			drawCenterText(
 				`Waiting for second player... (${attempts}/${maxAttempts})`
 			);
@@ -410,13 +410,14 @@ function setupMultiplayerKeyHandler(apiKey) {
 				case 'p':
 					if (!multiplayerGameStarted) {
 						multiplayerGameStarted = true;
-						console.log('Starting multiplayer game with P key');
+						console.log('Starting multiplayer game with P key', currentMultiplayerPostUrl, "Heyo");
 						try {
-							await fetch(currentMultiplayerPostUrl, {
+							await fetchWithRefreshNoCash(currentMultiplayerPostUrl, {
 								method: 'POST',
 								headers: {
 									'Content-Type': 'application/json',
 								},
+								credentials : 'include',
 								body: JSON.stringify({
 									apiKey: apiKey,
 									message: '{"action": "start"}',
@@ -722,9 +723,9 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 
 			switch (event.key) {
 				case 'p':
-					if (playerID === 1 && !multiplayerGameStarted) {
+					if (playerID == 1 && !multiplayerGameStarted) {
 						multiplayerGameStarted = true;
-						console.log('Starting multiplayer game with P key');
+						console.log('Starting multiplayer game with P key', currentMultiplayerPostUrl, "Heyo");
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {
@@ -757,7 +758,8 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 					}
 					break;
 				case 'ArrowUp':
-					if (playerID === 1) {
+					if (playerID == 1) {
+						console.log("p1 moving up")
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {
@@ -772,6 +774,7 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 							}),
 						});
 					} else {
+						console.log("p2 moving up")
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {
@@ -788,7 +791,8 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 					}
 					break;
 				case 'ArrowDown':
-					if (playerID === 1) {
+					if (playerID == 1) {
+						console.log("p1 moving down")
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {
@@ -803,6 +807,7 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 							}),
 						});
 					} else {
+						console.log("p2 moving down")
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {

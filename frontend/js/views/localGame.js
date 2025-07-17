@@ -476,8 +476,8 @@ export async function localGameController(id1, id2) {
 				case 'p':
 					if (gameStarted == false) {
 						gameStarted = true;
-						console.log('Starting game with P key');
-						fetch(currentPostUrl, {
+						console.log('Starting game with P key', gameStarted);
+						await fetch(currentPostUrl, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json',
@@ -524,7 +524,7 @@ export async function localGameController(id1, id2) {
 					}
 					break;
 				case 'ArrowUp':
-					fetch(currentPostUrl, {
+					await fetch(currentPostUrl, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -536,7 +536,7 @@ export async function localGameController(id1, id2) {
 					});
 					break;
 				case 'e':
-					fetch(currentPostUrl, {
+					await fetch(currentPostUrl, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -548,7 +548,7 @@ export async function localGameController(id1, id2) {
 					});
 					break;
 				case 'ArrowDown':
-					fetch(currentPostUrl, {
+					await fetch(currentPostUrl, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
@@ -560,7 +560,7 @@ export async function localGameController(id1, id2) {
 					});
 					break;
 				case 'd':
-					fetch(currentPostUrl, {
+					await fetch(currentPostUrl, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',

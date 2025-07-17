@@ -206,6 +206,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			for elem in jwt_l :
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					self.guests = elem["invites"]
+
 		elif action == "ShowResults" :
 			dicoInfo = {
 				"t_state" : "results",
