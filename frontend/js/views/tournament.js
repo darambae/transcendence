@@ -752,11 +752,21 @@ export async function tournamentController() {
                 }
               }
               if (data.t_state == "firsts-match-preview") {
-                // SEND MESSAGE KELLY
-                //    -> id       : data.tkey
-                //    -> content  : "⚠️ First matchs annoncement ⚠️
-                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
-                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
+				const msgInfo = {
+					content: null,
+					group_id: null,
+					sender_username: 'server',
+					sender_id: data.key,
+				};
+				message_1 = "⚠️ First matchs annoncement ⚠️";
+				message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
+				message_3 = `Match 1 : ${data.match2.player1} VS ${data.match2.player2}`
+				msgInfo.content = message_1;
+				sendMessage(msgInfo);
+				msgInfo.content = message_2;
+				sendMessage(msgInfo);
+				msgInfo.content = message_3;
+				sendMessage(msgInfo);
 
                 launchTournament(data)
 
@@ -764,11 +774,21 @@ export async function tournamentController() {
               }
               else if (data.t_state == "final-match-preview") {
                 console.log("data final match : ", data);
-                // SEND MESSAGE KELLY
-                //    -> id       : data.tkey
-                //    -> content  : "⚠️ Final matchs annoncement ⚠️
-                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
-                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
+				const msgInfo = {
+					content: null,
+					group_id: null,
+					sender_username: 'server',
+					sender_id: data.key,
+				};
+				message_1 = "⚠️ Final matchs annoncement ⚠️";
+				message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
+				message_3 = `Match 1 : ${data.match2.player1} VS ${data.match2.player2}`;
+				msgInfo.content = message_1;
+				sendMessage(msgInfo);
+				msgInfo.content = message_2;
+				sendMessage(msgInfo);
+				msgInfo.content = message_3;
+				sendMessage(msgInfo);
               }
               else if (data.t_state == "Someone-joined-left") {
                 console.log("Someone joined left : ", data);

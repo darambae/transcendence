@@ -494,7 +494,7 @@ export function sendMessage(msgInfo) {
 			// Vérifier si c'est un chat de tournoi avec le bon tournament_id
 			if (
 				item.dataset.tournamentId &&
-				item.dataset.tournamentId === msgInfo.group_id.toString()
+				item.dataset.tournamentId === msgInfo.sender_id.toString()
 			) {
 				targetGroupId = item.dataset.groupId;
 				console.log(
