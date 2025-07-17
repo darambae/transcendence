@@ -11,6 +11,23 @@ let multiplayerGameEnded = false;
 let currentMultiplayerApiKey = null;
 let currentMultiplayerPostUrl = null;
 let gameReadyCheckAbortController = null;
+let currentPlayerId = null;
+
+export async function getMultiplayerKey() {
+	return currentMultiplayerApiKey;
+}
+
+export async function setMultiplayerKey(value) {
+	currentMultiplayerApiKey = value
+}
+
+export async function getCurrentPlayerId() {
+	return currentPlayerId;
+}
+
+export async function setCurrentPlayerId(value) {
+	currentPlayerId = value
+}
 
 export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	console.log('Starting handleGame2Players with:', {
@@ -165,7 +182,7 @@ export function cleanupMultiplayerGame() {
 
 		// Try to forfeit as player 1 first
 		fetch(
-			`server-pong/forfait-game?apikey=${currentMultiplayerApiKey}&idplayer=1`,
+			`server-pong/forfait-game?apikey=${currentMultiplayerApiKey}&idplayer=${currentPlayerId}`,
 			{
 				headers: { 'X-CSRFToken': csrf },
 				credentials: 'include',
@@ -175,15 +192,15 @@ export function cleanupMultiplayerGame() {
 		});
 
 		// Also try as player 2 (one will succeed, one will fail, but that's ok)
-		fetch(
-			`server-pong/forfait-game?apikey=${currentMultiplayerApiKey}&idplayer=2`,
-			{
-				headers: { 'X-CSRFToken': csrf },
-				credentials: 'include',
-			}
-		).catch((error) => {
-			console.error('Error forfeiting as player 2:', error);
-		});
+		// fetch(
+		// 	`server-pong/forfait-game?apikey=${currentMultiplayerApiKey}&idplayer=2`,
+		// 	{
+		// 		headers: { 'X-CSRFToken': csrf },
+		// 		credentials: 'include',
+		// 	}
+		// ).catch((error) => {
+		// 	console.error('Error forfeiting as player 2:', error);
+		// });
 	}
 
 	// Destroy the API key if we have one
@@ -576,6 +593,8 @@ async function establishSSEConnection(
 ) {
 	// Set up multiplayer keydown handler before establishing SSE
 	setupMultiplayerKeyHandler(key);
+	
+	currentPlayerId = playerID;
 
 	// Build SSE URL
 	let url_sse = `server-pong/events?apikey=${key}&idplayer=${playerID}&ai=${isAiGame}&JWTid=${JWTid}&username=${username}`;
