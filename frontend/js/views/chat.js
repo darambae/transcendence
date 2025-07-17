@@ -60,7 +60,7 @@ async function initGlobalChatNotifications(currentUserId) {
 		await forceRefreshToken();
 		globalEventSource = new EventSource(`/chat/stream/notification/${currentUserId}/`);
 
-		globalEventSource.addEventListener('chat_notification', function (e) {
+		globalEventSource.addEventListener('chat_notification', async function (e) {
 			try {
 				const notificationData = JSON.parse(e.data);
 				console.log('Global: Chat notification received:', notificationData);
@@ -104,7 +104,7 @@ async function initGlobalChatNotifications(currentUserId) {
 
 							// Refresh chat list if modal is open
 							if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
-								loadChatRoomList(currentUserId);
+								await loadChatRoomList(currentUserId);
 							}
 
 							// Add visual indication that there's a new chat
@@ -146,7 +146,7 @@ async function initGlobalChatNotifications(currentUserId) {
 
 						// Refresh chat list if modal is open
 						if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
-							loadChatRoomList(currentUserId);
+							await loadChatRoomList(currentUserId);
 						}
 
 						// Add visual indication that there's a new chat
@@ -772,7 +772,7 @@ export async function loadChatRoomList(currentUserId) {
 			data.chats.forEach((chat) => {
 				const listItem = document.createElement('li');
 				listItem.classList.add('list-group-item');
-				if (chat.group_id === currentActiveChatGroup.id) {
+				if (currentActiveChatGroup && chat.group_id === currentActiveChatGroup.id) {
 					listItem.classList.add('active');
 				}
 				listItem.dataset.groupId = chat.group_id;
@@ -1247,7 +1247,7 @@ export function chatController(userId, username) {
 				initGlobalChatNotifications(userId);
 			}
 
-			loadChatRoomList(userId); // Load chat list dynamically
+			await loadChatRoomList(userId); // Load chat list dynamically
 
 			// Set initial state for chat log
 			const chatLog = document.getElementById('chatLog-active');
@@ -1335,7 +1335,17 @@ export function chatController(userId, username) {
 		messageInput.addEventListener('keypress', function (e) {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				sendMessage(userId);
+				// Always pass the logged-in user's username to sendMessage
+				const messageInput = document.getElementById('messageInput-active');
+				const groupIdInput = document.getElementById('groupIdInput-active');
+				const usernameInput = document.getElementById('usernameInput-active');
+				const msgInfo = {
+					content: messageInput.value.trim(),
+					group_id: groupIdInput.value,
+					sender_username: usernameInput.value,
+					sender_id: userId
+				};
+				sendMessage(msgInfo);
 			}
 		});
 		const charCounter = document.getElementById('char-counter');
@@ -1473,7 +1483,7 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 
 		if (existinggroupId) {
 			console.log(`Chat with ${chatInfo.name} already exists. Switching to it.`);
-			chatInfo[group_id] = existinggroupId;
+			chatInfo.group_id = existinggroupId;
 			await switchChatRoom(currentUserId, chatInfo);
 			return;
 		}
@@ -1494,12 +1504,12 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 				.then((response) =>
 					response.json().then((data) => ({ data, ok: response.ok }))
 				)
-				.then(({ data, ok }) => {
+				.then(async ({ data, ok }) => {
 					if (ok && data.status === 'success' && data.group_id) {
 						console.log(`Chat group ${data.group_id} created/retrieved.`);
-						loadChatRoomList(currentUserId).then(async () => {
-							await switchChatRoom(currentUserId, data.group_id, chatInfo);
-						});
+						await loadChatRoomList(currentUserId);
+						chatInfo.group_id = data.group_id;
+						await switchChatRoom(currentUserId, chatInfo);
 					} else {
 						console.error('Server error creating chat group:', data.message);
 						alert('Error creating chat group: ' + data.message);
@@ -1529,12 +1539,12 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 			.then((response) =>
 				response.json().then((data) => ({ data, ok: response.ok }))
 			)
-			.then(({ data, ok }) => {
+			.then(async ({ data, ok }) => {
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
-					loadChatRoomList(currentUserId).then(async () => {
-						await switchChatRoom(currentUserId, data.group_id, chatInfo);
-					});
+					await loadChatRoomList(currentUserId);
+					chatInfo.group_id = data.group_id;
+					await switchChatRoom(currentUserId, chatInfo);
 				} else {
 					console.error('Server error creating chat group:', data.message);
 					alert('Error creating chat group: ' + data.message);
@@ -1616,8 +1626,8 @@ export async function launchTournamentChat(tournament_id) {
 	}
 	const chatInfo = {
 			chat_type: 'tournament',
-			id: tournament_id,
-			name: 'tournement_'.tournement_id,
+			target_id: tournament_id,
+			name: 'tournament_' + tournament_id,
 		};
 	promptPrivateChat(userData.id, chatInfo);
 }

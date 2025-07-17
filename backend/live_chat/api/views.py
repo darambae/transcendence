@@ -251,7 +251,7 @@ async def _generate_notification_events(request, user_id):
     # --- SSE Token Authentication ---
     try:
         access_token = request.COOKIES.get('access_token')
-        token_data = jwt.decode(access_token, verify=False)
+        token_data = jwt.decode(access_token, algorithms=["HS256"], options={"verify_signature": False})
         expiry_time = token_data.get('exp')
 
         current_time = time.time()
@@ -340,7 +340,7 @@ async def _generate_events(request, group_id):
         # Your token expiration check code
         access_token = request.COOKIES.get('access_token')
 
-        token_data = jwt.decode(access_token, verify=False)
+        token_data = jwt.decode(access_token, algorithms=["HS256"], options={"verify_signature": False})
         expiry_time = token_data.get('exp')
 
         current_time = time.time()
