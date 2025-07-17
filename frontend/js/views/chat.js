@@ -957,7 +957,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	if (activeChatRoomName) {
 		if (chatInfo?.chat_type === 'tournament') {
 			// Tournament chat header - plain text without any clickable elements
-			activeChatRoomName.textContent = `Tournament_${chatInfo.targetGroupId}`;
+			activeChatRoomName.textContent = `Tournament_${chatInfo.target_id}`;
 		} else {
 			// Private chat header
 			const chatName =
