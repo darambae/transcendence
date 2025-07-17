@@ -19,76 +19,6 @@ logger = logging.getLogger(__name__)
 
 ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 
-# class tournamentChat(View):
-#     def post(self, request, *args, **kwargs):
-#         """
-#         Creates or retrieves a tournament chat group by proxying to access_postgresql.
-#         Expects 'current_user_id' and 'tournament_id' in the JSON body.
-#         Tournament chats are group chats (private=False) that allow multiple participants.
-#         """
-#         try:
-#             data = json.loads(request.body)
-#             tournament_id = data.get('tournament_id')
-#             current_user_name = data.get('current_username')
-
-#             if not tournament_id or not current_user_name:
-#                 return JsonResponse({'status': 'error', 'message': 'tournament_id and current_user_id are required.'}, status=400)
-
-#             logger.info(f"Creating tournament chat for user {current_user_name} with tournament {tournament_id}")
-
-#             access_token = request.COOKIES.get('access_token')
-#             if not access_token:
-#                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
-
-#             headers = {'Content-Type': 'application/json', 'Host': 'localhost', 'Authorization': f'Bearer {access_token}'}
-#             url = f"{ACCESS_PG_BASE_URL}/api/chat/tournament/"
-
-#             try:
-#                 resp = requests.post(url, json={
-#                     'current_user_name': current_user_name,
-#                     'tournament_id': tournament_id
-#                 }, headers=headers, timeout=10, verify=False)
-#                 resp.raise_for_status()
-
-#                 # Envoyer une notification pour le nouveau chat de tournoi
-#                 response_data = resp.json()
-#                 if response_data.get('status') == 'success':
-#                     # Récupérer les informations du tournoi pour la notification
-#                     channel_layer = get_channel_layer()
-#                     if channel_layer:
-#                         # Notification pour le créateur du tournoi
-#                         notification_group_name = f"notifications_{response_data.get('current_id')}"
-#                         async_to_sync(channel_layer.group_send)(
-#                             notification_group_name,
-#                             {
-#                                 "type": "chat_notification",
-#                                 "notification": {
-#                                     "type": "new_chat_group",
-#                                     "chat_type": "tournament",
-#                                     "tournament_id": tournament_id,
-#                                     "tournament_name": response_data.get('tournament_name'),
-#                                     "group_id": response_data.get('group_id'),
-# 									"current_user_id" = response_data.get('current_id'),
-#                                     "timestamp": datetime.now().isoformat()
-#                                 }
-#                             }
-#                         )
-
-#                 return JsonResponse(resp.json(), status=resp.status_code)
-
-#             except requests.RequestException as exc:
-#                 logger.error(f"tournamentChat POST request failed: {exc}")
-#                 return JsonResponse({'status': 'error', 'message': 'Could not connect to chat data service for tournament chat.'}, status=502)
-#             except Exception as e:
-#                 logger.error(f"Internal server error during tournament chat creation: {e}")
-#                 return JsonResponse({'status': 'error', 'message': 'Internal server error during tournament chat creation.'}, status=500)
-
-#         except json.JSONDecodeError:
-#             return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
-#         except Exception as e:
-#             logger.error(f"Internal server error: {e}")
-#             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
-
 class ChatGroupListCreateView(View):
     @method_decorator(csrf_exempt)
     def get(self, request, *args, **kwargs):
@@ -215,11 +145,6 @@ class ChatMessageView(View):
             resp.raise_for_status()
             return JsonResponse(resp.json(), status=resp.status_code)
         except requests.RequestException as exc:
-            logger.error(f"ChatMessageView GET request failed for group {group_id}: {exc}")
-            if hasattr(exc.response, 'status_code'):
-                logger.error(f"Response status: {exc.response.status_code}")
-                if hasattr(exc.response, 'text'):
-                    logger.error(f"Response content: {exc.response.text}")
             return JsonResponse({'status': 'error', 'message': 'Could not connect to data service for message history.'}, status=502)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': 'Internal server error during message history retrieval.'}, status=500)
@@ -275,7 +200,15 @@ class ChatMessageView(View):
                 if channel_layer is None:
                     return JsonResponse({'status': 'error', 'message': 'Real-time server not configured.'}, status=500)
 
-                channel_group_name = f"chat_{group_id}"
+                group_data = pg_response_data.get('group', {})
+                private = group_data.get('private')
+
+                # Si c'est un chat de tournoi, ajouter les informations supplémentaires
+                if private:
+					channel_group_name = f"chat_{group_id}"
+				else :
+					tournament_id = group_data.get("tournament_id")
+					channel_group_name = f"tournament_{tournament_id}"
 
                 # Use sync_to_async for group_send in a sync view
                 async_to_sync(channel_layer.group_send)(
@@ -295,6 +228,7 @@ class ChatMessageView(View):
             return JsonResponse({'status': 'error', 'message': 'Invalid JSON format.'}, status=400)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
+
 async def sse_notification_stream(request, currentUserId):
     response = StreamingHttpResponse(_generate_notification_events(request, currentUserId),
                                     content_type="text/event-stream")
@@ -317,7 +251,7 @@ async def _generate_notification_events(request, user_id):
     # --- SSE Token Authentication ---
     try:
         access_token = request.COOKIES.get('access_token')
-        token_data = jwt.decode(access_token, options={"verify_signature": False})
+        token_data = jwt.decode(access_token, verify=False)
         expiry_time = token_data.get('exp')
 
         current_time = time.time()
@@ -406,7 +340,7 @@ async def _generate_events(request, group_id):
         # Your token expiration check code
         access_token = request.COOKIES.get('access_token')
 
-        token_data = jwt.decode(access_token, options={"verify_signature": False})
+        token_data = jwt.decode(access_token, verify=False)
         expiry_time = token_data.get('exp')
 
         current_time = time.time()

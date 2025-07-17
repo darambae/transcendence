@@ -585,7 +585,7 @@ class ChatGroupListCreateView(APIView):
 					other_member = other_members.first()
 
 				chat_data.update({
-					'chat_type': 'private'
+					'chat_type': 'private',
 				})
 
 				# For private chats, add receiver details
@@ -747,13 +747,21 @@ class ChatMessageView(APIView):
 
 			message_data = []
 			for msg in messages:
-				message_data.append({
-					'id': msg.id,
-					'sender_id': msg.sender.id,
-					'sender_username': msg.sender.user_name,
-					'content': msg.content,
-					'timestamp': msg.timestamp.isoformat()
-				})
+				if chat_group.private
+					message_data.append({
+						'id': msg.id,
+						'sender_id': msg.sender.id,
+						'sender_username': msg.sender.user_name,
+						'content': msg.content,
+						'timestamp': msg.timestamp.isoformat()
+					})
+				else :
+					message_data.append({
+						'id': msg.id,
+						'sender_username': 'server',
+						'content': msg.content,
+						'timestamp': msg.timestamp.isoformat()
+					})
 
 			return Response({
 				'status': 'success',
@@ -791,18 +799,24 @@ class ChatMessageView(APIView):
 					{'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
 					status=status.HTTP_403_FORBIDDEN
 				)
-			receiver_id = None
-			receiver_username = None
-			other_member = chat_group.members.exclude(id=current_user.id).first()
-			if other_member:
-				receiver_id = other_member.id
-				receiver_username = other_member.user_name
-
-			message = Message.objects.create(
-				sender=current_user,
-				content=content,
-				group=chat_group
-			)
+			if chat_group.private :
+				receiver_id = None
+				receiver_username = None
+				other_member = chat_group.members.exclude(id=current_user.id).first()
+				if other_member:
+					receiver_id = other_member.id
+					receiver_username = other_member.user_name
+				message = Message.objects.create(
+					sender=current_user,
+					content=content,
+					group=chat_group
+				)
+			else :
+				message = Message.objects.create(
+					content=content,
+					group=chat_group,
+					private=false
+				)
 			logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_id}.")
 
 			channel_layer = get_channel_layer()
@@ -812,22 +826,30 @@ class ChatMessageView(APIView):
 					{'status': 'error', 'message': 'Server not configured for real-time communication.'},
 					status=status.HTTP_500_INTERNAL_SERVER_ERROR
 				)
+			if chat_group.private
+				channel_group_id = f"chat_{group_id}"
+				message_data = {
+					"id": message.id,
+					"sender_id": current_user.id,
+					"sender_username": current_user.user_name,
+					"content": content,
+					"timestamp": message.timestamp.isoformat(),
+					"group_id": group_id
+				}
+				if receiver_id:
+					message_data["receiver_id"] = receiver_id
+					message_data["receiver_username"] = receiver_username
+			else :
+				channel_group_id = f"tournament_{chat_group.tournament_id}"
+				message_data = {
+					"id": message.id,
+					"tournament_id":chat_group.tournament_id,
+					"sender_username": 'server',
+					"content": content,
+					"timestamp": message.timestamp.isoformat(),
+					"group_id": group_id
+				}
 
-			channel_group_id = f"chat_{group_id}"
-
-			message_data = {
-				"id": message.id,
-				"sender_id": current_user.id,
-				"sender_username": current_user.user_name,
-				"content": content,
-				"timestamp": message.timestamp.isoformat(),
-				"group_id": group_id
-			}
-
-			# Add receiver info for private chats
-			if receiver_id:
-				message_data["receiver_id"] = receiver_id
-				message_data["receiver_username"] = receiver_username
 
 			# Use async_to_sync to call async channel layer from sync code
 			async_to_sync(channel_layer.group_send)(
