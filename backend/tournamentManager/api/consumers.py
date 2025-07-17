@@ -10,11 +10,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .tournamentStatic import Tournament, Player, trnmtDict, getApiKeyTrnmt, LOCAL, REMOTE, supervise_match, Match, user_ws_connections
 
 async def setResults(trnmt, username, roundMatch, mKey) :
-	# print(f"RoundM : {roundMatch} | type : {type(roundMatch).__name__}", file=sys.stderr)
 	if (int(roundMatch) == 1) :
-		# print("---------------------------------! Firsts match !---------------------------------")
 		if trnmt.match1.key == mKey :
-			# print("Soooo -> ", trnmt.match2.launchable, file=sys.stderr)
 			if not trnmt.match2.launchable :
 				nextMatch = "m2"
 			else :
@@ -22,28 +19,23 @@ async def setResults(trnmt, username, roundMatch, mKey) :
 			trnmt.match1.played = True
 			trnmt.match2.launchable = True
 			mId = 1
-			# print(f"=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=> :  winner bracket : {trnmt.matchWinnerBracket.p1} | {trnmt.matchWinnerBracket.p2}", file=sys.stderr)
 			if (trnmt.matchWinnerBracket.p1 == None) :
-				# print(f"========================================================================> WINNERBRACEKT P1", file=sys.stderr)
 				if username == trnmt.match1.p1.username :
 					trnmt.matchWinnerBracket.p1 = trnmt.match1.p1
 				else :
 					trnmt.matchWinnerBracket.p1 = trnmt.match1.p2
 			else :
-				# print(f"========================================================================> WINNERBRACEKT P2", file=sys.stderr)
 
 				if username == trnmt.match1.p1.username :
 					trnmt.matchWinnerBracket.p2 = trnmt.match1.p1
 				else :
 					trnmt.matchWinnerBracket.p2 = trnmt.match1.p2
 			if (trnmt.matchLoserBracket.p1 == None) :
-				# print(f"========================================================================> LOSER BRACEKT P1", file=sys.stderr)
 				if username == trnmt.match1.p1.username :
 					trnmt.matchLoserBracket.p1 = trnmt.match1.p2
 				else : 
 					trnmt.matchLoserBracket.p1 = trnmt.match1.p1
 			else :
-				# print(f"========================================================================> LOSER BRACEKT P2", file=sys.stderr)
 				if username == trnmt.match1.p1.username :
 					trnmt.matchLoserBracket.p2 = trnmt.match1.p2
 				else : 
@@ -57,43 +49,35 @@ async def setResults(trnmt, username, roundMatch, mKey) :
 			trnmt.match2.played = True
 			trnmt.match1.launchable = True
 			mId = 2
-			# print(f"=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=>=> :  winner bracket : {trnmt.matchWinnerBracket.p1} | {trnmt.matchWinnerBracket.p2}", file=sys.stderr)
 			if (trnmt.matchWinnerBracket.p1 == None) :
-				# print(f"========================================================================> WINNERBRACEKT P1", file=sys.stderr)
 				if username == trnmt.match2.p1.username :
 					trnmt.matchWinnerBracket.p1 = trnmt.match2.p1
 				else :
 					trnmt.matchWinnerBracket.p1 = trnmt.match2.p2
 			else :
-				# print(f"========================================================================> WINNERBRACEKT P2", file=sys.stderr)
 				if username == trnmt.match2.p1.username :
 					trnmt.matchWinnerBracket.p2 = trnmt.match2.p1
 				else :
 					trnmt.matchWinnerBracket.p2 = trnmt.match2.p2
 			if (trnmt.matchLoserBracket.p1 == None) :
-				# print(f"========================================================================> LOSER BRACEKT P1", file=sys.stderr)
 				if username == trnmt.match2.p1.username :
 					trnmt.matchLoserBracket.p1 = trnmt.match2.p2
 				else : 
 					trnmt.matchLoserBracket.p1 = trnmt.match2.p1
 			else :
-				# print(f"========================================================================> LOSER BRACEKT P2", file=sys.stderr)
 				if username == trnmt.match2.p1.username :
 					trnmt.matchLoserBracket.p2 = trnmt.match2.p2
 				else : 
 					trnmt.matchLoserBracket.p2 = trnmt.match2.p1
 		
 		if (trnmt.matchWinnerBracket.p1 and trnmt.matchWinnerBracket.p2) :
-			# print("-------------------------------------------------------------------------------------------------------------> Goes to finalMatches !", file=sys.stderr)
 			trnmt.matchWinnerBracket.initValues()
 			trnmt.matchLoserBracket.initValues(trnmt.matchWinnerBracket)
 		
 		return (mId, nextMatch)
 	
 	else :
-		# print("---------------------------------! Final match !---------------------------------")
 		if trnmt.matchWinnerBracket.key == mKey :
-			# print("Soooo -> ", trnmt.matchLoserBracket.launchable, file=sys.stderr)
 			if not trnmt.matchLoserBracket.launchable :
 				nextMatch = "final-rounds"
 			else :
@@ -107,7 +91,6 @@ async def setResults(trnmt, username, roundMatch, mKey) :
 				trnmt.first = trnmt.matchWinnerBracket.p2
 				trnmt.second = trnmt.matchWinnerBracket.p1
 		else :
-			# print("Soooo -> ", trnmt.matchWinnerBracket.launchable, file=sys.stderr)
 			if not trnmt.matchWinnerBracket.launchable :
 				nextMatch = "final-rounds"
 			else :
@@ -129,11 +112,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 		params = parse_qs(query_string)
 
 		self.room_group_name = params.get('tkey', [None])[0]
-		# print(f"self.room_group_name : {self.room_group_name}", file=sys.stderr)
 		self.myJWT = params.get("jwt", [None])[0] #Encoded 
 		self.name = params.get("name", [None])[0]
 		self.guests = (params.get("guests", ["Nan"])[0]).split(',')
-		# print(f"self.name : {self.name}\nguests : {self.guests}", file=sys.stderr)
 
 
 		if not self.room_group_name:
@@ -147,8 +128,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			self.channel_name
 		)
 
-		# print(f"ChanelLayer : {self.channel_layer}", file=sys.stderr)
-
 		await self.send(text_data=json.dumps({
 			't_state': "Succefully joined tournament"
 		}))
@@ -161,8 +140,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 			}
 		)
-
-		# user_ws_connections[self.myJWT] = self
 	
 	async def disconnect(self, close_code):
 		await self.channel_layer.group_discard(
@@ -172,8 +149,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
 	async def launchGame(self, match, roundM) :
-		# print(f"roundMatch lauchGame : {roundM}", file=sys.stderr)
-		print(f"match.gamemode : {match.gameMode}\nREMOTE : {REMOTE}\nLOCAL : {LOCAL}", file=sys.stderr)
 		if match.p1.jwt != match.p2.jwt :
 			match.gameMode = REMOTE
 		if match.gameMode == REMOTE :
@@ -185,7 +160,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			else :
 				user = match.p2.username
 				playerId = 2
-			print(f"self.name : {self.name}\ns;ef.guests : {self.guests}\n\nmatch.p1.username : {match.p1.username}\nmatch.p2.username : {match.p2.username}", file=sys.stderr)
 			if (self.name == match.p1.username or match.p1.username in self.guests or self.name == match.p2.username or match.p2.username in self.guests) :
 				await self.send(text_data=json.dumps({
 					"t_state" : "game-start",
@@ -210,12 +184,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 							
 	async def receive(self, text_data):
-		# print(f"data : {text_data}", file=sys.stderr)
-		data = text_data # json.loads(text_data)
+		data = text_data
 		action = data.get("action")
-		# print(f"ction : {action}", file=sys.stderr)
 		if action == "create-bracket" :
-			# if self.name == trnmtDict[self.room_group_name].match1.p1.username :
 			await self.send(text_data=json.dumps({"t_state" : "firsts-match-preview", "tkey" : self.room_group_name, "match1" : {"player1" : trnmtDict[self.room_group_name].match1.p1.username, "player2" : trnmtDict[self.room_group_name].match1.p2.username}, "match2" : {"player1" : trnmtDict[self.room_group_name].match2.p1.username, "player2" : trnmtDict[self.room_group_name].match2.p2.username}}))
 			if trnmtDict[self.room_group_name].match1.launchable and not trnmtDict[self.room_group_name].match1.played:
 				await self.launchGame(trnmtDict[self.room_group_name].match1, 1)
@@ -223,8 +194,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 				await self.launchGame(trnmtDict[self.room_group_name].match2, 1)
 		
 		elif action == "final-matches" :
-			# print(f"finals matches consumer |\n trnmtDict[self.room_group_name].matchLoserBracket.launchable : {trnmtDict[self.room_group_name].matchLoserBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.launchable {trnmtDict[self.room_group_name].matchWinnerBracket.launchable} ||\n trnmtDict[self.room_group_name].matchWinnerBracket.played : {trnmtDict[self.room_group_name].matchWinnerBracket.played} ||\n trnmtDict[self.room_group_name].matchLoserBracket.played {trnmtDict[self.room_group_name].matchLoserBracket.played} ", file=sys.stderr)
-			# if self.name == trnmtDict[self.room_group_name].matchWinnerBracket.p1.username:
 			await self.send(text_data=json.dumps({"t_state" : "final-match-preview", "tkey" : self.room_group_name, "matchWinner" : {"player1" : trnmtDict[self.room_group_name].matchWinnerBracket.p1.username, "player2" : trnmtDict[self.room_group_name].matchWinnerBracket.p2.username}, "matchLooser" : {"player1" : trnmtDict[self.room_group_name].matchLoserBracket.p1.username, "player2" : trnmtDict[self.room_group_name].matchLoserBracket.p2.username}}))
 			if trnmtDict[self.room_group_name].matchWinnerBracket.launchable and not trnmtDict[self.room_group_name].matchWinnerBracket.played:
 				await self.launchGame(trnmtDict[self.room_group_name].matchWinnerBracket, 2)
@@ -235,9 +204,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			jwt_l = data.get("jwt-list")
 			
 			for elem in jwt_l :
-				print("Updating ", self.name, "\nelem", elem, file=sys.stderr)
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
-					print("Updated ", self.name, file=sys.stderr)
 					self.guests = elem["invites"]
 		elif action == "ShowResults" :
 			dicoInfo = {
@@ -250,38 +217,35 @@ class GameConsumer(AsyncWebsocketConsumer):
 			}
 			await self.send(text_data=json.dumps(dicoInfo))
 
+			await asyncio.sleep(5)
+
+			trnmtDict.pop(self.room_group_name)
+
+			await asyncio.sleep(2)
+
+			await self.sendReload(text_data)
+
 		elif action == "supervise" and self.name == data.get("player", None):
-			# print(f"A0 - {action}", file=sys.stderr)
 			roundMatch = data.get("round", 1)
-			# print(f"A1 - {roundMatch}", file=sys.stderr)
 			mKey = data.get("mKey", None)
 			tkey = data.get("tkey", None)
-			# print(f"A2 - {mKey}", file=sys.stderr)
 			if not mKey:
-				# print(f"A3 - END", file=sys.stderr)
 				return 
-			# print(f"A4 - ", file=sys.stderr)
 
 			trnmt = trnmtDict[tkey]
-			# print(f"A5 - {trnmt}", file=sys.stderr)
 			task = asyncio.create_task(supervise_match(mKey))
 			results = await task
-			# print(f"A6 - {results}", file=sys.stderr)
 			if int(roundMatch) == 1 : 
 				if int(results["score1"]) == 5 : 
 					matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
 				else :
-					# print(f"A8 - res2", file=sys.stderr)
 					matchId, nextToLaunch = await setResults(trnmt, results["username2"], roundMatch, results['matchKey'])
 			elif int(roundMatch) == 2 :
 				if int(results["score1"]) == 5 : 
 					matchId, nextToLaunch = await setResults(trnmt, results["username1"], roundMatch, results['matchKey'])
 				else :
-					# print(f"A8 - res2", file=sys.stderr)
 					matchId, nextToLaunch = await setResults(trnmt, results["username2"], roundMatch, results['matchKey'])
 			
-			# print("TOURNAMENT MATCH FINISHED !!!!!!!!!!!!!!!!!!!!!!!!!!!", file=sys.stderr)
-			# if self.name == 
 			dicoInfo = {
 				"t_state" : "game-finished",
 				"matchId" : matchId,
@@ -290,7 +254,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 				"tkey" : self.room_group_name
 			}
 			if trnmt.first and trnmt.second and trnmt.third and trnmt.fourth :
-				print("SETING RESULTS !!", file=sys.stderr)
 
 				dicoInfo2 = {
 					"t_state" : "results",
@@ -309,21 +272,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 					}
 				)
 
-
-				# dicoInfo["first"] = trnmt.first.username
-				# dicoInfo["second"] = trnmt.second.username
-				# dicoInfo["third"] = trnmt.third.username
-				# dicoInfo["fourth"] = trnmt.fourth.username
 			await self.send(text_data=json.dumps(dicoInfo))
 
 
 
 	async def tempReceived(self, event) :
-		# print(f"tempReceived : {event}", file=sys.stderr)
 		await self.receive(event["text_data"])
 
 	async def sendHB(self, event) :
 		await self.send(text_data=json.dumps({"t_state" : "Someone-joined-left"}))
+
+	async def sendReload(self, event) :
+		await self.send(text_data=json.dumps({"t_state" : "Back-to-main"}))
 
 	
 	
