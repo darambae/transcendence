@@ -20,8 +20,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8050
 # Remove the comment below so that you can run without elk
-#ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
-
-# CMD ["tail", "-f", "/dev/null"]
 CMD ["sh", "-c", "daphne -e ssl:8050:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]

@@ -2,7 +2,6 @@ import logging
 import time
 from functools import wraps
 
-# Loggers for game server service
 game_logger = logging.getLogger('game.server')
 match_logger = logging.getLogger('game.matches')
 stream_logger = logging.getLogger('game.streams')
@@ -79,27 +78,32 @@ def log_game_api_request(action_type='GAME_API_CALL', **kwargs):
     """Log API requests specific to game service"""
     def decorator(func):
         @wraps(func)
-        def wrapper(self, request, *args, **func_kwargs):
+        def wrapper(*args, **func_kwargs):
+            if len(args) > 1 and hasattr(args[1], 'method'):
+                request = args[1]
+            elif len(args) > 0 and hasattr(args[0], 'method'):
+                request = args[0]
+            else:
+                return func(*args, **func_kwargs)
+                
             start_time = time.time()
             
             api_logger.info(f"Game API Request Started: {action_type}", extra={
                 'action_type': action_type,
                 'view_name': func.__name__,
-                'class_name': self.__class__.__name__,
-                'method': request.method,
-                'path': request.path,
+                'http_method': request.method,
+                'request_path': request.path, 
                 'request': request,
                 **kwargs
             })
             
             try:
-                response = func(self, request, *args, **func_kwargs)
+                response = func(*args, **func_kwargs)
                 duration = time.time() - start_time
                 
                 api_logger.info(f"Game API Request Completed: {action_type}", extra={
                     'action_type': action_type,
                     'view_name': func.__name__,
-                    'class_name': self.__class__.__name__,
                     'status_code': getattr(response, 'status_code', 'unknown'),
                     'duration_ms': round(duration * 1000, 2),
                     'request': request,
@@ -114,7 +118,6 @@ def log_game_api_request(action_type='GAME_API_CALL', **kwargs):
                 api_logger.error(f"Game API Request Failed: {action_type}", extra={
                     'action_type': action_type,
                     'view_name': func.__name__,
-                    'class_name': self.__class__.__name__,
                     'error_type': type(e).__name__,
                     'error_message': str(e),
                     'duration_ms': round(duration * 1000, 2),

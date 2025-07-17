@@ -102,7 +102,7 @@ services:
     restart: always
 
 
-  ################## Auth ##################
+################## Auth ##################
 
   auth:
     build:
@@ -119,8 +119,7 @@ services:
         condition: service_completed_successfully
       logstash:
         condition: service_started
-    # environment:
-    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+
     env_file:
       - .env
     restart: always
@@ -164,10 +163,6 @@ services:
     volumes:
       - ./backend/mail:/app
       - certs:/certs
-    # environment:
-    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-    #   - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-    #   - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
     env_file:
       - .env
     depends_on:
@@ -178,7 +173,7 @@ services:
       - mail_network
       - elk_network
 
-  ############### Game import ##################
+  ############### Game ##################
   server_pong:
     build: 
       context: ./backend/server_pong/
@@ -273,12 +268,6 @@ services:
       - elk_network
     environment:
       LS_JAVA_OPTS: "-Xmx1g -Xms1g"
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost:9600/_node/stats"]
-    #   interval: 1m30s
-    #   timeout: 30s
-    #   retries: 5
-    #   start_period: 30s
     restart: unless-stopped
 
   elasticsearch:
@@ -367,6 +356,3 @@ networks:
   game_network:
     name: game_network
     driver: bridge
-  # jwt_network:
-  #   name: jwt_network
-  #   driver: bridge

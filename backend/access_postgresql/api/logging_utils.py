@@ -8,16 +8,26 @@ performance_logger = logging.getLogger('performance')
 def log_api_request(action_type='API_CALL', **kwargs):
     def decorator(func):
         @wraps(func)
-        def wrapper(self, request, *args, **kwargs):
+        def wrapper(*args, **func_kwargs):
+            # Handle both function-based and class-based views
+            if len(args) > 1 and hasattr(args[1], 'method'):
+                # Class-based view: first argument is self, second is request
+                request = args[1]
+            elif len(args) > 0 and hasattr(args[0], 'method'):
+                # Function-based view: first argument is request
+                request = args[0]
+            else:
+                # No valid request found
+                return func(*args, **func_kwargs)
+                
             start_time = time.time()
             
             # Log the incoming request
             api_logger.info(f"API Request Started: {action_type}", extra={
                 'action_type': action_type,
                 'view_name': func.__name__,
-                'class_name': self.__class__.__name__,
-                'method': request.method,
-                'path': request.path,
+                'http_method': request.method,  # Changed from 'method' to 'http_method'
+                'request_path': request.path,   # Changed from 'path' to 'request_path'
                 'query_params': dict(request.GET),
                 'content_length': request.META.get('CONTENT_LENGTH', 0),
                 'request': request,
@@ -25,14 +35,13 @@ def log_api_request(action_type='API_CALL', **kwargs):
             })
             
             try:
-                response = func(self, request, *args, **kwargs)
+                response = func(*args, **func_kwargs)
                 duration = time.time() - start_time
                 
                 # Log successful response
                 api_logger.info(f"API Request Completed: {action_type}", extra={
                     'action_type': action_type,
                     'view_name': func.__name__,
-                    'class_name': self.__class__.__name__,
                     'status_code': getattr(response, 'status_code', 'unknown'),
                     'duration_ms': round(duration * 1000, 2),
                     'request': request,
@@ -59,7 +68,6 @@ def log_api_request(action_type='API_CALL', **kwargs):
                 api_logger.error(f"API Request Failed: {action_type}", extra={
                     'action_type': action_type,
                     'view_name': func.__name__,
-                    'class_name': self.__class__.__name__,
                     'error_type': type(e).__name__,
                     'error_message': str(e),
                     'duration_ms': round(duration * 1000, 2),

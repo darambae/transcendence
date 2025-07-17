@@ -155,7 +155,7 @@ def getSimulationState(request):
         return JsonResponse({'error': 'Simulation not found'}, status=404)
 
 async def  checkForUpdates(uriKey, key) :
-    connection_id = str(uuid.uuid4())[:8]  # Generate a short connection ID for logging
+    connection_id = str(uuid.uuid4())[:8]
     
     try:
         log_stream_connection_event('STREAM_CONNECT_ATTEMPT', connection_id=connection_id, 
@@ -180,7 +180,6 @@ async def  checkForUpdates(uriKey, key) :
                                                 new_state=msg_data.get("state"),
                                                 trigger="stream_update")
                     except:
-                        # Don't crash if message parsing fails
                         pass
                 
                 yield f"data: {message}\n\n"
@@ -205,7 +204,7 @@ async def sseCheck(request) :
         log_server_event('SSE_CHECK_AUTH_FAILED', 
                         server_id=request.META.get('REMOTE_ADDR', 'unknown'),
                         status='unauthorized')
-        return HttpResponse401() # Set an error
+        return HttpResponse401()
         
     username = JWT[0]['payload'].get("username", "unknown")
     invites = JWT[0]['payload'].get("invites", [])
@@ -235,7 +234,7 @@ async def sse(request):
                      api_key_provided=apikey)
         return JsonResponse({'error': 'Invalid API key'}, status=400)
 
-    if idplayer == 0:  # Observer mode
+    if idplayer == 0:
         idp1 = int(request.GET.get("JWTidP1"))
         idp2 = int(request.GET.get("JWTidP2"))
         
@@ -261,7 +260,7 @@ async def sse(request):
                 content_type="text/event-stream"
             )
 
-    elif idplayer == 1:  # Player 1
+    elif idplayer == 1:
         idp1 = int(request.GET.get("JWTid"))
         
         if idp1 < 0:
@@ -281,7 +280,7 @@ async def sse(request):
                 content_type="text/event-stream"
             )
         
-    else:  # Player 2
+    else: 
         idp2 = int(request.GET.get("JWTid"))
         
         if idp2 < 0:
@@ -301,10 +300,9 @@ async def sse(request):
                 content_type="text/event-stream"
             )
 
-@csrf_exempt  # This exempts the view from CSRF verification
+@csrf_exempt 
 @log_game_api_request(action_type='SET_API_KEY_SP')
 def setApiKeySp(request):
-    # Log the request details to help debug cross-origin issues
     game_logger.info(f"Processing setApiKeySp request", 
                     extra={
                         'path': request.path,
@@ -314,14 +312,12 @@ def setApiKeySp(request):
                         'content_type': request.content_type or 'none',
                     })
     
-    # Ensure we have a proper request object
     if not request:
         log_game_error('MISSING_REQUEST', 
                      error_details='Request object missing in setApiKeySp',
                      error_type='TypeError')
         return JsonResponse({'error': 'Internal server error: Missing request'}, status=500)
     
-    # Debug logging to track the issue
     game_logger.info(f"setApiKeySp called with request method: {request.method}", 
                     extra={'path': request.path, 'method': request.method})
     
@@ -331,7 +327,7 @@ def setApiKeySp(request):
         log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
                      error_details='Missing or invalid JWT',
                      ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401() # Set an error
+        return HttpResponse401()
         
     user_id = JWT[0]['payload'].get('username', 'unknown')
     
@@ -345,14 +341,12 @@ def setApiKeySp(request):
                          user_id=user_id)
             return JsonResponse({'error': 'Missing API key'}, status=400)
         
-        # Register the API key
         dictApiSp[apikey] = 1
         apiKeys.append(apikey)
         
         log_game_event('API_KEY_REGISTERED', 
                      game_id=apikey, 
-                     player1_id=user_id,
-                     event_type='single_player')
+                     player1_id=user_id)
         
         return JsonResponse({"playable": "Game can start"})
         
@@ -377,10 +371,7 @@ def setApiKey(request):
         log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
                      error_details='Missing or invalid JWT',
                      ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401() # Set an error 
-    # fil = open('test.txt', 'w+')
-    # #print(f" Jwt : {JWT[0]}", file=fil)
-    # fil.close()
+        return HttpResponse401()
     user_id = JWT[0]['payload'].get('username', 'unknown')
     apikey = json.loads(request.body).get('apiKey')
     if not apikey:
@@ -425,12 +416,11 @@ def isGamePlayable(request):
         log_game_error('UNAUTHORIZED_GAME_CHECK', 
                 error_details='Missing or invalid JWT',
                 ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401() # Set an error 
+        return HttpResponse401()
     
     apikey = json.loads(request.body).get('apiKey')
     user_id = JWT[0]['payload'].get('username', 'unknown')
 
-    # Debug logging
     try:
         with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
             print(f"[DEBUG] isGamePlayable called - apikey: {apikey}", file=f)
@@ -442,13 +432,10 @@ def isGamePlayable(request):
     except Exception as e:
         print(f"Debug logging error: {e}", file=sys.stderr)
     
-    # Check if this room is already playable
     if apikey in apiKeys:
         return JsonResponse({"playable": "Game can start"})
     
-    # Use the new player tracking logic
     if apikey in dictApiPlayers and len(dictApiPlayers[apikey]) >= 2:
-        # Move to playable if not already there
         if apikey in apiKeysUnplayable:
             apiKeysUnplayable.remove(apikey)
         if apikey not in apiKeys:
@@ -465,10 +452,7 @@ def isGamePlayable(request):
                 game_id=apikey,
                 player_id=user_id,
                 player_count=dictApi.get(apikey, 0))
-            
-
     
-    # Debug logging
     try:
         with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
             print(f"[DEBUG] Returning playable: {playable}", file=f)
@@ -491,7 +475,6 @@ def get_api_key(request):
     except Exception as e:
         print(f"Debug logging error: {e}", file=sys.stderr)
     
-
     if not JWT[0] :
         return HttpResponseNoContent() # Set an error 
     api_key = str(uuid.uuid4())
@@ -508,11 +491,9 @@ async def sendNewJSON(request):
     message = dictionnaryJson.get("message", {})
 
     if not api_key:
-        return HttpResponse(status=400)  # apiKey manquant
+        return HttpResponse(status=400)
 
     m2 = json.loads(message)
-    # Obtenir ou créer un lock pour cette apiKey
-    # print(f"message : {message}", file=sys.stderr)
     speed = 15
     if m2["action"] == 'move' :
         try :
@@ -550,13 +531,10 @@ async def forfaitUser(request) :
     JWT = decodeJWT(request, "forfeitUser")
     if not JWT[0] :
         return HttpResponse401() # Set an error 
-   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
     apikey = request.GET.get("apikey")
     idplayer = request.GET.get("idplayer")
     rq = RequestParsed(apikey, {})
-    #print("---------------------6>   ->  -> Trying to disconnect ", file=sys.stderr)
     if (rq.apiKey) :
-       # print("Yay", file=sys.stderr)
         await channel_layer.group_send(
             rq.apiKey,
             {
@@ -572,7 +550,6 @@ async def forfaitUser(request) :
             except KeyError :
                 return HttpResponseNoContent()
         
-        # Clean up player tracking
         try:
             dictApiPlayers.pop(apikey)
         except KeyError:
@@ -591,10 +568,8 @@ async def forfaitUser(request) :
 async def disconnectUsr(request) :
     JWT = decodeJWT(request, "disconnectUsr")
     if not JWT[0] :
-        return HttpResponse401() # Set an error 
-   # print(f" Jwt : {JWT[0]}", file=sys.stderr)
+        return HttpResponse401()
     apikey = request.GET.get("apikey")
-    #print("disco usr", file=sys.stderr)
     await channel_layer.group_send(
         apikey,
         {
@@ -610,7 +585,6 @@ async def disconnectUsr(request) :
         except KeyError :
             return
     
-    # Clean up player tracking
     try:
         dictApiPlayers.pop(apikey)
     except KeyError:

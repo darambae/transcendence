@@ -13,3 +13,4 @@ python-logstash-async
 python-json-logger
 psycopg2-binary
 shortuuid
+asgiref

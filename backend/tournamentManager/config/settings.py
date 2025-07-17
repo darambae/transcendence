@@ -73,6 +73,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
+# ASGI configuration
+ASGI_APPLICATION = 'config.asgi.application'
+
 CORS_ALLOWED_ORIGINS = ['*']
 
 TEMPLATES = [
@@ -90,7 +93,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'  # Commented out for ASGI mode
 
 
 # Database

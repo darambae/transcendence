@@ -5,23 +5,29 @@ from functools import wraps
 api_logger = logging.getLogger('api')
 
 def log_api_request(action_type='USER_API_CALL', **kwargs):
-    """Log API requests specific to user service"""
     def decorator(func):
         @wraps(func)
-        def wrapper(request, *args, **func_kwargs):
+        def wrapper(*args, **func_kwargs):
+            if len(args) > 1 and hasattr(args[1], 'method'):
+                request = args[1]
+            elif len(args) > 0 and hasattr(args[0], 'method'):
+                request = args[0]
+            else:
+                return func(*args, **func_kwargs)
+                
             start_time = time.time()
             
             api_logger.info(f"User API Request Started: {action_type}", extra={
                 'action_type': action_type,
                 'view_name': func.__name__,
-                'method': request.method,
-                'path': request.path,
+                'http_method': request.method,  
+                'request_path': request.path, 
                 'request': request,
                 **kwargs
             })
             
             try:
-                response = func(request, *args, **func_kwargs)
+                response = func(*args, **func_kwargs)
                 duration = time.time() - start_time
                 
                 api_logger.info(f"User API Request Completed: {action_type}", extra={
@@ -53,7 +59,6 @@ def log_api_request(action_type='USER_API_CALL', **kwargs):
     return decorator
 
 def log_authentication_event(event_type, user=None, success=True, **kwargs):
-    """Log authentication events"""
     api_logger.info(f"Auth Event: {event_type}", extra={
         'auth_event_type': event_type,
         'user_id': getattr(user, 'id', None) if user else None,
@@ -64,7 +69,6 @@ def log_authentication_event(event_type, user=None, success=True, **kwargs):
     })
 
 def log_validation_error(validation_type, error_details, **kwargs):
-    """Log validation errors"""
     api_logger.warning(f"Validation Error: {validation_type}", extra={
         'validation_type': validation_type,
         'error_details': error_details,
@@ -73,12 +77,11 @@ def log_validation_error(validation_type, error_details, **kwargs):
     })
 
 def log_external_request(service_name, method, url, status_code=None, error=None, **kwargs):
-    """Log external service requests"""
     if error:
         api_logger.error(f"External Request Failed: {service_name}", extra={
             'service_name': service_name,
-            'method': method,
-            'url': url,
+            'http_method': method,
+            'request_url': url, 
             'error_message': str(error),
             'log_category': 'external_request',
             **kwargs
@@ -86,15 +89,14 @@ def log_external_request(service_name, method, url, status_code=None, error=None
     else:
         api_logger.info(f"External Request: {service_name}", extra={
             'service_name': service_name,
-            'method': method,
-            'url': url,
+            'http_method': method,  
+            'request_url': url,
             'status_code': status_code,
             'log_category': 'external_request',
             **kwargs
         })
 
 def log_user_action(action_type, username=None, success=True, **kwargs):
-    """Log user actions like profile updates, friend actions"""
     api_logger.info(f"User Action: {action_type}", extra={
         'user_action_type': action_type,
         'username': username,
@@ -104,11 +106,10 @@ def log_user_action(action_type, username=None, success=True, **kwargs):
     })
 
 def log_file_operation(operation_type, filename=None, file_size=None, success=True, **kwargs):
-    """Log file operations like avatar uploads"""
     level = api_logger.info if success else api_logger.error
     level(f"File Operation: {operation_type}", extra={
         'file_operation_type': operation_type,
-        'filename': filename,
+        'file_name': filename,
         'file_size_bytes': file_size,
         'operation_success': success,
         'log_category': 'file_operation',
@@ -116,7 +117,6 @@ def log_file_operation(operation_type, filename=None, file_size=None, success=Tr
     })
 
 def log_friend_action(action_type, username=None, target_user=None, success=True, **kwargs):
-    """Log friend-related actions"""
     api_logger.info(f"Friend Action: {action_type}", extra={
         'friend_action_type': action_type,
         'username': username,
@@ -125,3 +125,42 @@ def log_friend_action(action_type, username=None, target_user=None, success=True
         'log_category': 'friend_action',
         **kwargs
     })
+
+def log_password_change(success=True, error_reason=None, **kwargs):
+    level = api_logger.info if success else api_logger.warning
+    level(f"Password Change: {'SUCCESS' if success else 'FAILED'}", extra={
+        'password_change_success': success,
+        'error_reason': error_reason,
+        'log_category': 'password_change',
+        **kwargs
+    })
+
+def log_search_action(search_type, query=None, results_count=None, success=True, **kwargs):
+    api_logger.info(f"Search Action: {search_type}", extra={
+        'search_type': search_type,
+        'query': query,
+        'results_count': results_count,
+        'search_success': success,
+        'log_category': 'search_action',
+        **kwargs
+    })
+
+def log_proxy_request(target_service, method, endpoint, status_code=None, error=None, **kwargs):
+    if error:
+        api_logger.error(f"Proxy Request Failed: {target_service}", extra={
+            'target_service': target_service,
+            'http_method': method,
+            'endpoint': endpoint,
+            'error_message': str(error),
+            'log_category': 'proxy_request',
+            **kwargs
+        })
+    else:
+        api_logger.info(f"Proxy Request: {target_service}", extra={
+            'target_service': target_service,
+            'http_method': method,
+            'endpoint': endpoint,
+            'status_code': status_code,
+            'log_category': 'proxy_request',
+            **kwargs
+        })

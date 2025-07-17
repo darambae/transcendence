@@ -15,10 +15,8 @@ import re
 from .utils import setTheCookie
 from .logging_utils import (
     log_api_request, log_authentication_event, log_external_request, log_validation_error, log_user_action, 
-    log_file_operation, log_friend_action, api_logger as user_logger
+    log_file_operation, log_friend_action, log_password_change, log_search_action, api_logger as user_logger
 )
-
-
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
@@ -158,6 +156,7 @@ class infoUser(APIView):
 class infoOtherUser(APIView):
     permission_classes = [AllowAny]
 
+    @log_api_request(action_type='GET_OTHER_USER_INFO')
     def get(self, request, username):
         token = request.COOKIES.get('access_token')
 
@@ -170,9 +169,15 @@ class infoOtherUser(APIView):
                     'Host': 'localhost',
                 }
             )
+            
+            log_external_request('access_postgresql', 'GET', f'infoOtherUser/{username}', 
+                               status_code=response.status_code, target_user=username)
+            
             return Response(response.json(), status=response.status_code)
 
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
+            log_external_request('access_postgresql', 'GET', f'infoOtherUser/{username}', 
+                               error=str(e), target_user=username)
             return Response({'error': 'Access to access_postgres failed'}, status=500)
 
 
@@ -180,8 +185,13 @@ class infoOtherUser(APIView):
 class avatar(APIView):
     permission_classes = [AllowAny]
 
+    @log_api_request(action_type='GET_AVATAR')
     def get(self, request):
         token = request.COOKIES.get('access_token')
+        
+        if not token:
+            log_authentication_event('missing_token', success=False)
+            return JsonResponse({'error': 'No access token'}, status=401)
         
         try:
             response = requests.get(
@@ -192,24 +202,50 @@ class avatar(APIView):
                     'Host': 'localhost'
                 }
             )
-            path = None
             
-            if response.status_code == 200:
-                data = response.json()
-                path = data['avatar']
-            if path:
-                full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
-                return FileResponse(open(full_path, 'rb'), content_type='image/png')
-            else:
+            log_external_request('access_postgresql', 'GET', 'InfoUser', 
+                               status_code=response.status_code, operation='avatar_fetch')
+            
+            if response.status_code != 200:
+                log_file_operation('avatar_serve', success=False, 
+                                 error_reason=f'User info request failed: {response.status_code}')
                 return JsonResponse({'error': 'not authorized'}, status=401)
-        except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=401)
+            
+            try:
+                data = response.json()
+                path = data.get('avatar')
+            except (ValueError, KeyError) as e:
+                log_file_operation('avatar_serve', success=False, 
+                                 error_reason=f'Invalid user data response: {str(e)}')
+                return JsonResponse({'error': 'Invalid user data'}, status=500)
+            
+            if path:
+                try:
+                    full_path = os.path.join(settings.MEDIA_ROOT, 'imgs', path)
+                    log_file_operation('avatar_serve', filename=path, success=True)
+                    return FileResponse(open(full_path, 'rb'), content_type='image/png')
+                except (OSError, IOError) as e:
+                    log_file_operation('avatar_serve', filename=path, success=False, 
+                                     error_reason=f'File access error: {str(e)}')
+                    return JsonResponse({'error': 'Avatar file not found'}, status=404)
+            else:
+                log_file_operation('avatar_serve', success=False, error_reason='No avatar path in user data')
+                return JsonResponse({'error': 'No avatar set'}, status=404)
+                
+        except requests.exceptions.RequestException as e:
+            log_external_request('access_postgresql', 'GET', 'InfoUser', error=str(e))
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
 
 class avatarOther(APIView):
     permission_classes = [AllowAny]
 
+    @log_api_request(action_type='GET_OTHER_AVATAR')
     def get(self, request, username):
         token = request.COOKIES.get('access_token')
+
+        if not token:
+            log_authentication_event('missing_token', success=False)
+            return JsonResponse({'error': 'No access token'}, status=401)
 
         try:
             response = requests.get(
@@ -220,18 +256,42 @@ class avatarOther(APIView):
                     'Host': 'localhost'
                 }
             )
-            path = None
-
-            if response.status_code == 200:
-                data = response.json()
-                path = data['avatar']
-            if path:
-                full_path = os.path.join(settings.MEDIA_ROOT + 'imgs', path)
-                return FileResponse(open(full_path, 'rb'), content_type='image/png')
-            else:
+            
+            log_external_request('access_postgresql', 'GET', f'infoOtherUser/{username}', 
+                               status_code=response.status_code, target_user=username, 
+                               operation='avatar_fetch')
+            
+            if response.status_code != 200:
+                log_file_operation('other_avatar_serve', success=False, target_user=username,
+                                 error_reason=f'User info request failed: {response.status_code}')
                 return JsonResponse({'error': 'not authorized'}, status=401)
-        except requests.exceptions.RequestException:
-            return Response({'error': 'Access to access_postgres failed'}, status=401)
+
+            try:
+                data = response.json()
+                path = data.get('avatar')
+            except (ValueError, KeyError) as e:
+                log_file_operation('other_avatar_serve', success=False, target_user=username,
+                                 error_reason=f'Invalid user data response: {str(e)}')
+                return JsonResponse({'error': 'Invalid user data'}, status=500)
+            
+            if path:
+                try:
+                    full_path = os.path.join(settings.MEDIA_ROOT, 'imgs', path)
+                    log_file_operation('other_avatar_serve', filename=path, success=True, target_user=username)
+                    return FileResponse(open(full_path, 'rb'), content_type='image/png')
+                except (OSError, IOError) as e:
+                    log_file_operation('other_avatar_serve', filename=path, success=False, target_user=username,
+                                     error_reason=f'File access error: {str(e)}')
+                    return JsonResponse({'error': 'Avatar file not found'}, status=404)
+            else:
+                log_file_operation('other_avatar_serve', success=False, target_user=username, 
+                                 error_reason='No avatar path in user data')
+                return JsonResponse({'error': 'No avatar set'}, status=404)
+                
+        except requests.exceptions.RequestException as e:
+            log_external_request('access_postgresql', 'GET', f'infoOtherUser/{username}', 
+                               error=str(e), target_user=username)
+            return Response({'error': 'Access to access_postgres failed'}, status=500)
 
 
 
@@ -293,6 +353,7 @@ class saveImg(APIView):
 class savePrivateInfo(APIView):
     permission_classes = [AllowAny]
 
+    @log_api_request(action_type='UPDATE_PRIVATE_INFO')
     def patch(self, request):
         token = request.COOKIES.get('access_token')
         url_access = "https://access_postgresql:4000/api/uploadPrivateInfoUser/"
@@ -300,19 +361,32 @@ class savePrivateInfo(APIView):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
+            log_validation_error('invalid_json', 'JSON decode error in private info update')
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
         if not data.get('firstName', '').strip():
+            log_validation_error('empty_first_name', 'First name is empty in private info update')
             return JsonResponse({'error': 'firstName is empty'}, status=400)
 
         if not data.get('lastName', '').strip():
+            log_validation_error('empty_last_name', 'Last name is empty in private info update')
             return JsonResponse({'error': 'lastName is empty'}, status=400)
 
         try:
-            response = requests.patch(url_access, json=data, verify=False, headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
+            response = requests.patch(url_access, json=data, verify=False, 
+                                    headers={'Host': 'localhost', 'Authorization': f"bearer {token}"})
+            
+            log_external_request('access_postgresql', 'PATCH', 'uploadPrivateInfoUser', 
+                               status_code=response.status_code)
+            
+            if response.status_code == 200:
+                log_user_action('private_info_update', success=True)
+            else:
+                log_user_action('private_info_update', success=False)
 
             return JsonResponse(response.json(), status=response.status_code)
         except requests.exceptions.RequestException as e:
+            log_external_request('access_postgresql', 'PATCH', 'uploadPrivateInfoUser', error=str(e))
             return JsonResponse({'error': 'Internal request failed', 'details': str(e)}, status=500)
 
 
