@@ -66,8 +66,6 @@ async def setTheCookie(response, access=None, refresh=None) :
 			httponly=True,
 			samesite='Lax'
 		)
-	# with open("log-auth-cookie.txt", "w+") as f :
-	# 	# print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
 	return response
 
 async def decodeJWT(request, func=None, encodedJwt=None) :
@@ -76,36 +74,24 @@ async def decodeJWT(request, func=None, encodedJwt=None) :
 	if not encodedJwt :
 		log_tournament_event('JWT_DECODE_FAILED', reason='missing_token', function=func)
 		return [None] * 3
-	
-	try:
-		res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', 
-		                  headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, 
-		                  verify=False, timeout=10)
-		res_json = res.json()
-		
-		if res.status_code != 200 :
-			if (res_json.get('error') == "Token expired"):
-				log_tournament_event('JWT_TOKEN_EXPIRED', function=func, attempting_refresh=True)
-				refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', 
-				                         headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, 
-				                         verify=False, timeout=10)
-				if refresh_res.status_code == 200:
-					new_access_token = refresh_res.json().get('access')
-					res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',
-					                   headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, 
-					                   verify=False, timeout=10)
-					res2 = await setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-					log_tournament_event('JWT_TOKEN_REFRESHED', function=func)
-					return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-				log_tournament_event('JWT_REFRESH_FAILED', function=func)
-				return [None] * 3
-			log_tournament_event('JWT_DECODE_FAILED', function=func, status_code=res.status_code, 
-			                   error=res_json.get('error', 'unknown'))
+
+	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+	res_json = res.json()
+	if res.status_code != 200 :
+		if (res_json.get('error') == "Token expired"):
+			log_tournament_event('JWT_TOKEN_EXPIRED', function=func, attempting_refresh=True)
+			refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+			if refresh_res.status_code == 200:
+				new_access_token = refresh_res.json().get('access')
+				res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+				res2 = await setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+				log_tournament_event('JWT_TOKEN_REFRESHED', function=func)
+				return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+			log_tournament_event('JWT_REFRESH_FAILED', function=func)
 			return [None] * 3
-		return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
-	except requests.RequestException as e:
-		log_tournament_event('JWT_DECODE_NETWORK_ERROR', function=func, error_message=str(e))
+		log_tournament_event('JWT_DECODE_FAILED', function=func, status_code=res.status_code, error=res_json.get('error', 'unknown'))
 		return [None] * 3
+	return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 
 @csrf_exempt
@@ -116,11 +102,9 @@ async def launchMatch(request) :
 		tkey = body["tKey"]
 		
 		log_tournament_match('MATCH_LAUNCH_REQUEST', tournament_id=tkey)
-		
 		if tkey not in trnmtDict:
 			log_tournament_event('TOURNAMENT_NOT_FOUND', tournament_id=tkey, action='launch_match')
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
-			
 		if trnmtDict[tkey].launched :
 			log_tournament_event('TOURNAMENT_ALREADY_LAUNCHED', tournament_id=tkey)
 			return JsonResponse({"Error" : "Tournament already launched"}, status=403)
@@ -147,9 +131,7 @@ async def launchMatch(request) :
 			}
 		)
 		
-		log_tournament_event('GUEST_UPDATE_SENT', tournament_id=tkey, jwt_count=len(lsTrnmtJwt))
-		
-		asyncio.sleep(1000)
+		asyncio.sleep(5)
 
 		await channel_layer.group_send(
 			tkey,
@@ -214,7 +196,6 @@ async def launchNextMatch(request) :
 		tkey = body["tKey"]
 		
 		log_tournament_match('NEXT_MATCH_REQUEST', tournament_id=tkey)
-		
 		if tkey not in trnmtDict:
 			log_tournament_event('TOURNAMENT_NOT_FOUND', tournament_id=tkey, action='launch_next_match')
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
@@ -227,8 +208,6 @@ async def launchNextMatch(request) :
 		if trnmtDict[tkey].launched == False :
 			log_tournament_event('TOURNAMENT_NOT_LAUNCHED', tournament_id=tkey, action='launch_next_match')
 			return JsonResponse({"Error": "Forbidden"}, status=403)
-			
-		# Check if tournament is complete
 		if (trnmtDict[tkey].first and trnmtDict[tkey].second and trnmtDict[tkey].third and trnmtDict[tkey].fourth) :
 			log_tournament_event('TOURNAMENT_COMPLETED', tournament_id=tkey,
 			                   first=trnmtDict[tkey].first.username,
@@ -257,7 +236,6 @@ async def launchNextMatch(request) :
 					"text_data": {"action" : "final-matches"}
 				}
 			)
-			
 		return JsonResponse({"Info" : "Ready to start"})
 	except TournamentError as e:
 		log_tournament_event('TOURNAMENT_ERROR', tournament_id=tkey if 'tkey' in locals() else None, 
@@ -273,7 +251,7 @@ async def launchNextMatch(request) :
 @log_tournament_api_request(action_type='CHECK_SSE_ACCESS')
 async def checkSSE(request) :
 	try:
-		jwt = await decodeJWT(request, "checkSSE")
+		jwt = await decodeJWT(request)
 		if not jwt[0] :
 			log_tournament_event('SSE_CHECK_UNAUTHORIZED', 
 			                   ip=request.META.get('REMOTE_ADDR', 'unknown'))
@@ -298,7 +276,7 @@ async def checkSSE(request) :
 @log_tournament_api_request(action_type='JOIN_GUEST_TO_TOURNAMENT')
 async def joinGuest(request) :
 	try:
-		jwt_token = await decodeJWT(request, "joinGuest")
+		jwt_token = await decodeJWT(request)
 		if not jwt_token[0] :
 			log_tournament_event('GUEST_JOIN_UNAUTHORIZED', 
 			                   ip=request.META.get('REMOTE_ADDR', 'unknown'))
@@ -311,18 +289,26 @@ async def joinGuest(request) :
 			log_tournament_event('GUEST_JOIN_INVALID_JWT', username=username if 'username' in locals() else 'unknown')
 			return JsonResponse({"Error": "Unauthorized"}, status=401)
 			
-		# Find tournament containing the user
 		tKey = None
 		for elem in trnmtDict :
 			if username in trnmtDict[elem].listUsr() :
 				tKey = elem
-				break
-
+		
 		if tKey not in trnmtDict:
 			log_tournament_event('GUEST_JOIN_TOURNAMENT_NOT_FOUND', username=username, guest=guest)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
-			
-		player = Player(jwt_payload, guest)
+		lsTrnmtJwt = trnmtDict[tKey].listJWT()
+		await channel_layer.group_send(
+			tKey,
+			{
+				"type": "tempReceived",
+				"text_data": {"action" : "update-guest", "jwt-list" : lsTrnmtJwt}
+			}
+		)
+
+		asyncio.sleep(0.5)
+
+		player = Player(jwt_token, guest)
 		trnmtDict[tKey].addPlayers(player)
 		
 		log_tournament_event('GUEST_JOINED_TOURNAMENT', tournament_id=tKey, 
@@ -342,7 +328,7 @@ async def joinGuest(request) :
 async def joinTournament(request):
 	try:
 		body = json.loads(request.body)
-		jwt_token = await decodeJWT(request, "joinTournament")
+		jwt_token = await decodeJWT(request)
 		if not jwt_token[0] :
 			log_tournament_event('JOIN_TOURNAMENT_UNAUTHORIZED', 
 			                   ip=request.META.get('REMOTE_ADDR', 'unknown'))
@@ -355,7 +341,7 @@ async def joinTournament(request):
 			return JsonResponse({"Error": "Unauthorized"}, status=401)
 			
 		tKey = body["tKey"]
-
+		
 		if tKey not in trnmtDict:
 			log_tournament_event('JOIN_TOURNAMENT_NOT_FOUND', tournament_id=tKey, username=username)
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
@@ -378,7 +364,7 @@ async def joinTournament(request):
 		                   username=username, player_count=trnmtDict[tKey].nbPl)
 
 		return JsonResponse({"key" : tKey, "main" : username})		
-
+		
 	except Exception as e:
 		log_tournament_event('JOIN_TOURNAMENT_UNEXPECTED_ERROR', 
 		                   tournament_id=tKey if 'tKey' in locals() else 'unknown',
@@ -434,22 +420,19 @@ async def getIds(request) :
 async def leaveTournament(request):
 	try :
 		body = json.loads(request.body)
-		jwt_token = await decodeJWT(request, "leaveTournament")
+		jwt_token = await decodeJWT(request)
 		if not jwt_token[0] :
 			log_tournament_event('LEAVE_TOURNAMENT_UNAUTHORIZED', 
 			                   ip=request.META.get('REMOTE_ADDR', 'unknown'))
 			return JsonResponse({"Error" : "Unauthorized"}, status=401)
 		encoded = request.COOKIES.get("access_token", None)
-		
 		try :
 			jwt_payload = jwt_token[0]["payload"]
 			username = jwt_payload["username"]
 		except Exception :
 			log_tournament_event('LEAVE_TOURNAMENT_INVALID_JWT')
 			return JsonResponse({"Error": "Unauthorized"}, status=401)
-			
 		tKey = body["tKey"]
-		
 		if tKey in trnmtDict :
 			listJWT = trnmtDict[tKey].listJWT()
 			listUsername = trnmtDict[tKey].listUsr()
@@ -509,6 +492,8 @@ async def leaveTournament(request):
 @log_tournament_api_request(action_type='CREATE_TOURNAMENT')
 async def createTournament(request) :
 	try :
+		if (len(list(trnmtDict.keys())) > 9) :
+			return JsonResponse({"Error" : "Already 10 tournaments"}, status=403)
 		tr = Tournament()
 		trnmtDict[tr.tKey] = tr
 		
@@ -566,7 +551,8 @@ async def tournamentManager(request) :
 @log_tournament_api_request(action_type='SUPERVISE_MATCH')
 async def Supervise(request) :
 	try :
-		jwt = await decodeJWT(request, "Supervise")
+		channel_layer = get_channel_layer()
+		jwt = await decodeJWT(request)
 		if not jwt[0]:
 			log_tournament_event('SUPERVISE_UNAUTHORIZED', 
 			                   ip=request.META.get('REMOTE_ADDR', 'unknown'))

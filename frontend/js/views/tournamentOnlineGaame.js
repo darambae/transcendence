@@ -12,7 +12,7 @@ export async function onlineGameTr(
 ) {
 	let sseTournament = getSSE();
 
-	sseTournament.onmessage = function (event) {
+	sseTournament.onmessage = async function (event) {
 		try {
 			// Skip heartbeat messages
 			if (
@@ -33,7 +33,7 @@ export async function onlineGameTr(
 				//  })
 				//}
 				if (data.mkey == key) {
-					actualizeIndexPage('contentTournementPage', routesTr['tournament']);
+					await actualizeIndexPage('contentTournementPage', routesTr['tournament']);
 				}
 			}
 			if (data.t_state == 'results') {

@@ -87,11 +87,9 @@ async def isWallIntersection(pos, spd, pointTrajectory, timeLeft : float) -> flo
 		pos = intersectionPoint																																# Set the new ballPosition to the intersection with the wall
 		spd[1] = -spd[1]
 		pos = await calculateLinearMovement(pos, spd, 2)
-		print("pos1 : ", pos, file=sys.stderr)
 		return (0.0, pos)																																					# Return the time to calculate after the reflexion
 	else :
 		pos = pointTrajectory				
-		print("pos2 : ", pos, file=sys.stderr)																											# No collision + No winning round --> Keep same vector and update value
 		return (0.0, pos)					
 
 async def getWallsHit(toReturn) -> None :
@@ -116,51 +114,50 @@ except Exception as e:
 @log_ai_operation('GET_POSITION')
 async def getActualPosition(apiKey) :
 	try :
-		res = requests.get(f"{urlRequests}server-pong/api/simulation?apikey={apiKey}")
+		res = requests.get(f"{urlRequests}server-pong/api/simulation?apikey={apiKey}", verify=False, headers={'Host' : 'localhost'})
 		if res.status_code != 200 :
 			return
 		else :
 			toReturn = res.json()
-			print("toreturn : ", toReturn, file=sys.stderr)
 			toReturn["ball"]["position"] = await getWallsHit(toReturn) #timeLeft = await self.isWallIntersection(linearMovementPoint, timeLeft)
-			print("toreturn222 : ", toReturn, file=sys.stderr)
 			return toReturn
 	except Exception as e :
 		print(f"error getActualPos : {e}", file=sys.stderr)
 
 @log_ai_operation('GAME_SESSION')
 async def sendInfo(apiKey) :
-    try :
-        position = await getActualPosition(apiKey)
-        actualTime = time.time()
-        ai_logger.info(f"Starting AI game session", extra={'api_key': apiKey})
-        while position["team1Score"] < 5 and position["team2Score"] < 5 :
-            racketY = position["player2"]
-            for j in range(20) :
-                posYAi = (racketY[1][1] + racketY[0][1]) / 2
-                resultStats = posYAi - position["ball"]["position"][1]
-                if resultStats < -5 :
-                    requests.post(f"{urlRequests}/server-pong/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "down"}'})
-                    racketY[0][1] -= 5
-                    racketY[1][1] -= 5
-                elif resultStats > 5 :
-                    requests.post(f"{urlRequests}/server-pong/send-message", json={"apiKey": apiKey, "message": '{"action": "move", "player2": "up"}'})
-                    racketY[0][1] += 5
-                    racketY[1][1] += 5
-                await asyncio.sleep(0.05)
-            position = await getActualPosition(apiKey)
-            performance_logger.info(f"AI processing cycle completed", extra={
+	try :
+		position = await getActualPosition(apiKey)
+		actualTime = time.time()
+		ai_logger.info(f"Starting AI game session", extra={'api_key': apiKey})
+		while position["team1Score"] < 5 and position["team2Score"] < 5 :
+			racketY = position["player2"]
+			for j in range(40) :
+				posYAi = (racketY[1][1] + racketY[0][1]) / 2
+				resultStats = posYAi - position["ball"]["position"][1]
+				if resultStats < -15 :
+					requests.post(f"{urlRequests}/server-pong/send-message", verify=False, json={"apiKey": apiKey, "message": '{"action": "move", "player2": "down"}'}, headers={'Host' : 'localhost'})
+					racketY[0][1] += 15
+					racketY[1][1] += 15
+				elif resultStats > 15 :
+					requests.post(f"{urlRequests}/server-pong/send-message", verify=False, json={"apiKey": apiKey, "message": '{"action": "move", "player2": "up"}'}, headers={'Host' : 'localhost'})
+					racketY[0][1] -= 15
+					racketY[1][1] -= 15
+				await asyncio.sleep(0.025)
+			position = await getActualPosition(apiKey)
+			# print(f"time Before last view : {time.time() - actualTime}", file=sys.stderr)
+			performance_logger.info(f"AI processing cycle completed", extra={
                 'api_key': apiKey,
                 'cycle_duration_ms': round((time.time() - actualTime) * 1000, 2)
             })
-            actualTime = time.time()
-        log_game_event('GAME_ENDED', api_key=apiKey, 
+			actualTime = time.time()
+			log_game_event('GAME_ENDED', api_key=apiKey, 
                       team1_score=position["team1Score"], 
                       team2_score=position["team2Score"])
                       
-    except Exception as e:
-        print(f"error : {e}", file=sys.stderr)
-        pass
+	except Exception as e:
+		print(f"error : {e}", file=sys.stderr)
+		pass
 
 @log_api_request(action_type='AI_INIT')
 def initAI(request) :

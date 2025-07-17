@@ -14,11 +14,11 @@ from datetime import datetime
 import requests
 from http import HTTPStatus
 from .logging_utils import (
-    log_game_api_request, log_game_event, log_game_error,
-    log_player_action, log_server_event, log_stream_connection_event, log_game_state_change, log_player_disconnect,
-    game_logger
+	log_game_api_request, log_game_event, log_game_error,
+	log_player_action, log_server_event, log_stream_connection_event, log_game_state_change, log_player_disconnect,
+	game_logger
 )
-
+import asyncio
 from serverPong.Racket import dictInfoRackets, wall1, wall2
 from serverPong.ball import calcIntersections
 
@@ -29,21 +29,21 @@ uri = "wss://server_pong:8030/ws/game/"
 uriJwt = "https://access_postgresql:4000/"
 
 class HttpResponseNoContent(HttpResponse):
-    status_code = HTTPStatus.NO_CONTENT
+	status_code = HTTPStatus.NO_CONTENT
 
 class HttpResponse401(HttpResponse):
-    status_code = 401
+	status_code = 401
 
 
 # apiKey is a string that identifies the game room
 
 class   RequestParsed :
-    def __init__(self, apiKey, action) :
-        if apiKey in apiKeys or apiKey in apiKeysUnplayable :
-            self.apiKey = apiKey
-        else :
-            self.apiKey = None
-        self.action = action
+	def __init__(self, apiKey, action) :
+		if apiKey in apiKeys or apiKey in apiKeysUnplayable :
+			self.apiKey = apiKey
+		else :
+			self.apiKey = None
+		self.action = action
 
 # Create your views here.
 
@@ -62,69 +62,28 @@ def setTheCookie(response, access=None, refresh=None) :
 			httponly=True,
 			samesite='Lax'
 		)
-	# with open("log-auth-cookie.txt", "w+") as f :
-	# 	print(f"body : {response}\naccess : {access}\nrefresh : {refresh}", file=f)
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-    # Use a default function name if none provided
-    log_func = func if func else "unknown"
-    
-    # Ensure the log file can be created, handle any potential errors
-    try:
-        with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f :
-            tm = datetime.now()
-            print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f) 
-    except (OSError, IOError) as e:
-        # If file creation fails, print to stderr instead
-        print(f"Warning: Could not create log file for {log_func}: {e}", file=sys.stderr)
-    
-    try:
-        with open(f"/app/{log_func}_decodeJWT.txt", "a+") as f : 
-            if not encodedJwt :
-                encodedJwt = request.COOKIES.get("access_token", None)
-            if not encodedJwt :
-                print("Error 1", file=f)
-                return [None] * 3
-            
-            print(f"encoded: {encodedJwt}", file=f)
-            res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-            print(f"res : {res}", file=f)
-            res_json = res.json()
-            print(f"res.json() : {res_json}", file=f)
-            if res.status_code != 200 :
-                print(f"Not recognized, code = {res.status_code} Body : {res.text}", file=f)
-                if (res_json.get('error') == "Token expired"):
-                    refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-                    if refresh_res.status_code == 200:
-                        new_access_token = refresh_res.json().get('access')
-                        res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-                        res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-                        return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-                    return [None] * 3
-                return [None] * 3
-            return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
-    except (OSError, IOError) as e:
-        # If file operations fail, continue without logging
-        print(f"Warning: Could not write to log file for {log_func}: {e}", file=sys.stderr)
-        # Continue with the JWT decoding logic without file logging
-        if not encodedJwt :
-            encodedJwt = request.COOKIES.get("access_token", None)
-        if not encodedJwt :
-            return [None] * 3
-        
-        res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-        res_json = res.json()
-        if res.status_code != 200 :
-            if (res_json.get('error') == "Token expired"):
-                refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
-                if refresh_res.status_code == 200:
-                    new_access_token = refresh_res.json().get('access')
-                    res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
-                    res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
-                    return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
-                return [None] * 3
-        return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
+	# Continue with the JWT decoding logic without file logging
+	if not encodedJwt :
+		encodedJwt = request.COOKIES.get("access_token", None)
+	if not encodedJwt :
+		return [None] * 3
+	
+	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+	res_json = res.json()
+	if res.status_code != 200 :
+		if (res_json.get('error') == "Token expired"):
+			refresh_res = requests.get(f'https://access_postgresql:4000/api/token/refresh', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
+			if refresh_res.status_code == 200:
+				new_access_token = refresh_res.json().get('access')
+				res2 = requests.post('https://access_postgresql:4000/api/DecodeJwt',headers={"Authorization": f"bearer {new_access_token}", 'Host': 'localhost'}, verify=False)
+				res2 = setTheCookie(res2, new_access_token, request.COOKIES.get("refresh_token", None))
+				return [res2.json(), new_access_token, request.COOKIES.get("refresh_token", None)]
+			return [None] * 3
+		return [None] * 3
+	return [res_json, encodedJwt, request.COOKIES.get("refresh_token", None)]
 
 dictActivePlayer = {}
 apiKeysUnplayable = []
@@ -132,491 +91,376 @@ dictApi = {}
 dictApiSp = {}
 dictApiPlayers = {}
 apiKeys = []
-#print("VIEW IMPORTEEE", file=sys.stderr)
 
 @log_game_api_request(action_type='GET_SIMULATION_STATE')
 def getSimulationState(request):
-    apikey = request.GET.get('apikey')
-    
-    log_game_event('SIMULATION_STATE_REQUEST', game_id=apikey)
-    
-    if not apikey:
-        log_game_error('MISSING_API_KEY', error_details='API key not provided in request')
-        return JsonResponse({'error': 'API key manquante'}, status=400)
-    
-    data = cache.get(f'simulation_state_{apikey}')
-    
-    if data:
-        log_game_event('SIMULATION_STATE_FOUND', game_id=apikey)
-        return JsonResponse(data)
-    else:
-        log_game_error('SIMULATION_NOT_FOUND', game_id=apikey, 
-                     error_details='No simulation data in cache for the provided API key')
-        return JsonResponse({'error': 'Simulation not found'}, status=404)
+	apikey = request.GET.get('apikey')
+	log_game_event('SIMULATION_STATE_REQUEST', game_id=apikey)
+	
+	if not apikey:
+		log_game_error('MISSING_API_KEY', error_details='API key not provided in request')
+		return JsonResponse({'error': 'API key manquante'}, status=400)
+	
+	data = cache.get(f'simulation_state_{apikey}')
+	
+	if data:
+		log_game_event('SIMULATION_STATE_FOUND', game_id=apikey)
+		return JsonResponse(data)
+	else:
+		log_game_error('SIMULATION_NOT_FOUND', game_id=apikey, error_details='No simulation data in cache for the provided API key')
+		return JsonResponse({'error': 'Simulation not found'}, status=404)
 
 async def  checkForUpdates(uriKey, key) :
-    connection_id = str(uuid.uuid4())[:8]
-    
-    try:
-        log_stream_connection_event('STREAM_CONNECT_ATTEMPT', connection_id=connection_id, 
-                               game_id=key, uri=uriKey)
-                               
-        ssl_context = ssl.create_default_context()
-        ssl_context.load_verify_locations('/certs/fullchain.crt')
-        
-        async with websockets.connect(uriKey, ssl=ssl_context) as ws:
-            log_stream_connection_event('STREAM_CONNECTED', connection_id=connection_id,
-                                   game_id=key, uri=uriKey)
-            
-            while True:
-                message = await ws.recv()
-                
-                if "gameState" in message:
-                    try:
-                        msg_data = json.loads(message)
-                        if msg_data.get("type") == "gameState":
-                            log_game_state_change(key, 
-                                                old_state=None, 
-                                                new_state=msg_data.get("state"),
-                                                trigger="stream_update")
-                    except:
-                        pass
-                
-                yield f"data: {message}\n\n"
-                
-    except Exception as e:
-        log_stream_connection_event('STREAM_ERROR', connection_id=connection_id,
-                               game_id=key, error_type=type(e).__name__,
-                               error_message=str(e))
-        yield f"data: Stream connection error : {e}\n\n"
-        
-    finally:
-        log_stream_connection_event('STREAM_DISCONNECTED', connection_id=connection_id,
-                               game_id=key)
+	connection_id = str(uuid.uuid4())[:8]
+	try :
+		log_stream_connection_event('STREAM_CONNECT_ATTEMPT', connection_id=connection_id, game_id=key, uri=uriKey)
+
+		ssl_context = ssl.create_default_context()
+		ssl_context.load_verify_locations('/certs/fullchain.crt')
+		async with websockets.connect(uriKey, ssl=ssl_context) as ws:
+			log_stream_connection_event('STREAM_CONNECTED', connection_id=connection_id, game_id=key, uri=uriKey)
+			while True:
+				message = await asyncio.wait_for(ws.recv(), timeout=20)
+				yield f"data: {message}\n\n"
+	except Exception as e:
+		log_stream_connection_event('STREAM_ERROR', connection_id=connection_id, game_id=key, error_type=type(e).__name__,
+            error_message=str(e))
+		yield f"data: Stream connection error : {e}\n\n"
+	finally:
+		log_stream_connection_event('STREAM_DISCONNECTED', connection_id=connection_id, game_id=key)
 
 async def sseCheck(request) :
-    log_server_event('SSE_CHECK_REQUEST', 
-                    server_id=request.META.get('REMOTE_ADDR', 'unknown'))
+	log_server_event('SSE_CHECK_REQUEST', server_id=request.META.get('REMOTE_ADDR', 'unknown'))
+
+	JWT = decodeJWT(request, "sseCheck")
+	if not JWT[0] :
+		log_server_event('SSE_CHECK_AUTH_FAILED', server_id=request.META.get('REMOTE_ADDR', 'unknown'), status='unauthorized')
+		return HttpResponse401()
+	username = JWT[0]['payload'].get("username", "unknown")
+	invites = JWT[0]['payload'].get("invites", [])
     
-    JWT = decodeJWT(request, "sseCheck")
-    
-    if not JWT[0]:
-        log_server_event('SSE_CHECK_AUTH_FAILED', 
-                        server_id=request.META.get('REMOTE_ADDR', 'unknown'),
-                        status='unauthorized')
-        return HttpResponse401()
-        
-    username = JWT[0]['payload'].get("username", "unknown")
-    invites = JWT[0]['payload'].get("invites", [])
-    
-    log_server_event('SSE_CHECK_SUCCESS', 
-                    server_id=request.META.get('REMOTE_ADDR', 'unknown'),
-                    username=username,
-                    guest_count=len(invites))
+	log_server_event('SSE_CHECK_SUCCESS', server_id=request.META.get('REMOTE_ADDR', 'unknown'),
+                    username=username, guest_count=len(invites))
                     
-    return JsonResponse({"username": username, "guest": invites})
+	return JsonResponse({"username" : JWT[0]['payload']["username"], "guest" : JWT[0]["payload"]["invites"]})
 
 async def sse(request):
-    apikey = request.GET.get("apikey")
-    AI = request.GET.get('ai')
-    idplayer = int(request.GET.get("idplayer"))
-    
-    log_game_event('SSE_CONNECTION_REQUEST', 
-                 game_id=apikey, 
-                 player_id=idplayer, 
-                 is_ai_game=bool(AI and AI != '0'))
-    
-    rq = RequestParsed(apikey, {})
-    
-    if not rq.apiKey:
-        log_game_error('INVALID_API_KEY', 
-                     error_details='API key not found or invalid',
-                     api_key_provided=apikey)
-        return JsonResponse({'error': 'Invalid API key'}, status=400)
+	apikey=request.GET.get("apikey")
+	AI = request.GET.get('ai')
+	idplayer = int(request.GET.get("idplayer"))
+	rq = RequestParsed(apikey, {})
+	log_game_event('SSE_CONNECTION_REQUEST', game_id=apikey, player_id=idplayer, is_ai_game=bool(AI and AI != '0'))
+	if not rq.apiKey:
+		log_game_error('INVALID_API_KEY', error_details='API key not found or invalid', api_key_provided=apikey)
+		return JsonResponse({'error': 'Invalid API key'}, status=400)
 
-    if idplayer == 0:
-        idp1 = int(request.GET.get("JWTidP1"))
-        idp2 = int(request.GET.get("JWTidP2"))
-        
-        if idp1 < 0:
-            username1 = request.GET.get("username", "Guest")
-        else:
-            username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
+	if idplayer == 0 :
+		idp1 = int(request.GET.get("JWTidP1"))
+		idp2 = int(request.GET.get("JWTidP2"))
+		if idp1 < 0 :
+			username1 = request.GET.get("username", "Guest")
+		else :
+			username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
 
-        if idp2 < 0:
-            username2 = request.GET.get("username", "Guest")
-        else:
-            username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
-        
-        log_game_event('OBSERVER_CONNECTED', 
-                     game_id=rq.apiKey,
-                     player1_id=username1, 
-                     player2_id=username2)
-        
-        if rq.apiKey:
-            conn_uri = f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}"
-            return StreamingHttpResponse(
-                checkForUpdates(conn_uri, rq.apiKey), 
-                content_type="text/event-stream"
-            )
+		if idp2 < 0 :
+			username2 = request.GET.get("username", "Guest")
+		else :
+			username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
+		log_game_event('OBSERVER_CONNECTED', game_id=rq.apiKey, player1_id=username1, player2_id=username2)
+		if (rq.apiKey) :
+			return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&u1={username1}&u2={username2}", rq.apiKey), content_type="text/event-stream")
 
-    elif idplayer == 1:
-        idp1 = int(request.GET.get("JWTid"))
-        
-        if idp1 < 0:
-            username1 = request.GET.get("username", "Guest")
-        else:
-            username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
-
-        log_player_action('PLAYER_CONNECTED', 
+	elif idplayer == 1 :
+		idp1 = int(request.GET.get("JWTid"))
+		if idp1 < 0 :
+			username1 = request.GET.get("username", "Guest")
+		else :
+			username1 = request.GET.get(f"guest{idp1 + 1}", "Guest")
+		log_player_action('PLAYER_CONNECTED', 
                         game_id=rq.apiKey, 
                         player_id=username1, 
                         action_data={'player_number': 1})
         
-        if rq.apiKey:
-            conn_uri = f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}"
-            return StreamingHttpResponse(
-                checkForUpdates(conn_uri, rq.apiKey), 
-                content_type="text/event-stream"
-            )
-        
-    else: 
-        idp2 = int(request.GET.get("JWTid"))
-        
-        if idp2 < 0:
-            username2 = request.GET.get("username", "Guest")
-        else:
-            username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
-
-        log_player_action('PLAYER_CONNECTED', 
-                        game_id=rq.apiKey, 
-                        player_id=username2, 
-                        action_data={'player_number': 2})
-
-        if rq.apiKey:
-            conn_uri = f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}"
-            return StreamingHttpResponse(
-                checkForUpdates(conn_uri, rq.apiKey), 
-                content_type="text/event-stream"
-            )
+		if (rq.apiKey) :
+			return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username1}", rq.apiKey), content_type="text/event-stream")
+		
+	else :
+		idp2 = int(request.GET.get("JWTid"))
+		if idp2 < 0 :
+			username2 = request.GET.get("username", "Guest")
+		else :
+			username2 = request.GET.get(f"guest{idp2 + 1}", "Guest")
+		log_player_action('PLAYER_CONNECTED', game_id=rq.apiKey, player_id=username2, action_data={'player_number': 2})
+		if (rq.apiKey) :
+			return StreamingHttpResponse(checkForUpdates(f"{uri}?room={rq.apiKey}&userid={idplayer}&AI={AI}&name={username2}", rq.apiKey), content_type="text/event-stream")
 
 @csrf_exempt 
 @log_game_api_request(action_type='SET_API_KEY_SP')
 def setApiKeySp(request):
-    game_logger.info(f"Processing setApiKeySp request", 
-                    extra={
-                        'path': request.path,
-                        'method': request.method,
-                        'origin': request.META.get('HTTP_ORIGIN', 'unknown'),
-                        'referer': request.META.get('HTTP_REFERER', 'unknown'),
-                        'content_type': request.content_type or 'none',
-                    })
+	game_logger.info(f"Processing setApiKeySp request", extra={
+		'path': request.path,
+		'method': request.method,
+		'origin': request.META.get('HTTP_ORIGIN', 'unknown'),
+		'referer': request.META.get('HTTP_REFERER', 'unknown'),
+		'content_type': request.content_type or 'none',
+	})
     
-    if not request:
-        log_game_error('MISSING_REQUEST', 
-                     error_details='Request object missing in setApiKeySp',
-                     error_type='TypeError')
-        return JsonResponse({'error': 'Internal server error: Missing request'}, status=500)
+	if not request:
+		log_game_error('MISSING_REQUEST', 
+						error_details='Request object missing in setApiKeySp',
+						error_type='TypeError')
+		return JsonResponse({'error': 'Internal server error: Missing request'}, status=500)
     
-    game_logger.info(f"setApiKeySp called with request method: {request.method}", 
+	game_logger.info(f"setApiKeySp called with request method: {request.method}", 
                     extra={'path': request.path, 'method': request.method})
     
-    JWT = decodeJWT(request, "setApiKeySp")
-    
-    if not JWT[0]:
-        log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
+	JWT = decodeJWT(request, "setApiKeySp")
+	if not JWT[0] :
+		log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
                      error_details='Missing or invalid JWT',
                      ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401()
+		return HttpResponse401()
+	user_id = JWT[0]['payload'].get('username', 'unknown')
+	body = json.loads(request.body)
+	apikey = body.get('apiKey')
+	if not apikey:
+		log_game_error('INVALID_API_KEY_REQUEST', 
+						error_details='Missing API key in request body',
+						user_id=user_id)
+		return JsonResponse({'error': 'Missing API key'}, status=400)
         
-    user_id = JWT[0]['payload'].get('username', 'unknown')
-    
-    try:
-        body = json.loads(request.body)
-        apikey = body.get('apiKey')
-        
-        if not apikey:
-            log_game_error('INVALID_API_KEY_REQUEST', 
-                         error_details='Missing API key in request body',
-                         user_id=user_id)
-            return JsonResponse({'error': 'Missing API key'}, status=400)
-        
-        dictApiSp[apikey] = 1
-        apiKeys.append(apikey)
-        
-        log_game_event('API_KEY_REGISTERED', 
-                     game_id=apikey, 
-                     player1_id=user_id)
-        
-        return JsonResponse({"playable": "Game can start"})
-        
-    except json.JSONDecodeError:
-        log_game_error('MALFORMED_REQUEST', 
-                     error_details='Invalid JSON in request body',
-                     user_id=user_id)
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        log_game_error('API_KEY_REGISTRATION_FAILED',
-                     error_details=str(e),
-                     error_type=type(e).__name__,
-                     user_id=user_id)
-        return JsonResponse({'error': 'Internal server error'}, status=500)
+	dictApiSp[apikey] = 1
+	apiKeys.append(apikey)
+	log_game_event('API_KEY_REGISTERED', game_id=apikey, player1_id=user_id)
+	return JsonResponse({"playable": "Game can start"})
 
 
 @csrf_exempt
 @log_game_api_request(action_type='SET_API_KEY')
 def setApiKey(request):
-    JWT = decodeJWT(request, "setApiKey")
-    if not JWT[0] :
-        log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
-                     error_details='Missing or invalid JWT',
-                     ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401()
-    user_id = JWT[0]['payload'].get('username', 'unknown')
-    apikey = json.loads(request.body).get('apiKey')
-    if not apikey:
-        log_game_error('INVALID_API_KEY_REQUEST', 
-                        error_details='Missing API key in request body',
-                        user_id=user_id)
-        return JsonResponse({'error': 'Missing API key'}, status=400)
+	JWT = decodeJWT(request, "setApiKey")
+	if not JWT[0] :
+		log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
+				error_details='Missing or invalid JWT',
+				ip=request.META.get('REMOTE_ADDR'))
+		return HttpResponse401() # Set an error 
+	
+	apikey = json.loads(request.body).get('apiKey')
+	if not apikey:
+		log_game_error('INVALID_API_KEY_REQUEST', 
+						error_details='Missing API key in request body',
+						user_id=user_id)
+		return JsonResponse({'error': 'Missing API key'}, status=400)
 
-    if apikey not in apiKeysUnplayable:
-        log_game_error('ROOM_NOT_FOUND',
+	user_data = JWT[0]['payload']
+	user_id = user_data.get('user_id') or user_data.get('username') or 'anonymous'
+	
+	if apikey not in apiKeysUnplayable:
+		log_game_error('ROOM_NOT_FOUND',
                          error_details=f'Room {apikey} does not exist',
                          user_id=user_id, 
                          api_key=apikey)
-        return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
-    if apikey in dictApi :
-        dictApi[apikey] += 1
-        log_game_event('PLAYER_JOINED_EXISTING_GAME',
-                         game_id=apikey,
-                         player2_id=user_id,
-                         player_count=dictApi[apikey])
-    else :
-        dictApi[apikey] = 1
-        log_game_event('PLAYER_JOINED_NEW_GAME',
-                game_id=apikey,
-                player1_id=user_id,
-                player_count=1)
+		return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
+	
+	if apikey in apiKeys:
+		return JsonResponse({"playable": "Game can start"})
+	
+	if apikey not in dictApiPlayers:
+		dictApiPlayers[apikey] = []
+	
+	if user_id in dictApiPlayers[apikey]:
+		current_count = len(dictApiPlayers[apikey])
+	else:
+		dictApiPlayers[apikey].append(user_id)
+		current_count = len(dictApiPlayers[apikey])
+		
+		dictApi[apikey] = current_count
 
+	if current_count >= 2 :
+		if apikey in apiKeysUnplayable:
+			apiKeysUnplayable.remove(apikey)
+		if apikey not in apiKeys:
+			apiKeys.append(apikey)
+		playable = "Game can start"
+	else:
+		playable = "Need more player"
 
-    if (dictApi[apikey] > 1) :
-        apiKeysUnplayable.remove(apikey)
-        apiKeys.append(apikey)
-        playable = "Game can start"
-    else :
-        playable = "Need more player"
+	return JsonResponse({"playable": playable})
 
-    return JsonResponse({"playable": playable})
 @csrf_exempt
 @log_game_api_request(action_type='CHECK_GAME_PLAYABLE')
-def isGamePlayable(request):
-    JWT = decodeJWT(request, "isGamePlayable")
-    if not JWT[0] :
-        log_game_error('UNAUTHORIZED_GAME_CHECK', 
-                error_details='Missing or invalid JWT',
-                ip=request.META.get('REMOTE_ADDR'))
-        return HttpResponse401()
-    
-    apikey = json.loads(request.body).get('apiKey')
-    user_id = JWT[0]['payload'].get('username', 'unknown')
-
-    try:
-        with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
-            print(f"[DEBUG] isGamePlayable called - apikey: {apikey}", file=f)
-            print(f"[DEBUG] dictApiPlayers: {dictApiPlayers}", file=f)
-            print(f"[DEBUG] apiKeys: {apiKeys}", file=f)
-            print(f"[DEBUG] apiKeysUnplayable: {apiKeysUnplayable}", file=f)
-            if apikey in dictApiPlayers:
-                print(f"[DEBUG] dictApiPlayers[{apikey}]: {dictApiPlayers[apikey]} (length: {len(dictApiPlayers[apikey])})", file=f)
-    except Exception as e:
-        print(f"Debug logging error: {e}", file=sys.stderr)
-    
-    if apikey in apiKeys:
-        return JsonResponse({"playable": "Game can start"})
-    
-    if apikey in dictApiPlayers and len(dictApiPlayers[apikey]) >= 2:
-        if apikey in apiKeysUnplayable:
-            apiKeysUnplayable.remove(apikey)
-        if apikey not in apiKeys:
-            apiKeys.append(apikey)
-        playable = "Game can start"
-        log_game_event('GAME_READY_CHECK_SUCCESS',
-                game_id=apikey,
-                player_id=user_id,
-                player_count=dictApi[apikey])
-
-    else:
-        playable = "Need more player"
-        log_game_event('GAME_WAITING_FOR_PLAYERS',
-                game_id=apikey,
-                player_id=user_id,
-                player_count=dictApi.get(apikey, 0))
-    
-    try:
-        with open("/app/isGamePlayable_decodeJWT.txt", "a+") as f:
-            print(f"[DEBUG] Returning playable: {playable}", file=f)
-    except Exception as e:
-        log_game_error('GAME_CHECK_FAILED',
-                     error_details=str(e),
-                     error_type=type(e).__name__,
-                     user_id=user_id,
-                     api_key=apikey if 'apikey' in locals() else None)
-        return JsonResponse({'error': 'Internal server error'}, status=500)
-    
-    return JsonResponse({"playable": playable})
+def isGamePlayable(request) :
+	JWT = decodeJWT(request, "isGamePlayable")
+	if not JWT[0] :
+		log_game_error('UNAUTHORIZED_API_KEY_REQUEST', 
+				error_details='Missing or invalid JWT',
+				ip=request.META.get('REMOTE_ADDR'))
+		return HttpResponse401() # Set an error 
+	
+	apikey = json.loads(request.body).get('apiKey')
+	
+	if apikey in apiKeys:
+		return JsonResponse({"playable": "Game can start"})
+	
+	if apikey in dictApiPlayers and len(dictApiPlayers[apikey]) >= 2:
+		if apikey in apiKeysUnplayable:
+			apiKeysUnplayable.remove(apikey)
+		if apikey not in apiKeys:
+			apiKeys.append(apikey)
+		playable = "Game can start"
+	else:
+		playable = "Need more player"
+	return JsonResponse({"playable": playable})
 
 
 def get_api_key(request):
-    JWT = decodeJWT(request, "getApiKey")
-    try:
-        with open("/app/test.txt", "a+") as f:
-            print(f"[DEBUG] get_api_key called - JWT: {JWT[0]}", file=f)
-    except Exception as e:
-        print(f"Debug logging error: {e}", file=sys.stderr)
-    
-    if not JWT[0] :
-        return HttpResponseNoContent() # Set an error 
-    api_key = str(uuid.uuid4())
-    apiKeysUnplayable.append(api_key)
+	JWT = decodeJWT(request, "getApiKey")
+	try:
+		with open("/app/test.txt", "a+") as f:
+			print(f"[DEBUG] get_api_key called - JWT: {JWT[0]}", file=f)
+	except Exception as e:
+		print(f"Debug logging error: {e}", file=sys.stderr)
+	
 
-    return JsonResponse({"api_key": api_key})
+	if not JWT[0] :
+		return HttpResponseNoContent()
+	api_key = str(uuid.uuid4())
+	apiKeysUnplayable.append(api_key)
+
+	return JsonResponse({"api_key": api_key})
 
 locks = {}
 
 @csrf_exempt
 async def sendNewJSON(request):
-    dictionnaryJson = json.loads(request.body)
-    api_key = dictionnaryJson.get("apiKey", None)
-    message = dictionnaryJson.get("message", {})
+	dictionnaryJson = json.loads(request.body)
+	api_key = dictionnaryJson.get("apiKey", None)
+	message = dictionnaryJson.get("message", {})
 
-    if not api_key:
-        return HttpResponse(status=400)
+	if not api_key:
+		return HttpResponse(status=400)
 
-    m2 = json.loads(message)
-    speed = 15
-    if m2["action"] == 'move' :
-        try :
-            if m2["player1"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] - speed] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] - speed], wall1[0], wall1[1]) == (None, None): 
-                dictInfoRackets[api_key]["racket1"][0][1] -= speed
-                dictInfoRackets[api_key]["racket1"][1][1] -= speed
-            elif m2["player1"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] + speed] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] + speed], wall2[0], wall2[1]) == (None, None): 
-                dictInfoRackets[api_key]["racket1"][0][1] += speed
-                dictInfoRackets[api_key]["racket1"][1][1] += speed
-        except KeyError :
-            try :
-                if m2["player2"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] - speed] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] - speed], wall1[0], wall1[1]) == (None, None): 
-                    dictInfoRackets[api_key]["racket2"][0][1] -= speed
-                    dictInfoRackets[api_key]["racket2"][1][1] -= speed
-                elif m2["player2"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] + speed] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] + speed], wall2[0], wall2[1]) == (None, None): 
-                    dictInfoRackets[api_key]["racket2"][0][1] += speed
-                    dictInfoRackets[api_key]["racket2"][1][1] += speed
-            except Exception :
-                return HttpResponse(status=500)
+	m2 = json.loads(message)
 
-    else :
-        rq = RequestParsed(api_key, message)
-        await channel_layer.group_send(
-            rq.apiKey,
-            {
-                "type": "tempReceived",
-                "text_data": rq.action
-            }
-        )
+	speed = 15
+	if m2["action"] == 'move' :
+		try :
+			if m2["player1"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] - speed] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] - speed], wall1[0], wall1[1]) == (None, None): 
+				dictInfoRackets[api_key]["racket1"][0][1] -= speed
+				dictInfoRackets[api_key]["racket1"][1][1] -= speed
+			elif m2["player1"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket1"][0][0], dictInfoRackets[api_key]["racket1"][0][1] + speed] ,[dictInfoRackets[api_key]["racket1"][1][0], dictInfoRackets[api_key]["racket1"][1][1] + speed], wall2[0], wall2[1]) == (None, None): 
+				dictInfoRackets[api_key]["racket1"][0][1] += speed
+				dictInfoRackets[api_key]["racket1"][1][1] += speed
+		except KeyError :
+			try :
+				if m2["player2"] == "up" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] - speed] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] - speed], wall1[0], wall1[1]) == (None, None): 
+					dictInfoRackets[api_key]["racket2"][0][1] -= speed
+					dictInfoRackets[api_key]["racket2"][1][1] -= speed
+				elif m2["player2"] == "down" and calcIntersections([dictInfoRackets[api_key]["racket2"][0][0], dictInfoRackets[api_key]["racket2"][0][1] + speed] ,[dictInfoRackets[api_key]["racket2"][1][0], dictInfoRackets[api_key]["racket2"][1][1] + speed], wall2[0], wall2[1]) == (None, None): 
+					dictInfoRackets[api_key]["racket2"][0][1] += speed
+					dictInfoRackets[api_key]["racket2"][1][1] += speed
+			except Exception :
+				return HttpResponse(status=500)
 
-    return HttpResponse(status=204)
+	else :
+		rq = RequestParsed(api_key, message)
+		await channel_layer.group_send(
+			rq.apiKey,
+			{
+				"type": "tempReceived",
+				"text_data": rq.action
+			}
+		)
+
+	return HttpResponse(status=204)
 
 async def forfaitUser(request) :
-    
-    JWT = decodeJWT(request, "forfeitUser")
-    if not JWT[0] :
-        return HttpResponse401() # Set an error 
-    apikey = request.GET.get("apikey")
-    idplayer = request.GET.get("idplayer")
-    rq = RequestParsed(apikey, {})
-    if (rq.apiKey) :
-        await channel_layer.group_send(
-            rq.apiKey,
-            {
-                "type" : "tempReceived",
-                "text_data" : f'{{"action" : "forfait", "player" : {idplayer}}}'
-            }
-        )
-        try :
-            dictApi.pop(apikey)
-        except KeyError :
-            try :
-                dictApiSp.pop(apikey)
-            except KeyError :
-                return HttpResponseNoContent()
-        
-        try:
-            dictApiPlayers.pop(apikey)
-        except KeyError:
-            pass
-            
-        try :
-            apiKeys.remove(apikey)
-        except Exception :
-            try:
-                apiKeysUnplayable.remove(apikey)
-            except ValueError:
-                pass
-            return HttpResponseNoContent()
-    return HttpResponseNoContent()
+	
+	JWT = decodeJWT(request, "forfeitUser")
+	if not JWT[0] :
+		return HttpResponse401()
+	apikey = request.GET.get("apikey")
+	idplayer = request.GET.get("idplayer")
+	rq = RequestParsed(apikey, {})
+	if (rq.apiKey) :
+		await channel_layer.group_send(
+			rq.apiKey,
+			{
+				"type" : "tempReceived",
+				"text_data" : f'{{"action" : "forfait", "player" : {idplayer}}}'
+			}
+		)
+		try :
+			dictApi.pop(apikey)
+		except KeyError :
+			try :
+				dictApiSp.pop(apikey)
+			except KeyError :
+				return HttpResponseNoContent()
+		
+		try:
+			dictApiPlayers.pop(apikey)
+		except KeyError:
+			pass
+			
+		try :
+			apiKeys.remove(apikey)
+		except Exception :
+			try:
+				apiKeysUnplayable.remove(apikey)
+			except ValueError:
+				pass
+			return HttpResponseNoContent()
+	return HttpResponseNoContent()
 
 async def disconnectUsr(request) :
-    JWT = decodeJWT(request, "disconnectUsr")
-    if not JWT[0] :
-        return HttpResponse401()
-    apikey = request.GET.get("apikey")
-    await channel_layer.group_send(
-        apikey,
-        {
-            "type" : "tempReceived",
-            "text_data" : '{"action" : "disconnect"}'
-        }
-    )
-    try :
-        dictApi.pop(apikey)
-    except KeyError :
-        try :
-            dictApiSp.pop(apikey)
-        except KeyError :
-            return
-    
-    try:
-        dictApiPlayers.pop(apikey)
-    except KeyError:
-        pass
-        
-    try :
-        apiKeys.remove(apikey)
-    except Exception :
-        try:
-            apiKeysUnplayable.remove(apikey)
-        except ValueError:
-            pass
-        return HttpResponseNoContent()
-    log_player_disconnect(
-        game_id=apikey,
-        player_id=JWT[0]['payload'].get('username', 'unknown'),
-        disconnect_reason='user_disconnected'
-    )
-    return HttpResponseNoContent()
+	JWT = decodeJWT(request, "disconnectUsr")
+	if not JWT[0] :
+		return HttpResponse401()
+	apikey = request.GET.get("apikey")
+	await channel_layer.group_send(
+		apikey,
+		{
+			"type" : "tempReceived",
+			"text_data" : '{"action" : "disconnect"}'
+		}
+	)
+	try :
+		dictApi.pop(apikey)
+	except KeyError :
+		try :
+			dictApiSp.pop(apikey)
+		except KeyError :
+			return
+	
+	try:
+		dictApiPlayers.pop(apikey)
+	except KeyError:
+		pass
+		
+	try :
+		apiKeys.remove(apikey)
+	except Exception :
+		try:
+			apiKeysUnplayable.remove(apikey)
+		except ValueError:
+			pass
+		return HttpResponseNoContent()
+	log_player_disconnect(game_id=apikey, player_id=JWT[0]['payload'].get('username', 'unknown'), disconnect_reason='user_disconnected')
+	return HttpResponseNoContent()
 
 @csrf_exempt
 def apiKeyManager(request) :
-    if request.method == 'GET' :
-        return get_api_key(request)
-    elif request.method == 'POST' :
-        return setApiKey(request)
+	if request.method == 'GET' :
+		return get_api_key(request)
+	elif request.method == 'POST' :
+		return setApiKey(request)
 
 
 @csrf_exempt
 def destroyKey(request, key) :
-    try :
-        dictApi.pop(key)
-        return JsonResponse({"Success" : "Key deleted"})
-    except Exception as e :
-        return JsonResponse({"Error" : "Not found"}, status=404)
+	try :
+		dictApi.pop(key)
+		return JsonResponse({"Success" : "Key deleted"})
+	except Exception as e :
+		return JsonResponse({"Error" : "Not found"}, status=404)
