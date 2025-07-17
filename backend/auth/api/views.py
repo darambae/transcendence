@@ -18,9 +18,7 @@ import random
 import string
 from .logging_utils import (
     log_auth_api_request, log_auth_attempt, log_security_event, 
-    log_token_operation, log_2fa_event, log_session_event,
-    log_password_policy_violation, log_failed_login_attempt,
-    auth_logger, security_logger
+    log_2fa_event, auth_logger
 )
 
 

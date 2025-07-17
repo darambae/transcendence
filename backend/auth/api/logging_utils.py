@@ -36,16 +36,6 @@ def log_security_event(event_type, severity='INFO', **kwargs):
         **kwargs
     })
 
-def log_token_operation(operation, token_type=None, success=True, **kwargs):
-    """Log token-related operations (JWT, refresh tokens, etc.)"""
-    auth_logger.info(f"Token Operation: {operation}", extra={
-        'token_operation': operation,
-        'token_type': token_type,
-        'operation_success': success,
-        'log_category': 'token_management',
-        **kwargs
-    })
-
 def log_2fa_event(event_type, user_id=None, success=True, **kwargs):
     """Log two-factor authentication events"""
     auth_logger.info(f"2FA Event: {event_type}", extra={
@@ -53,15 +43,6 @@ def log_2fa_event(event_type, user_id=None, success=True, **kwargs):
         'user_id': user_id,
         'tfa_success': success,
         'log_category': '2fa',
-        **kwargs
-    })
-
-def log_session_event(event_type, session_id=None, **kwargs):
-    """Log session management events"""
-    auth_logger.info(f"Session Event: {event_type}", extra={
-        'session_event_type': event_type,
-        'session_id': session_id,
-        'log_category': 'session_management',
         **kwargs
     })
 
@@ -115,22 +96,3 @@ def log_auth_api_request(action_type='AUTH_API_CALL', **kwargs):
                 
         return wrapper
     return decorator
-
-def log_password_policy_violation(violation_type, user_id=None, **kwargs):
-    """Log password policy violations"""
-    security_logger.warning(f"Password Policy Violation: {violation_type}", extra={
-        'violation_type': violation_type,
-        'user_id': user_id,
-        'log_category': 'password_policy',
-        **kwargs
-    })
-
-def log_failed_login_attempt(user_identifier, attempt_count=1, **kwargs):
-    """Log failed login attempts for brute force detection"""
-    security_logger.warning("Failed Login Attempt", extra={
-        'user_identifier': user_identifier,
-        'attempt_count': attempt_count,
-        'log_category': 'failed_login',
-        'security_concern': 'brute_force',
-        **kwargs
-    })

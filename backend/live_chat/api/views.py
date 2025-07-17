@@ -16,8 +16,8 @@ import jwt
 import time
 from .logging_utils import (
     log_broadcast_event, log_chat_api_request, log_chat_room_event, 
-    log_message_event, log_websocket_connection, log_message_filter,
-    log_user_activity, chat_logger, message_logger, api_logger
+    log_message_event, log_sse_connection, log_message_filter,
+    chat_logger, message_logger, api_logger
 )
 
 logger = logging.getLogger(__name__)
@@ -190,10 +190,6 @@ class ChatMessageView(View):
             log_message_event('SEND_MESSAGE_ATTEMPT', chat_room=group_id, 
                             content_length=len(content) if content else 0)
             
-            if not content:
-                log_message_filter('EMPTY_CONTENT', chat_room=group_id, action_taken='reject')
-                return JsonResponse({'status': 'error', 'message': 'content are required.'}, status=400)
-                
             if not content or len(content) < MIN_LENGTH:
                 log_message_filter('EMPTY_CONTENT', chat_room=group_id, action_taken='reject')
                 return JsonResponse({'status': 'error', 'message': 'Message is empty'}, status=400)
@@ -315,8 +311,8 @@ async def _generate_events(request, group_id):
     
     channel_layer = get_channel_layer()
     if channel_layer is None:
-        log_websocket_connection('CONFIGURATION_ERROR', connection_id=connection_id,
-                               error_type='missing_channel_layer', chat_room=group_id)
+        log_sse_connection('CONFIGURATION_ERROR', connection_id=connection_id,
+                           error_type='missing_channel_layer', chat_room=group_id)
         yield f"event: error\ndata: {json.dumps({'message': 'Channel layer not configured'})}\n\n"
         return  # Empty return to stop the generator
 
@@ -332,8 +328,8 @@ async def _generate_events(request, group_id):
         access_token = request.COOKIES.get('access_token')
         
         if not access_token:
-            log_websocket_connection('AUTH_FAILURE', connection_id=connection_id,
-                                   error_type='missing_token', chat_room=group_id)
+            log_sse_connection('AUTH_FAILURE', connection_id=connection_id,
+                               error_type='missing_token', chat_room=group_id)
             yield f"event: error\ndata: {json.dumps({'message': 'No authentication token'})}\n\n"
             return
             
@@ -342,16 +338,16 @@ async def _generate_events(request, group_id):
 
         current_time = time.time()
         if expiry_time and (expiry_time - current_time < 300):
-            log_websocket_connection('TOKEN_EXPIRING_SOON', connection_id=connection_id,
-                                   seconds_remaining=(expiry_time - current_time),
-                                   chat_room=group_id)
+            log_sse_connection('TOKEN_EXPIRING_SOON', connection_id=connection_id,
+                               seconds_remaining=(expiry_time - current_time),
+                               chat_room=group_id)
             yield f"event: refresh_token\ndata: {{}}\n\n"
 
     except Exception as e:
-        log_websocket_connection('TOKEN_CHECK_ERROR', connection_id=connection_id,
-                               error_type=type(e).__name__, 
-                               error_message=str(e),
-                               chat_room=group_id)
+        log_sse_connection('TOKEN_CHECK_ERROR', connection_id=connection_id,
+                           error_type=type(e).__name__, 
+                           error_message=str(e),
+                           chat_room=group_id)
     
     # Validate token
     try:
@@ -366,9 +362,9 @@ async def _generate_events(request, group_id):
             )
 
         if resp.status_code != 200:
-            log_websocket_connection('AUTH_REJECTED', connection_id=connection_id,
-                                   status_code=resp.status_code,
-                                   chat_room=group_id)
+            log_sse_connection('AUTH_REJECTED', connection_id=connection_id,
+                               status_code=resp.status_code,
+                               chat_room=group_id)
             await channel_layer.group_discard(channel_group_name, client_channel_name)
             yield f"event: error\ndata: {json.dumps({'message': 'Unauthorized'})}\n\n"
             return
@@ -376,9 +372,9 @@ async def _generate_events(request, group_id):
         user_data = resp.json()
         user_id = user_data.get('payload', {}).get('username')
         
-        log_websocket_connection('AUTH_SUCCESS', connection_id=connection_id,
-                               user_id=user_id,
-                               chat_room=group_id)
+        log_sse_connection('AUTH_SUCCESS', connection_id=connection_id,
+                           user_id=user_id,
+                           chat_room=group_id)
                                
         log_chat_room_event('USER_CONNECTED', room_id=group_id,
                           user_id=user_id)
@@ -441,12 +437,12 @@ async def _generate_events(request, group_id):
                 yield ":heartbeat\n\n"
 
     except Exception as e:
-        log_websocket_connection('CONNECTION_ERROR', 
-                               connection_id=connection_id,
-                               user_id=user_id,
-                               chat_room=group_id,
-                               error_type=type(e).__name__,
-                               error_message=str(e))
+        log_sse_connection('CONNECTION_ERROR', 
+                           connection_id=connection_id,
+                           user_id=user_id,
+                           chat_room=group_id,
+                           error_type=type(e).__name__,
+                           error_message=str(e))
         yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
         
     finally:
@@ -454,10 +450,10 @@ async def _generate_events(request, group_id):
                           room_id=group_id,
                           user_id=user_id)
                           
-        log_websocket_connection('DISCONNECTED', 
-                               connection_id=connection_id,
-                               user_id=user_id,
-                               chat_room=group_id)
+        log_sse_connection('DISCONNECTED', 
+                           connection_id=connection_id,
+                           user_id=user_id,
+                           chat_room=group_id)
                                
         await channel_layer.group_discard(channel_group_name, client_channel_name)
 		

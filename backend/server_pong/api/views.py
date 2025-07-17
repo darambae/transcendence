@@ -15,8 +15,7 @@ import requests
 from http import HTTPStatus
 from .logging_utils import (
     log_game_api_request, log_game_event, log_game_error,
-    log_player_action, log_server_event, log_websocket_game_event,
-    log_game_state_change, log_player_disconnect, log_matchmaking_event,
+    log_player_action, log_server_event, log_stream_connection_event, log_game_state_change, log_player_disconnect,
     game_logger
 )
 
@@ -131,7 +130,7 @@ dictActivePlayer = {}
 apiKeysUnplayable = []
 dictApi = {}
 dictApiSp = {}
-dictApiPlayers = {}  # Track players per room: {apikey: [player1_id, player2_id]}
+dictApiPlayers = {}
 apiKeys = []
 #print("VIEW IMPORTEEE", file=sys.stderr)
 
@@ -155,27 +154,23 @@ def getSimulationState(request):
                      error_details='No simulation data in cache for the provided API key')
         return JsonResponse({'error': 'Simulation not found'}, status=404)
 
-# Asynchronous generator function('async' + 'yield') to handle WebSocket connections
-# -> When it runs, it produces a value (in this case, a formatted string) and pauses 
-# the function’s execution. The next time the generator is iterated, execution resumes right after the yield.
 async def  checkForUpdates(uriKey, key) :
     connection_id = str(uuid.uuid4())[:8]  # Generate a short connection ID for logging
     
     try:
-        log_websocket_game_event('WS_CONNECT_ATTEMPT', connection_id=connection_id, 
+        log_stream_connection_event('STREAM_CONNECT_ATTEMPT', connection_id=connection_id, 
                                game_id=key, uri=uriKey)
                                
         ssl_context = ssl.create_default_context()
         ssl_context.load_verify_locations('/certs/fullchain.crt')
         
         async with websockets.connect(uriKey, ssl=ssl_context) as ws:
-            log_websocket_game_event('WS_CONNECTED', connection_id=connection_id,
+            log_stream_connection_event('STREAM_CONNECTED', connection_id=connection_id,
                                    game_id=key, uri=uriKey)
             
             while True:
                 message = await ws.recv()
                 
-                # Log only periodically to avoid excessive logging
                 if "gameState" in message:
                     try:
                         msg_data = json.loads(message)
@@ -183,7 +178,7 @@ async def  checkForUpdates(uriKey, key) :
                             log_game_state_change(key, 
                                                 old_state=None, 
                                                 new_state=msg_data.get("state"),
-                                                trigger="websocket_update")
+                                                trigger="stream_update")
                     except:
                         # Don't crash if message parsing fails
                         pass
@@ -191,13 +186,13 @@ async def  checkForUpdates(uriKey, key) :
                 yield f"data: {message}\n\n"
                 
     except Exception as e:
-        log_websocket_game_event('WS_ERROR', connection_id=connection_id,
+        log_stream_connection_event('STREAM_ERROR', connection_id=connection_id,
                                game_id=key, error_type=type(e).__name__,
                                error_message=str(e))
-        yield f"data: WebSocket stop, error : {e}\n\n"
+        yield f"data: Stream connection error : {e}\n\n"
         
     finally:
-        log_websocket_game_event('WS_DISCONNECTED', connection_id=connection_id,
+        log_stream_connection_event('STREAM_DISCONNECTED', connection_id=connection_id,
                                game_id=key)
 
 async def sseCheck(request) :
@@ -517,7 +512,6 @@ async def sendNewJSON(request):
 
     m2 = json.loads(message)
     # Obtenir ou créer un lock pour cette apiKey
-
     # print(f"message : {message}", file=sys.stderr)
     speed = 15
     if m2["action"] == 'move' :
@@ -630,6 +624,11 @@ async def disconnectUsr(request) :
         except ValueError:
             pass
         return HttpResponseNoContent()
+    log_player_disconnect(
+        game_id=apikey,
+        player_id=JWT[0]['payload'].get('username', 'unknown'),
+        disconnect_reason='user_disconnected'
+    )
     return HttpResponseNoContent()
 
 @csrf_exempt

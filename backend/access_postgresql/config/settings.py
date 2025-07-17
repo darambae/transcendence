@@ -212,7 +212,6 @@ import logging
 # }
 
 
-# # Enhanced logging configuration for microservices
 class AddAppNameFilter(logging.Filter):
     def filter(self, record):
         if not hasattr(record, 'app_name'):
@@ -220,7 +219,6 @@ class AddAppNameFilter(logging.Filter):
         return True
 
 class RequestContextFilter(logging.Filter):
-    """Add request context to log records"""
     def filter(self, record):
         request = getattr(record, 'request', None)
         if request:
@@ -244,7 +242,6 @@ class RequestContextFilter(logging.Filter):
         return True
     
     def get_client_ip(self, request):
-        """Get the real client IP address"""
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]
@@ -284,7 +281,7 @@ LOGGING = {
     },
     'handlers': {
         'logstash': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
             'host': 'logstash',
             'port': 6006,
@@ -295,7 +292,7 @@ LOGGING = {
             'filters': ['add_app_name', 'request_context'],
         },
         'console': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'text',
             'filters': ['add_app_name', 'request_context'],
@@ -315,7 +312,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # Reduced noise
+            'level': 'INFO', 
             'propagate': False,
         },
         'django.request': {
@@ -338,12 +335,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'microservice.requests': {  # Custom logger for inter-service requests
-            'handlers': ['console', 'logstash'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'performance': {  # Custom logger for performance metrics
+        'performance': {
             'handlers': ['logstash'],
             'level': 'INFO',
             'propagate': False,

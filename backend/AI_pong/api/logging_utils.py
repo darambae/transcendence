@@ -2,7 +2,6 @@ import logging
 import time
 from functools import wraps
 
-# Loggers for AI service
 ai_logger = logging.getLogger('ai.game')
 performance_logger = logging.getLogger('ai.performance')
 api_logger = logging.getLogger('api')
@@ -58,39 +57,6 @@ def log_game_event(event_type, game_id=None, player_info=None, **kwargs):
         'game_id': game_id,
         'player_info': player_info,
         'log_category': 'game_event',
-        **kwargs
-    })
-
-def log_ai_decision(decision_type, difficulty=None, player_position=None, ball_position=None, **kwargs):
-    """Log AI decision-making process"""
-    ai_logger.info(f"AI Decision: {decision_type}", extra={
-        'decision_type': decision_type,
-        'difficulty': difficulty,
-        'player_position': player_position,
-        'ball_position': ball_position,
-        'log_category': 'ai_decision',
-        **kwargs
-    })
-
-def log_performance_metric(metric_name, value, game_id=None, **kwargs):
-    """Log performance metrics for AI"""
-    performance_logger.info(f"AI Performance Metric: {metric_name}", extra={
-        'metric_type': 'ai_performance',
-        'metric_name': metric_name,
-        'metric_value': value,
-        'game_id': game_id,
-        'app_name': 'AI_pong',
-        'service_type': 'ai_service',
-        **kwargs
-    })
-
-def log_websocket_event(event_type, connection_id=None, **kwargs):
-    """Log WebSocket events for real-time game communication"""
-    api_logger.info(f"WebSocket Event: {event_type}", extra={
-        'event_type': event_type,
-        'connection_id': connection_id,
-        'log_category': 'websocket',
-        'communication_type': 'websocket',
         **kwargs
     })
 

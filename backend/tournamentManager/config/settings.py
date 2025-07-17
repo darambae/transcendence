@@ -280,7 +280,7 @@ LOGGING = {
     },
     'handlers': {
         'logstash': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
             'host': 'logstash',
             'port': 6006,
@@ -291,7 +291,7 @@ LOGGING = {
             'filters': ['add_app_name', 'request_context'],
         },
         'console': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'text',
             'filters': ['add_app_name', 'request_context'],
@@ -311,17 +311,12 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # Reduced noise
+            'level': 'INFO', 
             'propagate': False,
         },
         'django.request': {
             'handlers': ['console', 'logstash'],
             'level': 'INFO',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['console', 'logstash'],
-            'level': 'WARNING',
             'propagate': False,
         },
         'api': {
@@ -334,19 +329,14 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'microservice.requests': {  # Custom logger for inter-service requests
+        'tournament.manager': {
             'handlers': ['console', 'logstash'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'performance': {  # Custom logger for performance metrics
-            'handlers': ['logstash'],
             'level': 'INFO',
             'propagate': False,
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',  # Only important messages at root level
+        'level': 'WARNING',
     },
 }

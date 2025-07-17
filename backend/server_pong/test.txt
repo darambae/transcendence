@@ -1,2 +1,6 @@
-[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752680150, 'iat': 1752678950, 'jti': '0110942e90714efaabc585631a4b02a5', 'user_id': 1, 'username': 'kelly', 'invites': []}}
-[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752680150, 'iat': 1752678950, 'jti': '0110942e90714efaabc585631a4b02a5', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752684207, 'iat': 1752682944, 'jti': 'cc062b6c778e4a109d7ba46d60b09d91', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752684800, 'iat': 1752682944, 'jti': 'bcc55bee8d744a3a87dd8f29d7db2e20', 'user_id': 1, 'username': 'kelly', 'invites': []}}
+[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}
+[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}
+[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}
+[DEBUG] get_api_key called - JWT: {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}

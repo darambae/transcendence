@@ -3,17 +3,17 @@ import time
 from functools import wraps
 
 # Loggers for chat service
-chat_logger = logging.getLogger('chat.websocket')
+chat_logger = logging.getLogger('chat.sse')
 message_logger = logging.getLogger('chat.messages')
 api_logger = logging.getLogger('api')
 
-def log_websocket_connection(event_type, connection_id=None, user_id=None, **kwargs):
-    """Log WebSocket connection events"""
-    chat_logger.info(f"WebSocket {event_type}", extra={
-        'websocket_event': event_type,
+def log_sse_connection(event_type, connection_id=None, user_id=None, **kwargs):
+    """Log SSE (Server-Sent Events) connection events"""
+    chat_logger.info(f"SSE {event_type}", extra={
+        'sse_event': event_type,
         'connection_id': connection_id,
         'user_id': user_id,
-        'log_category': 'websocket_connection',
+        'log_category': 'sse_connection',
         **kwargs
     })
 
@@ -36,27 +36,6 @@ def log_chat_room_event(event_type, room_id=None, user_id=None, **kwargs):
         'room_id': room_id,
         'user_id': user_id,
         'log_category': 'chat_room',
-        **kwargs
-    })
-
-def log_moderation_action(action_type, moderator_id=None, target_user_id=None, reason=None, **kwargs):
-    """Log chat moderation actions"""
-    chat_logger.warning(f"Moderation Action: {action_type}", extra={
-        'moderation_action': action_type,
-        'moderator_id': moderator_id,
-        'target_user_id': target_user_id,
-        'moderation_reason': reason,
-        'log_category': 'moderation',
-        **kwargs
-    })
-
-def log_user_activity(activity_type, user_id=None, chat_room=None, **kwargs):
-    """Log user activities in chat"""
-    chat_logger.info(f"User Activity: {activity_type}", extra={
-        'user_activity_type': activity_type,
-        'user_id': user_id,
-        'chat_room': chat_room,
-        'log_category': 'user_activity',
         **kwargs
     })
 
@@ -122,19 +101,7 @@ def log_message_filter(filter_type, message_content=None, sender_id=None, action
         **kwargs
     })
 
-def log_connection_metrics(metric_name, value, **kwargs):
-    """Log connection and performance metrics"""
-    chat_logger.info(f"Chat Metric: {metric_name}", extra={
-        'metric_type': 'chat_performance',
-        'metric_name': metric_name,
-        'metric_value': value,
-        'app_name': 'live_chat',
-        'service_type': 'chat_service',
-        **kwargs
-    })
-
 def log_broadcast_event(event_type, recipient_count=0, message_type=None, **kwargs):
-    """Log broadcast messages to multiple users"""
     chat_logger.info(f"Broadcast Event: {event_type}", extra={
         'broadcast_type': event_type,
         'recipient_count': recipient_count,

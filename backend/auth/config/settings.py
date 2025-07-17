@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-#### REQUIRED ELK LIBRARY ####
 import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -265,14 +264,14 @@ LOGGING = {
                 'levelname': 'level'
             },
             'static_fields': {
-                'service_type': 'auth_service',  # Changed from 'user_service' to 'auth_service'
+                'service_type': 'auth_service',
                 'environment': 'development'
             }
         },
     },
     'handlers': {
         'logstash': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
             'host': 'logstash',
             'port': 6006,
@@ -283,7 +282,7 @@ LOGGING = {
             'filters': ['add_app_name', 'request_context'],
         },
         'console': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'text',
             'filters': ['add_app_name', 'request_context'],
@@ -303,7 +302,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # Reduced noise
+            'level': 'INFO', 
             'propagate': False,
         },
         'django.request': {
@@ -321,24 +320,19 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'api.views': {
-            'handlers': ['console', 'api_handler'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'microservice.requests': {  # Custom logger for inter-service requests
+        'auth.events': {
             'handlers': ['console', 'logstash'],
             'level': 'INFO',
             'propagate': False,
         },
-        'performance': {  # Custom logger for performance metrics
-            'handlers': ['logstash'],
+        'auth.security': {
+            'handlers': ['console', 'logstash'],
             'level': 'INFO',
             'propagate': False,
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',  # Only important messages at root level
+        'level': 'WARNING',
     },
 }

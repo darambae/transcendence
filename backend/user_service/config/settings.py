@@ -270,22 +270,11 @@ LOGGING = {
             'formatter': 'text',
             'filters': ['add_app_name', 'request_context'],
         },
-        'proxy_handler': {
-            'level': 'INFO',
-            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-            'host': 'logstash',
-            'port': 6006,
-            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
-            'ssl_enable': False,
-            'formatter': 'logstash',
-            'ensure_ascii': True,
-            'filters': ['add_app_name', 'request_context'],
-        }
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # Reduced noise
+            'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
@@ -299,18 +288,13 @@ LOGGING = {
             'propagate': False,
         },
         'api': {
-            'handlers': ['console', 'proxy_handler'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'proxy.requests': {  # Custom logger for proxy requests
-            'handlers': ['console', 'proxy_handler'],
+            'handlers': ['console', 'logstash'],
             'level': 'INFO',
             'propagate': False,
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',  # Only important messages at root level
+        'level': 'WARNING',
     },
 }

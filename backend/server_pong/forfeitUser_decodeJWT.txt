@@ -1,0 +1,20 @@
+--------------------------
+Beginning : 16:58:27 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjg2Mjk0LCJpYXQiOjE3NTI2ODUwOTQsImp0aSI6IjUyZTFmM2Q0NGM5ZDQzOTk4MWFjYzdlNjI1NzNmYWFlIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOlsiZ2F1dGllciIsIkd1ZXN0Iiwib21hciJdfQ.y4YX4k8QmgycHhJU4bgmVeYeaFBr9Jsif1ygMWcKPNI
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}
+--------------------------
+Beginning : 16:59:14 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjg2Mjk0LCJpYXQiOjE3NTI2ODUwOTQsImp0aSI6IjUyZTFmM2Q0NGM5ZDQzOTk4MWFjYzdlNjI1NzNmYWFlIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOlsiZ2F1dGllciIsIkd1ZXN0Iiwib21hciJdfQ.y4YX4k8QmgycHhJU4bgmVeYeaFBr9Jsif1ygMWcKPNI
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}
+--------------------------
+Beginning : 16:59:31 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjg2Mjk0LCJpYXQiOjE3NTI2ODUwOTQsImp0aSI6IjUyZTFmM2Q0NGM5ZDQzOTk4MWFjYzdlNjI1NzNmYWFlIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOlsiZ2F1dGllciIsIkd1ZXN0Iiwib21hciJdfQ.y4YX4k8QmgycHhJU4bgmVeYeaFBr9Jsif1ygMWcKPNI
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}
+--------------------------
+Beginning : 16:59:43 
+encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUyNjg2Mjk0LCJpYXQiOjE3NTI2ODUwOTQsImp0aSI6IjUyZTFmM2Q0NGM5ZDQzOTk4MWFjYzdlNjI1NzNmYWFlIiwidXNlcl9pZCI6MSwidXNlcm5hbWUiOiJrZWxseSIsImludml0ZXMiOlsiZ2F1dGllciIsIkd1ZXN0Iiwib21hciJdfQ.y4YX4k8QmgycHhJU4bgmVeYeaFBr9Jsif1ygMWcKPNI
+res : <Response [200]>
+res.json() : {'payload': {'token_type': 'access', 'exp': 1752686294, 'iat': 1752685094, 'jti': '52e1f3d44c9d439981acc7e62573faae', 'user_id': 1, 'username': 'kelly', 'invites': ['gautier', 'Guest', 'omar']}}

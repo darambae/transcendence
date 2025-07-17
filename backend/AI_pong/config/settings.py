@@ -239,7 +239,7 @@ LOGGING = {
     },
     'handlers': {
         'logstash': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
             'host': 'logstash',
             'port': 6006,
@@ -250,7 +250,7 @@ LOGGING = {
             'filters': ['add_app_name', 'request_context'],
         },
         'console': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'text',
             'filters': ['add_app_name', 'request_context'],
@@ -270,7 +270,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # Reduced noise
+            'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
@@ -288,12 +288,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'ai.game': {  # Custom logger for AI game logic
+        'ai.game': {
             'handlers': ['console', 'ai_handler'],
             'level': 'INFO',
             'propagate': False,
         },
-        'ai.performance': {  # Custom logger for AI performance metrics
+        'ai.performance': {
             'handlers': ['ai_handler'],
             'level': 'INFO',
             'propagate': False,
@@ -301,7 +301,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',  # Only important messages at root level
+        'level': 'WARNING',
     },
 }
 

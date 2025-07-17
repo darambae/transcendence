@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password, make_password
 from django.utils.encoding import force_str
 from .utils import generate_otp_send_mail, generateJwt
-from .logging_utils import log_api_request, log_database_operation, log_user_action, log_profile_operation, log_authentication_event
+from .logging_utils import log_api_request, log_database_operation, log_user_action, log_authentication_event
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
@@ -27,25 +27,7 @@ import re
 from django.conf import settings
 import re
 # Create your views here.
-
-try:
-	from .models import USER, ChatGroup, Message, MATCHTABLE
-except ImportError:
-	# Fallback/Error handling if models are not correctly configured
-	# In a real application, you'd want to ensure models are correctly imported.
-	logging.error("Failed to import models (USER, ChatGroup, Message) in access_postgresql/views.py. "
-				  "Please ensure your models are defined and accessible.")
-	# You might want to raise an exception or handle this more gracefully
-	# depending on your application's setup.
-	class USER: # Dummy classes to prevent NameError if import fails
-		objects = None
-	class ChatGroup:
-		objects = None
-	class Message:
-		objects = None
-	class MATCHTABLE:
-		objects = None
-
+logger = logging.getLogger(__name__)
 
 class api_signup(APIView):
 	permission_classes = [AllowAny]

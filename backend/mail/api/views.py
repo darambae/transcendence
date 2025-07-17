@@ -12,7 +12,7 @@ import string
 import random
 import requests
 import logging
-from .logging_utils import log_mail_api_request, log_email_event as log_mail_event, mail_logger
+from .logging_utils import log_mail_api_request, log_mail_event, mail_logger
 
 # Create your views here.
 

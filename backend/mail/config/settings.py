@@ -190,7 +190,6 @@ class AddAppNameFilter(logging.Filter):
         return True
 
 class RequestContextFilter(logging.Filter):
-    """Add request context to log records"""
     def filter(self, record):
         request = getattr(record, 'request', None)
         if request:
@@ -214,7 +213,6 @@ class RequestContextFilter(logging.Filter):
         return True
     
     def get_client_ip(self, request):
-        """Get the real client IP address"""
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]
@@ -247,14 +245,14 @@ LOGGING = {
                 'levelname': 'level'
             },
             'static_fields': {
-                'service_type': 'mail_service',  # Changed from 'user_service' to 'mail_service'
+                'service_type': 'mail_service',
                 'environment': 'development'
             }
         },
     },
     'handlers': {
         'logstash': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO', 
             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
             'host': 'logstash',
             'port': 6006,
@@ -265,7 +263,7 @@ LOGGING = {
             'filters': ['add_app_name', 'request_context'],
         },
         'console': {
-            'level': 'INFO',  # Changed from DEBUG to reduce noise
+            'level': 'INFO', 
             'class': 'logging.StreamHandler',
             'formatter': 'text',
             'filters': ['add_app_name', 'request_context'],
@@ -285,7 +283,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',  # Reduced noise
+            'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
@@ -308,19 +306,14 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'microservice.requests': {  # Custom logger for inter-service requests
-            'handlers': ['console', 'logstash'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'performance': {  # Custom logger for performance metrics
-            'handlers': ['logstash'],
+        'mail.sender': {
+            'handlers': ['console' ,'logstash'],
             'level': 'INFO',
             'propagate': False,
         },
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',  # Only important messages at root level
+        'level': 'WARNING',
     },
 }

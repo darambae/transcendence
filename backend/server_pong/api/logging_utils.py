@@ -5,6 +5,7 @@ from functools import wraps
 # Loggers for game server service
 game_logger = logging.getLogger('game.server')
 match_logger = logging.getLogger('game.matches')
+stream_logger = logging.getLogger('game.streams')
 api_logger = logging.getLogger('api')
 
 def log_game_event(event_type, game_id=None, player1_id=None, player2_id=None, **kwargs):
@@ -52,14 +53,14 @@ def log_server_event(event_type, server_id=None, capacity=None, active_games=Non
         **kwargs
     })
 
-def log_websocket_game_event(event_type, connection_id=None, game_id=None, player_id=None, **kwargs):
-    """Log WebSocket events for real-time game communication"""
-    game_logger.info(f"WebSocket Game Event: {event_type}", extra={
-        'websocket_event_type': event_type,
+def log_stream_connection_event(event_type, connection_id=None, game_id=None, player_id=None, **kwargs):
+    """Log SSE streaming connection events for client-side connections"""
+    stream_logger.info(f"Stream Connection Event: {event_type}", extra={
+        'stream_event_type': event_type,
         'connection_id': connection_id,
         'game_id': game_id,
         'player_id': player_id,
-        'log_category': 'websocket_game',
+        'log_category': 'stream_connection',
         **kwargs
     })
 
@@ -71,18 +72,6 @@ def log_game_state_change(game_id, old_state=None, new_state=None, trigger=None,
         'new_state': new_state,
         'state_change_trigger': trigger,
         'log_category': 'game_state',
-        **kwargs
-    })
-
-def log_game_performance(metric_name, value, game_id=None, **kwargs):
-    """Log game performance metrics"""
-    game_logger.info(f"Game Performance: {metric_name}", extra={
-        'metric_type': 'game_performance',
-        'metric_name': metric_name,
-        'metric_value': value,
-        'game_id': game_id,
-        'app_name': 'server_pong',
-        'service_type': 'game_service',
         **kwargs
     })
 
@@ -154,16 +143,5 @@ def log_game_error(error_type, game_id=None, error_details=None, **kwargs):
         'game_id': game_id,
         'error_details': error_details,
         'log_category': 'game_error',
-        **kwargs
-    })
-
-def log_matchmaking_event(event_type, player_id=None, opponent_id=None, queue_time=None, **kwargs):
-    """Log matchmaking events"""
-    game_logger.info(f"Matchmaking Event: {event_type}", extra={
-        'matchmaking_event_type': event_type,
-        'player_id': player_id,
-        'opponent_id': opponent_id,
-        'queue_time_ms': queue_time,
-        'log_category': 'matchmaking',
         **kwargs
     })
