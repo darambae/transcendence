@@ -149,7 +149,7 @@ class checkPassword(APIView):
 			if user.activated:
 				if user.online:
 					return JsonResponse({'error': 'User is already logged in'}, status=409)
-				
+
 				if check_password(data.get('password'), user.password):
 					# opt = generate_otp_send_mail(user)
 					opt = "NZHK-GO7Q-9JSD-X9QI"
@@ -373,6 +373,7 @@ class addResultGames(APIView):
 
 	def post(self, request):
 
+
 		data = request.data
 		#data_json = data.json()
 
@@ -570,22 +571,35 @@ class ChatGroupListCreateView(APIView):
 		logger.info(f"Retrieving chat groups for user {current_user.user_name}")
 
 		for group in chat_groups:
-			# For private chats (2 members), get the other user
-			other_member = None
-			other_members = group.members.exclude(id=current_user.id)
-			if other_members.exists():
-				other_member = other_members.first()
-
 			chat_data = {
 				'group_id': group.id,
 				'group_name': group.name,
 			}
 
-			# For private chats, add receiver details
-			if other_member:
+			# Utiliser le champ private pour déterminer le type de chat
+			if group.private:
+				# Chat privé (2 membres), get the other user
+				other_member = None
+				other_members = group.members.exclude(id=current_user.id)
+				if other_members.exists():
+					other_member = other_members.first()
+
 				chat_data.update({
-					'receiver_id': other_member.id,
-					'receiver_name': other_member.user_name
+					'chat_type': 'private',
+				})
+
+				# For private chats, add receiver details
+				if other_member:
+					chat_data.update({
+						'receiver_id': other_member.id,
+						'receiver_name': other_member.user_name
+					})
+			else:
+				# Chat de tournoi (groupe)
+				chat_data.update({
+					'chat_type': 'tournament',
+					'tournament_id': group.tournament_id,
+					'tournament_name': f'tournament_{group.tournament_id}'
 				})
 
 			chat_list.append(chat_data)
@@ -601,66 +615,105 @@ class ChatGroupListCreateView(APIView):
 		"""
 		current_user = request.user  # Authenticated user
 		data = request.data
-		target_user_id = data.get('target_user_id')
-
-		if not target_user_id:
-			return Response({
-				'status': 'error',
-				'message': 'Target user ID is required'
-			}, status=status.HTTP_400_BAD_REQUEST)
-
-		try:
-			target_user = USER.objects.get(id=target_user_id)
-			if current_user.id == target_user.id:
-				logger.warning(f"User {current_user.id} attempted to create chat with themselves")
+		if data.get('chat_type') == 'tournament':
+			tournament_id = data.get('target_id')
+			if not tournament_id:
 				return Response({
 					'status': 'error',
-					'message': 'Cannot create chat with yourself'
+					'message': 'Tournament ID is required'
 				}, status=status.HTTP_400_BAD_REQUEST)
+			try:
+				# Create stable group name using IDs instead of usernames
+				chat_name = f"tournament_{tournament_id}"
+				existing_chat = ChatGroup.objects.filter(name=chat_name).first()
+				if existing_chat:
+					logger.info(f"Found existing chat group: {existing_chat.id}")
+					chat_group = existing_chat
+					chat_group.members.add(current_user)
+				else:
+					# Create a new chat group
+					logger.info(f"Creating new tournament chat named {chat_name} with users {current_user.id}")
+					chat_group = ChatGroup.objects.create(name=chat_name)
+					chat_group.private = False
+					chat_group.tournament_id = tournament_id
+					chat_group.members.add(current_user)
+					chat_group.save()
+					logger.info(f"Created new tournament chat: {chat_group.id}")
+				return Response({
+					'status': 'success',
+					'chat_type': 'tournament',
+					'group_id': chat_group.id,
+					'group_name': chat_group.name,
+					'tournament_id': tournament_id,
+					'user_name': current_user.user_name,
+					'user_id': current_user.id
+				}, status=status.HTTP_200_OK)
+			except Exception as e:
+				logger.exception(f"Error creating chat tournament: {e}")
+				return Response({
+					'status': 'error',
+					'message': f'Internal server error: {str(e)}'
+				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-			# Create stable group name using IDs instead of usernames
-			user_ids = sorted([current_user.id, target_user.id])
-			chat_name = f"chat_{user_ids[0]}_{user_ids[1]}"
-			existing_chat = ChatGroup.objects.filter(
-				name=chat_name,
-				members=current_user
-			).filter(
-				members=target_user
-			).first()
+		if data.get('chat_type') == 'private':
+			target_user_id = data.get('target_id')
+			if not target_user_id:
+				return Response({
+					'status': 'error',
+					'message': 'Target user ID is required'
+				}, status=status.HTTP_400_BAD_REQUEST)
+			try:
+				target_user = USER.objects.get(id=target_user_id)
+				if current_user.id == target_user.id:
+					logger.warning(f"User {current_user.id} attempted to create chat with themselves")
+					return Response({
+						'status': 'error',
+						'message': 'Cannot create chat with yourself'
+					}, status=status.HTTP_400_BAD_REQUEST)
+				# Create stable group name using IDs instead of usernames
+				user_ids = sorted([current_user.id, target_user.id])
+				chat_name = f"chat_{user_ids[0]}_{user_ids[1]}"
+				existing_chat = ChatGroup.objects.filter(
+					name=chat_name,
+					members=current_user
+				).filter(
+					members=target_user
+				).first()
+				if existing_chat:
+					logger.info(f"Found existing chat group: {existing_chat.id} between users {current_user.id} and {target_user.id}")
+					chat_group = existing_chat
+				else:
+					# Create a new chat group
+					logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
+					chat_group = ChatGroup.objects.create(name=chat_name)
+					chat_group.members.add(current_user, target_user)
+					chat_group.save()
+					logger.info(f"Created new chat group: {chat_group.id}")
 
-			if existing_chat:
-				logger.info(f"Found existing chat group: {existing_chat.id} between users {current_user.id} and {target_user.id}")
-				chat_group = existing_chat
-			else:
-				# Create a new chat group
-				logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
-				chat_group = ChatGroup.objects.create(name=chat_name)
-				chat_group.members.add(current_user, target_user)
-				logger.info(f"Created new chat group: {chat_group.id}")
+				# Return the chat group details
+				return Response({
+					'status': 'success',
+					'chat_type': 'private',
+					'group_id': chat_group.id,
+					'group_name': chat_group.name,
+					'receiver_id': target_user.id,
+					'receiver_name': target_user.user_name,
+					'sender_name': current_user.user_name,
+					'sender_id': current_user.id
+				}, status=status.HTTP_200_OK)
 
-			# Return the chat group details
-			return Response({
-				'status': 'success',
-				'group_id': chat_group.id,
-				'group_name': chat_group.name,
-				'receiver_id': target_user.id,
-				'receiver_name': target_user.user_name,
-				'sender_name': current_user.user_name,
-				'sender_id': current_user.id
-			}, status=status.HTTP_200_OK)
-
-		except USER.DoesNotExist:
-			logger.warning(f"Target user {target_user_id} not found for chat creation")
-			return Response({
-				'status': 'error',
-				'message': 'Target user not found'
-			}, status=status.HTTP_404_NOT_FOUND)
-		except Exception as e:
-			logger.exception(f"Error creating chat group: {e}")
-			return Response({
-				'status': 'error',
-				'message': f'Internal server error: {str(e)}'
-			}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			except USER.DoesNotExist:
+				logger.warning(f"Target user {target_user_id} not found for chat creation")
+				return Response({
+					'status': 'error',
+					'message': 'Target user not found'
+				}, status=status.HTTP_404_NOT_FOUND)
+			except Exception as e:
+				logger.exception(f"Error creating chat group: {e}")
+				return Response({
+					'status': 'error',
+					'message': f'Internal server error: {str(e)}'
+				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # ===============================================================
 # 3. Chat Message Send & History View
 # Handles: GET & POST /api/chat/<int:group_id>/messages/
@@ -697,13 +750,21 @@ class ChatMessageView(APIView):
 
 			message_data = []
 			for msg in messages:
-				message_data.append({
-					'id': msg.id,
-					'sender_id': msg.sender.id,
-					'sender_username': msg.sender.user_name,
-					'content': msg.content,
-					'timestamp': msg.timestamp.isoformat()
-				})
+				if chat_group.private:
+					message_data.append({
+						'id': msg.id,
+						'sender_id': msg.sender.id,
+						'sender_username': msg.sender.user_name,
+						'content': msg.content,
+						'timestamp': msg.timestamp.isoformat()
+					})
+				else :
+					message_data.append({
+						'id': msg.id,
+						'sender_username': 'server',
+						'content': msg.content,
+						'timestamp': msg.timestamp.isoformat()
+					})
 
 			return Response({
 				'status': 'success',
@@ -741,18 +802,24 @@ class ChatMessageView(APIView):
 					{'status': 'error', 'message': 'Access denied: Not a member of this chat group.'},
 					status=status.HTTP_403_FORBIDDEN
 				)
-			receiver_id = None
-			receiver_username = None
-			other_member = chat_group.members.exclude(id=current_user.id).first()
-			if other_member:
-				receiver_id = other_member.id
-				receiver_username = other_member.user_name
-
-			message = Message.objects.create(
-				sender=current_user,
-				content=content,
-				group=chat_group
-			)
+			if chat_group.private :
+				receiver_id = None
+				receiver_username = None
+				other_member = chat_group.members.exclude(id=current_user.id).first()
+				if other_member:
+					receiver_id = other_member.id
+					receiver_username = other_member.user_name
+				message = Message.objects.create(
+					sender=current_user,
+					content=content,
+					group=chat_group
+				)
+			else :
+				message = Message.objects.create(
+					content=content,
+					group=chat_group,
+					private=False
+				)
 			logger.info(f"Message saved to DB: '{content[:50]}' by {current_user.user_name} in group {group_id}.")
 
 			channel_layer = get_channel_layer()
@@ -762,22 +829,30 @@ class ChatMessageView(APIView):
 					{'status': 'error', 'message': 'Server not configured for real-time communication.'},
 					status=status.HTTP_500_INTERNAL_SERVER_ERROR
 				)
+			if chat_group.private:
+				channel_group_id = f"chat_{group_id}"
+				message_data = {
+					"id": message.id,
+					"sender_id": current_user.id,
+					"sender_username": current_user.user_name,
+					"content": content,
+					"timestamp": message.timestamp.isoformat(),
+					"group_id": group_id
+				}
+				if receiver_id:
+					message_data["receiver_id"] = receiver_id
+					message_data["receiver_username"] = receiver_username
+			else :
+				channel_group_id = f"tournament_{chat_group.tournament_id}"
+				message_data = {
+					"id": message.id,
+					"tournament_id":chat_group.tournament_id,
+					"sender_username": 'server',
+					"content": content,
+					"timestamp": message.timestamp.isoformat(),
+					"group_id": group_id
+				}
 
-			channel_group_id = f"chat_{group_id}"
-
-			message_data = {
-				"id": message.id,
-				"sender_id": current_user.id,
-				"sender_username": current_user.user_name,
-				"content": content,
-				"timestamp": message.timestamp.isoformat(),
-				"group_id": group_id
-			}
-
-			# Add receiver info for private chats
-			if receiver_id:
-				message_data["receiver_id"] = receiver_id
-				message_data["receiver_username"] = receiver_username
 
 			# Use async_to_sync to call async channel layer from sync code
 			async_to_sync(channel_layer.group_send)(

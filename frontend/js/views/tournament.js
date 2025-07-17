@@ -7,6 +7,7 @@ import { getOtherUserAvatar } from "./card_profile.js";
 import { routes } from "../routes.js"
 
 const csrf = getCookie('csrftoken');
+import { launchTournamentChat, sendMessage } from './chat.js';
 
 let sseTournament;
 let launchbool = false;
@@ -336,7 +337,7 @@ export async function affichUserTournament() {
                       color: rgb(255, 255, 255);
                       order: ${i};
                 ">
-                
+
                 <h6 class="mb-2">${pl}</h6>
                 <img
                   alt="Avatar User"
@@ -444,7 +445,7 @@ export async function tournamentController() {
               userId = jwtInfo["userId"]
             })
             .then(async data => {
-              
+
               // Put here !!!
               //    -> ID               = userId
               //    -> username         = usernameJwt
@@ -539,7 +540,7 @@ export async function tournamentController() {
                     console.log("============================>>", data);
                   }
                   else if (data.t_state == "firsts-match-preview") {
-                    // SEND MESSAGE KELLY 
+                    // SEND MESSAGE KELLY
                 //    -> id       : data.tkey
                 //    -> content  : "⚠️ First matchs annoncement ⚠️
                 //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
@@ -550,7 +551,7 @@ export async function tournamentController() {
                   }
                   else if (data.t_state == "final-match-preview") {
                     console.log("data final match : ", data);
-                    // SEND MESSAGE KELLY 
+                    // SEND MESSAGE KELLY
                 //    -> id       : data.tkey
                 //    -> content  : "⚠️ Final matchs annoncement ⚠️
                 //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
@@ -676,10 +677,8 @@ export async function tournamentController() {
           btnId.style.backgroundColor = "green";
 
 
-          // Put here !!!
-          //    -> ID               = userId
-          //    -> username         = usernameJwt
-          //    -> tournament key   = data["key"]
+		await launchTournamentChat(data['key']);
+
 
 
           const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
@@ -753,7 +752,7 @@ export async function tournamentController() {
                 }
               }
               if (data.t_state == "firsts-match-preview") {
-                // SEND MESSAGE KELLY 
+                // SEND MESSAGE KELLY
                 //    -> id       : data.tkey
                 //    -> content  : "⚠️ First matchs annoncement ⚠️
                 //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
@@ -765,7 +764,7 @@ export async function tournamentController() {
               }
               else if (data.t_state == "final-match-preview") {
                 console.log("data final match : ", data);
-                // SEND MESSAGE KELLY 
+                // SEND MESSAGE KELLY
                 //    -> id       : data.tkey
                 //    -> content  : "⚠️ Final matchs annoncement ⚠️
                 //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
@@ -843,41 +842,6 @@ export async function tournamentController() {
         });
     }
   })
-
-
-  //tournamentLaunch.addEventListener('click', async (event) => {
-  //  const target = event.target;
-  //  console.log("===================")
-  //  console.log(target)
-  //  console.log("===================")
-
-  //  if (target.tagName === "BUTTON") {
-  //    event.preventDefault();
-  //    const view = target.id;
-
-  //    await fetchWithRefresh("tournament/match", {
-  //      method: "POST",
-  //      headers: {
-  //        'X-CSRFToken': csrf,
-  //        'Content-Type': 'application/json',
-  //      },
-  //      credentials: 'include',
-  //      body: JSON.stringify({ "tKey": view })
-  //    })
-  //    .then(response => {
-  //      if (!response.ok) throw new Error("https Error: " + response.status);
-  //      console.log("entreeeeeeeeokoko")
-  //      return response.json();
-  //    })
-  //    .then(data => {
-  //      //tournamentInfo.innerHTML = `<h6>${data["Info"]}</h6>`;
-  //      })
-  //      .catch(error => {
-  //        console.error("Erreur de requête :", error);
-  //        throw error;
-  //      });
-  //  }
-  //})
 
 
   tournamentGame.addEventListener('click', async (event) => {
@@ -1005,7 +969,7 @@ async function launchGame(data_game) {
       [a, b, c] = guestArray;
       console.log(data)
       username = data.username || 'anonymous';
-      
+
       console.log("==========================")
       console.log(data)
       console.log(username)
@@ -1034,7 +998,7 @@ async function launchGame(data_game) {
 
 
 //                      +-------------------+
-//                      |  TOURNAMENT INFO  |                   
+//                      |  TOURNAMENT INFO  |
 //                      +-------------------+
 //                      |                   |
 //                      |   MATCH PREVIEW   |
