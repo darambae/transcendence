@@ -8,7 +8,7 @@ import {
 import { renderChatButtonIfAuthenticated } from './views/chat.js';
 import { cleanupLocalGame } from './views/localGame.js';
 import { cleanupMultiplayerGame } from './views/multiplayerGameSession.js';
-import { cleanupTournament } from './views/tournament.js';
+// import { cleanupTournament } from './views/tournament.js';
 
 // State management
 let navigationBlocked = false;
@@ -182,7 +182,7 @@ export async function navigate() {
 		// Cleanup any active game timers before navigating to a new page
 		cleanupLocalGame();
 		cleanupMultiplayerGame();
-		cleanupTournament();
+		// cleanupTournament();
 		await actualizeIndexPage('main-content', view);
 	} catch (error) {
 		console.error('Error loading template:', error);
