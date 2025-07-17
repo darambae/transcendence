@@ -11,7 +11,7 @@ import { getOtherUserAvatar } from './card_profile.js';
 import { routes } from '../routes.js';
 
 const csrf = getCookie('csrftoken');
-import { promptTournamentChat, sendTournamentDuelInvitation } from './chat.js';
+import { launchTournamentChat, sendTournamentDuelInvitation } from './chat.js';
 
 let sseTournament;
 let launchbool = false;
@@ -654,7 +654,8 @@ export async function tournamentController() {
 
 				const data = await response.json();
 				btnId.style.backgroundColor = 'green';
-
+				//init tournament_chat
+				await launchTournamentChat(data['key']);
 				// Close existing SSE connection if it exists
 				if (SSEStream && SSEStream.readyState !== EventSource.CLOSED) {
 					SSEStream.close();

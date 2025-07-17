@@ -615,66 +615,102 @@ class ChatGroupListCreateView(APIView):
 		"""
 		current_user = request.user  # Authenticated user
 		data = request.data
-		target_user_id = data.get('target_user_id')
-
-		if not target_user_id:
-			return Response({
-				'status': 'error',
-				'message': 'Target user ID is required'
-			}, status=status.HTTP_400_BAD_REQUEST)
-
-		try:
-			target_user = USER.objects.get(id=target_user_id)
-			if current_user.id == target_user.id:
-				logger.warning(f"User {current_user.id} attempted to create chat with themselves")
+		if data.get('chat_type') == 'tournament':
+			tournament_id = data.get('target_id')
+			if not tournament_id:
 				return Response({
 					'status': 'error',
-					'message': 'Cannot create chat with yourself'
+					'message': 'Tournament ID is required'
 				}, status=status.HTTP_400_BAD_REQUEST)
+			try:
+				# Create stable group name using IDs instead of usernames
+				chat_name = f"tournament_{tournament_id}"
+				existing_chat = ChatGroup.objects.filter(name=chat_name).first()
+				if existing_chat:
+					logger.info(f"Found existing chat group: {existing_chat.id}")
+					chat_group = existing_chat
+				else:
+					# Create a new chat group
+					logger.info(f"Creating new tournament chat named {chat_name} with users {current_user.id}")
+					chat_group = ChatGroup.objects.create(name=chat_name)
+					chat_group.private = False
+					chat_group.tournament_id = tournament_id
+					chat_group.members.add(current_user)
+					logger.info(f"Created new tournament chat: {chat_group.id}")
+				return Response({
+					'status': 'success',
+					'chat_type': 'tournament',
+					'group_id': chat_group.id,
+					'group_name': chat_group.name,
+					'tournament_id': tournament_id,
+					'user_name': current_user.user_name,
+					'user_id': current_user.id
+				}, status=status.HTTP_200_OK)
+			except Exception as e:
+				logger.exception(f"Error creating chat tournament: {e}")
+				return Response({
+					'status': 'error',
+					'message': f'Internal server error: {str(e)}'
+				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-			# Create stable group name using IDs instead of usernames
-			user_ids = sorted([current_user.id, target_user.id])
-			chat_name = f"chat_{user_ids[0]}_{user_ids[1]}"
-			existing_chat = ChatGroup.objects.filter(
-				name=chat_name,
-				members=current_user
-			).filter(
-				members=target_user
-			).first()
+		if data.get('chat_type') == 'private':
+			target_user_id = data.get('target_id')
+			if not target_user_id:
+				return Response({
+					'status': 'error',
+					'message': 'Target user ID is required'
+				}, status=status.HTTP_400_BAD_REQUEST)
+			try:
+				target_user = USER.objects.get(id=target_user_id)
+				if current_user.id == target_user.id:
+					logger.warning(f"User {current_user.id} attempted to create chat with themselves")
+					return Response({
+						'status': 'error',
+						'message': 'Cannot create chat with yourself'
+					}, status=status.HTTP_400_BAD_REQUEST)
+				# Create stable group name using IDs instead of usernames
+				user_ids = sorted([current_user.id, target_user.id])
+				chat_name = f"chat_{user_ids[0]}_{user_ids[1]}"
+				existing_chat = ChatGroup.objects.filter(
+					name=chat_name,
+					members=current_user
+				).filter(
+					members=target_user
+				).first()
+				if existing_chat:
+					logger.info(f"Found existing chat group: {existing_chat.id} between users {current_user.id} and {target_user.id}")
+					chat_group = existing_chat
+				else:
+					# Create a new chat group
+					logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
+					chat_group = ChatGroup.objects.create(name=chat_name)
+					chat_group.members.add(current_user, target_user)
+					logger.info(f"Created new chat group: {chat_group.id}")
 
-			if existing_chat:
-				logger.info(f"Found existing chat group: {existing_chat.id} between users {current_user.id} and {target_user.id}")
-				chat_group = existing_chat
-			else:
-				# Create a new chat group
-				logger.info(f"Creating new chat group between users {current_user.id} and {target_user.id}")
-				chat_group = ChatGroup.objects.create(name=chat_name)
-				chat_group.members.add(current_user, target_user)
-				logger.info(f"Created new chat group: {chat_group.id}")
+				# Return the chat group details
+				return Response({
+					'status': 'success',
+					'chat_type': 'private',
+					'group_id': chat_group.id,
+					'group_name': chat_group.name,
+					'receiver_id': target_user.id,
+					'receiver_name': target_user.user_name,
+					'sender_name': current_user.user_name,
+					'sender_id': current_user.id
+				}, status=status.HTTP_200_OK)
 
-			# Return the chat group details
-			return Response({
-				'status': 'success',
-				'group_id': chat_group.id,
-				'group_name': chat_group.name,
-				'receiver_id': target_user.id,
-				'receiver_name': target_user.user_name,
-				'sender_name': current_user.user_name,
-				'sender_id': current_user.id
-			}, status=status.HTTP_200_OK)
-
-		except USER.DoesNotExist:
-			logger.warning(f"Target user {target_user_id} not found for chat creation")
-			return Response({
-				'status': 'error',
-				'message': 'Target user not found'
-			}, status=status.HTTP_404_NOT_FOUND)
-		except Exception as e:
-			logger.exception(f"Error creating chat group: {e}")
-			return Response({
-				'status': 'error',
-				'message': f'Internal server error: {str(e)}'
-			}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			except USER.DoesNotExist:
+				logger.warning(f"Target user {target_user_id} not found for chat creation")
+				return Response({
+					'status': 'error',
+					'message': 'Target user not found'
+				}, status=status.HTTP_404_NOT_FOUND)
+			except Exception as e:
+				logger.exception(f"Error creating chat group: {e}")
+				return Response({
+					'status': 'error',
+					'message': f'Internal server error: {str(e)}'
+				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 # ===============================================================
 # 3. Chat Message Send & History View
 # Handles: GET & POST /api/chat/<int:group_id>/messages/
@@ -1116,74 +1152,67 @@ class blockedStatus(APIView):
             )
 
 
-class tournamentChat(APIView):
-    """
-    API endpoint to create or retrieve a tournament chat group.
-    Tournament chats are group chats that can have multiple participants.
-    """
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can create tournament chats
+# class tournamentChat(APIView):
+#     """
+#     API endpoint to create or retrieve a tournament chat group.
+#     Tournament chats are group chats that can have multiple participants.
+#     """
+#     permission_classes = [IsAuthenticated]  # Ensure only authenticated users can create tournament chats
 
-    def post(self, request) -> Response:
-        """
-        Creates or retrieves a tournament chat group.
-        Expects 'tournament_id' and 'current_user_id' in the request data.
-        """
-        current_user = request.user  # Authenticated user
-        data = request.data
-        tournament_id = data.get('tournament_id')
-        current_user_id = data.get('current_user_id')
+#     def post(self, request) -> Response:
+#         """
+#         Creates or retrieves a tournament chat group.
+#         Expects 'tournament_id' and 'current_user_id' in the request data.
+#         """
+#         current_user = request.user  # Authenticated user
+#         data = request.data
+#         tournament_id = data.get('tournament_id')
 
-        if not tournament_id:
-            return Response({
-                'status': 'error',
-                'message': 'Tournament ID is required'
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         if not tournament_id:
+#             return Response({
+#                 'status': 'error',
+#                 'message': 'Tournament ID is required'
+#             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if not current_user_id or current_user_id != current_user.id:
-            return Response({
-                'status': 'error',
-                'message': 'Invalid user authentication'
-            }, status=status.HTTP_400_BAD_REQUEST)
+#         try:
+#             # Create a unique name for the tournament chat group
+#             tournament_name = f"Tournament_{tournament_id}"
+#             chat_name = f"tournament_{tournament_id}"
 
-        try:
-            # Create a unique name for the tournament chat group
-            tournament_name = f"Tournament_{tournament_id}"
-            chat_name = f"tournament_{tournament_id}"
+#             # Use get_or_create to handle race conditions - thread-safe operation
+#             chat_group, created = ChatGroup.objects.get_or_create(
+#                 tournament_id=tournament_id,
+#                 private=False,
+#                 defaults={
+#                     'name': chat_name,
+#                     'tournament_name': tournament_name
+#                 }
+#             )
 
-            # Use get_or_create to handle race conditions - thread-safe operation
-            chat_group, created = ChatGroup.objects.get_or_create(
-                tournament_id=tournament_id,
-                private=False,
-                defaults={
-                    'name': chat_name,
-                    'tournament_name': tournament_name
-                }
-            )
+#             if created:
+#                 # New group created - add the creator as first member
+#                 chat_group.members.add(current_user)
+#                 logger.info(f"Created new tournament chat group: {chat_group.id} for tournament {tournament_id}")
+#             else:
+#                 # Group already exists - log that we found it
+#                 logger.info(f"Found existing tournament chat group: {chat_group.id} for tournament {tournament_id}")
+#                 # For existing tournament chats, only participants should be added through tournament logic
+#                 # Do not automatically add users here
 
-            if created:
-                # New group created - add the creator as first member
-                chat_group.members.add(current_user)
-                logger.info(f"Created new tournament chat group: {chat_group.id} for tournament {tournament_id}")
-            else:
-                # Group already exists - log that we found it
-                logger.info(f"Found existing tournament chat group: {chat_group.id} for tournament {tournament_id}")
-                # For existing tournament chats, only participants should be added through tournament logic
-                # Do not automatically add users here
+#             # Return the chat group details
+#             return Response({
+#                 'status': 'success',
+#                 'group_id': chat_group.id,
+#                 'group_name': chat_group.name,
+#                 'tournament_id': tournament_id,
+#                 'tournament_name': tournament_name,
+#                 'current_id': current_user.id,
+#                 'current_name': current_user.user_name
+#             }, status=status.HTTP_200_OK)
 
-            # Return the chat group details
-            return Response({
-                'status': 'success',
-                'group_id': chat_group.id,
-                'group_name': chat_group.name,
-                'tournament_id': tournament_id,
-                'tournament_name': tournament_name,
-                'creator_id': current_user.id,
-                'creator_name': current_user.user_name
-            }, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            logger.exception(f"Error creating tournament chat group: {e}")
-            return Response({
-                'status': 'error',
-                'message': f'Internal server error: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Exception as e:
+#             logger.exception(f"Error creating tournament chat group: {e}")
+#             return Response({
+#                 'status': 'error',
+#                 'message': f'Internal server error: {str(e)}'
+#             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
