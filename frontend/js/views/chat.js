@@ -89,13 +89,11 @@ async function initGlobalChatNotifications(currentUserId) {
 			}
 		});
 
-		// Ajouter l'écoute des notifications de blocage/déblocage
 		globalEventSource.addEventListener('block_notification', function (e) {
 			try {
 				const notificationData = JSON.parse(e.data);
 				console.log('Global: Block notification received:', notificationData);
 
-				// Vérifier si cette notification concerne l'utilisateur actuel
 				if (notificationData.target_user_id.toString() === currentUserId.toString()) {
 					let message, toastType;
 
@@ -108,13 +106,10 @@ async function initGlobalChatNotifications(currentUserId) {
 					}
 
 					if (message) {
-						// Afficher la notification toast
 						showChatNotification(message, toastType, 8000);
 
-						// Rafraîchir le chat si l'utilisateur concerné est dans la conversation active
 						if (currentTargetId && currentTargetId.toString() === notificationData.actor_id.toString()) {
 							console.log('Block status changed for current chat partner, refreshing chat state');
-							// Utiliser la fonction existante pour rafraîchir le chat
 							refreshChatAfterBlockStatusChange(notificationData.actor_id);
 						}
 					}
@@ -441,37 +436,67 @@ function sendMessage(currentUserId) {
 		});
 }
 
+function updateGlobalUnreadStatus(hasUnread) {
+    const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+    
+    if (!mainChatToggleButton) return;
+    
+    if (hasUnread) {
+        mainChatToggleButton.classList.add('has-unread-overall');
+        console.log('Added unread indicator to chat button');
+    } else {
+        mainChatToggleButton.classList.remove('has-unread-overall');
+        console.log('Removed unread indicator from chat button');
+    }
+}
+
+async function initializeAllChatConnections(currentUserId) {
+	if (!currentUserId) {
+		console.log('No user ID provided for chat connections initialization');
+		return;
+	}
+
+	try {
+		console.log('Initializing all chat connections for user:', currentUserId);
+		const response = await fetchWithRefresh(`/chat/?t=${Date.now()}`, {
+			method: 'GET',
+			headers: {
+				'X-CSRFToken': getCookie('csrftoken'),
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+		});
+
+		if (!response.ok) {
+			console.error('Error loading chat list for connections initialization');
+			return;
+		}
+
+		const data = await response.json();
+
+		if (response.ok && Array.isArray(data.chats)) {
+			console.log('Initializing SSE connections for', data.chats.length, 'chats');
+			data.chats.forEach((chat) => {
+				// Initialize all SSE connections for all existing chats
+				initEventSource(chat.group_id, currentUserId);
+			});
+		}
+	} catch (error) {
+		console.error('Error initializing chat connections:', error);
+	}
+}
+
 // Function to initialize EventSource (SSE) for a group
 async function initEventSource(groupId, currentUserId) {
-	// Close any other active EventSources before opening a new one
-	// for (const key in eventSources) {
-	// 	if (eventSources[key].readyState === EventSource.OPEN) {
-	// 		eventSources[key].close();
-	// 		delete eventSources[key];
-	// 		console.log(`Closed SSE for group: ${key}`);
-	// 	}
-	// }
-	// if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
-	//     console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
-	//     return;
-	// }
+	console.log('in initEventSource');
 	if (eventSources[groupId]) {
 		console.log(
 			`Fermeture de la connexion SSE existante pour le groupe ${groupId}.`
 		);
-		eventSources[groupId].close(); // <-- C'est la ligne magique !
-		delete eventSources[groupId]; // Facultatif mais bonne pratique pour nettoyer
+		eventSources[groupId].close();
+		delete eventSources[groupId];
 	}
 	try {
-		// await fetchWithRefresh(`/chat/${groupId}/messages/`, {
-		// 	method: 'GET',
-		// 	headers: {
-		// 		'Content-Type': 'application/json',
-		// 		'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
-		// 	},
-		// 	credentials: 'include',
-		// });
-		// UPDATED URL: /chat/stream/{group_id}/
 		await fetchWithRefresh('/auth/refresh-token/', {
 			method: 'GET',
 			credentials: 'include',
@@ -502,7 +527,7 @@ async function initEventSource(groupId, currentUserId) {
 		const recentlyReceivedMessages = new Set(); // For message deduplication
 		source.onmessage = function (e) {
 			try {
-				// Skip heartbeat messages
+				console.log("in on message");
 				if (
 					e.data === 'heartbeat' ||
 					e.data.trim() === ''
@@ -518,9 +543,10 @@ async function initEventSource(groupId, currentUserId) {
 				}
 
 				// Create a unique identifier that matches the one used in loadMessageHistory
-				const messageTimestamp = new Date(
-					messageData.timestamp
-				).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], { 
+					hour: '2-digit', 
+					minute: '2-digit' 
+				});
 				const messageId = `${messageData.sender_username}-${messageData.content}-${messageTimestamp}`;
 
 				// Skip if we've seen this message recently (deduplication)
@@ -537,8 +563,29 @@ async function initEventSource(groupId, currentUserId) {
 					recentlyReceivedMessages.delete(messageId);
 				}, 10000);
 
-				// Only append if the message is for the currently active chat group
-				if (messageData.group_id === currentActiveChatGroup) {
+
+				const mainChatWindowElement = document.getElementById('mainChatWindow');
+				const isModalClosed = !mainChatWindowElement || !mainChatWindowElement.classList.contains('show');
+				
+				console.log('Modal state - isModalClosed:', isModalClosed, 'currentActiveChatGroup:', currentActiveChatGroup, 'messageGroupId:', messageData.group_id);
+
+				// const chatListItem = document.querySelector(`#chatRoomList [data-group-id="${messageData.group_id}"]`);
+				// if (chatListItem && messageData.group_id !== currentActiveChatGroup) {
+				// 	// Marquer ce chat comme ayant des messages non lus (sauf si c'est le chat actif)
+				// 	chatListItem.classList.add('has-unread-messages');
+				// 	console.log(`Marked chat ${messageData.group_id} as having unread messages`);
+				// }
+
+				if (isModalClosed || messageData.group_id !== currentActiveChatGroup) {
+					console.log('Marking global unread status - modal closed:', isModalClosed, 'different chat:', messageData.group_id !== currentActiveChatGroup);
+					updateGlobalUnreadStatus(true);
+					
+					if (isModalClosed) {
+						return;
+					}
+				}
+
+				if (!isModalClosed && messageData.group_id === currentActiveChatGroup) {
 					const chatLog = document.getElementById('chatLog-active');
 					if (!chatLog) {
 						console.error(`chatLog-active not found for initEventSource.`);
@@ -546,31 +593,18 @@ async function initEventSource(groupId, currentUserId) {
 					}
 
 					// Check if this message already exists in the chat log
-					const existingMessages = Array.from(
-						chatLog.querySelectorAll('.chat-message')
-					).map((msgEl) => {
-						const sender =
-							msgEl.querySelector('.message-sender')?.textContent || '';
+					const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map((msgEl) => {
+						const sender = msgEl.querySelector('.message-sender')?.textContent || '';
 						const content = msgEl.textContent
-							.replace(
-								msgEl.querySelector('.message-sender')?.textContent || '',
-								''
-							)
-							.replace(
-								msgEl.querySelector('.message-timestamp')?.textContent || '',
-								''
-							)
+							.replace(msgEl.querySelector('.message-sender')?.textContent || '', '')
+							.replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '')
 							.trim();
-						const timestamp =
-							msgEl.querySelector('.message-timestamp')?.textContent || '';
+						const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
 						return `${sender}-${content}-${timestamp}`;
 					});
 
 					if (existingMessages.includes(messageId)) {
-						console.log(
-							'Message already exists in chat log, skipping:',
-							messageId
-						);
+						console.log('Message already exists in chat log, skipping:', messageId);
 						return;
 					}
 
@@ -581,25 +615,7 @@ async function initEventSource(groupId, currentUserId) {
 					}
 					const msgElement = createMessageElement(messageData, currentUserId);
 					chatLog.appendChild(msgElement);
-					chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
-				} else {
-					// *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
-					console.log(
-						`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`
-					);
-					const inactiveChatListItem = document.querySelector(
-						`#chatRoomList [data-group-id="${messageData.group_id}"]`
-					);
-					if (inactiveChatListItem) {
-						inactiveChatListItem.classList.add('has-unread-messages');
-					}
-					const mainChatToggleButton = document.getElementById(
-						'mainChatToggleButton'
-					);
-					if (mainChatToggleButton && !hasOverallUnreadMessages) {
-						mainChatToggleButton.classList.add('has-unread-overall');
-						hasOverallUnreadMessages = true; // Empêche d'ajouter la classe plusieurs fois
-					}
+					chatLog.scrollTop = chatLog.scrollHeight;
 				}
 			} catch (error) {
 				console.error(
@@ -706,7 +722,10 @@ export async function loadChatRoomList(currentUserId) {
 					}
 				};
 				chatRoomListUl.appendChild(listItem);
-				initEventSource(chat.group_id, currentUserId);
+				// *** MODIFICATION : Seulement initialiser SSE si pas déjà présent ***
+				if (!eventSources[chat.group_id]) {
+					initEventSource(chat.group_id, currentUserId);
+				}
 			});
 		} else {
 			console.error(
@@ -743,12 +762,20 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	);
 	if (newActiveItem) {
 		newActiveItem.classList.add('active');
+		newActiveItem.classList.remove('has-unread-messages');
 	}
-	newActiveItem.classList.remove('has-unread-messages');
+
 	// Update current active group
 	currentActiveChatGroup = newgroupId;
 	currentTargetId = targetUserId;
 	console.log(`Switched to chat room: ${newgroupId}`);
+
+	// *** NOUVEAU : Vérifier s'il reste des chats non lus ***
+	const hasOtherUnreadChats = document.querySelector('#chatRoomList .has-unread-messages');
+	if (!hasOtherUnreadChats) {
+		console.log('No more unread chats, removing global unread status');
+		updateGlobalUnreadStatus(false);
+	}
 	// Update header of the right column with the other user's name
 	const activeChatRoomName = document.getElementById('activeChatRoomName');
 	const targetChatListItem = document.querySelector(
@@ -1067,6 +1094,7 @@ export async function initChatModule(currentUserId) {
 	// Initialize global notifications
 	if (currentUserId) {
 		initGlobalChatNotifications(currentUserId);
+		await initializeAllChatConnections(currentUserId);
 	}
 }
 
@@ -1088,8 +1116,8 @@ export function chatController(userId, username) {
 		usernameInputActive.value = username;
 	}
 
-	// Initialize global chat notifications
 	initGlobalChatNotifications(userId);
+	initializeAllChatConnections(userId);
 
 	// 1. Initialize Bootstrap Modal
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
@@ -1098,15 +1126,11 @@ export function chatController(userId, username) {
 
 		mainChatWindowElement.addEventListener('shown.bs.modal', async () => {
 			console.log('Main Chat Window is shown');
-			hasOverallUnreadMessages = false; // Réinitialiser l'état global
-			const mainChatToggleButton = document.getElementById(
-				'mainChatToggleButton'
-			);
-			if (mainChatToggleButton) {
-				mainChatToggleButton.classList.remove('has-unread-overall');
-			}
+			
+			updateGlobalUnreadStatus(false);
+
 			console.log('Logged in user ID:', userId);
-			loadChatRoomList(userId); // Load chat list dynamically
+			loadChatRoomList(userId);
 
 			// Set initial state for chat log
 			const chatLog = document.getElementById('chatLog-active');
@@ -1118,7 +1142,8 @@ export function chatController(userId, username) {
 			if (currentActiveChatGroup) {
 				await switchChatRoom(userId, currentActiveChatGroup, currentTargetId);
 			}
-			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
+			setupUserSearchAutocomplete(); 
+
 			// Focus on new chat user ID input initially
 			const targetUserInput = document.getElementById('targetUserInput');
 			if (targetUserInput) {
@@ -1127,21 +1152,18 @@ export function chatController(userId, username) {
 		});
 		mainChatWindowElement.addEventListener('hidden.bs.modal', () => {
 			console.log('Main Chat Window is hidden');
-			// Close all SSE connections when modal closes
-			cleanupAllChatConnections();
-
 			currentActiveChatGroup = null; // Reset active chat group when closing modal
 			currentTargetId = null;
-			// Clear chat log and reset UI state
+
 			const chatLog = document.getElementById('chatLog-active');
 			if (chatLog)
 				chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
 
 			document.getElementById('messageInput-active').disabled = true;
 			document.getElementById('sendMessageBtn').disabled = true;
-			document.getElementById('activeChatRoomName').textContent = ''; // Clear header
+			document.getElementById('activeChatRoomName').textContent = '';
 			document.getElementById('groupIdInput-active').value = '';
-			document.getElementById('targetUserInput').value = ''; // Clear new chat input
+			document.getElementById('targetUserInput').value = '';
 
 			const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 			if (gameInvitationBtn) {
@@ -1168,7 +1190,6 @@ export function chatController(userId, username) {
 	const sendMessageBtn = document.getElementById('sendMessageBtn');
 	if (sendMessageBtn) {
 		sendMessageBtn.addEventListener('click', () => {
-			// Always pass the logged-in user's username to sendMessage
 			sendMessage(userId);
 		});
 	}
@@ -1281,7 +1302,7 @@ function handleStartNewChat(currentUserId, currentUsername) {
 	}
 
 	promptPrivateChat(currentUserId, targetUserId, targetUsername);
-	targetUserInput.value = ''; // Clear input field
+	targetUserInput.value = '';
 	targetUserInput.dataset.userId = '';
 }
 
@@ -1304,7 +1325,7 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 	let existinggroupId = null;
 	chatRooms.forEach((room) => {
 		if (room.dataset.targetUserId === targetUserId) {
-			existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
+			existinggroupId = room.dataset.groupId; 
 		}
 	});
 
