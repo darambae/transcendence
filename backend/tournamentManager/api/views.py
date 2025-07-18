@@ -60,10 +60,16 @@ async def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 async def decodeJWT(request, func=None, encodedJwt=None) :
+	# with open(f"{func}_decodeJWT.txt", "a+") as f :
+	#     tm = datetime.now()
+	#     # print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f)
+	# with open(f"{func}_decodeJWT.txt", "a") as f :
 	if not encodedJwt :
 		encodedJwt = request.COOKIES.get("access_token", None)
 	if not encodedJwt :
 		return [None] * 3
+
+	# # print(f"encoded: {encodedJwt}", file=f)
 
 	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
 	res_json = res.json()
@@ -101,8 +107,8 @@ async def launchMatch(request) :
 				"text_data": {"action" : "update-guest", "jwt-list" : lsTrnmtJwt}
 			}
 		)
-		
-		asyncio.sleep(5)
+
+		await asyncio.sleep(5) # Might need change
 
 		await channel_layer.group_send(
 			tkey,
@@ -201,7 +207,7 @@ async def joinGuest(request) :
 		for elem in trnmtDict :
 			if username in trnmtDict[elem].listUsr() :
 				tKey = elem
-		
+
 		if tKey not in trnmtDict:
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 		lsTrnmtJwt = trnmtDict[tKey].listJWT()
@@ -222,6 +228,8 @@ async def joinGuest(request) :
 	except Exception as e :
 		print(f"Error : {e}", file=sys.stderr)
 
+
+
 async def joinTournament(request):
 	try:
 		body = json.loads(request.body)
@@ -235,21 +243,21 @@ async def joinTournament(request):
 		except Exception :
 			return JsonResponse({"Error": "Unauthorized"}, status=401)
 		tKey = body["tKey"]
-		
+
 		if tKey not in trnmtDict:
 			return JsonResponse({"Error": "Tournament not found"}, status=404)
 
 		try :
 			for elem in trnmtDict :
-				if username in trnmtDict[elem].listUsr() : 
+				if username in trnmtDict[elem].listUsr() :
 					return JsonResponse({"Error" : "player already in a tournament"}, status=403)
 		except Exception as e :
 			print(f"Error : {e}", file=sys.stderr)
 		player = Player(jwt_token, username)
 		trnmtDict[tKey].addPlayers(player)
 
-		return JsonResponse({"key" : tKey, "main" : username})		
-		
+		return JsonResponse({"key" : tKey, "main" : username})
+
 	except Exception as e:
 		return JsonResponse({"error": f"Internal server error {e}"}, status=500)
 
@@ -365,7 +373,7 @@ async def Supervise(request) :
 		jwt = jwt[0]['payload']
 		tkey = request.GET.get("tkey")
 		mkey = request.GET.get("key")
-		roundM = request.GET.get("round", 1) 
+		roundM = request.GET.get("round", 1)
 
 		await channel_layer.group_send(
 			tkey,
@@ -384,15 +392,15 @@ async def amIinTournament(request) :
 		jwt = await decodeJWT(request)
 
 		jwt = jwt[0]['payload']
-		for elem in trnmtDict : 
+		for elem in trnmtDict :
 			lsJwt = trnmtDict[elem].listJWTPlayers()
 			if (jwt["username"] in lsJwt) :
-				lsPlayer = trnmtDict[elem].listUsr()			
+				lsPlayer = trnmtDict[elem].listUsr()
 				return JsonResponse({"Tournament" : elem, "number" : trnmtDict[elem].nbPl, "players" : lsPlayer})
 		return JsonResponse({"Tournament" : "None"})
 	except Exception as e :
 		return JsonResponse({"Error" : "Unauthorized"}, status=401)
-	
+
 @csrf_exempt
 async def getResults(request, tkey) :
 	return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})

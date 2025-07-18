@@ -668,7 +668,7 @@ async function establishSSEConnection(
 				}
 			}
 		} catch (error) {
-			console.warn('Error parsing SSE message:', error);
+			console.warn('Error parsing SSE message:', event.data);
 		}
 	};
 
@@ -681,6 +681,7 @@ async function establishSSEConnection(
 
 	// Add error handling for SSE connection (should be more stable now)
 	SSEStream.onerror = function (error) {
+		
 		console.error('Multiplayer SSE connection error:', error);
 		if (SSEStream.readyState === EventSource.CLOSED) {
 			console.log('Multiplayer SSE connection was closed');

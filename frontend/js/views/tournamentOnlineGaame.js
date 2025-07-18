@@ -61,5 +61,5 @@ export async function onlineGameTr(
 		}
 	);
 
-	handleGame2Players(key, Number(playerID), isAiGame, JWTid);
+	await handleGame2Players(key, Number(playerID), isAiGame, JWTid);
 }

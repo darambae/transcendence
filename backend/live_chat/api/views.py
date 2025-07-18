@@ -85,13 +85,11 @@ class ChatGroupListCreateView(View):
                 'current_user': data.get('current_username'),
                 'target_user': data.get('target_username')
             })
-            target_user_id = data.get('target_user_id')
-            current_user_id = data.get('current_user_id')
-            if not target_user_id or not current_user_id:
-                return JsonResponse({'status': 'error', 'message': 'user ids are required.'}, status=400)
-
+            target_id = data.get('target_id')
+            if not target_id:
+                return JsonResponse({'status': 'error', 'message': 'target_id is required.'}, status=400)
             # Get current user from the authenticated request
-            logger.info(f"Creating private chat for user {current_user_id} with target user {target_user_id}")
+            logger.info(f"Creating private or tournament chat with target {target_id}")
             access_token = request.COOKIES.get('access_token')
             if not access_token:
                 return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
@@ -99,8 +97,8 @@ class ChatGroupListCreateView(View):
             url = f"{ACCESS_PG_BASE_URL}/api/chat/"
             try:
                 resp = requests.post(url, json={
-                    'current_user_id': current_user_id,
-                    'target_user_id': target_user_id
+                    'target_id': target_id,
+                    'chat_type': data.get('chat_type')
                 }, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
                 # Envoyer une notification au destinataire du nouveau chat privé
@@ -110,21 +108,41 @@ class ChatGroupListCreateView(View):
                     channel_layer = get_channel_layer()
                     if channel_layer:
                         # Notification pour le destinataire
-                        notification_group_name = f"notifications_{target_user_id}"
-                        async_to_sync(channel_layer.group_send)(
-                            notification_group_name,
-                            {
-                                "type": "chat_notification",
-                                "notification": {
-                                    "type": "new_chat_group",
-                                    "target_user_id": target_user_id,
-                                    "creator_id": current_user_id,
-                                    "creator_username": response_data.get('sender_name'),
-                                    "group_id": response_data.get('group_id'),
-                                    "timestamp": datetime.now().isoformat()
+                        if (data.get('chat_type') == 'private'):
+                            notification_group_name = f"notifications_{target_id}"
+                            async_to_sync(channel_layer.group_send)(
+                                notification_group_name,
+                                {
+                                    "type": "chat_notification",
+                                    "notification": {
+                                        "chat_type": data.get('chat_type'),
+                                        "type": "new_chat_group",
+                                        "target_id": target_id,
+                                        "creator_id": response_data.get('sender_id'),
+                                        "creator_username": response_data.get('sender_name'),
+                                        "group_id": response_data.get('group_id'),
+                                        "timestamp": datetime.now().isoformat()
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        if (data.get('chat_type') == 'tournament'):
+                            notification_group_name = f"notifications_{response_data.get('current_user_id')}"
+                            async_to_sync(channel_layer.group_send)(
+                                notification_group_name,
+                                {
+                                    "type": "chat_notification",
+                                    "notification": {
+                                        "chat_type": data.get('chat_type'),
+                                        "type": "new_chat_group",
+                                        "target_id": data.get('target_id'),
+                                        "user_id": response_data.get('user_id'),
+                                        "user_name": response_data.get('user_name'),
+                                        "group_id": response_data.get('group_id'),
+                                        "group_name": response_data.get('group_name'),
+                                        "timestamp": datetime.now().isoformat()
+                                    }
+                                }
+                            )
 
                 return JsonResponse(resp.json(), status=resp.status_code)
             except requests.RequestException as exc:
@@ -265,8 +283,11 @@ class ChatMessageView(View):
                                     message_id=message_id, error='channel_layer_not_configured')
                     return JsonResponse({'status': 'error', 'message': 'Real-time server not configured.'}, status=500)
 
-                channel_group_name = f"chat_{group_id}"
+                group_data = pg_response_data.get('group', {})
+                private = group_data.get('private')
 
+                # Si c'est un chat de tournoi, ajouter les informations supplémentaires
+                channel_group_name = f"chat_{group_id}"
                 # Use sync_to_async for group_send in a sync view
                 async_to_sync(channel_layer.group_send)(
                     channel_group_name,
@@ -307,6 +328,7 @@ class ChatMessageView(View):
                 'error_message': str(e)
             })
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
+
 async def sse_notification_stream(request, currentUserId):
     response = StreamingHttpResponse(_generate_notification_events(request, currentUserId),
                                     content_type="text/event-stream")
@@ -329,7 +351,7 @@ async def _generate_notification_events(request, user_id):
     # --- SSE Token Authentication ---
     try:
         access_token = request.COOKIES.get('access_token')
-        token_data = jwt.decode(access_token, verify=False)
+        token_data = jwt.decode(access_token, algorithms=["HS256"], options={"verify_signature": False})
         expiry_time = token_data.get('exp')
 
         current_time = time.time()
@@ -432,14 +454,13 @@ async def _generate_events(request, group_id):
     try:
         # Your token expiration check code
         access_token = request.COOKIES.get('access_token')
-        
         if not access_token:
             log_sse_connection('AUTH_FAILURE', connection_id=connection_id,
                                error_type='missing_token', chat_room=group_id)
             yield f"event: error\ndata: {json.dumps({'message': 'No authentication token'})}\n\n"
             return
-            
-        token_data = jwt.decode(access_token, verify=False)
+
+        token_data = jwt.decode(access_token, algorithms=["HS256"], options={"verify_signature": False})
         expiry_time = token_data.get('exp')
 
         current_time = time.time()
@@ -508,14 +529,14 @@ async def _generate_events(request, group_id):
                     
                     message_id = message["message"].get("id")
                     sender_id = message["message"].get("sender_id")
-                    
-                    log_message_event('MESSAGE_DELIVERED', 
-                                     message_id=message_id, 
-                                     sender_id=sender_id, 
-                                     recipient_id=user_id, 
-                                     chat_room=group_id)
+                    if message_id and sender_id:
+                        log_message_event('MESSAGE_DELIVERED', 
+                                        message_id=message_id, 
+                                        sender_id=sender_id, 
+                                        recipient_id=user_id, 
+                                        chat_room=group_id)
                                      
-                    yield f"data: {sse_data}\n\n"
+                        yield f"data: {sse_data}\n\n"
                 else:
                     # Only log occasional heartbeats to avoid log spam
                     if heartbeat_count % 5 == 0:
@@ -530,7 +551,6 @@ async def _generate_events(request, group_id):
                     yield ":heartbeat\n\n"
 
             except asyncio.TimeoutError:
-                # Only log occasional heartbeats to avoid log spam
                 if heartbeat_count % 5 == 0:
                     chat_logger.info(f"Chat connection timeout heartbeat", extra={
                         'metric_type': 'chat_performance',
@@ -581,8 +601,8 @@ class blockedStatus(View):
         except Exception as e:
             logger.error(f"Failed to decode JSON from backend: {e}")
             return JsonResponse({'status': 'error', 'message': 'Internal server error during blocked status retrieval.'}, status=500)
-    
-    @method_decorator(csrf_exempt)    
+
+    @method_decorator(csrf_exempt)
     def post (self, request, targetUserId):
         try:
             access_token = request.COOKIES.get('access_token')
