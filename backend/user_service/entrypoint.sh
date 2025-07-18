@@ -2,7 +2,6 @@
 set -ex
 
 # Check if ELK is up and running
-# Wait for Elasticsearch to be ready
 
 until curl -s -k -u "elastic:${ELASTIC_PASSWORD}" "https://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=1s" | grep -q '"status":"yellow"\|"status":"green"'; do
   echo "Waiting for Elasticsearch to be ready..."
@@ -15,11 +14,5 @@ until curl -sf "http://logstash:9600/_node/pipelines?pretty"; do
   sleep 15
 done
 
-# if ! python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(is_superuser=True).exists())" | grep "True"; then
-#   echo "Creating superuser 'admin'..."
-#   python manage.py createsuperuser --user_name "${DJANGO_SUPERUSER}" --mail "${DJANGO_SUPERUSER_EMAIL}" --noinput
-# else
-#   echo "A superuser already exists."
-# fi
 python manage.py collectstatic --noinput
 exec "$@"

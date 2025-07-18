@@ -13,7 +13,7 @@ USER_CONTAINER=nginx_modsecurity postgres access_postgresql auth user_service ma
 # POUR RAFAEL
 GAME_CONTAINER=ai_pong server_pong game_redis nginx_modsecurity postgres user_service access_postgresql auth mail tournament live_chat
 
-# POUR KELLY PLUS TARD
+# POUR KELLY
 CHAT_CONTAINER=live_chat nginx_modsecurity postgres redis access_postgresql server_pong ai_pong user_service tournament
 
 COMPOSE=docker compose -f ${DOCKER_FILE}

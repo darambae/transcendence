@@ -17,11 +17,10 @@ RUN chmod +x /entrypoint.sh
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-# Initialise un projet Django minimal
 
 EXPOSE 8020
 
-#ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["sh", "-c", "daphne -e ssl:8020:privateKey=/certs/server.key:certKey=/certs/fullchain.crt -b 0.0.0.0 config.asgi:application"]
 # daphne -b 0.0.0.0 -p 8000 myproject.asgi:application

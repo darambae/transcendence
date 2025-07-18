@@ -12,8 +12,6 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chown elasticsearch:elasticsearch /usr/local/bin/entrypoint.sh
 RUN chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/config /usr/share/elasticsearch/data /usr/share/elasticsearch/logs /usr/share/elasticsearch/bin
 
-# USER elasticsearch                                                                                                                                                  
-
 RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 9200 9300
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
