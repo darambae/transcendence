@@ -61,10 +61,16 @@ export async function handleSignupSubmit(event) {
 			}
 		} else {
 			console.log("signup form couldn't connect");
-			const errorMsg = responseData.create_user.error;
+			let errorMsg;
+            if (responseData.create_user && responseData.create_user.error) {
+                errorMsg = responseData.create_user.error;
+            } else if (responseData.error) {
+                errorMsg = responseData.error;
+            }
+
 			console.log('error: ', errorMsg);
 
-			const errorDiv = document.querySelector('.signup-form .error-msg');
+			const errorDiv = document.getElementById('passwordConfirmationError');
 			if (errorMsg) {
 				errorDiv.textContent = 'ERROR: ' + errorMsg.toUpperCase();
 				//shaking animation
@@ -73,7 +79,11 @@ export async function handleSignupSubmit(event) {
 				errorDiv.classList.add('shake');
 			}
 
-			//signup form error handling (already existing, password etc..)
+			setTimeout(() => {
+				errorDiv.textContent = '';
+				//element.style.display = 'none';
+				errorDiv.classList.remove('shake');
+			}, 5000);
 		}
 	} catch (error) {
 		console.error('connection error: ', error);
@@ -97,7 +107,7 @@ export function signupController() {
 	const ruleUppercase = document.getElementById('rule-uppercase');
 	const ruleNumber = document.getElementById('rule-number');
 	const ruleSpecialChar = document.getElementById('rule-special-char');
-	const invalidSpan = document.getElementById('invalid');
+	const invalidSpan = document.getElementById('passwordConfirmationError');
 
 	function resetError() {
 		if (invalidSpan) {
@@ -105,6 +115,13 @@ export function signupController() {
 			invalidSpan.style.display = 'none';
 			invalidSpan.classList.remove('shake');
 		}
+
+		const passwordConfirmationError = document.getElementById('passwordConfirmationError');
+        if (passwordConfirmationError) {
+            passwordConfirmationError.textContent = '';
+            passwordConfirmationError.style.display = 'none';
+            passwordConfirmationError.classList.remove('shake');
+        }
 	}
 
 	// Utility function to display validation errors with animation
@@ -271,7 +288,6 @@ export function signupController() {
 
 				// Password validation
 				const value = passwordInput.value;
-				console.log('password input : ', value);
 				const hasUppercase = /[A-Z]/.test(value);
 				const hasNumber = /\d/.test(value);
 				const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
@@ -291,8 +307,6 @@ export function signupController() {
 				if (inputErrRef.inputErr) {
 					displayErrors(invalidSpan, errMsg);
 					return;
-				} else {
-					invalidSpan.style.display = 'none';
 				}
 			}
 			handleSignupSubmit(event);
