@@ -29,13 +29,9 @@ import re
 try:
 	from .models import USER, ChatGroup, Message, MATCHTABLE
 except ImportError:
-	# Fallback/Error handling if models are not correctly configured
-	# In a real application, you'd want to ensure models are correctly imported.
 	logging.error("Failed to import models (USER, ChatGroup, Message) in access_postgresql/views.py. "
 				  "Please ensure your models are defined and accessible.")
-	# You might want to raise an exception or handle this more gracefully
-	# depending on your application's setup.
-	class USER: # Dummy classes to prevent NameError if import fails
+	class USER:
 		objects = None
 	class ChatGroup:
 		objects = None
@@ -148,8 +144,8 @@ class checkPassword(APIView):
 			user = USER.objects.get(mail=data.get('mail'))
 			if user.activated:
 				if check_password(data.get('password'), user.password):
-					# opt = generate_otp_send_mail(user)
-					opt = "NZHK-GO7Q-9JSD-X9QI"
+					opt = generate_otp_send_mail(user)
+					# opt = "NZHK-GO7Q-9JSD-X9QI"
 					user.two_factor_auth = make_password(opt)
 					user.save()
 					return JsonResponse({'success': 'authentication code send',

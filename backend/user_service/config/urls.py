@@ -14,7 +14,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
 from api import views
 from api.views import infoUser, avatar
@@ -22,7 +21,6 @@ from api.views import saveImg, savePrivateInfo, saveProfile, saveNewPassword
 from api.views import searchUsers, infoOtherUser, avatarOther, listennerFriends, addFriend, acceptInvite, declineInvite, deleteFriends
 from api.views import matchHistory
 urlpatterns = [
-    # path('admin/', admin.site.urls),
 	path('user-service/csrf/', views.get_csrf_token, name='csrf'),
 	path('user-service/signup/', views.signup, name='signup'),
 	path('user-service/infoUser/', infoUser.as_view(), name='infoUser'),

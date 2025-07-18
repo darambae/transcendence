@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-#### REQUIRED ELK LIBRARY ####
 import logging
 
 APP_NAME = 'server-pong'
@@ -22,24 +21,16 @@ CSRF_TRUSTED_ORIGINS = [
 	'https://localhost:8443',
 ]
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR.parent
 PROJECT_DIR = BACKEND_DIR.parent
 FRONTEND_DIR = os.path.join(PROJECT_DIR, 'frontend/')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Allow all hosts for development; adjust in production
-#ALLOWED_HOSTS = ['server_pong']
-# Application definition
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -67,14 +58,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "https://localhost:8443",
-#     "http://127.0.0.1:3000",
-#     "https://server-pong:8030",
-#     "https://transcendence.42.fr:8443",
-#     "https://10.18.161.147:8443",
-# ]
 CORS_ALLOWED_ORIGINS = ["*"]
 TEMPLATES = [
     {
@@ -91,7 +74,6 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'myproject.wsgi.application'
 ASGI_APPLICATION = 'myproject.asgi.application'
 
 CHANNEL_LAYERS = {
@@ -103,17 +85,11 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.dummy'
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -130,10 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -143,115 +115,74 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
 STATIC_ROOT = FRONTEND_DIR
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'simple': {
-#             'format': '[{levelname}] {asctime} {name}: {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple',
-#             'level': 'DEBUG',  # Show all logs
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console'],
-#         'level': 'DEBUG',  # Show all logs
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from Django
-#             'propagate': False,
-#         },
-#         'api': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',  # Show all logs from your app
-#             'propagate': False,
-#         },
-#     },
-# }
-
-# Remove the comment below so that you can run without elk
-# class AddAppNameFilter(logging.Filter):
-#     def filter(self, record):
-#         if not hasattr(record, 'app_name'):
-#             record.app_name = APP_NAME
-#         return True
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'add_app_name': {
-#             '()': AddAppNameFilter,
-#         },
-#     },
-#     'formatters': {
-#         'text': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'logging.Formatter',
-#         },
-#         'logstash': {
-#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-#         },
-#     },
-#     'handlers': {
-#         'logstash': {
-#             'level': 'DEBUG',
-#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-#             'host': 'logstash',
-#             'port': 6006,
-#             'database_path': os.path.join(BASE_DIR, 'logstash.db'),
-#             'ssl_enable': False,
-#             'formatter': 'logstash',
-#             'ensure_ascii': True,
-#             'filters': ['add_app_name'],
-#         },
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'text',
-#             'filters': ['add_app_name'],
-#         }
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'], # Only send Django logs to console by default
-#             'level': 'DEBUG',
-#             'propagate': False, # Prevent duplicate logging via root logger
-#         },
-#         'django.request': {
-#             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
-#             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger
-#         },
-#         'api': {
-#             'handlers': ['console' ,'logstash'],
-#             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger if needed
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console', 'logstash'],
-#         'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
-#     },
-# }
+class AddAppNameFilter(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, 'app_name'):
+            record.app_name = APP_NAME
+        return True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
+        },
+    },
+    'formatters': {
+        'text': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'logging.Formatter',
+        },
+        'logstash': {
+            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+            'host': 'logstash',
+            'port': 6006,
+            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+            'ssl_enable': False,
+            'formatter': 'logstash',
+            'ensure_ascii': True,
+            'filters': ['add_app_name'],
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'text',
+            'filters': ['add_app_name'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False, 
+        },
+        'django.request': {
+            'handlers': ['console', 'logstash'], 
+            'level': 'INFO',
+            'propagate': False, 
+        },
+        'api': {
+            'handlers': ['console' ,'logstash'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'logstash'],
+        'level': 'WARNING',
+    },
+}
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True

@@ -60,6 +60,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     env_file:
       - .env
     restart: always
@@ -82,6 +84,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     env_file:
       - .env
     restart: always
@@ -113,8 +117,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
-    # environment:
-    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      logstash:
+        condition: service_started
     env_file:
       - .env
     restart: always
@@ -140,7 +144,12 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      certs_generator:
+        condition: service_completed_successfully
+      logstash:
+        condition: service_started
     restart: always
     networks:
       - elk_network
@@ -157,10 +166,9 @@ services:
     volumes:
       - ./backend/mail:/app
       - certs:/certs
-    # environment:
-    #   - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
-    #   - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-    #   - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+    depends_on:
+      logstash:
+        condition: service_started
     env_file:
       - .env
     restart: always
@@ -179,6 +187,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     env_file:
       - .env
     volumes:
@@ -200,6 +210,8 @@ services:
         condition: service_started
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     volumes:
       - certs:/certs
       - ./backend/AI_pong:/app
@@ -224,6 +236,8 @@ services:
     depends_on :
       certs_generator:
         condition: service_completed_successfully
+      logstash:
+        condition: service_started
     volumes:
       - certs:/certs
       - ./backend/tournamentManager:/app
@@ -343,6 +357,3 @@ networks:
   game_network:
     name: game_network
     driver: bridge
-  # jwt_network:
-  #   name: jwt_network
-  #   driver: bridge

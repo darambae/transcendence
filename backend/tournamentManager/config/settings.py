@@ -12,14 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-import sys
-
-#### REQUIRED ELK LIBRARY ####
-from .jsonSocketHandler import JSONSocketHandler
-import dj_database_url
 import logging
-from logstash_async.formatter import LogstashFormatter
-from logstash_async.handler import AsynchronousLogstashHandler
 
 
 APP_NAME = 'tournament_manager'
@@ -149,67 +142,66 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# # Logging configuration <-- To detach elk from django app, comment out 'AddAppNameFilter' and 'LOGGING'
-# class AddAppNameFilter(logging.Filter):
-#     def filter(self, record):
-#         if not hasattr(record, 'app_name'):
-#             record.app_name = APP_NAME
-#         return True
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'add_app_name': {
-#             '()': AddAppNameFilter,
-#         },
-#     },
-#     'formatters': {
-#         'text': {
-#             'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
-#             'class': 'logging.Formatter',
-#         },
-#         'logstash': {
-#             '()': 'logstash_async.formatter.DjangoLogstashFormatter',
-#         },
-#     },
-#     'handlers': {
-#         'logstash': {
-#             'level': 'DEBUG',
-#             'class': 'logstash_async.handler.AsynchronousLogstashHandler',
-#             'host': 'logstash',
-#             'port': 6006,
-#             'database_path': os.path.join(BASE_DIR, 'logstash.db'),
-#             'ssl_enable': False,
-#             'formatter': 'logstash',
-#             'ensure_ascii': True,
-#             'filters': ['add_app_name'],
-#         },
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'text',
-#             'filters': ['add_app_name'],
-#         }
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'], # Only send Django logs to console by default
-#             'level': 'DEBUG',
-#             'propagate': False, # Prevent duplicate logging via root logger
-#         },
-#         'django.request': {
-#             'handlers': ['console', 'logstash'], # Send Django request logs to Logstash
-#             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger
-#         },
-#         'api': {
-#             'handlers': ['console' ,'logstash'],
-#             'level': 'DEBUG',
-#             'propagate': True, # Prevent duplicate logging via root logger if needed
-#         },
-#     },
-#     'root': {
-#         'handlers': ['console', 'logstash'],
-#         'level': 'DEBUG', # Set root logger to a higher level to avoid duplicates
-#     },
-# }
+class AddAppNameFilter(logging.Filter):
+    def filter(self, record):
+        if not hasattr(record, 'app_name'):
+            record.app_name = APP_NAME
+        return True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'add_app_name': {
+            '()': AddAppNameFilter,
+        },
+    },
+    'formatters': {
+        'text': {
+            'format': '%(asctime)s [%(levelname)s] [%(name)s] [%(app_name)s] %(message)s',
+            'class': 'logging.Formatter',
+        },
+        'logstash': {
+            '()': 'logstash_async.formatter.DjangoLogstashFormatter',
+        },
+    },
+    'handlers': {
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash_async.handler.AsynchronousLogstashHandler',
+            'host': 'logstash',
+            'port': 6006,
+            'database_path': os.path.join(BASE_DIR, 'logstash.db'),
+            'ssl_enable': False,
+            'formatter': 'logstash',
+            'ensure_ascii': True,
+            'filters': ['add_app_name'],
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'text',
+            'filters': ['add_app_name'],
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False, 
+        },
+        'django.request': {
+            'handlers': ['console', 'logstash'], 
+            'level': 'INFO',
+            'propagate': False, 
+        },
+        'api': {
+            'handlers': ['console' ,'logstash'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'logstash'],
+        'level': 'WARNING',
+    },
+}

@@ -1,6 +1,5 @@
 api.http.host: "0.0.0.0"
 
-# xpack.monitoring.enabled: false
 log.level: "debug"
 xpack.monitoring.elasticsearch.hosts: ["https://elasticsearch:9200"]
 xpack.monitoring.enabled: true
@@ -13,7 +12,7 @@ path.data: "/usr/share/logstash/data"
 path.config: "/usr/share/logstash/config"
 
 pipeline.id: "main"
-pipeline.workers: 2 # Or the number of CPU cores you want to dedicate
+pipeline.workers: 2 
 pipeline.batch.size: 125
 pipeline.batch.delay: 50
 pipeline.buffer.type: heap

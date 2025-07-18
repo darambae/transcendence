@@ -14,10 +14,3 @@ urlpatterns = [
     path('server-pong/check-sse', sseCheck, name="sseCheck"),
     path('server-pong/<str:key>/delete-key/', destroyKey, name="destroyKey")
 ]
-
-# from django.urls import get_resolver
-# import sys
-
-# resolver = get_resolver()
-# for pattern in resolver.url_patterns:
-#     print(pattern, file=sys.stderr)

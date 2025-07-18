@@ -20,7 +20,7 @@ echo "${ELASTICSEARCH_PASSWORD}" | bin/elasticsearch-keystore -E path.config=/us
 echo "${ELASTICSEARCH_PASSWORD}" | bin/elasticsearch-keystore -E path.config=/usr/share/elasticsearch/config add --force xpack.security.http.ssl.keystore.secure_password --stdin
                                                                                                                                             
 gosu elasticsearch bin/elasticsearch &
-sleep 120 #Reduce the time here if it takes too long but make sure to put enough time so that ES is ready to execute the rest. 
+sleep 120 
 
 echo "Resetting password for the elastic built-in user..."
 /usr/bin/expect <<EOF
