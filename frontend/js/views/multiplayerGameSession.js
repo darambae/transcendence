@@ -55,7 +55,7 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 	}
 
 	// Show initial game state
-	if (playerID === 2) {
+	if (playerID == 2) {
 		drawCenterText('waiting for the player to start the match');
 		guideTouch();
 	} else {
@@ -351,7 +351,7 @@ async function waitForGameReady(
 
 		attempts++;
 		// Show waiting message
-		if (playerID === 1) {
+		if (playerID == 1) {
 			drawCenterText(
 				`Waiting for second player... (${attempts}/${maxAttempts})`
 			);
@@ -722,7 +722,7 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 
 			switch (event.key) {
 				case 'p':
-					if (playerID === 1 && !multiplayerGameStarted) {
+					if (playerID == 1 && !multiplayerGameStarted) {
 						multiplayerGameStarted = true;
 						console.log('Starting multiplayer game with P key');
 						fetch(currentMultiplayerPostUrl, {
@@ -757,7 +757,7 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 					}
 					break;
 				case 'ArrowUp':
-					if (playerID === 1) {
+					if (playerID == 1) {
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {
@@ -788,7 +788,7 @@ function setupMultiplayerKeyboardControls(key, playerID, csrf) {
 					}
 					break;
 				case 'ArrowDown':
-					if (playerID === 1) {
+					if (playerID == 1) {
 						fetch(currentMultiplayerPostUrl, {
 							method: 'POST',
 							headers: {
