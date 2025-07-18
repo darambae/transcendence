@@ -188,7 +188,7 @@ async function launchTournament(data) {
   const avatarother4 = document.getElementById("avatarother4");
   const nameAvatarother4 = avatarother4.getAttribute("data-username")
   const avatarother6 = document.getElementById("avatarother6");
-  const nameAvatarother6 = avatarother4.getAttribute("data-username")
+  const nameAvatarother6 = avatarother6.getAttribute("data-username")
 
   if (data.match1) {
     if (data.match1.player1 == nameAvatarother0) {
@@ -249,13 +249,15 @@ async function launchTournament(data) {
 
 
 async function startTournament(data) {
+  const idplayerInTournament = document.getElementById("idplayerInTournament");
   const tournamentLeave = document.getElementById("Tournament-leave");
-
+  
   tournamentLeave.innerHTML = ""
+  idplayerInTournament.innerHTML = ""
 
   const view = data.Tournament
 
-  fetchWithRefresh("tournament/match", {
+  await fetchWithRefresh("tournament/match", {
     method: "POST",
     headers: {
       'X-CSRFToken': csrf,
@@ -277,20 +279,21 @@ async function startTournament(data) {
     });
 }
 
-export async function affichUserTournament() {
+export async function affichUserTournament(exit = false) {
   const idtournament = document.getElementById("idtournament");
   const idNBtournament = document.getElementById("idNBtournament");
   const idplayerInTournament = document.getElementById("idplayerInTournament")
   const divGuest = document.getElementById("guest-add");
 
-
-  if (!idtournament || !idNBtournament || !idplayerInTournament) {
+  if ((!idtournament || !idNBtournament || !idplayerInTournament )&& exit == false) {
+    console.log("exit")
+    console.log(idtournament)
+    console.log(idNBtournament)
+    console.log(idplayerInTournament)
     return;
   }
 
-  idplayerInTournament.innerHTML = "";
-
-  const response = await fetch('tournament/me', {
+  const response = await fetchWithRefreshNoCash('tournament/me', {
     headers: {
       'X-CSRFToken': csrf,
     },
@@ -298,7 +301,8 @@ export async function affichUserTournament() {
   })
   const data = await response.json();
 
-  if (data.number == 4) {
+  console.log(data.number, launchbool);
+  if (data.number == 4 && exit == false) {
     divGuest.innerHTML = ""
     divGuest.style.display = "none";
     if (launchbool == false) {
@@ -308,23 +312,24 @@ export async function affichUserTournament() {
       console.log('error tournamentLaunch not found')
     }
   }
-  else if (data.number >= 1) {
-    let text = await fetch('./templates/invits.html')
+  else if (data.number >= 1 && exit == false) {
+    let text = await fetchWithRefreshNoCash('./templates/invits.html')
     text = await text.text()
     divGuest.innerHTML = text
     divGuest.style.display = "block";
   }
-  // console.log("data tournament :", data);
 
   if (response.ok) {
     idtournament.textContent = data.Tournament
     idNBtournament.textContent = data.number + " / 4"
 
     if (data.players) {
-
-
+      console.log("=================================")
+      console.log(data.players)
+      console.log("=================================")
       let i = 0;
       let html = "";
+      idplayerInTournament.innerHTML = "";
       for (const pl of data.players) {
         html = `
               <button
@@ -337,7 +342,7 @@ export async function affichUserTournament() {
                       color: rgb(255, 255, 255);
                       order: ${i};
                 ">
-
+                
                 <h6 class="mb-2">${pl}</h6>
                 <img
                   alt="Avatar User"
@@ -347,9 +352,8 @@ export async function affichUserTournament() {
                   height="128"
                 />
               </button>
-      `;
+        `;
         idplayerInTournament.innerHTML += html;
-        getOtherUserAvatar(pl, i)
         if (i == 6) {
           html = `
               <div
@@ -379,6 +383,12 @@ export async function affichUserTournament() {
         }
         i += 2;
       }
+      i = 0;
+      for (const pl of data.players) {
+        await getOtherUserAvatar(pl, i)
+        i += 2;
+      }
+
       document.querySelectorAll('.profile-btn').forEach(btn => {
         btn.addEventListener('click', async function () {
           const username = btn.dataset.username;
@@ -390,8 +400,115 @@ export async function affichUserTournament() {
   }
 }
 
+export async function afficheWinnerTournament(data) {
+  const avatarother0 = document.getElementById("avatarother0");
+  const nameAvatarother0 = avatarother0.getAttribute("data-username")
+  const avatarother2 = document.getElementById("avatarother2");
+  const nameAvatarother2 = avatarother2.getAttribute("data-username")
+  const avatarother4 = document.getElementById("avatarother4");
+  const nameAvatarother4 = avatarother4.getAttribute("data-username")
+  const avatarother6 = document.getElementById("avatarother6");
+  const nameAvatarother6 = avatarother6.getAttribute("data-username")
+  const idVS1 = document.getElementById("idVS1");
+  const idVS2 = document.getElementById("idVS2");
+  const leave = document.getElementById("Tournament-leave")
 
 
+
+  console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
+  if (leave) {
+    leave.style.display = "block"
+  }
+  if (idVS1) {
+    idVS1.style.display = "none"
+  }
+  if (idVS2) {
+    idVS2.style.display = "none"
+  }
+    if (data.first == nameAvatarother0) {
+      avatarother0.style.order = 0;
+      avatarother0.innerHTML += "1"
+    }
+    else if (data.first == nameAvatarother2) {
+      avatarother2.style.order = 0;
+      avatarother2.innerHTML += "1"
+
+    }
+    if (data.first == nameAvatarother4) {
+      avatarother4.style.order = 0;
+      avatarother4.innerHTML += "1"
+
+    }
+    else if (data.first == nameAvatarother6) {
+      avatarother6.style.order = 0;
+      avatarother6.innerHTML += "1"
+
+    }
+
+    if (data.second == nameAvatarother0) {
+      avatarother0.style.order = 2;
+      avatarother0.innerHTML += "2"
+
+    }
+    else if (data.second == nameAvatarother2) {
+      avatarother2.style.order = 2;
+      avatarother2.innerHTML += "2"
+
+    }
+    if (data.second == nameAvatarother4) {
+      avatarother4.style.order = 2;
+      avatarother4.innerHTML += "2"
+
+    }
+    else if (data.second == nameAvatarother6) {
+      avatarother6.style.order = 2;
+      avatarother6.innerHTML += "2"
+
+    }
+
+    if (data.third == nameAvatarother0) {
+      avatarother0.style.order = 4;
+      avatarother0.innerHTML += "3"
+
+    }
+    else if (data.third == nameAvatarother2) {
+      avatarother2.style.order = 4;
+      avatarother2.innerHTML += "3"
+
+    }
+    if (data.third == nameAvatarother4) {
+      avatarother4.style.order = 4;
+      avatarother4.innerHTML += "3"
+
+    }
+    else if (data.third == nameAvatarother6) {
+      avatarother6.style.order = 4;
+      avatarother6.innerHTML += "3"
+
+    }
+
+    if (data.fourth == nameAvatarother0) {
+      avatarother0.style.order = 6;
+      avatarother0.innerHTML += "4"
+
+    }
+    else if (data.fourth == nameAvatarother2) {
+      avatarother2.style.order = 6;
+      avatarother2.innerHTML += "4"
+
+    }
+    if (data.fourth == nameAvatarother4) {
+      avatarother4.style.order = 6;
+      avatarother4.innerHTML += "4"
+
+    }
+    else if (data.fourth == nameAvatarother6) {
+      avatarother6.style.order = 6;
+      avatarother6.innerHTML += "4"
+
+    }
+    
+}
 
 export async function tournamentController() {
   const ulDropdown = document.getElementById("trnmt-list-ul");
@@ -409,7 +526,7 @@ export async function tournamentController() {
   const divGuest = document.getElementById("guest-add");
 
   try {
-    await fetchWithRefresh('tournament/me', {
+    await fetchWithRefreshNoCash('tournament/me', {
       headers: {
         'X-CSRFToken': csrf,
       },
@@ -430,7 +547,7 @@ export async function tournamentController() {
 
 
           // Check if the clicked element is an <a> tag
-          await fetchWithRefresh("tournament/check-sse", {
+          await fetchWithRefreshNoCash("tournament/check-sse", {
             headers: {
               'X-CSRFToken': csrf,
             },
@@ -459,7 +576,7 @@ export async function tournamentController() {
                 SSEStream = new EventSource(url_sse);
                 setSSE(SSEStream);
               }
-              SSEStream.onmessage = function (event) {
+              SSEStream.onmessage = async function (event) {
                 try {
                   // console.log("ggg", event.data);
                   const data = JSON.parse(event.data);
@@ -467,6 +584,11 @@ export async function tournamentController() {
                   // console.log("fff", data.t_state);
                   if (data.t_state == "game-start") {
                     // LaunchGameIntournament(data)
+  
+                    tournamentLeave.innerHTML = ""
+                    
+
+                    console.log("------------------------------------------------------------------------------------------------->>>>>LLLL ", data)
                     console.log("SSE 1")
                     const buttonGame = document.createElement("button");
                     console.log("SSE 2")
@@ -477,15 +599,15 @@ export async function tournamentController() {
                     buttonGame.dataset.type = data.mode;
                     console.log("SSE 5")
                     if (data.mode == "local") {
-                    console.log("SSE 6")
-                    buttonGame.dataset.p1 = data.player1;
-                    console.log("SSE 7")
-                    buttonGame.dataset.p2 = data.player2;
+                      console.log("SSE 6")
+                      buttonGame.dataset.p1 = data.player1;
+                      console.log("SSE 7")
+                      buttonGame.dataset.p2 = data.player2;
                     }
                     else {
-                    buttonGame.dataset.player = data.player;
-                    buttonGame.dataset.playerId = data.playerId;
-                    console.log("done");
+                      buttonGame.dataset.player = data.player;
+                      buttonGame.dataset.playerId = data.playerId;
+                      console.log("done");
                     }
                     console.log("SSE 8")
                     buttonGame.dataset.key = data.key;
@@ -496,12 +618,13 @@ export async function tournamentController() {
                     console.log("SSE 10")
                     tournamentGame.appendChild(buttonGame);
                     console.log("SSE 11")
+
                   }
                   else if (data.t_state == "game-finished") {
-                    actualizeIndexPage("contentTournementPage", routesTr['tournament'])
+                    await actualizeIndexPage("contentTournementPage", routesTr['tournament'])
                     // console.log("sse data: ", data.next)
                     if (data.next == "final-rounds") {
-                      fetchWithRefresh("tournament/finals", {
+                      await fetchWithRefreshNoCash("tournament/finals", {
                         method: "POST",
                         headers: {
                           'X-CSRFToken': csrf,
@@ -518,7 +641,7 @@ export async function tournamentController() {
                     //  })
                     //}
                     else {
-                      fetchWithRefresh("tournament/next", {
+                      await fetchWithRefreshNoCash("tournament/next", {
                         method: "POST",
                         headers: {
                           'X-CSRFToken': csrf,
@@ -537,28 +660,46 @@ export async function tournamentController() {
                     }
                   }
                   if (data.t_state == "results") {
+                    afficheWinnerTournament(data)
                     console.log("============================>>", data);
                   }
+                  else if (data.t_state == "Back-to-main") {
+                    console.log("detected BTM2")
+                    await fetch('tournament/guests', {
+                      credentials : 'include'
+                    })
+                    await actualizeIndexPage("contentTournementPage", routesTr['tournament'])
+                  }
                   else if (data.t_state == "firsts-match-preview") {
-                    // SEND MESSAGE KELLY
-                //    -> id       : data.tkey
-                //    -> content  : "⚠️ First matchs annoncement ⚠️
-                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
-                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
-                    launchTournament(data)
+                    const message_1 = "⚠️ First matchs annoncement ⚠️";
+                    const message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
+                    const message_3 = `Match 2 : ${data.match2.player1} VS ${data.match2.player2}`;
+                    msgInfo.content = message_1;
+                    sendMessage(msgInfo);
+                    msgInfo.content = message_2;
+                    sendMessage(msgInfo);
+                    msgInfo.content = message_3;
+                    sendMessage(msgInfo);
+                    await affichUserTournament()
+                    await launchTournament(data)
 
                     console.log("data firsts match : ", data);
                   }
                   else if (data.t_state == "final-match-preview") {
                     console.log("data final match : ", data);
+                    await affichUserTournament()
+                    await launchTournament(data)
                     // SEND MESSAGE KELLY
-                //    -> id       : data.tkey
-                //    -> content  : "⚠️ Final matchs annoncement ⚠️
-                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
-                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
+                    //    -> id       : data.tkey
+                    //    -> content  : "⚠️ Final matchs annoncement ⚠️
+                    //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                    //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
                   }
                   else if (data.t_state == "Someone-joined-left") {
+                    console.log("ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc")
                     console.log("Someone joined left : ", data);
+                    await affichUserTournament()
+                    await launchTournament(data)
                     listTournament()
                   }
                 }
@@ -582,7 +723,7 @@ export async function tournamentController() {
 
 
 
-              await fetchWithRefresh("tournament/next", {
+              await fetchWithRefreshNoCash("tournament/next", {
                 method: "POST",
                 headers: {
                   'X-CSRFToken': csrf,
@@ -638,7 +779,7 @@ export async function tournamentController() {
 
 
       try {
-        await fetchWithRefresh("tournament/check-sse", {
+        await fetchWithRefreshNoCash("tournament/check-sse", {
           headers: {
             'X-CSRFToken': csrf,
           },
@@ -658,7 +799,7 @@ export async function tournamentController() {
         console.log("Error : ", error);
       }
 
-      await fetchWithRefresh("tournament/tournament", {
+      await fetchWithRefreshNoCash("tournament/tournament", {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrf,
@@ -677,14 +818,14 @@ export async function tournamentController() {
           btnId.style.backgroundColor = "green";
 
 
-		await launchTournamentChat(data['key']);
+          await launchTournamentChat(data['key']);
 
 
 
           const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
           SSEStream = new EventSource(url_sse);
           setSSE(SSEStream);
-          SSEStream.onmessage = function (event) {
+          SSEStream.onmessage = async function (event) {
             try {
               // console.log("iii", event.data);
               const data = JSON.parse(event.data);
@@ -693,6 +834,9 @@ export async function tournamentController() {
               if (data.t_state == "game-start") {
 
                 // LaunchGameIntournament(data)
+                tournamentLeave.innerHTML = ""
+
+                console.log("------------------------------------------------------------------------------------------------->>>>>LLLL ", data)
 
                 console.log("SSE 1")
                 const buttonGame = document.createElement("button");
@@ -704,15 +848,15 @@ export async function tournamentController() {
                 buttonGame.dataset.type = data.mode;
                 console.log("SSE 5")
                 if (data.mode == "local") {
-                console.log("SSE 6")
-                buttonGame.dataset.p1 = data.player1;
-                console.log("SSE 7")
-                buttonGame.dataset.p2 = data.player2;
+                  console.log("SSE 6")
+                  buttonGame.dataset.p1 = data.player1;
+                  console.log("SSE 7")
+                  buttonGame.dataset.p2 = data.player2;
                 }
                 else {
-                buttonGame.dataset.player = data.player;
-                buttonGame.dataset.playerId = data.playerId;
-                console.log("done");
+                  buttonGame.dataset.player = data.player;
+                  buttonGame.dataset.playerId = data.playerId;
+                  console.log("done");
                 }
                 console.log("SSE 8")
                 buttonGame.dataset.round = data.round;
@@ -725,11 +869,24 @@ export async function tournamentController() {
                 console.log("SSE 11")
 
               }
+              else if (data.t_state == "Back-to-main") {
+                console.log("detected BTM1")
+                await fetch('tournament/guests', {
+                  credentials : 'include'
+                })
+                  .then(response => {
+                    return response.json();
+                  })
+                  .then(data => {
+                    console.log(data);
+                })
+                await actualizeIndexPage("contentTournementPage", routesTr['tournament'])
+              }
               else if (data.t_state == "game-finished") {
-                actualizeIndexPage("contentTournementPage", routesTr['tournament'])
+                await actualizeIndexPage("contentTournementPage", routesTr['tournament'])
                 // console.log("sse data: ", data.next)
                 if (data.next == "final-rounds") {
-                  fetchWithRefresh("tournament/finals", {
+                  await fetchWithRefreshNoCash("tournament/finals", {
                     method: "POST",
                     headers: {
                       'X-CSRFToken': csrf,
@@ -740,7 +897,7 @@ export async function tournamentController() {
                   })
                 }
                 else {
-                  fetchWithRefresh("tournament/match", {
+                  await fetchWithRefreshNoCash("tournament/match", {
                     method: "POST",
                     headers: {
                       'X-CSRFToken': csrf,
@@ -751,48 +908,62 @@ export async function tournamentController() {
                   })
                 }
               }
+              //if (data.t_state == "results") {
+              //  afficheWinnerTournament(data)
+              //  console.log("============================>>", data);
+              //}
               if (data.t_state == "firsts-match-preview") {
-				const msgInfo = {
-					content: null,
-					group_id: null,
-					sender_username: 'server',
-					sender_id: data.tkey, // Utiliser l'ID du tournoi
-				};
+                const msgInfo = {
+                  content: null,
+                  group_id: null,
+                  sender_username: 'server',
+                  sender_id: data.tkey, // Utiliser l'ID du tournoi
+                };
 
-				console.log("trying to send message for the first match");
-				const message_1 = "⚠️ First matchs annoncement ⚠️";
-				const message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
-				const message_3 = `Match 2 : ${data.match2.player1} VS ${data.match2.player2}`;
-				msgInfo.content = message_1;
-				sendMessage(msgInfo);
-				msgInfo.content = message_2;
-				sendMessage(msgInfo);
-				msgInfo.content = message_3;
-				sendMessage(msgInfo);
+                await affichUserTournament()
+                await launchTournament(data)
 
-                launchTournament(data)
+                console.log("trying to send message for the first match");
+                const message_1 = "⚠️ First matchs annoncement ⚠️";
+                const message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
+                const message_3 = `Match 2 : ${data.match2.player1} VS ${data.match2.player2}`;
+                msgInfo.content = message_1;
+                sendMessage(msgInfo);
+                msgInfo.content = message_2;
+                sendMessage(msgInfo);
+                msgInfo.content = message_3;
+                sendMessage(msgInfo);
+
 
                 console.log("data firsts match : ", data);
               }
               else if (data.t_state == "final-match-preview") {
                 console.log("data final match : ", data);
-				const msgInfo = {
-					content: null,
-					group_id: null,
-					sender_username: 'server',
-					sender_id: data.tkey, // Utiliser l'ID du tournoi
-				};
-				console.log("trying to send message for the final match");
-				const message_1 = "⚠️ Final match annoncement ⚠️";
-				const message_2 = `Final : ${data.match1.player1} VS ${data.match1.player2}`;
-				msgInfo.content = message_1;
-				sendMessage(msgInfo);
-				msgInfo.content = message_2;
-				sendMessage(msgInfo);
+                const msgInfo = {
+                  content: null,
+                  group_id: null,
+                  sender_username: 'server',
+                  sender_id: data.tkey, // Utiliser l'ID du tournoi
+                };
+                console.log("trying to send message for the final match");
+                const message_1 = "⚠️ Final match annoncement ⚠️";
+                const message_2 = `Final : ${data.match1.player1} VS ${data.match1.player2}`;
+                const message_3 = `Final Loser : ${data.match2.player1} VS ${data.match2.player2}`
+                msgInfo.content = message_1;
+                sendMessage(msgInfo);
+                msgInfo.content = message_2;
+                sendMessage(msgInfo);
+                msgInfo.content = message_3;
+                sendMessage(msgInfo);
+                await affichUserTournament()
+                await launchTournament(data)
               }
               else if (data.t_state == "Someone-joined-left") {
+                console.log("ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")
                 console.log("Someone joined left : ", data);
-                affichUserTournament()
+                await affichUserTournament()
+                await launchTournament(data)
+                listTournament()
               }
             }
             catch (error) {
@@ -817,7 +988,7 @@ export async function tournamentController() {
 
 
           setPositionTournamentList("absolute")
-          //affichUserTournament()
+          // affichUserTournament()
 
 
           return invitsController()
@@ -834,7 +1005,7 @@ export async function tournamentController() {
 
     if (target.tagName === "BUTTON") {
       event.preventDefault();
-      await fetchWithRefresh("tournament/tournament", {
+      await fetchWithRefreshNoCash("tournament/tournament", {
         method: 'POST',
         headers: {
           'X-CSRFToken': csrf,
@@ -865,77 +1036,77 @@ export async function tournamentController() {
 
 
   tournamentGame.addEventListener('click', async (event) => {
-   const target = event.target;
+    const target = event.target;
 
-   if (target.tagName === "BUTTON") {
-     event.preventDefault();
+    if (target.tagName === "BUTTON") {
+      event.preventDefault();
 
-     const KeepInfo = document.getElementById("contentTournementPage");
-     // const contentInfo = KeepInfo.innerHTML;
+      const KeepInfo = document.getElementById("contentTournementPage");
+      // const contentInfo = KeepInfo.innerHTML;
 
-     if (target.dataset.type == "local") {
-       localStorage.setItem("p1", target.dataset.p1);
-       localStorage.setItem("p2", target.dataset.p2);
-       localStorage.setItem("key", target.dataset.key);
-       localStorage.setItem("tkey", target.dataset.tkey);
-       // console.log("Target.dataset", target.dataset);
-       await fetchWithRefresh(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
-         credentials: "include",
-       })
-         .then(response => {
-           if (!response.ok) throw new Error("https Error: " + response.status);
-           return response.json();
-         })
-       // .then(data => {
-       //   console.log(data);
-       // })
+      if (target.dataset.type == "local") {
+        localStorage.setItem("p1", target.dataset.p1);
+        localStorage.setItem("p2", target.dataset.p2);
+        localStorage.setItem("key", target.dataset.key);
+        localStorage.setItem("tkey", target.dataset.tkey);
+        // console.log("Target.dataset", target.dataset);
+        await fetchWithRefreshNoCash(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
+          credentials: "include",
+        })
+          .then(response => {
+            if (!response.ok) throw new Error("https Error: " + response.status);
+            return response.json();
+          })
+        // .then(data => {
+        //   console.log(data);
+        // })
 
-       return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
-     }
-     else {
-       let idJWT;
-       try {
-         const response = await fetchWithRefresh('server-pong/check-sse', {
-           headers: { 'X-CSRFToken': csrf },
-           credentials: 'include',
-         });
+        return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
+      }
+      else {
+        let idJWT;
+        try {
+          const response = await fetchWithRefreshNoCash('server-pong/check-sse', {
+            headers: { 'X-CSRFToken': csrf },
+            credentials: 'include',
+          });
 
-         console.log('data', response.status);
-         if (!response.ok) throw new Error('HTTP Error: ' + response.status);
+          console.log('data', response.status);
+          if (!response.ok) throw new Error('HTTP Error: ' + response.status);
 
-         const data = await response.json();
-         let username;
-         let a;
-         let b;
-         let c;
+          const data = await response.json();
+          let username;
+          let a;
+          let b;
+          let c;
 
-         const guestArray = Array.isArray(data.guest) ? data.guest : [];
-         [a, b, c] = guestArray;
-         console.log(data)
-         username = data.username || 'anonymous';
+          const guestArray = Array.isArray(data.guest) ? data.guest : [];
+          [a, b, c] = guestArray;
+          console.log(data)
+          username = data.username || 'anonymous';
 
-         console.log(target.dataset)
-         console.log(username)
+          console.log(target.dataset)
+          console.log(username)
 
-         if (target.dataset.player == username) {
-           idJWT = -1
-         }
-         else if (target.dataset.player == a) {
-           idJWT = 0
-         }
-         else if (target.dataset.player == b) {
-           idJWT = 1
-         }
-         else {
-           idJWT = 2
-         }
-       } catch (error) {
-         console.error('Request error:', error);
-         // Could set default values for a, b, c if needed
-       }
-       return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));
-     }
-   }
+          if (target.dataset.player == username) {
+            idJWT = -1
+          }
+          else if (target.dataset.player == a) {
+            idJWT = 0
+          }
+          else if (target.dataset.player == b) {
+            idJWT = 1
+          }
+          else {
+            idJWT = 2
+          }
+        } catch (error) {
+          console.error('Request error:', error);
+          // Could set default values for a, b, c if needed
+        }
+        return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));
+      }
+    }
   })
 }
 
@@ -954,7 +1125,7 @@ async function launchGame(data_game) {
     localStorage.setItem("p2", data_game.player2);
     localStorage.setItem("key", data_game.key);
     localStorage.setItem("tkey", data_game.tkey);
-    await fetchWithRefresh(`tournament/supervise?key=${data_game.key}&tkey=${data_game.tkey}&round=${data_game.round}`, {
+    await fetchWithRefreshNoCash(`tournament/supervise?key=${data_game.key}&tkey=${data_game.tkey}&round=${data_game.round}`, {
       credentials: "include",
     })
       .then(response => {
@@ -970,7 +1141,7 @@ async function launchGame(data_game) {
   else {
     let idJWT;
     try {
-      const response = await fetchWithRefresh('server-pong/check-sse', {
+      const response = await fetchWithRefreshNoCash('server-pong/check-sse', {
         headers: { 'X-CSRFToken': csrf },
         credentials: 'include',
       });

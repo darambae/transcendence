@@ -21,7 +21,7 @@ export async function card_profileController(username) {
 
 	if (username) {
 		getOtherUserInfo(username);
-		getOtherUserAvatar(username);
+		await getOtherUserAvatar(username);
 		addFriend();
 		changeBlockedStatus(username);
 	}
@@ -150,7 +150,7 @@ export async function getOtherUserInfo(userName) {
 }
 
 
-export function getOtherUserAvatar(userName, i = "") {
+export async function getOtherUserAvatar(userName, i = "") {
 	fetchWithRefresh(`user-service/avatarOther/${userName}`, {
 		method: "GET",
 		credentials: 'include',

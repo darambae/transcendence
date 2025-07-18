@@ -130,8 +130,7 @@ export function checkwin() {
 		!player1Score ||
 		!player2Score ||
 		!player1Name ||
-		!player2Name ||
-		!replaySinglePlayer
+		!player2Name
 	) {
 		return; // Exit early if any required elements don't exist
 	}
@@ -143,7 +142,9 @@ export function checkwin() {
 		player1Name.style.color = 'red';
 		player2Score.style.setProperty('--score-color', 'green');
 		player2Name.style.color = 'green';
-		replaySinglePlayer.style.display = 'block';
+		if (replaySinglePlayer) {
+			replaySinglePlayer.style.display = 'block';
+		}
 	} else if (player1Score.getAttribute('data-score') == 5) {
 		gameEnded = true; // Mark game as ended
 		console.log('Game ended - Player 1 wins');
@@ -151,7 +152,9 @@ export function checkwin() {
 		player2Name.style.color = 'red';
 		player1Score.style.setProperty('--score-color', 'green');
 		player1Name.style.color = 'green';
-		replaySinglePlayer.style.display = 'block';
+		if (replaySinglePlayer) {
+			replaySinglePlayer.style.display = 'block';
+		}
 	}
 }
 
