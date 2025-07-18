@@ -65,8 +65,8 @@ export async function handleGame2Players(key, playerID, isAiGame, JWTid) {
 
 	// Load game state UI
 	try {
-		let mul = await fetch('./templates/localGame.html');
-		let mulTxt = await mul.text();
+		//let mul = await fetch('./templates/localGame.html');
+		let mulTxt = ''
 		let gameState = document.getElementById('idfooterCanvas');
 		if (gameState) {
 			gameState.innerHTML = mulTxt;
