@@ -1058,7 +1058,6 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	// Load history and initialize SSE for the new group
 	messageOffsets[chatInfo.group_id] = 0; // Reset offset for new room
 	loadMessageHistory(currentUserId, chatInfo.group_id);
-
 	// Handle blocking logic only for private chats
 	if (chatInfo?.chat_type === 'private' && chatInfo.target_id) {
 		const targetbBlockedStatus = await getBlockedStatus(chatInfo.target_id);
@@ -1148,6 +1147,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 			if (messageInput) {
 				messageInput.focus();
 			}
+			messageInput.placeholder = 'Type your message...';
 		}
 	} else {
 		// For tournament chats, disable messaging (only server can send messages)
