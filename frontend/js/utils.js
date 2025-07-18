@@ -154,6 +154,7 @@ export async function getBlockedStatus(targetUserId) {
 }
 
 export async function fetchWithRefreshNoCash(url, options = {}) {
+	console.log("fetchWithRefreshNoCash called");
 	let response = await fetch(url, options);
 
 	if (response.status === 401) {
@@ -206,11 +207,13 @@ function clearAuthAndRedirect() {
 		'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
 	setTimeout(() => {
+		console.log('redirecting to home');
 		window.location.href = '/#home';
 	}, 100);
 }
 
 export async function fetchWithRefresh(url, options = {}) {
+	console.log('fetchWithRefresh called');
 	const cacheKey = `${url}-${JSON.stringify(options.body || {})}`;
 
 	// Return cached response if available and recent (within 5 seconds)

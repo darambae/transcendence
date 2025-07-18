@@ -7,6 +7,7 @@ import { getOtherUserAvatar } from "./card_profile.js";
 import { routes } from "../routes.js"
 
 const csrf = getCookie('csrftoken');
+import { launchTournamentChat, sendMessage } from './chat.js';
 
 let sseTournament;
 let launchbool = false;
@@ -247,7 +248,6 @@ async function launchTournament(data) {
 }
 
 
-
 async function startTournament(data) {
   const tournamentLeave = document.getElementById("Tournament-leave");
 
@@ -337,7 +337,7 @@ export async function affichUserTournament() {
                       color: rgb(255, 255, 255);
                       order: ${i};
                 ">
-                
+
                 <h6 class="mb-2">${pl}</h6>
                 <img
                   alt="Avatar User"
@@ -445,7 +445,7 @@ export async function tournamentController() {
               userId = jwtInfo["userId"]
             })
             .then(async data => {
-              
+
               // Put here !!!
               //    -> ID               = userId
               //    -> username         = usernameJwt
@@ -540,12 +540,22 @@ export async function tournamentController() {
                     console.log("============================>>", data);
                   }
                   else if (data.t_state == "firsts-match-preview") {
+                    // SEND MESSAGE KELLY
+                //    -> id       : data.tkey
+                //    -> content  : "⚠️ First matchs annoncement ⚠️
+                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
                     launchTournament(data)
 
                     console.log("data firsts match : ", data);
                   }
                   else if (data.t_state == "final-match-preview") {
                     console.log("data final match : ", data);
+                    // SEND MESSAGE KELLY
+                //    -> id       : data.tkey
+                //    -> content  : "⚠️ Final matchs annoncement ⚠️
+                //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
+                //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
                   }
                   else if (data.t_state == "Someone-joined-left") {
                     console.log("Someone joined left : ", data);
@@ -667,10 +677,8 @@ export async function tournamentController() {
           btnId.style.backgroundColor = "green";
 
 
-          // Put here !!!
-          //    -> ID               = userId
-          //    -> username         = usernameJwt
-          //    -> tournament key   = data["key"]
+		await launchTournamentChat(data['key']);
+
 
 
           const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
@@ -744,15 +752,43 @@ export async function tournamentController() {
                 }
               }
               if (data.t_state == "firsts-match-preview") {
-                // SEND MESSAGE KELLY 
-                //    -> 
-                //    -> 
+				const msgInfo = {
+					content: null,
+					group_id: null,
+					sender_username: 'server',
+					sender_id: data.tkey, // Utiliser l'ID du tournoi
+				};
+
+				console.log("trying to send message for the first match");
+				const message_1 = "⚠️ First matchs annoncement ⚠️";
+				const message_2 = `Match 1 : ${data.match1.player1} VS ${data.match1.player2}`;
+				const message_3 = `Match 2 : ${data.match2.player1} VS ${data.match2.player2}`;
+				msgInfo.content = message_1;
+				sendMessage(msgInfo);
+				msgInfo.content = message_2;
+				sendMessage(msgInfo);
+				msgInfo.content = message_3;
+				sendMessage(msgInfo);
+
                 launchTournament(data)
 
                 console.log("data firsts match : ", data);
               }
               else if (data.t_state == "final-match-preview") {
                 console.log("data final match : ", data);
+				const msgInfo = {
+					content: null,
+					group_id: null,
+					sender_username: 'server',
+					sender_id: data.tkey, // Utiliser l'ID du tournoi
+				};
+				console.log("trying to send message for the final match");
+				const message_1 = "⚠️ Final match annoncement ⚠️";
+				const message_2 = `Final : ${data.match1.player1} VS ${data.match1.player2}`;
+				msgInfo.content = message_1;
+				sendMessage(msgInfo);
+				msgInfo.content = message_2;
+				sendMessage(msgInfo);
               }
               else if (data.t_state == "Someone-joined-left") {
                 console.log("Someone joined left : ", data);
@@ -826,41 +862,6 @@ export async function tournamentController() {
         });
     }
   })
-
-
-  //tournamentLaunch.addEventListener('click', async (event) => {
-  //  const target = event.target;
-  //  console.log("===================")
-  //  console.log(target)
-  //  console.log("===================")
-
-  //  if (target.tagName === "BUTTON") {
-  //    event.preventDefault();
-  //    const view = target.id;
-
-  //    await fetchWithRefresh("tournament/match", {
-  //      method: "POST",
-  //      headers: {
-  //        'X-CSRFToken': csrf,
-  //        'Content-Type': 'application/json',
-  //      },
-  //      credentials: 'include',
-  //      body: JSON.stringify({ "tKey": view })
-  //    })
-  //    .then(response => {
-  //      if (!response.ok) throw new Error("https Error: " + response.status);
-  //      console.log("entreeeeeeeeokoko")
-  //      return response.json();
-  //    })
-  //    .then(data => {
-  //      //tournamentInfo.innerHTML = `<h6>${data["Info"]}</h6>`;
-  //      })
-  //      .catch(error => {
-  //        console.error("Erreur de requête :", error);
-  //        throw error;
-  //      });
-  //  }
-  //})
 
 
   tournamentGame.addEventListener('click', async (event) => {
@@ -988,7 +989,7 @@ async function launchGame(data_game) {
       [a, b, c] = guestArray;
       console.log(data)
       username = data.username || 'anonymous';
-      
+
       console.log("==========================")
       console.log(data)
       console.log(username)
@@ -1013,3 +1014,21 @@ async function launchGame(data_game) {
     return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](data_game.key, data_game.playerId, 0, idJWT, data_game.tkey, data_game.round));
   }
 }
+
+
+
+//                      +-------------------+
+//                      |  TOURNAMENT INFO  |
+//                      +-------------------+
+//                      |                   |
+//                      |   MATCH PREVIEW   |
+// +--------------------+                   +--------------------+
+// |     Match 1        |   Firsts matchs   |       Match 2      |
+// +--------------------+-------------------+--------------------+
+// |      Player 1      |                   |      Player 1      |
+// |  Bob               |                   |  Bob               |
+// +--------------------+                   +--------------------+
+// |      Player 2      |                   |      Player 2      |
+// |  Bob2              |                   |  Bob2              |
+// +--------------------+                   +--------------------+
+// |  ${format_name(data.match1.player1)}|                   |  ${format_name(data.match1.player2)}|
