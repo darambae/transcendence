@@ -10,32 +10,60 @@ import { routes } from '../routes.js';
 import { card_profileController } from './card_profile.js';
 
 let hasOverallUnreadMessages = false;
-let mainChatBootstrapModal; // Bootstrap Modal instance
-let currentActiveChatGroup = null; // No default active group, will be set on selection
+let mainChatBootstrapModal;
+let currentActiveChatGroup = null;
 let currentTargetId = null;
-let globalEventSource = null; // Global EventSource for general chat notifications
-const eventSources = {}; // Stores EventSource objects per groupId
-const messageOffsets = {}; // Stores the offset for message history for each group
+let globalEventSource = null;
+const eventSources = {};
+const messageOffsets = {};
 
-// Initialize global EventSource for chat notifications
-async function initGlobalChatNotifications(currentUserId) {
-	// Close existing global connection if any
-	if (globalEventSource) {
-		globalEventSource.close();
-		globalEventSource = null;
-	}
+/**
+ * Check if the main chat modal is currently visible
+ * @returns {boolean} - True if modal is open, false otherwise
+ */
+function isModalVisible() {
+	const mainChatWindowElement = document.getElementById('mainChatWindow');
+	const isVisible =
+		mainChatWindowElement && mainChatWindowElement.classList.contains('show');
+	console.log('isModalVisible check:', {
+		element: !!mainChatWindowElement,
+		hasShowClass: mainChatWindowElement?.classList.contains('show'),
+		result: isVisible,
+	});
+	return isVisible;
+}
 
+async function forceRefreshToken() {
 	try {
-		// Refresh token before establishing connection
-		await fetchWithRefresh('/auth/refresh-token/', {
+		const response = await fetchWithRefresh('/auth/refresh-token/', {
 			method: 'GET',
 			credentials: 'include',
 			headers: { 'X-CSRFToken': getCookie('csrftoken') },
 		});
+		if (!response.ok) {
+			console.error('Failed to refresh token:', response.statusText);
+			throw new Error('Token refresh failed');
+		}
+		console.log('Tokens refreshed successfully.');
+	} catch (error) {
+		console.error('Network or other error during token refresh:', error);
+		throw error;
+	}
+}
 
-		globalEventSource = new EventSource(`/chat/stream/notification/${currentUserId}/`);
+// Initialize global EventSource for chat notifications
+async function initGlobalChatNotifications(currentUserId) {
+	if (globalEventSource) {
+		globalEventSource.close();
+		globalEventSource = null;
+	}
+	try {
+		await forceRefreshToken();
+		globalEventSource = new EventSource(
+			`/chat/stream/notification/${currentUserId}/`
+		);
 
-		globalEventSource.addEventListener('chat_notification', function (e) {
+		globalEventSource.addEventListener('chat_notification', async function (e) {
 			try {
 				const notificationData = JSON.parse(e.data);
 				console.log('Global: Chat notification received:', notificationData);
@@ -44,43 +72,137 @@ async function initGlobalChatNotifications(currentUserId) {
 				if (notificationData.type === 'new_chat_group') {
 					// Only process if this user is the target (not the creator)
 					// Convert both to strings for comparison to handle type differences
-					if (notificationData.target_user_id.toString() === currentUserId.toString()) {
-						// Show toast notification
-						const message = `${notificationData.creator_username} started a new chat with you!`;
-						const toast = showChatNotification(message, 'info', 10000);
+					if (notificationData.chat_type === 'private') {
+						if (
+							notificationData.target_id.toString() === currentUserId.toString()
+						) {
+							// Show toast notification
+							const chatInfoPrivate = {
+								chat_type: 'private',
+								target_id: notificationData.creator_id,
+								group_id: notificationData.group_id,
+								name: notificationData.creator_username,
+							};
+							const message = `${notificationData.creator_username} started a new chat with you!`;
+							const toast = showChatNotification(message, 'info', 10000);
 
+							// Add click handler to toast for quick access
+							toast.style.cursor = 'pointer';
+							toast.addEventListener('click', async () => {
+								// Open chat modal and switch to the new chat
+								const mainChatWindowElement =
+									document.getElementById('mainChatWindow');
+								if (!mainChatWindowElement.classList.contains('show')) {
+									mainChatBootstrapModal.show();
+									// Wait for modal to be shown
+									mainChatWindowElement.addEventListener(
+										'shown.bs.modal',
+										async function onShown() {
+											mainChatWindowElement.removeEventListener(
+												'shown.bs.modal',
+												onShown
+											);
+											await loadChatRoomList(currentUserId);
+											await switchChatRoom(currentUserId, chatInfoPrivate);
+										}
+									);
+								} else {
+									// Modal is already open, just switch
+									await loadChatRoomList(currentUserId);
+									await switchChatRoom(currentUserId, chatInfoPrivate);
+								}
+								toast.remove();
+							});
+
+							// Refresh chat list if modal is open
+							if (
+								mainChatWindowElement &&
+								mainChatWindowElement.classList.contains('show')
+							) {
+								await loadChatRoomList(currentUserId);
+							}
+
+							// Add visual indication that there's a new chat
+							const mainChatToggleButton = document.getElementById(
+								'mainChatToggleButton'
+							);
+							if (
+								mainChatToggleButton &&
+								!hasOverallUnreadMessages &&
+								!isModalVisible()
+							) {
+								addMainChatIndicator();
+							}
+						}
+					}
+					if (notificationData.chat_type === 'tournament') {
+						const chatInfoTournament = {
+							chat_type: 'tournament',
+							target_id: notificationData.target_id,
+							group_id: notificationData.group_id,
+							name: notificationData.group_name,
+						};
+						const message = `You begin a new tournament named ${notificationData.group_name}!`;
+						const toast = showChatNotification(message, 'info', 10000);
 						// Add click handler to toast for quick access
 						toast.style.cursor = 'pointer';
 						toast.addEventListener('click', async () => {
 							// Open chat modal and switch to the new chat
-							const mainChatWindowElement = document.getElementById('mainChatWindow');
+							const mainChatWindowElement =
+								document.getElementById('mainChatWindow');
 							if (!mainChatWindowElement.classList.contains('show')) {
 								mainChatBootstrapModal.show();
 								// Wait for modal to be shown
-								mainChatWindowElement.addEventListener('shown.bs.modal', async function onShown() {
-									mainChatWindowElement.removeEventListener('shown.bs.modal', onShown);
-									await loadChatRoomList(currentUserId);
-									await switchChatRoom(currentUserId, notificationData.group_id, notificationData.creator_id);
-								});
+								mainChatWindowElement.addEventListener(
+									'shown.bs.modal',
+									async function onShown() {
+										mainChatWindowElement.removeEventListener(
+											'shown.bs.modal',
+											onShown
+										);
+										await loadChatRoomList(currentUserId);
+										await switchChatRoom(currentUserId, chatInfoTournament);
+									}
+								);
 							} else {
 								// Modal is already open, just switch
 								await loadChatRoomList(currentUserId);
-								await switchChatRoom(currentUserId, notificationData.group_id, notificationData.creator_id);
+								await switchChatRoom(currentUserId, chatInfoTournament);
 							}
 							toast.remove();
 						});
 
 						// Refresh chat list if modal is open
-						const mainChatWindowElement = document.getElementById('mainChatWindow');
-						if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
-							loadChatRoomList(currentUserId);
+						if (
+							mainChatWindowElement &&
+							mainChatWindowElement.classList.contains('show')
+						) {
+							await loadChatRoomList(currentUserId);
 						}
 
 						// Add visual indication that there's a new chat
-						const mainChatToggleButton = document.getElementById('mainChatToggleButton');
-						if (mainChatToggleButton && !hasOverallUnreadMessages) {
-							mainChatToggleButton.classList.add('has-unread-overall');
-							hasOverallUnreadMessages = true;
+						const mainChatToggleButton = document.getElementById(
+							'mainChatToggleButton'
+						);
+						console.log(
+							'Global notification - Checking main chat indicator conditions:',
+							{
+								mainChatToggleButton: !!mainChatToggleButton,
+								hasOverallUnreadMessages: hasOverallUnreadMessages,
+								isModalVisible: isModalVisible(),
+							}
+						);
+						if (
+							mainChatToggleButton &&
+							!hasOverallUnreadMessages &&
+							!isModalVisible()
+						) {
+							console.log('Global notification - Adding main chat indicator');
+							addMainChatIndicator();
+						} else {
+							console.log(
+								'Global notification - Conditions NOT met for main chat indicator'
+							);
 						}
 					}
 				}
@@ -89,13 +211,11 @@ async function initGlobalChatNotifications(currentUserId) {
 			}
 		});
 
-		// Ajouter l'écoute des notifications de blocage/déblocage
 		globalEventSource.addEventListener('block_notification', function (e) {
 			try {
 				const notificationData = JSON.parse(e.data);
 				console.log('Global: Block notification received:', notificationData);
 
-				// Vérifier si cette notification concerne l'utilisateur actuel
 				if (notificationData.target_user_id.toString() === currentUserId.toString()) {
 					let message, toastType;
 
@@ -108,13 +228,10 @@ async function initGlobalChatNotifications(currentUserId) {
 					}
 
 					if (message) {
-						// Afficher la notification toast
 						showChatNotification(message, toastType, 8000);
 
-						// Rafraîchir le chat si l'utilisateur concerné est dans la conversation active
 						if (currentTargetId && currentTargetId.toString() === notificationData.actor_id.toString()) {
 							console.log('Block status changed for current chat partner, refreshing chat state');
-							// Utiliser la fonction existante pour rafraîchir le chat
 							refreshChatAfterBlockStatusChange(notificationData.actor_id);
 						}
 					}
@@ -193,13 +310,19 @@ function createMessageElement(messageData, currentUserId) {
 	const msg = document.createElement('div');
 	msg.classList.add('chat-message');
 
-	// Determine if the message sender is the current logged-in user
-	const isSelf = messageData.sender_id === currentUserId;
-
-	if (isSelf) {
-		msg.classList.add('self');
+	// Check if message is from server (system messages)
+	if (messageData.sender_username === 'server') {
+		msg.classList.add('server');
 	} else {
-		msg.classList.add('other');
+		// Determine if the message sender is the current logged-in user
+		// Convert both to strings for comparison to handle type differences
+		const isSelf =
+			messageData.sender_id.toString() === currentUserId.toString();
+		if (isSelf) {
+			msg.classList.add('self');
+		} else {
+			msg.classList.add('other');
+		}
 	}
 
 	const senderSpan = document.createElement('span');
@@ -342,19 +465,41 @@ async function loadMessageHistory(currentUserId, groupId, prepend = false) {
 	}
 }
 
-
-function sendMessage(currentUserId) {
-	const messageInput = document.getElementById('messageInput-active');
-	const groupIdInput = document.getElementById('groupIdInput-active');
-	const usernameInput = document.getElementById('usernameInput-active');
-
-	const content = messageInput.value.trim();
-	const groupId = groupIdInput.value;
-	const username = usernameInput.value;
-
+export function sendMessage(msgInfo) {
 	const MIN_LENGTH = 1;
 	const MAX_LENGTH = 1000; // Set appropriate limit
 
+	if (msgInfo.sender_username == 'server') {
+		// Pour les messages serveur dans un tournoi, trouver le groupe de chat correspondant
+		const chatRoomItems = document.querySelectorAll(
+			'#chatRoomList .list-group-item'
+		);
+		let targetGroupId = null;
+
+		chatRoomItems.forEach((item) => {
+			// Vérifier si c'est un chat de tournoi avec le bon tournament_id
+			if (
+				item.dataset.tournamentId &&
+				item.dataset.tournamentId === msgInfo.sender_id.toString()
+			) {
+				targetGroupId = item.dataset.groupId;
+				console.log(
+					`Found tournament chat group ${targetGroupId} for tournament ${msgInfo.group_id}`
+				);
+			}
+		});
+
+		if (!targetGroupId) {
+			console.error(`No chat group found for tournament ${msgInfo.group_id}`);
+			return;
+		}
+
+		// Utiliser le group_id trouvé pour le message
+		msgInfo.group_id = targetGroupId;
+	}
+
+	const content = msgInfo.content;
+	const groupId = msgInfo.group_id;
 	if (!content || !groupId) {
 		alert(
 			'Please ensure you are logged in, selected a chat, and typed a message.'
@@ -378,8 +523,8 @@ function sendMessage(currentUserId) {
 	const tempMessageData = {
 		content: content,
 		group_id: groupId,
-		sender_id: currentUserId,
-		sender_username: username,
+		sender_id: msgInfo.sender_id,
+		sender_username: msgInfo.sender_username,
 		timestamp: new Date().toISOString(),
 	};
 
@@ -392,13 +537,16 @@ function sendMessage(currentUserId) {
 			noMessagesDiv.remove();
 		}
 
-		const msgElement = createMessageElement(tempMessageData, currentUserId);
+		const msgElement = createMessageElement(tempMessageData, msgInfo.sender_id);
 		chatLog.appendChild(msgElement);
 		chatLog.scrollTop = chatLog.scrollHeight;
 	}
 
 	// Clear input field immediately for better UX
-	messageInput.value = '';
+	const messageInput = document.getElementById('messageInput-active');
+	if (messageInput) {
+		messageInput.value = '';
+	}
 
 	fetchWithRefresh(`/chat/${groupId}/messages/`, {
 		method: 'POST',
@@ -410,8 +558,8 @@ function sendMessage(currentUserId) {
 		body: JSON.stringify({
 			content: content,
 			group_id: groupId,
-			sender_id: currentUserId,
-			sender_username: username,
+			sender_id: msgInfo.sender_id,
+			sender_username: msgInfo.sender_username,
 		}),
 	})
 		.then((response) =>
@@ -441,37 +589,66 @@ function sendMessage(currentUserId) {
 		});
 }
 
+function updateGlobalUnreadStatus(hasUnread) {
+    const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+
+    if (!mainChatToggleButton) return;
+
+    if (hasUnread) {
+        mainChatToggleButton.classList.add('has-unread-overall');
+        console.log('Added unread indicator to chat button');
+    } else {
+        mainChatToggleButton.classList.remove('has-unread-overall');
+        console.log('Removed unread indicator from chat button');
+    }
+}
+
+async function initializeAllChatConnections(currentUserId) {
+	if (!currentUserId) {
+		console.log('No user ID provided for chat connections initialization');
+		return;
+	}
+
+	try {
+		console.log('Initializing all chat connections for user:', currentUserId);
+		const response = await fetchWithRefresh(`/chat/?t=${Date.now()}`, {
+			method: 'GET',
+			headers: {
+				'X-CSRFToken': getCookie('csrftoken'),
+				'Content-Type': 'application/json',
+			},
+			credentials: 'include',
+		});
+
+		if (!response.ok) {
+			console.error('Error loading chat list for connections initialization');
+			return;
+		}
+
+		const data = await response.json();
+
+		if (response.ok && Array.isArray(data.chats)) {
+			console.log('Initializing SSE connections for', data.chats.length, 'chats');
+			data.chats.forEach((chat) => {
+				// Initialize all SSE connections for all existing chats
+				initEventSource(chat.group_id, currentUserId);
+			});
+		}
+	} catch (error) {
+		console.error('Error initializing chat connections:', error);
+	}
+}
+
 // Function to initialize EventSource (SSE) for a group
 async function initEventSource(groupId, currentUserId) {
-	// Close any other active EventSources before opening a new one
-	// for (const key in eventSources) {
-	// 	if (eventSources[key].readyState === EventSource.OPEN) {
-	// 		eventSources[key].close();
-	// 		delete eventSources[key];
-	// 		console.log(`Closed SSE for group: ${key}`);
-	// 	}
-	// }
-	// if (eventSources[groupId] && eventSources[groupId].readyState === EventSource.OPEN) {
-	//     console.log(`SSE for group ${groupId} is already open. Skipping re-initialization.`);
-	//     return;
-	// }
 	if (eventSources[groupId]) {
 		console.log(
 			`Fermeture de la connexion SSE existante pour le groupe ${groupId}.`
 		);
-		eventSources[groupId].close(); // <-- C'est la ligne magique !
-		delete eventSources[groupId]; // Facultatif mais bonne pratique pour nettoyer
+		eventSources[groupId].close();
+		delete eventSources[groupId];
 	}
 	try {
-		// await fetchWithRefresh(`/chat/${groupId}/messages/`, {
-		// 	method: 'GET',
-		// 	headers: {
-		// 		'Content-Type': 'application/json',
-		// 		'X-CSRFToken': getCookie('csrftoken'), // For CSRF protection if needed
-		// 	},
-		// 	credentials: 'include',
-		// });
-		// UPDATED URL: /chat/stream/{group_id}/
 		await fetchWithRefresh('/auth/refresh-token/', {
 			method: 'GET',
 			credentials: 'include',
@@ -503,24 +680,29 @@ async function initEventSource(groupId, currentUserId) {
 		source.onmessage = function (e) {
 			try {
 				// Skip heartbeat messages
-				if (
-					e.data === 'heartbeat' ||
-					e.data.trim() === ''
-				) {
+				if (e.data === 'heartbeat' || e.data.trim() === '') {
 					return;
 				}
 				const messageData = JSON.parse(e.data);
 
+				// Debug: Print messageData content
+				console.log('SSE messageData received:', messageData);
+				console.log('Current user ID:', currentUserId, 'type:', typeof currentUserId);
+				console.log('Message sender ID:', messageData.sender_id, 'type:', typeof messageData.sender_id);
+
 				// Skip if this message is from the current user (we've already displayed it)
-				if (messageData.sender_id === currentUserId) {
-					console.log('Skipping own message from SSE');
-					return;
+				if (messageData.sender_username != 'server') {
+					if (messageData.sender_id.toString() === currentUserId.toString()) {
+						console.log('Skipping own message from SSE');
+						return;
+					}
 				}
 
 				// Create a unique identifier that matches the one used in loadMessageHistory
-				const messageTimestamp = new Date(
-					messageData.timestamp
-				).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], {
+					hour: '2-digit',
+					minute: '2-digit'
+				});
 				const messageId = `${messageData.sender_username}-${messageData.content}-${messageTimestamp}`;
 
 				// Skip if we've seen this message recently (deduplication)
@@ -537,8 +719,22 @@ async function initEventSource(groupId, currentUserId) {
 					recentlyReceivedMessages.delete(messageId);
 				}, 10000);
 
-				// Only append if the message is for the currently active chat group
-				if (messageData.group_id === currentActiveChatGroup) {
+
+				const mainChatWindowElement = document.getElementById('mainChatWindow');
+				const isModalClosed = !mainChatWindowElement || !mainChatWindowElement.classList.contains('show');
+
+				console.log('Modal state - isModalClosed:', isModalClosed, 'currentActiveChatGroup:', currentActiveChatGroup, 'messageGroupId:', messageData.group_id);
+
+				if (isModalClosed || messageData.group_id !== currentActiveChatGroup) {
+					console.log('Marking global unread status - modal closed:', isModalClosed, 'different chat:', messageData.group_id !== currentActiveChatGroup);
+					updateGlobalUnreadStatus(true);
+
+					if (isModalClosed) {
+						return;
+					}
+				}
+
+				if (!isModalClosed && currentActiveChatGroup && currentActiveChatGroup.group_id && messageData.group_id.toString() === currentActiveChatGroup.group_id.toString()) {
 					const chatLog = document.getElementById('chatLog-active');
 					if (!chatLog) {
 						console.error(`chatLog-active not found for initEventSource.`);
@@ -546,31 +742,18 @@ async function initEventSource(groupId, currentUserId) {
 					}
 
 					// Check if this message already exists in the chat log
-					const existingMessages = Array.from(
-						chatLog.querySelectorAll('.chat-message')
-					).map((msgEl) => {
-						const sender =
-							msgEl.querySelector('.message-sender')?.textContent || '';
+					const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map((msgEl) => {
+						const sender = msgEl.querySelector('.message-sender')?.textContent || '';
 						const content = msgEl.textContent
-							.replace(
-								msgEl.querySelector('.message-sender')?.textContent || '',
-								''
-							)
-							.replace(
-								msgEl.querySelector('.message-timestamp')?.textContent || '',
-								''
-							)
+							.replace(msgEl.querySelector('.message-sender')?.textContent || '', '')
+							.replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '')
 							.trim();
-						const timestamp =
-							msgEl.querySelector('.message-timestamp')?.textContent || '';
+						const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
 						return `${sender}-${content}-${timestamp}`;
 					});
 
 					if (existingMessages.includes(messageId)) {
-						console.log(
-							'Message already exists in chat log, skipping:',
-							messageId
-						);
+						console.log('Message already exists in chat log, skipping:', messageId);
 						return;
 					}
 
@@ -584,21 +767,31 @@ async function initEventSource(groupId, currentUserId) {
 					chatLog.scrollTop = chatLog.scrollHeight; // Auto-scroll to bottom
 				} else {
 					// *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
+					console.log('❌ Message NOT for active chat group');
+					console.log('Message group_id:', messageData.group_id, 'Active group id:', currentActiveChatGroup?.group_id);
 					console.log(
 						`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`
 					);
-					const inactiveChatListItem = document.querySelector(
-						`#chatRoomList [data-group-id="${messageData.group_id}"]`
-					);
-					if (inactiveChatListItem) {
-						inactiveChatListItem.classList.add('has-unread-messages');
-					}
+					// Add a subtle red dot indicator without changing the overall appearance
+					addUnreadIndicator(messageData.group_id);
+
 					const mainChatToggleButton = document.getElementById(
 						'mainChatToggleButton'
 					);
-					if (mainChatToggleButton && !hasOverallUnreadMessages) {
-						mainChatToggleButton.classList.add('has-unread-overall');
-						hasOverallUnreadMessages = true; // Empêche d'ajouter la classe plusieurs fois
+					console.log('Checking main chat indicator conditions:', {
+						mainChatToggleButton: !!mainChatToggleButton,
+						hasOverallUnreadMessages: hasOverallUnreadMessages,
+						isModalVisible: isModalVisible(),
+					});
+					if (
+						mainChatToggleButton &&
+						!hasOverallUnreadMessages &&
+						!isModalVisible()
+					) {
+						console.log('Conditions met, adding main chat indicator');
+						addMainChatIndicator();
+					} else {
+						console.log('Conditions NOT met for main chat indicator');
 					}
 				}
 			} catch (error) {
@@ -626,7 +819,7 @@ async function initEventSource(groupId, currentUserId) {
 
 			// Only attempt reconnect if currentActiveChatGroup is still this groupId
 			// and the connection wasn't intentionally closed
-			if (currentActiveChatGroup === groupId) {
+			if (currentActiveChatGroup && currentActiveChatGroup.group_id === groupId) {
 				console.log('Refreshing token and reconnecting SSE...');
 				await new Promise((resolve) => setTimeout(resolve, 3000));
 				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
@@ -684,29 +877,61 @@ export async function loadChatRoomList(currentUserId) {
 			data.chats.forEach((chat) => {
 				const listItem = document.createElement('li');
 				listItem.classList.add('list-group-item');
-				if (chat.group_id === currentActiveChatGroup) {
+				if (
+					currentActiveChatGroup &&
+					chat.group_id === currentActiveChatGroup.group_id
+				) {
 					listItem.classList.add('active');
 				}
 				listItem.dataset.groupId = chat.group_id;
-				listItem.dataset.targetUserId = chat.receiver_id; // Store ID
-				listItem.dataset.receiver = chat.receiver_name; // Store username for display
-				listItem.textContent = chat.receiver_name;
+
+				// Handle different chat types
+				if (chat.chat_type === 'private') {
+					listItem.dataset.targetUserId = chat.receiver_id;
+					listItem.dataset.receiver = chat.receiver_name;
+					listItem.textContent = chat.receiver_name;
+					listItem.onclick = async () => {
+						try {
+							const chatInfo = {
+								chat_type: 'private',
+								target_id: chat.receiver_id,
+								group_id: chat.group_id,
+								name: chat.receiver_name,
+							};
+							await switchChatRoom(currentUserId, chatInfo);
+							removeUnreadIndicator(listItem);
+						} catch (e) {
+							console.error('Error switching chat room:', e);
+							alert('Could not switch chat room. Please try again.');
+						}
+					};
+				} else if (chat.chat_type === 'tournament') {
+					listItem.dataset.tournamentId = chat.tournament_id;
+					listItem.dataset.tournamentName = chat.tournament_id;
+					listItem.textContent = chat.tournament_id;
+					listItem.onclick = async () => {
+						try {
+							const chatInfo = {
+								chat_type: 'tournament',
+								target_id: chat.tournament_id,
+								group_id: chat.group_id,
+								name: chat.tournament_id,
+							};
+							await switchChatRoom(currentUserId, chatInfo);
+							removeUnreadIndicator(listItem);
+						} catch (e) {
+							console.error('Error switching tournament chat:', e);
+							alert('Could not switch tournament chat. Please try again.');
+						}
+					};
+				}
+
 				listItem.style.cursor = 'pointer';
-				listItem.onclick = async () => {
-					try {
-						await switchChatRoom(
-							currentUserId,
-							chat.group_id,
-							chat.receiver_id
-						);
-						listItem.classList.remove('has-unread-messages');
-					} catch (e) {
-						console.error('Error switching chat room:', e);
-						alert('Could not switch chat room. Please try again.');
-					}
-				};
 				chatRoomListUl.appendChild(listItem);
-				initEventSource(chat.group_id, currentUserId);
+				// *** MODIFICATION : Seulement initialiser SSE si pas déjà présent ***
+				if (!eventSources[chat.group_id]) {
+					initEventSource(chat.group_id, currentUserId);
+				}
 			});
 		} else {
 			console.error(
@@ -722,12 +947,15 @@ export async function loadChatRoomList(currentUserId) {
 }
 
 // Function to switch between chat rooms
-async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
-	if (newgroupId === null || newgroupId === undefined) {
+async function switchChatRoom(currentUserId, chatInfo) {
+	if (chatInfo.group_id === null || chatInfo.group_id === undefined) {
 		console.error('No groupId provided for loading history.');
 		return;
 	}
-	if (currentActiveChatGroup === newgroupId) {
+	if (
+		currentActiveChatGroup &&
+		currentActiveChatGroup.group_id === chatInfo.group_id
+	) {
 		return;
 	}
 
@@ -739,40 +967,67 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 		oldActiveItem.classList.remove('active');
 	}
 	const newActiveItem = document.querySelector(
-		`#chatRoomList [data-group-id="${newgroupId}"]`
+		`#chatRoomList [data-group-id="${chatInfo.group_id}"]`
 	);
 	if (newActiveItem) {
 		newActiveItem.classList.add('active');
+		newActiveItem.classList.remove('has-unread-messages');
 	}
-	newActiveItem.classList.remove('has-unread-messages');
+
 	// Update current active group
-	currentActiveChatGroup = newgroupId;
-	currentTargetId = targetUserId;
-	console.log(`Switched to chat room: ${newgroupId}`);
-	// Update header of the right column with the other user's name
-	const activeChatRoomName = document.getElementById('activeChatRoomName');
-	const targetChatListItem = document.querySelector(
-		`#chatRoomList [data-group-id="${newgroupId}"]`
+	currentActiveChatGroup = chatInfo;
+
+	// Handle different chat types
+	if (chatInfo.chat_type === 'private') {
+		currentTargetId = chatInfo.target_id;
+	} else {
+		currentTargetId = null; // Pour les tournois, pas de target spécifique
+	}
+	console.log(
+		`Switched to chat room: ${chatInfo.group_id} (type: ${chatInfo.chat_type})`
 	);
-	if (activeChatRoomName && targetChatListItem) {
-		const receiverUsername = targetChatListItem.dataset.receiver;
-		activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${receiverUsername}</a>`;
 
-		const profileLink = document.getElementById('receiverProfileLink');
-		if (profileLink) {
-			profileLink.addEventListener('click', async function (e) {
-				e.preventDefault();
-				await actualizeIndexPage(
-					'modal-container',
-					routes['card_profile'](receiverUsername)
-				);
-			});
+
+	const hasOtherUnreadChats = document.querySelector('#chatRoomList .has-unread-messages');
+	if (!hasOtherUnreadChats) {
+		console.log('No more unread chats, removing global unread status');
+		updateGlobalUnreadStatus(false);
+	}
+	// Update header of the right column
+	const activeChatRoomName = document.getElementById('activeChatRoomName');
+
+	if (activeChatRoomName) {
+		if (chatInfo?.chat_type === 'tournament') {
+			// Tournament chat header - plain text without any clickable elements
+			activeChatRoomName.textContent = `Tournament_${chatInfo.target_id}`;
+		} else {
+			// Private chat header
+			const chatName =
+				chatInfo?.name || newActiveItem?.dataset.receiver || 'Unknown';
+			activeChatRoomName.innerHTML = `Chat with <a href="#" id="receiverProfileLink" style="text-decoration:underline; cursor:pointer;">${chatName}</a>`;
+			const profileLink = document.getElementById('receiverProfileLink');
+			if (profileLink) {
+				profileLink.addEventListener('click', async function (e) {
+					e.preventDefault();
+					await actualizeIndexPage(
+						'modal-container',
+						routes['card_profile'](chatName)
+					);
+				});
+			}
 		}
+	}
 
-		//Invite friend to play the game
-		const gameInvitationBtn = document.getElementById('gameInvitationBtn');
-		if (gameInvitationBtn) {
+	// Game invitation button - only for private chats
+	const gameInvitationBtn = document.getElementById('gameInvitationBtn');
+	if (gameInvitationBtn) {
+		if (chatInfo?.chat_type === 'tournament') {
+			// Hide game invitation for tournament chats
+			gameInvitationBtn.classList.add('d-none');
+		} else {
+			// Show game invitation for private chats
 			gameInvitationBtn.classList.remove('d-none');
+			const receiverUsername = newActiveItem?.dataset.receiver || 'Unknown';
 			gameInvitationBtn.onclick = function () {
 				if (
 					confirm(
@@ -788,7 +1043,7 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	// Update hidden input for sending messages
 	const groupIdInput = document.getElementById('groupIdInput-active');
 	if (groupIdInput) {
-		groupIdInput.value = newgroupId;
+		groupIdInput.value = chatInfo.group_id;
 	}
 
 	// Clear current messages
@@ -801,93 +1056,105 @@ async function switchChatRoom(currentUserId, newgroupId, targetUserId) {
 	}
 
 	// Load history and initialize SSE for the new group
-	messageOffsets[newgroupId] = 0; // Reset offset for new room
-	loadMessageHistory(currentUserId, newgroupId);
-	const targetbBlockedStatus = await getBlockedStatus(targetUserId);
-	let block_reason = null;
-	if (targetbBlockedStatus.hasBlocked) {
-		block_reason = 'this user blocked you';
-	} else if (targetbBlockedStatus.isBlocked) {
-		//create a pop window to ask unblock
-		const unblockTargetUser = confirm(
-			'You blocked this user, do you want to unblock him ?'
-		);
-		if (unblockTargetUser) {
-			//if yes
-			fetchWithRefresh(`/chat/${targetUserId}/blockedStatus/`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-CSRFToken': getCookie('csrftoken'),
-				},
-				credentials: 'include',
-				body: JSON.stringify({}),
-			})
-				.then((response) =>
-					response.json().then((data) => ({
-						data,
-						ok: response.ok,
-						status: response.status,
-						statusText: response.statusText,
-					}))
-				)
-				.then(({ data, ok, status, statusText }) => {
-					if (ok) {
-						if (data.status === 'success') {
-							// Enable message input and send button
-							document.getElementById('messageInput-active').disabled = false;
-							document.getElementById('sendMessageBtn').disabled = false;
-							// Focus on message input
-							const messageInput = document.getElementById(
-								'messageInput-active'
-							);
-							if (messageInput) {
-								messageInput.focus();
-							}
-							return;
-						} else {
-							console.error('Server error unblocking the user:', targetUserId);
-							alert('Error unblocking the user: ' + targetUserId);
-						}
-					} else {
-						console.error(
-							'HTTP error unblocking the user :',
-							status,
-							targetUserId || statusText
-						);
-						alert('HTTP Error: ' + (targetUserId || statusText));
-					}
+	messageOffsets[chatInfo.group_id] = 0; // Reset offset for new room
+	loadMessageHistory(currentUserId, chatInfo.group_id);
+
+	// Handle blocking logic only for private chats
+	if (chatInfo?.chat_type === 'private' && chatInfo.target_id) {
+		const targetbBlockedStatus = await getBlockedStatus(chatInfo.target_id);
+		let block_reason = null;
+
+		if (targetbBlockedStatus.hasBlocked) {
+			block_reason = 'this user blocked you';
+		} else if (targetbBlockedStatus.isBlocked) {
+			const unblockTargetUser = confirm(
+				'You blocked this user, do you want to unblock him ?'
+			);
+			if (unblockTargetUser) {
+				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': getCookie('csrftoken'),
+					},
+					credentials: 'include',
+					body: JSON.stringify({}),
 				})
-				.catch((error) => {
-					console.error('Network or JSON error:', error);
-					alert('Cannot connect to server to unblock the user.');
-				});
-		} else {
-			//user doesn't want to unblock
-			block_reason = 'you blocked this user';
+					.then((response) =>
+						response.json().then((data) => ({
+							data,
+							ok: response.ok,
+							status: response.status,
+							statusText: response.statusText,
+						}))
+					)
+					.then(({ data, ok, status, statusText }) => {
+						if (ok) {
+							if (data.status === 'success') {
+								// Enable message input and send button
+								document.getElementById('messageInput-active').disabled = false;
+								document.getElementById('sendMessageBtn').disabled = false;
+								const messageInput = document.getElementById(
+									'messageInput-active'
+								);
+								if (messageInput) {
+									messageInput.focus();
+								}
+								return;
+							} else {
+								console.error(
+									'Server error unblocking the user:',
+									chatInfo.name
+								);
+								alert('Error unblocking the user: ' + chatInfo.name);
+							}
+						} else {
+							console.error(
+								'HTTP error unblocking the user :',
+								status,
+								chatInfo.name || statusText
+							);
+							alert('HTTP Error: ' + (chatInfo.name || statusText));
+						}
+					})
+					.catch((error) => {
+						console.error('Network or JSON error:', error);
+						alert('Cannot connect to server to unblock the user.');
+					});
+			} else {
+				block_reason = 'you blocked this user';
+			}
 		}
-	}
-	const gameInvitationBtn = document.getElementById('gameInvitationBtn');
-	if (block_reason != null) {
+
+		const gameInvBtn = document.getElementById('gameInvitationBtn');
+		if (block_reason != null) {
+			document.getElementById('messageInput-active').disabled = true;
+			document.getElementById('sendMessageBtn').disabled = true;
+			if (gameInvBtn) {
+				gameInvBtn.classList.add('d-none');
+				gameInvBtn.disabled = true;
+			}
+			alert(block_reason);
+		} else {
+			// Enable message input and send button
+			document.getElementById('messageInput-active').disabled = false;
+			document.getElementById('sendMessageBtn').disabled = false;
+			if (gameInvBtn) {
+				gameInvBtn.classList.remove('d-none');
+				gameInvBtn.disabled = false;
+			}
+			const messageInput = document.getElementById('messageInput-active');
+			if (messageInput) {
+				messageInput.focus();
+			}
+		}
+	} else {
+		// For tournament chats, disable messaging (only server can send messages)
 		document.getElementById('messageInput-active').disabled = true;
 		document.getElementById('sendMessageBtn').disabled = true;
-		if (gameInvitationBtn) {
-			gameInvitationBtn.classList.add('d-none');
-			gameInvitationBtn.disabled = true;
-		}
-		alert(block_reason);
-	} else {
-		// Enable message input and send button
-		document.getElementById('messageInput-active').disabled = false;
-		document.getElementById('sendMessageBtn').disabled = false;
-		if (gameInvitationBtn) {
-			gameInvitationBtn.classList.remove('d-none');
-			gameInvitationBtn.disabled = false;
-		}
-		// Focus on message input
 		const messageInput = document.getElementById('messageInput-active');
 		if (messageInput) {
-			messageInput.focus();
+			messageInput.placeholder = 'Only tournament updates are shown here';
 		}
 	}
 }
@@ -969,7 +1236,15 @@ async function inviteFriendToPlay(currentUserId) {
 		const messageInput = document.getElementById('messageInput-active');
 		messageInput.value = `🎮 PongPong invitation: copy and paste this key to join my game : ${apiKey}.\n`;
 
-		sendMessage(currentUserId);
+		const groupIdInput = document.getElementById('groupIdInput-active');
+		const usernameInput = document.getElementById('usernameInput-active');
+		const msgInfo = {
+			content: messageInput.value.trim(),
+			group_id: groupIdInput.value,
+			sender_username: usernameInput.value,
+			sender_id: currentUserId,
+		};
+		sendMessage(msgInfo);
 
 		// const invitationMessage = `🎮 Game Invitation: Join my PongPong game with this key: ${apiKey}`;
 		// await sendInvitationMessage(invitationMessage, currentUserId);
@@ -992,21 +1267,19 @@ async function inviteFriendToPlay(currentUserId) {
 	}
 }
 
-/**
- * Updates the message input placeholder and state based on blocking status
- * @param {Object} blockStatus - The blocking status object with isBlocked and hasBlocked properties
- * @param {boolean} enabled - Whether the input should be enabled or disabled
- */
 function updateMessageInputState(blockStatus, enabled = true) {
 	const messageInput = document.getElementById('messageInput-active');
 	const sendBtn = document.getElementById('sendMessageBtn');
 
 	if (!messageInput || !sendBtn) return;
 
-	if (enabled && (!blockStatus || (!blockStatus.isBlocked && !blockStatus.hasBlocked))) {
+	if (
+		enabled &&
+		(!blockStatus || (!blockStatus.isBlocked && !blockStatus.hasBlocked))
+	) {
 		// Normal state - no blocking
 		messageInput.disabled = false;
-		messageInput.placeholder = "Type your message...";
+		messageInput.placeholder = 'Type your message...';
 		sendBtn.disabled = false;
 		messageInput.focus();
 	} else {
@@ -1015,11 +1288,12 @@ function updateMessageInputState(blockStatus, enabled = true) {
 		sendBtn.disabled = true;
 
 		if (blockStatus?.hasBlocked) {
-			messageInput.placeholder = "This user blocked you, you can't send a message";
+			messageInput.placeholder =
+				"This user blocked you, you can't send a message";
 		} else if (blockStatus?.isBlocked) {
 			messageInput.placeholder = "Blocked user, you can't send a message";
 		} else {
-			messageInput.placeholder = "Type your message...";
+			messageInput.placeholder = 'Type your message...';
 		}
 	}
 }
@@ -1046,7 +1320,7 @@ export async function initChatModule(currentUserId) {
 	hasOverallUnreadMessages = false;
 	currentActiveChatGroup = null;
 	currentTargetId = null;
-	Object.keys(messageOffsets).forEach(key => delete messageOffsets[key]);
+	Object.keys(messageOffsets).forEach((key) => delete messageOffsets[key]);
 
 	const chatLog = document.getElementById('chatLog-active');
 	if (chatLog) {
@@ -1067,9 +1341,9 @@ export async function initChatModule(currentUserId) {
 	// Initialize global notifications
 	if (currentUserId) {
 		initGlobalChatNotifications(currentUserId);
+		await initializeAllChatConnections(currentUserId);
 	}
 }
-
 
 // Main chat controller function, called after login
 export function chatController(userId, username) {
@@ -1088,8 +1362,8 @@ export function chatController(userId, username) {
 		usernameInputActive.value = username;
 	}
 
-	// Initialize global chat notifications
 	initGlobalChatNotifications(userId);
+	initializeAllChatConnections(userId);
 
 	// 1. Initialize Bootstrap Modal
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
@@ -1098,15 +1372,17 @@ export function chatController(userId, username) {
 
 		mainChatWindowElement.addEventListener('shown.bs.modal', async () => {
 			console.log('Main Chat Window is shown');
-			hasOverallUnreadMessages = false; // Réinitialiser l'état global
-			const mainChatToggleButton = document.getElementById(
-				'mainChatToggleButton'
-			);
-			if (mainChatToggleButton) {
-				mainChatToggleButton.classList.remove('has-unread-overall');
-			}
+
+			updateGlobalUnreadStatus(false);
+
 			console.log('Logged in user ID:', userId);
-			loadChatRoomList(userId); // Load chat list dynamically
+
+			// Initialize global notifications if not already done
+			if (!globalEventSource) {
+				initGlobalChatNotifications(userId);
+			}
+
+			await loadChatRoomList(userId); // Load chat list dynamically
 
 			// Set initial state for chat log
 			const chatLog = document.getElementById('chatLog-active');
@@ -1116,9 +1392,11 @@ export function chatController(userId, username) {
 			}
 			// If a group was active before closing/reopening, switch back to it
 			if (currentActiveChatGroup) {
-				await switchChatRoom(userId, currentActiveChatGroup, currentTargetId);
+				const chatInfo = currentActiveChatGroup;
+				await switchChatRoom(userId, chatInfo);
 			}
-			setupUserSearchAutocomplete(); // Setup autocomplete for new chat input
+			setupUserSearchAutocomplete();
+
 			// Focus on new chat user ID input initially
 			const targetUserInput = document.getElementById('targetUserInput');
 			if (targetUserInput) {
@@ -1127,21 +1405,18 @@ export function chatController(userId, username) {
 		});
 		mainChatWindowElement.addEventListener('hidden.bs.modal', () => {
 			console.log('Main Chat Window is hidden');
-			// Close all SSE connections when modal closes
-			cleanupAllChatConnections();
-
 			currentActiveChatGroup = null; // Reset active chat group when closing modal
 			currentTargetId = null;
-			// Clear chat log and reset UI state
+
 			const chatLog = document.getElementById('chatLog-active');
 			if (chatLog)
 				chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
 
 			document.getElementById('messageInput-active').disabled = true;
 			document.getElementById('sendMessageBtn').disabled = true;
-			document.getElementById('activeChatRoomName').textContent = ''; // Clear header
+			document.getElementById('activeChatRoomName').textContent = '';
 			document.getElementById('groupIdInput-active').value = '';
-			document.getElementById('targetUserInput').value = ''; // Clear new chat input
+			document.getElementById('targetUserInput').value = '';
 
 			const gameInvitationBtn = document.getElementById('gameInvitationBtn');
 			if (gameInvitationBtn) {
@@ -1169,7 +1444,16 @@ export function chatController(userId, username) {
 	if (sendMessageBtn) {
 		sendMessageBtn.addEventListener('click', () => {
 			// Always pass the logged-in user's username to sendMessage
-			sendMessage(userId);
+			const messageInput = document.getElementById('messageInput-active');
+			const groupIdInput = document.getElementById('groupIdInput-active');
+			const usernameInput = document.getElementById('usernameInput-active');
+			const msgInfo = {
+				content: messageInput.value.trim(),
+				group_id: groupIdInput.value,
+				sender_username: usernameInput.value,
+				sender_id: userId,
+			};
+			sendMessage(msgInfo);
 		});
 	}
 
@@ -1178,7 +1462,17 @@ export function chatController(userId, username) {
 		messageInput.addEventListener('keypress', function (e) {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				sendMessage(userId);
+				// Always pass the logged-in user's username to sendMessage
+				const messageInput = document.getElementById('messageInput-active');
+				const groupIdInput = document.getElementById('groupIdInput-active');
+				const usernameInput = document.getElementById('usernameInput-active');
+				const msgInfo = {
+					content: messageInput.value.trim(),
+					group_id: groupIdInput.value,
+					sender_username: usernameInput.value,
+					sender_id: userId,
+				};
+				sendMessage(msgInfo);
 			}
 		});
 		const charCounter = document.getElementById('char-counter');
@@ -1215,7 +1509,6 @@ export function chatController(userId, username) {
 		);
 	}
 }
-
 
 // Function to clean up all chat SSE connections
 function cleanupAllChatConnections() {
@@ -1255,7 +1548,7 @@ export function cleanupChatOnLogout() {
 	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
 	if (mainChatToggleButton) {
 		mainChatToggleButton.style.display = 'none';
-		mainChatToggleButton.classList.remove('has-unread-overall');
+		removeMainChatIndicator();
 	}
 
 	// Close modal if open
@@ -1279,42 +1572,84 @@ function handleStartNewChat(currentUserId, currentUsername) {
 		alert('You cannot start a chat with yourself.');
 		return;
 	}
-
-	promptPrivateChat(currentUserId, targetUserId, targetUsername);
+	const chatInfo = {
+		chat_type: 'private',
+		target_id: targetUserId,
+		name: targetUsername,
+		group_id: null,
+	};
+	promptPrivateChat(currentUserId, chatInfo);
 	targetUserInput.value = ''; // Clear input field
 	targetUserInput.dataset.userId = '';
 }
 
-async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
-	console.log(
-		`Requesting private chat with ${targetUsername} for user ${currentUserId}`
-	);
+async function promptPrivateChat(currentUserId, chatInfo) {
 	if (!currentUserId) {
 		alert('Please log in to start a new chat.');
 		return;
 	}
-
-	if (currentUserId === targetUserId) {
-		alert('You cannot start a chat with yourself.');
-		return;
-	}
+	if (chatInfo.chat_type == 'private') {
+		console.log(
+			`Requesting private chat with ${chatInfo.name} for user ${currentUserId}`
+		);
+		if (currentUserId === chatInfo.target_id) {
+			alert('You cannot start a chat with yourself.');
+			return;
+		}
 
 	// Check if chat with this user already exists in the list
 	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
 	let existinggroupId = null;
 	chatRooms.forEach((room) => {
-		if (room.dataset.targetUserId === targetUserId) {
-			existinggroupId = room.dataset.groupId; // Get the group ID of the existing chat
+		if (room.dataset.targetUserId === chatInfo.target_id) {
+			existinggroupId = room.dataset.groupId;
 		}
 	});
 
-	if (existinggroupId) {
-		console.log(`Chat with ${targetUsername} already exists. Switching to it.`);
-		await switchChatRoom(currentUserId, existinggroupId, targetUserId);
-		return;
-	}
+		if (existinggroupId) {
+			console.log(
+				`Chat with ${chatInfo.name} already exists. Switching to it.`
+			);
+			chatInfo.group_id = existinggroupId;
+			await switchChatRoom(currentUserId, chatInfo);
+			return;
+		}
 
-	if (confirm(`Do you want to start a new chat with ${targetUsername}?`)) {
+		if (confirm(`Do you want to start a new chat with ${chatInfo.name}?`)) {
+			try {
+				const response = await fetchWithRefresh('/chat/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': getCookie('csrftoken'),
+					},
+					body: JSON.stringify({
+						chat_type: chatInfo.chat_type,
+						target_id: chatInfo.target_id,
+					}),
+					credentials: 'include',
+				});
+
+				const data = await response.json();
+
+				if (response.ok && data.status === 'success' && data.group_id) {
+					console.log(`Chat group ${data.group_id} created/retrieved.`);
+					await loadChatRoomList(currentUserId);
+					chatInfo.group_id = data.group_id;
+					await switchChatRoom(currentUserId, chatInfo);
+				} else {
+					console.error('Server error creating chat group:', data.message);
+					alert('Error creating chat group: ' + data.message);
+				}
+			} catch (error) {
+				console.error('Network error creating chat group:', error);
+				alert('Cannot connect to server to create chat group.');
+			}
+		}
+	} else {
+		console.log(
+			`Requesting tournament chat ${chatInfo.name} for user ${currentUserId}`
+		);
 		fetchWithRefresh('/chat/', {
 			method: 'POST',
 			headers: {
@@ -1322,20 +1657,20 @@ async function promptPrivateChat(currentUserId, targetUserId, targetUsername) {
 				'X-CSRFToken': getCookie('csrftoken'),
 			},
 			body: JSON.stringify({
-				current_user_id: currentUserId,
-				target_user_id: targetUserId,
+				chat_type: chatInfo.chat_type,
+				target_id: chatInfo.target_id,
 			}),
 			credentials: 'include',
 		})
 			.then((response) =>
 				response.json().then((data) => ({ data, ok: response.ok }))
 			)
-			.then(({ data, ok }) => {
+			.then(async ({ data, ok }) => {
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
-					loadChatRoomList(currentUserId).then(async () => {
-						await switchChatRoom(currentUserId, data.group_id, targetUserId);
-					});
+					await loadChatRoomList(currentUserId);
+					chatInfo.group_id = data.group_id;
+					await switchChatRoom(currentUserId, chatInfo);
 				} else {
 					console.error('Server error creating chat group:', data.message);
 					alert('Error creating chat group: ' + data.message);
@@ -1396,12 +1731,46 @@ export async function renderChatButtonIfAuthenticated(userIsAuth = null) {
 	}
 }
 
+export async function launchTournamentChat(tournament_id) {
+	const userData = await fetchWithRefresh('/user-service/infoUser/', {
+		method: 'GET',
+		credentials: 'include',
+	})
+		.then((response) => response.json())
+		.then((data) => ({
+			id: data.id,
+			username: data.user_name,
+		}))
+		.catch((error) => {
+			console.error('Error fetching user info:', error);
+			return null;
+		});
+
+	if (!userData || !userData.id) {
+		console.error('User data not found');
+		return;
+	}
+	const chatInfo = {
+		chat_type: 'tournament',
+		target_id: tournament_id,
+		name: null,
+	};
+	promptPrivateChat(userData.id, chatInfo);
+}
+
 /**
  * Function to refresh chat status when block/unblock status changes
  * This function can be called from other modules like card_profile.js
  */
 export async function refreshChatAfterBlockStatusChange(targetUserId) {
-	console.log('Refreshing chat after block status change for user:', targetUserId);
+	console.log(
+		'Refreshing chat after block status change for user:',
+		targetUserId
+	);
+	console.log(
+		'Refreshing chat after block status change for user:',
+		targetUserId
+	);
 
 	// Get current user info
 	const userData = await fetchWithRefresh('/user-service/infoUser/', {
@@ -1425,15 +1794,24 @@ export async function refreshChatAfterBlockStatusChange(targetUserId) {
 
 	// If the chat is currently active and the modal is open
 	const mainChatWindowElement = document.getElementById('mainChatWindow');
-	if (mainChatWindowElement && mainChatWindowElement.classList.contains('show')) {
+	if (
+		mainChatWindowElement &&
+		mainChatWindowElement.classList.contains('show')
+	) {
 		console.log('Chat modal is open, refreshing chat list and active chat');
 
 		// Refresh the chat room list
 		await loadChatRoomList(userData.id);
 
 		// If we're currently chatting with the user whose block status changed, refresh that conversation
-		if (currentTargetId && currentTargetId.toString() === targetUserId.toString()) {
-			console.log('Currently chatting with affected user, refreshing conversation state');			// Re-check block status and update input state
+		if (
+			currentTargetId &&
+			currentTargetId.toString() === targetUserId.toString()
+		) {
+			console.log(
+				'Currently chatting with affected user, refreshing conversation state'
+			);
+			// Re-check block status and update input state
 			const targetBlockedStatus = await getBlockedStatus(targetUserId);
 			let block_reason = null;
 
@@ -1515,4 +1893,136 @@ function setupUserSearchAutocomplete() {
 			resultsBox.innerHTML = `<li class="list-group-item text-danger">Error loading users</li>`;
 		}
 	});
+}
+
+function addUnreadIndicator(chatItem) {
+	let element;
+
+	// If chatItem is a string or number (group ID), find the element
+	if (typeof chatItem === 'string' || typeof chatItem === 'number') {
+		const groupId = chatItem.toString();
+		console.log('Looking for chat item with group ID:', groupId);
+		element = document.querySelector(
+			`#chatRoomList [data-group-id="${groupId}"]`
+		);
+		console.log('Found element:', element);
+	} else {
+		element = chatItem;
+	}
+
+	if (!element) {
+		console.warn(
+			'Could not find chat item to add unread indicator for:',
+			chatItem
+		);
+		return;
+	}
+
+	console.log('Element type:', typeof element, 'Element:', element);
+	console.log(
+		'Element tagName:',
+		element.tagName,
+		'Element classList:',
+		element.classList
+	);
+
+	// Check if indicator already exists
+	if (element.querySelector && element.querySelector('.unread-indicator')) {
+		console.log('Indicator already exists, skipping');
+		return; // Already has indicator
+	}
+
+	console.log('Creating new indicator');
+	// Create a small red dot indicator
+	const indicator = document.createElement('span');
+	indicator.className = 'unread-indicator';
+	indicator.style.cssText = `
+		position: absolute;
+		top: 50%;
+		right: 10px;
+		transform: translateY(-50%);
+		width: 8px;
+		height: 8px;
+		background-color: #dc3545;
+		border-radius: 50%;
+		border: 1px solid white;
+		z-index: 10;
+	`;
+
+	// Make sure the parent has relative positioning
+	element.style.position = 'relative';
+
+	// Add the indicator
+	element.appendChild(indicator);
+	console.log('Indicator added successfully');
+}
+
+function removeUnreadIndicator(chatItem) {
+	if (!chatItem) return;
+
+	console.log('Removing indicator from:', chatItem);
+	const indicator = chatItem.querySelector('.unread-indicator');
+	if (indicator) {
+		indicator.remove();
+		console.log('Indicator removed successfully');
+	} else {
+		console.log('No indicator found to remove');
+	}
+}
+
+/**
+ * Add a red dot indicator to the main chat toggle button
+ */
+function addMainChatIndicator() {
+	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+	if (!mainChatToggleButton) return;
+
+	// Check if indicator already exists
+	if (mainChatToggleButton.querySelector('.main-chat-indicator')) {
+		return; // Already has indicator
+	}
+
+	console.log('Adding main chat indicator');
+	// Create a small red dot indicator
+	const indicator = document.createElement('span');
+	indicator.className = 'main-chat-indicator';
+	indicator.style.cssText = `
+		position: absolute;
+		top: -5px;
+		right: -5px;
+		width: 12px;
+		height: 12px;
+		background-color: #dc3545;
+		border-radius: 50%;
+		border: 2px solid white;
+		z-index: 1000;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	`;
+
+	// Make sure the parent has relative positioning
+	mainChatToggleButton.style.position = 'relative';
+
+	// Add the indicator
+	mainChatToggleButton.appendChild(indicator);
+	hasOverallUnreadMessages = true;
+	console.log('Main chat indicator added successfully');
+}
+
+/**
+ * Remove the red dot indicator from the main chat toggle button
+ */
+function removeMainChatIndicator() {
+	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+	if (!mainChatToggleButton) return;
+
+	console.log('Removing main chat indicator');
+	const indicator = mainChatToggleButton.querySelector('.main-chat-indicator');
+	if (indicator) {
+		indicator.remove();
+		console.log('Main chat indicator removed successfully');
+	}
+
+	// Also remove the CSS class if present
+	mainChatToggleButton.classList.remove('has-unread-overall');
+	hasOverallUnreadMessages = false;
 }
