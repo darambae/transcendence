@@ -1,5 +1,5 @@
 import { actualizeIndexPage, fetchWithRefresh } from '../utils.js';
-import { routesTr, getSSE } from './tournament.js';
+import { routesTr, getSSE, afficheWinnerTournament, affichUserTournament } from './tournament.js';
 import { handleGame2Players } from './multiplayerGameSession.js';
 
 export async function onlineGameTr(
@@ -37,7 +37,9 @@ export async function onlineGameTr(
 				}
 			}
 			if (data.t_state == 'results') {
-				console.log('------------------------------->>', data);
+				await affichUserTournament()
+				await afficheWinnerTournament(data)
+				console.log("------------------------------->>", data);
 			}
 		} catch (error) {
 			console.log('Error sseTournament', error);

@@ -1,6 +1,6 @@
 import { getCookie } from '../utils.js';
 import { setPlayersLocalName } from './gameApi.js';
-import { getSSE } from './tournament.js';
+import { afficheWinnerTournament, affichUserTournament, getSSE } from './tournament.js';
 import { routesTr } from './tournament.js';
 import { localGameController } from './localGame.js';
 import { actualizeIndexPage } from '../utils.js';
@@ -35,7 +35,9 @@ export async function localGameTr() {
 				}
 			}
 			if (data.t_state == 'results') {
-				console.log('===============--------=============>>', data);
+				await affichUserTournament()
+				await afficheWinnerTournament(data)
+				console.log("===============--------=============>>", data);
 			}
 		} catch (error) {
 			console.log('Error sseTournament :', error);
