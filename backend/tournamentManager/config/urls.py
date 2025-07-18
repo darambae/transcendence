@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from api.views import tournamentManager, sse, joinGuest, launchMatch, checkSSE, getIds, Supervise, amIinTournament, launchFinals, getResults, launchNextMatch
+from api.views import tournamentManager, sse, joinGuest, launchMatch, checkSSE, getIds, Supervise, amIinTournament, launchFinals, getResults, launchNextMatch, clearGuests
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -29,5 +29,6 @@ urlpatterns = [
     path("tournament/supervise", Supervise, name="Supervise"),
     path("tournament/me", amIinTournament, name="amIinTournament"),
     path("tournament/next", launchNextMatch, name="launchNextMatch"),
-	path("tournament/<str:tkey>/results/", getResults, name="getResults")
+	path("tournament/<str:tkey>/results/", getResults, name="getResults"),
+    path("tournament/guests", clearGuests, name="clearGuests")
 ]
