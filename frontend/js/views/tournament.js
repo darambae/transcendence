@@ -3,7 +3,6 @@ import { getCookie } from "../utils.js"
 import { handleInvitSubmit } from "./invits.js";
 import { localGameTr } from "./tournamentLocalGame.js";
 import { onlineGameTr } from "./tournamentOnlineGaame.js";
-import { getOtherUserAvatar } from "./card_profile.js";
 import { routes } from "../routes.js"
 
 const csrf = getCookie('csrftoken');
@@ -68,7 +67,6 @@ export async function refreshTournament() {
       return response.json();
     })
     .then(data => {
-      // console.log("Données reçues TrnmtKey:", data["list"]);
       trnmt = data["list"];
     })
     .catch(error => {
@@ -95,8 +93,6 @@ export async function refreshTournament() {
 }
 
 async function createEvent(csrf, ulElem) {
-  // // console.log("Hey 3")
-
   await fetchWithRefreshNoCash('tournament/tournament', {
     method: 'POST',
     headers: {
@@ -110,10 +106,6 @@ async function createEvent(csrf, ulElem) {
       if (!response.ok) throw new Error("https Error: " + response.status);
       return response.json();
     })
-    // .then(data => {
-    //   // // console.log("Données reçues TrnmtCreate:", data);
-    //   // let trnmt = data["list"];
-    // })
     .catch(error => {
       console.error("Erreur de requête :", error);
       throw error;
@@ -121,16 +113,8 @@ async function createEvent(csrf, ulElem) {
   refreshTournament();
 }
 
-
-// function diplayListStatus(status) {
-//   const statusList = document.getElementById("divlistTournament")
-
-//   statusList.style.display = status;
-// }
-
 function setPositionTournamentList(pos) {
   const container = document.getElementById("listPlayerGameTournament");
-
 
   container.style.position = pos;
   if (pos == "relative") {
@@ -166,7 +150,6 @@ function listTournament(csrf, ulElem) {
 async function LaunchGameIntournament(data) {
   const idNBtournament = document.getElementById("idNBtournament");
   let seconds = 5;
-
 
   const interval = setInterval(() => {
     idNBtournament.textContent = seconds;
@@ -245,7 +228,6 @@ async function launchTournament(data) {
       avatarother6.style.order = 6;
     }
   }
-
 }
 
 
@@ -270,9 +252,6 @@ async function startTournament(data) {
     .then(response => {
       if (!response.ok) throw new Error("https Error: " + response.status);
       return response.json();
-    })
-    .then(data => {
-      //tournamentInfo.innerHTML = `<h6>${data["Info"]}</h6>`;
     })
     .catch(error => {
       console.error("Erreur de requête :", error);
@@ -427,9 +406,6 @@ export async function afficheWinnerTournament(data) {
   const idVS2 = document.getElementById("idVS2");
   const leave = document.getElementById("Tournament-leave")
 
-
-
-  console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
   if (leave) {
     leave.style.display = "block"
   }
@@ -532,7 +508,6 @@ export async function tournamentController() {
   let SSEStream;
   let leaveButton = undefined;
   let launchButton = undefined;
-  //const tournamentInfo = document.getElementById("Tournament-info");
   const tournamentLeave = document.getElementById("Tournament-leave");
   const tournamentGame = document.getElementById("Tournament-game");
   const tournamentLaunch = document.getElementById("Tournament-launch");
@@ -551,7 +526,6 @@ export async function tournamentController() {
         return response.json()
       })
       .then(async data => {
-        // console.log("dat : ", data);
         if (data.Tournament != "None") {
           let usernameJwt;
           let jwtInfo;
@@ -570,39 +544,25 @@ export async function tournamentController() {
             .then(async response => {
               if (!response.ok) throw new Error("https Error: " + response.status);
               jwtInfo = await response.json();
-              // console.log("inf : ", jwtInfo);
               usernameJwt = jwtInfo["key"];
               guestJwt = jwtInfo["guests"];
               userId = jwtInfo["userId"]
             })
             .then(async data => {
-
-              // Put here !!!
-              //    -> ID               = userId
-              //    -> username         = usernameJwt
-              //    -> tournament key   = data["key"]
-
-
               const url_sse = `tournament/events?tKey=${trId}&name=${usernameJwt}&guests=${guestJwt}`;
               SSEStream = getSSE();
-              // console.log(SSEStream);
               if (SSEStream === undefined) {
                 SSEStream = new EventSource(url_sse);
                 setSSE(SSEStream);
               }
               SSEStream.onmessage = async function (event) {
                 try {
-                  // console.log("ggg", event.data);
                   const data = JSON.parse(event.data);
                   console.log("eee :", data);
-                  // console.log("fff", data.t_state);
                   if (data.t_state == "game-start") {
-                    // LaunchGameIntournament(data)
   
                     tournamentLeave.innerHTML = ""
                     
-
-                    console.log("------------------------------------------------------------------------------------------------->>>>>LLLL ", data)
                     console.log("SSE 1")
                     const buttonGame = document.createElement("button");
                     console.log("SSE 2")
@@ -636,7 +596,6 @@ export async function tournamentController() {
                   }
                   else if (data.t_state == "game-finished") {
                     await actualizeIndexPage("contentTournementPage", routesTr['tournament'])
-                    // console.log("sse data: ", data.next)
                     if (data.next == "final-rounds") {
                       await fetchWithRefreshNoCash("tournament/finals", {
                         method: "POST",
@@ -647,14 +606,7 @@ export async function tournamentController() {
                         credentials: 'include',
                         body: JSON.stringify({ "tKey": data.tkey })
                       })
-                    }
-                    //else if (data.next == "set-results") {
-                    //  SSEStream.close();
-                    //  fetchWithRefresh(`tournament/${data.tkey}/results/`, {
-                    //    credentials: 'include'
-                    //  })
-                    //}
-                    else {
+                    } else {
                       await fetchWithRefreshNoCash("tournament/next", {
                         method: "POST",
                         headers: {
@@ -668,9 +620,6 @@ export async function tournamentController() {
                           if (!response.ok) throw new Error("https Error: " + response.status);
                           return response.json()
                         })
-                      // .then(data => {
-                      //   console.log("NEXT : ", data)
-                      // })
                     }
                   }
                   if (data.t_state == "results") {
@@ -703,14 +652,8 @@ export async function tournamentController() {
                     console.log("data final match : ", data);
                     await affichUserTournament()
                     await launchTournament(data)
-                    // SEND MESSAGE KELLY
-                    //    -> id       : data.tkey
-                    //    -> content  : "⚠️ Final matchs annoncement ⚠️
-                    //    -> content2 : `Match 1 : ${data.match1.player1 VS ${data.match1.player2}`
-                    //    -> content3 : `Match 1 : ${data.match2.player1 VS ${data.match2.player2}`
                   }
                   else if (data.t_state == "Someone-joined-left") {
-                    console.log("ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc")
                     console.log("Someone joined left : ", data);
                     await affichUserTournament()
                     await launchTournament(data)
@@ -727,15 +670,7 @@ export async function tournamentController() {
               leaveButton.className = "btn btn-outline-secondary";
               leaveButton.textContent = "Leave";
 
-              //launchButton = document.createElement("button");
-              //launchButton.id = trId;
-              //launchButton.className = "btn btn-outline-secondary";
-              //launchButton.textContent = "Start";
-
               tournamentLeave.appendChild(leaveButton)
-              //tournamentLaunch.appendChild(launchButton);
-
-
 
               await fetchWithRefreshNoCash("tournament/next", {
                 method: "POST",
@@ -750,9 +685,6 @@ export async function tournamentController() {
                   if (!response.ok) throw new Error("https Error: " + response.status);
                   return response.json()
                 })
-              // .then(data => {
-              //   console.log("NEXT : ", data)
-              // });
 
               return invitsController()
             })
@@ -768,12 +700,6 @@ export async function tournamentController() {
     console.log("Error : ", error);
   }
 
-  // console.log("csrf:", csrf);
-  // console.log("HEY 1")
-
-
-
-
   ulDropdown.addEventListener('click', async (event) => {
     const target = event.target;
     let usernameJwt;
@@ -781,14 +707,9 @@ export async function tournamentController() {
     let guestJwt;
     let userId;
 
-
-    // console.log("entree")
-
-    // Check if the clicked element is an <a> tag
     if (target.tagName === "BUTTON") {
       event.preventDefault();
       const view = target.dataset.view;
-      // console.log("aaaaa", view);
       const btnId = document.getElementById(view)
 
 
@@ -801,9 +722,7 @@ export async function tournamentController() {
         })
           .then(async response => {
             if (!response.ok) throw new Error("https Error: " + response.status);
-            // console.log("response : ", response)
             jwtInfo = await response.json();
-            // console.log("------------------------->>> ", jwtInfo);
             usernameJwt = jwtInfo["key"];
             guestJwt = jwtInfo["guests"]
             userId = jwtInfo["userId"]
@@ -823,7 +742,6 @@ export async function tournamentController() {
         body: JSON.stringify({ "action": "join", "tKey": view })
       })
         .then(response => {
-          // console.log("aaa1", response)
           btnId.style.backgroundColor = "red";
           if (!response.ok) throw new Error("https Error: " + response.status);
           return response.json();
@@ -831,26 +749,16 @@ export async function tournamentController() {
         .then(async data => {
           btnId.style.backgroundColor = "green";
 
-
           await launchTournamentChat(data['key']);
-
-
 
           const url_sse = `tournament/events?tKey=${data["key"]}&name=${usernameJwt}&guests=${guestJwt}`;
           SSEStream = new EventSource(url_sse);
           setSSE(SSEStream);
           SSEStream.onmessage = async function (event) {
             try {
-              // console.log("iii", event.data);
               const data = JSON.parse(event.data);
-              // console.log("jjj", data);
-              // console.log("kkk", data.t_state);
               if (data.t_state == "game-start") {
-
-                // LaunchGameIntournament(data)
                 tournamentLeave.innerHTML = ""
-
-                console.log("------------------------------------------------------------------------------------------------->>>>>LLLL ", data)
 
                 console.log("SSE 1")
                 const buttonGame = document.createElement("button");
@@ -898,7 +806,6 @@ export async function tournamentController() {
               }
               else if (data.t_state == "game-finished") {
                 await actualizeIndexPage("contentTournementPage", routesTr['tournament'])
-                // console.log("sse data: ", data.next)
                 if (data.next == "final-rounds") {
                   await fetchWithRefreshNoCash("tournament/finals", {
                     method: "POST",
@@ -922,16 +829,12 @@ export async function tournamentController() {
                   })
                 }
               }
-              //if (data.t_state == "results") {
-              //  afficheWinnerTournament(data)
-              //  console.log("============================>>", data);
-              //}
               if (data.t_state == "firsts-match-preview") {
                 const msgInfo = {
                   content: null,
                   group_id: null,
                   sender_username: 'server',
-                  sender_id: data.tkey, // Utiliser l'ID du tournoi
+                  sender_id: data.tkey,
                 };
 
                 await affichUserTournament()
@@ -957,7 +860,7 @@ export async function tournamentController() {
                   content: null,
                   group_id: null,
                   sender_username: 'server',
-                  sender_id: data.tkey, // Utiliser l'ID du tournoi
+                  sender_id: data.tkey,
                 };
                 console.log("trying to send message for the final match");
                 const message_1 = "⚠️ Final match annoncement ⚠️";
@@ -973,7 +876,6 @@ export async function tournamentController() {
                 await launchTournament(data)
               }
               else if (data.t_state == "Someone-joined-left") {
-                console.log("ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")
                 console.log("Someone joined left : ", data);
                 await affichUserTournament()
                 await launchTournament(data)
@@ -991,19 +893,10 @@ export async function tournamentController() {
           leaveButton.className = "btn btn-outline-secondary";
           leaveButton.textContent = "Leave";
 
-          //launchButton = document.createElement("button");
-          //launchButton.id = view;
-          //launchButton.className = "btn btn-outline-secondary";
-          //launchButton.textContent = "Start";
-
           tournamentLeave.appendChild(leaveButton)
-          //tournamentLaunch.appendChild(launchButton);
           refreshTournament()
 
-
           setPositionTournamentList("absolute")
-          // affichUserTournament()
-
 
           return invitsController()
         })
@@ -1034,8 +927,6 @@ export async function tournamentController() {
         })
         .then(data => {
           SSEStream.close();
-          //tournamentInfo.innerHTML = "";
-          //tournamentLaunch.innerHTML = ""
           tournamentLeave.innerHTML = ""
           divGuest.innerHTML = "";
           listTournament(csrf, ulElem)
@@ -1056,14 +947,13 @@ export async function tournamentController() {
       event.preventDefault();
 
       const KeepInfo = document.getElementById("contentTournementPage");
-      // const contentInfo = KeepInfo.innerHTML;
 
       if (target.dataset.type == "local") {
         localStorage.setItem("p1", target.dataset.p1);
         localStorage.setItem("p2", target.dataset.p2);
         localStorage.setItem("key", target.dataset.key);
         localStorage.setItem("tkey", target.dataset.tkey);
-        // console.log("Target.dataset", target.dataset);
+  
         await fetchWithRefreshNoCash(`tournament/supervise?key=${target.dataset.key}&tkey=${target.dataset.tkey}&round=${target.dataset.round}`, {
           credentials: "include",
         })
@@ -1071,9 +961,6 @@ export async function tournamentController() {
             if (!response.ok) throw new Error("https Error: " + response.status);
             return response.json();
           })
-        // .then(data => {
-        //   console.log(data);
-        // })
 
         return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
       }
@@ -1116,7 +1003,6 @@ export async function tournamentController() {
           }
         } catch (error) {
           console.error('Request error:', error);
-          // Could set default values for a, b, c if needed
         }
         return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](target.dataset.key, target.dataset.playerId, 0, idJWT, target.dataset.tkey, target.dataset.round));
       }
@@ -1128,7 +1014,6 @@ export async function tournamentController() {
 async function launchGame(data_game) {
 
   const KeepInfo = document.getElementById("contentTournementPage");
-  // const contentInfo = KeepInfo.innerHTML;
 
   console.log("==========================")
   console.log(data_game)
@@ -1146,9 +1031,6 @@ async function launchGame(data_game) {
         if (!response.ok) throw new Error("https Error: " + response.status);
         return response.json();
       })
-    // .then(data => {
-    //   console.log(data);
-    // })
 
     return actualizeIndexPage("contentTournementPage", routesTr['matchSp']);
   }
@@ -1194,26 +1076,7 @@ async function launchGame(data_game) {
       }
     } catch (error) {
       console.error('Request error:', error);
-      // Could set default values for a, b, c if needed
     }
     return actualizeIndexPage("contentTournementPage", routesTr['matchOnline'](data_game.key, data_game.playerId, 0, idJWT, data_game.tkey, data_game.round));
   }
 }
-
-
-
-//                      +-------------------+
-//                      |  TOURNAMENT INFO  |
-//                      +-------------------+
-//                      |                   |
-//                      |   MATCH PREVIEW   |
-// +--------------------+                   +--------------------+
-// |     Match 1        |   Firsts matchs   |       Match 2      |
-// +--------------------+-------------------+--------------------+
-// |      Player 1      |                   |      Player 1      |
-// |  Bob               |                   |  Bob               |
-// +--------------------+                   +--------------------+
-// |      Player 2      |                   |      Player 2      |
-// |  Bob2              |                   |  Bob2              |
-// +--------------------+                   +--------------------+
-// |  ${format_name(data.match1.player1)}|                   |  ${format_name(data.match1.player2)}|

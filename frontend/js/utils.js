@@ -26,7 +26,6 @@ export async function actualizeIndexPage(elementId, view) {
 
 	if (typeof view.controller === 'function') {
 		try {
-			// This will work for both async and regular functions
 			await Promise.resolve(view.controller());
 		} catch (error) {
 			console.error(`Error executing controller for ${view.template}:`, error);
@@ -43,7 +42,6 @@ export async function closeModal() {
 	if (loginForm) {
 		loginForm.classList.remove('active');
 	}
-	//window.location = "#home";
 }
 
 //csrf token getter
@@ -87,22 +85,19 @@ export async function isUserAuthenticated() {
 
 export function attachLoginListener(userIsAuth = null) {
 	const toggleLogin = document.querySelector('.login-link');
-	if (!toggleLogin) return; // Exit early if element doesn't exist
+	if (!toggleLogin) return;
 
 	if (userIsAuth === null) {
-		// Only check authentication if status wasn't provided
 		isUserAuthenticated().then((isAuth) => {
 			console.log('Login listener - authenticated:', isAuth);
 			setupLoginClick(toggleLogin, isAuth);
 		});
 	} else {
-		// Use the provided authentication status directly
 		console.log('Login listener - using provided auth status:', userIsAuth);
 		setupLoginClick(toggleLogin, userIsAuth);
 	}
 }
 
-// Helper function to keep code DRY
 function setupLoginClick(toggleLogin, isAuth) {
 	toggleLogin.addEventListener('click', async () => {
 		if (isAuth === false) {
@@ -116,7 +111,7 @@ function setupLoginClick(toggleLogin, isAuth) {
 export async function getBlockedStatus(targetUserId) {
 	try {
 		const timestamp = Date.now();
-		const random = Math.random(); // Ajouter encore plus d'unicité
+		const random = Math.random();
 		const response = await fetchWithRefresh(
 			`/chat/${targetUserId}/blockedStatus/?t=${timestamp}&r=${random}`,
 			{
@@ -141,8 +136,7 @@ export async function getBlockedStatus(targetUserId) {
 			);
 			return null;
 		}
-		const data = await response.json(); // Ajout de 'await' manquant
-		// Extraire le vrai blockedStatus de la réponse
+		const data = await response.json();
 		let blockedStatus = data.blockedStatus || data;
 		console.log('Extracted blockedStatus:', blockedStatus);
 		return blockedStatus;
@@ -181,18 +175,18 @@ export async function fetchWithRefreshNoCash(url, options = {}) {
 	return response;
 }
 
-const requestCache = new Map(); // Stores cached responses
-const inFlightRequests = new Map(); // Tracks pending requests
-let refreshPromise = null; // Holds the single refresh token operation
+const requestCache = new Map();
+const inFlightRequests = new Map();
+let refreshPromise = null;
 
 // Authentication state management
 let isRedirecting = false;
 
 // Clear authentication state and redirect to home
 function clearAuthAndRedirect() {
-	if (isRedirecting) return; // Prevent multiple redirections
+	if (isRedirecting) return;
 	isRedirecting = true;
-	window.isRedirecting = true; // Make it globally accessible
+	window.isRedirecting = true;
 
 	console.log('Clearing authentication state and redirecting to home');
 
@@ -227,11 +221,9 @@ export async function fetchWithRefresh(url, options = {}) {
 
 	const fetchPromise = (async () => {
 		let response = await fetch(url, options);
-		// Clone the response immediately to preserve its body
 		let responseToReturn = response.clone();
-		// Handle authentication and refresh logic
+
 		if (response.status === 401) {
-			// Use a single shared refresh promise
 			if (!refreshPromise) {
 				refreshPromise = fetch('/auth/refresh-token/', {
 					method: 'GET',
@@ -241,14 +233,12 @@ export async function fetchWithRefresh(url, options = {}) {
 			}
 
 			const refreshResponse = await refreshPromise;
-			refreshPromise = null; // Reset for next time
+			refreshPromise = null;
 
 			if (refreshResponse.ok) {
 				response = await fetch(url, options);
-				// Update our clone with the fresh response
 				responseToReturn = response.clone();
 			} else {
-				// Refresh token is also expired or invalid
 				console.log('Refresh token expired or invalid');
 
 				// For logout requests, allow the logout to complete locally
@@ -274,7 +264,6 @@ export async function fetchWithRefresh(url, options = {}) {
 				}
 			}
 		} else if (response.status === 413) {
-			// Handle "Request Entity Too Large" errors
 			return new Response(
 				JSON.stringify({
 					status: 'error',
@@ -292,17 +281,14 @@ export async function fetchWithRefresh(url, options = {}) {
 			});
 		}
 
-		// Return the cloned response to ensure the body can be read multiple times
 		return responseToReturn;
 	})();
 
-	// Track in-flight request
 	inFlightRequests.set(cacheKey, fetchPromise);
 
 	try {
 		return await fetchPromise;
 	} finally {
-		// Remove from in-flight tracking when done
 		inFlightRequests.delete(cacheKey);
 	}
 }

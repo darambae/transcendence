@@ -14,14 +14,10 @@ export async function settingsProfileController() {
 	Friends.searchFriends();
 	Friends.listennerFriends();
 
-	// Add real-time username validation
 	setupUsernameValidation();
-
-	// Add real-time name validation
 	setupNameValidation();
 }
 
-// Add username validation for real-time feedback
 function setupUsernameValidation() {
 	const usernameInput = document.getElementById('inputUsername');
 
@@ -43,7 +39,6 @@ function setupUsernameValidation() {
 					errorDiv.classList.add('text-danger');
 					errorDiv.style.display = 'block';
 
-					// Hide after 2 seconds
 					setTimeout(() => {
 						if (errorDiv.textContent.includes('whitespace')) {
 							errorDiv.style.display = 'none';
@@ -54,14 +49,12 @@ function setupUsernameValidation() {
 				this.style.borderColor = 'red';
 				this.title = 'Username cannot exceed 15 characters';
 
-				// Show immediate feedback
 				if (errorDiv) {
 					errorDiv.textContent = 'Username cannot exceed 15 characters.';
 					errorDiv.classList.remove('text-success');
 					errorDiv.classList.add('text-danger');
 					errorDiv.style.display = 'block';
 
-					// Hide after 2 seconds
 					setTimeout(() => {
 						if (errorDiv.textContent.includes('exceed 15')) {
 							errorDiv.style.display = 'none';
@@ -72,7 +65,6 @@ function setupUsernameValidation() {
 				this.style.borderColor = '';
 				this.title = '';
 
-				// Clear error if it was about whitespace or length
 				if (
 					errorDiv &&
 					(errorDiv.textContent.includes('whitespace') ||

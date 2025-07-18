@@ -14,7 +14,6 @@ export async function onlineGameTr(
 
 	sseTournament.onmessage = async function (event) {
 		try {
-			// Skip heartbeat messages
 			if (
 				event.data === 'heartbeat' ||
 				event.data.trim() === ''
@@ -27,11 +26,6 @@ export async function onlineGameTr(
 				if (data.next == 'set-results') {
 					console.log('results : ', data);
 				}
-				//  sseTournament.close();
-				//  fetchWithRefresh(`tournament/${data.tkey}/results/`, {
-				//    credentials: 'include'
-				//  })
-				//}
 				if (data.mkey == key) {
 					await actualizeIndexPage('contentTournementPage', routesTr['tournament']);
 				}

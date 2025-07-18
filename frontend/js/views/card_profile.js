@@ -83,7 +83,6 @@ async function gestFooter(friend_status, blockedStatus) {
 	console.log('gestFooter - isBlocked:', blockedStatus?.isBlocked)
 	console.log('gestFooter - hasBlocked:', blockedStatus?.hasBlocked)
 
-	// Vérifier si blockedStatus est un objet valide
 	if (!blockedStatus) {
 		console.log('blockedStatus is null/undefined - treating as no blocking')
 		blockedStatus = { isBlocked: false, hasBlocked: false };
@@ -92,7 +91,7 @@ async function gestFooter(friend_status, blockedStatus) {
 	if (blockedStatus.isBlocked) {
 		sep.style.display = "none"
 		btnAdd.style.display = "none"
-		btnAddBlock.textContent = "unblock"//to unblock
+		btnAddBlock.textContent = "unblock"
 		btnAddBlock.style.display = "block"
 		console.log('Case 1: User is blocked - showing unblock button')
 	} else {
@@ -205,7 +204,7 @@ function addFriend() {
 function changeBlockedStatus(userName) {
 	try {
 		const blockBtn = document.getElementById('blockUserId');
-		console.log('Block button found:', blockBtn); // Debug log
+		console.log('Block button found:', blockBtn);
 		if (blockBtn) {
 			blockBtn.addEventListener('click', async () => {
 				if (blockBtn.disabled) {
@@ -213,11 +212,10 @@ function changeBlockedStatus(userName) {
 					return;
 				}
 
-				console.log('Block button clicked!'); // Debug log
+				console.log('Block button clicked!'); 
 				const userId = blockBtn.dataset.userId;
-				console.log('User ID:', userId); // Debug log
+				console.log('User ID:', userId); 
 
-				// Disable the button during processing
 				blockBtn.disabled = true;
 				const originalText = blockBtn.textContent;
 				blockBtn.textContent = 'Processing...';
@@ -258,12 +256,6 @@ function changeBlockedStatus(userName) {
 						} catch (chatError) {
 							console.error('Error refreshing chat status:', chatError);
 						}
-
-						// Vérifier le statut côté serveur après un délai pour la cohérence
-						// setTimeout(async () => {
-						// 	console.log('Vérification différée du statut côté serveur...');
-						// 	await getOtherUserInfo(userName);
-						// }, 2000); // 2 secondes de délai
 					} else {
 						blockBtn.disabled = false;
 						blockBtn.textContent = originalText;
@@ -275,7 +267,7 @@ function changeBlockedStatus(userName) {
 				}
 			});
 		} else {
-			console.error('Block button not found!'); // Debug log
+			console.error('Block button not found!');
 		}
 	} catch (error) {
 		console.error('Error in changeBlockedStatus:', error);
