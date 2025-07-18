@@ -182,12 +182,13 @@ async function LaunchGameIntournament(data) {
 
 async function launchTournament(data) {
   const avatarother0 = document.getElementById("avatarother0");
-  const nameAvatarother0 = avatarother0.getAttribute("data-username")
   const avatarother2 = document.getElementById("avatarother2");
-  const nameAvatarother2 = avatarother2.getAttribute("data-username")
   const avatarother4 = document.getElementById("avatarother4");
-  const nameAvatarother4 = avatarother4.getAttribute("data-username")
   const avatarother6 = document.getElementById("avatarother6");
+
+  const nameAvatarother0 = avatarother0.getAttribute("data-username")
+  const nameAvatarother2 = avatarother2.getAttribute("data-username")
+  const nameAvatarother4 = avatarother4.getAttribute("data-username")
   const nameAvatarother6 = avatarother6.getAttribute("data-username")
 
   if (data.match1) {
@@ -345,8 +346,8 @@ export async function affichUserTournament(exit = false) {
                 
                 <h6 class="mb-2">${pl}</h6>
                 <img
-                  alt="Avatar User"
-                  src="/assets/img/default.png"
+                  alt=""
+                  src=""
                   class="rounded-circle img-responsive"
                   width="128"
                   height="128"
@@ -354,6 +355,24 @@ export async function affichUserTournament(exit = false) {
               </button>
         `;
         idplayerInTournament.innerHTML += html;
+        fetchWithRefresh(`user-service/avatarOther/${pl}`, {
+          method: "GET",
+          credentials: 'include',
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("Error retrieving other Avatar");
+          return res.blob();
+        })
+        .then(blob => {
+          const imgUrl = URL.createObjectURL(blob);
+          console.log("avatarother" + (i - 2))
+          const bt = document.getElementById("avatarother" + (i - 2))
+          const img = bt.querySelector('img')
+          img.src = imgUrl
+        })
+        .catch(err => {
+          console.error("Error loading other avatar :", err);
+        });
         if (i == 6) {
           html = `
               <div
@@ -381,11 +400,6 @@ export async function affichUserTournament(exit = false) {
             `;
           idplayerInTournament.innerHTML += html;
         }
-        i += 2;
-      }
-      i = 0;
-      for (const pl of data.players) {
-        await getOtherUserAvatar(pl, i)
         i += 2;
       }
 
