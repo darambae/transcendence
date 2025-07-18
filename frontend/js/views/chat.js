@@ -1071,7 +1071,8 @@ async function switchChatRoom(currentUserId, chatInfo) {
 				'You blocked this user, do you want to unblock him ?'
 			);
 			if (unblockTargetUser) {
-				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, {
+				// Might need await
+				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, { 
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -1665,7 +1666,7 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 			.then((response) =>
 				response.json().then((data) => ({ data, ok: response.ok }))
 			)
-			.then(async ({ data, ok }) => {
+			.then(async ({ data, ok }) => { //Might cause issue
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
 					await loadChatRoomList(currentUserId);

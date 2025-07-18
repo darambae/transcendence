@@ -54,6 +54,7 @@ export async function sendGameCreation() {
 
 	let keepGoing = true;
 	let gameState = document.getElementById('idfooterCanvas');
+	gameState.innerHTML = '';
 	gameState.innerHTML = mulTxt;
 	gameState = document.getElementById('gameid');
 	

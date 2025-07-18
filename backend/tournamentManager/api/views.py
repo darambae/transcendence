@@ -108,9 +108,7 @@ async def launchMatch(request) :
 			}
 		)
 
-		asyncio.sleep(1000)
-
-		asyncio.sleep(5)
+		asyncio.sleep(5) # Might need change
 
 		await channel_layer.group_send(
 			tkey,
@@ -375,8 +373,6 @@ async def Supervise(request) :
 		jwt = jwt[0]['payload']
 		tkey = request.GET.get("tkey")
 		mkey = request.GET.get("key")
-		roundM = request.GET.get("round", 1)
-		# print(f"- {mkey}", file=sys.stderr)
 		roundM = request.GET.get("round", 1)
 
 		await channel_layer.group_send(
