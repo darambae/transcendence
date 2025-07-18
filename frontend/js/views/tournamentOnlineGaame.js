@@ -37,9 +37,9 @@ export async function onlineGameTr(
 				}
 			}
 			if (data.t_state == 'results') {
-				await affichUserTournament()
-				await afficheWinnerTournament(data)
 				console.log("------------------------------->>", data);
+				await affichUserTournament(true)
+				await afficheWinnerTournament(data)
 			}
 		} catch (error) {
 			console.log('Error sseTournament', error);

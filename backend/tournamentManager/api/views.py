@@ -408,3 +408,26 @@ async def amIinTournament(request) :
 @csrf_exempt
 async def getResults(request, tkey) :
 	return JsonResponse({"Info" : "Results", "first" : trnmtDict[tkey].first.username, "second" : trnmtDict[tkey].second.username, "third" : trnmtDict[tkey].third.username, "fourth" : trnmtDict[tkey].fourth.username})
+
+@csrf_exempt
+async def clearGuests(request) :
+	jwt_token = await decodeJWT(request)
+	if not jwt_token[0] :
+		return JsonResponse({"Error" : "Unauthorized"}, status=401)
+	encoded = request.COOKIES.get("access_token", None)
+	try :
+		jwt_token = jwt_token[0]
+		jwt_token = jwt_token["payload"]
+		username = jwt_token["username"]
+	except Exception :
+		return JsonResponse({"Error": "Unauthorized"}, status=401)
+	
+	response = requests.delete("https://access_postgresql:4000/api/guest/", headers={"Authorization" : f"bearer {encoded}", 'Host': 'localhost'}, verify=False)
+	if response.status_code == 200 :
+		res_json = response.json()
+		access = res_json.get("access", "None")
+		refresh = res_json.get("refresh", "None")
+
+		return await setTheCookie(JsonResponse({"Result" : "Guests cleared"}), access, refresh)
+	else :
+		return JsonResponse({"Result" : "No guests to delete"})
