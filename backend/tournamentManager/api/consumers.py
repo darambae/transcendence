@@ -7,7 +7,7 @@ import asyncio
 import requests
 from urllib.parse import parse_qs
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .tournamentStatic import Tournament, Player, trnmtDict, getApiKeyTrnmt, LOCAL, REMOTE, supervise_match, Match, user_ws_connections
+from .tournamentStatic import trnmtDict, REMOTE, supervise_match
 
 async def setResults(trnmt, username, roundMatch, mKey) :
 	if (int(roundMatch) == 1) :

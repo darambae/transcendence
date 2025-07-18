@@ -18,7 +18,6 @@ from django.urls import path
 from api.views import tournamentManager, sse, joinGuest, launchMatch, checkSSE, getIds, Supervise, amIinTournament, launchFinals, getResults, launchNextMatch, clearGuests
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
     path("tournament/tournament", tournamentManager, name="tournamentManager"),
     path("tournament/guest", joinGuest, name="joinGuest"),
     path("tournament/events", sse, name="sse"),

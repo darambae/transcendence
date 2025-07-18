@@ -5,8 +5,6 @@ from django.http import JsonResponse, FileResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.tokens import default_token_generator
-from django.db import transaction
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render
 import sys
@@ -524,7 +522,6 @@ class matchHistory(APIView):
                 },
             )
             res = requests.get('https://access_postgresql:4000/api/DecodeJwt/', headers={"Authorization" : f"bearer {token}", 'Host': 'localhost'}, verify=False)
-            # print(f"Not recognized, codeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee = {res.status_code} Body : {res.text}", file=sys.stderr)
 
             return Response(response.json().get("result"), status=response.status_code)
 

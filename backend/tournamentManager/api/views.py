@@ -1,16 +1,13 @@
 from django.shortcuts import render
-import random
 import sys
 import requests
 from django.http import HttpResponse
 from http import HTTPStatus
 from django.views.decorators.csrf import csrf_exempt
-import uuid
 import ssl
 import websockets
 import asyncio
-import redis
-from .tournamentStatic import Tournament, Player, trnmtDict, user_ws_connections, dictJwt
+from .tournamentStatic import Tournament, Player, trnmtDict, user_ws_connections
 from channels.layers import get_channel_layer
 from django.http import JsonResponse, StreamingHttpResponse
 import json

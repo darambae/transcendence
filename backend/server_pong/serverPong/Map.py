@@ -1,14 +1,11 @@
 import math
-import os
 from .utilsClasses import Vector, Point
 import time
 import numpy as np
 import json
 
 class Map() :
-	''' Permit to create customs map, if we want to do the game customizaion option'''
 	def __init__(self, filePath : str|None = None) :
-		'''If no argument given or if the custom map has an error, it will generate default map'''
 		self.center = Point(500, 300)
 		if (filePath == None):
 			self.walls : list[list[Point]] = [[Point(-5, 0), Point(1005, 0)], [Point(-5, 600), Point(1005, 600)]]

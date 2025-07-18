@@ -216,7 +216,10 @@ async function initGlobalChatNotifications(currentUserId) {
 				const notificationData = JSON.parse(e.data);
 				console.log('Global: Block notification received:', notificationData);
 
-				if (notificationData.target_user_id.toString() === currentUserId.toString()) {
+				if (
+					notificationData.target_user_id.toString() ===
+					currentUserId.toString()
+				) {
 					let message, toastType;
 
 					if (notificationData.action === 'blocked') {
@@ -230,8 +233,14 @@ async function initGlobalChatNotifications(currentUserId) {
 					if (message) {
 						showChatNotification(message, toastType, 8000);
 
-						if (currentTargetId && currentTargetId.toString() === notificationData.actor_id.toString()) {
-							console.log('Block status changed for current chat partner, refreshing chat state');
+						if (
+							currentTargetId &&
+							currentTargetId.toString() ===
+								notificationData.actor_id.toString()
+						) {
+							console.log(
+								'Block status changed for current chat partner, refreshing chat state'
+							);
 							refreshChatAfterBlockStatusChange(notificationData.actor_id);
 						}
 					}
@@ -590,17 +599,17 @@ export function sendMessage(msgInfo) {
 }
 
 function updateGlobalUnreadStatus(hasUnread) {
-    const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
 
-    if (!mainChatToggleButton) return;
+	if (!mainChatToggleButton) return;
 
-    if (hasUnread) {
-        mainChatToggleButton.classList.add('has-unread-overall');
-        console.log('Added unread indicator to chat button');
-    } else {
-        mainChatToggleButton.classList.remove('has-unread-overall');
-        console.log('Removed unread indicator from chat button');
-    }
+	if (hasUnread) {
+		mainChatToggleButton.classList.add('has-unread-overall');
+		console.log('Added unread indicator to chat button');
+	} else {
+		mainChatToggleButton.classList.remove('has-unread-overall');
+		console.log('Removed unread indicator from chat button');
+	}
 }
 
 async function initializeAllChatConnections(currentUserId) {
@@ -628,7 +637,11 @@ async function initializeAllChatConnections(currentUserId) {
 		const data = await response.json();
 
 		if (response.ok && Array.isArray(data.chats)) {
-			console.log('Initializing SSE connections for', data.chats.length, 'chats');
+			console.log(
+				'Initializing SSE connections for',
+				data.chats.length,
+				'chats'
+			);
 			data.chats.forEach((chat) => {
 				// Initialize all SSE connections for all existing chats
 				initEventSource(chat.group_id, currentUserId);
@@ -687,8 +700,18 @@ async function initEventSource(groupId, currentUserId) {
 
 				// Debug: Print messageData content
 				console.log('SSE messageData received:', messageData);
-				console.log('Current user ID:', currentUserId, 'type:', typeof currentUserId);
-				console.log('Message sender ID:', messageData.sender_id, 'type:', typeof messageData.sender_id);
+				console.log(
+					'Current user ID:',
+					currentUserId,
+					'type:',
+					typeof currentUserId
+				);
+				console.log(
+					'Message sender ID:',
+					messageData.sender_id,
+					'type:',
+					typeof messageData.sender_id
+				);
 
 				// Skip if this message is from the current user (we've already displayed it)
 				if (messageData.sender_username != 'server') {
@@ -699,9 +722,11 @@ async function initEventSource(groupId, currentUserId) {
 				}
 
 				// Create a unique identifier that matches the one used in loadMessageHistory
-				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], {
+				const messageTimestamp = new Date(
+					messageData.timestamp
+				).toLocaleTimeString([], {
 					hour: '2-digit',
-					minute: '2-digit'
+					minute: '2-digit',
 				});
 				const messageId = `${messageData.sender_username}-${messageData.content}-${messageTimestamp}`;
 
@@ -719,14 +744,27 @@ async function initEventSource(groupId, currentUserId) {
 					recentlyReceivedMessages.delete(messageId);
 				}, 10000);
 
-
 				const mainChatWindowElement = document.getElementById('mainChatWindow');
-				const isModalClosed = !mainChatWindowElement || !mainChatWindowElement.classList.contains('show');
+				const isModalClosed =
+					!mainChatWindowElement ||
+					!mainChatWindowElement.classList.contains('show');
 
-				console.log('Modal state - isModalClosed:', isModalClosed, 'currentActiveChatGroup:', currentActiveChatGroup, 'messageGroupId:', messageData.group_id);
+				console.log(
+					'Modal state - isModalClosed:',
+					isModalClosed,
+					'currentActiveChatGroup:',
+					currentActiveChatGroup,
+					'messageGroupId:',
+					messageData.group_id
+				);
 
 				if (isModalClosed || messageData.group_id !== currentActiveChatGroup) {
-					console.log('Marking global unread status - modal closed:', isModalClosed, 'different chat:', messageData.group_id !== currentActiveChatGroup);
+					console.log(
+						'Marking global unread status - modal closed:',
+						isModalClosed,
+						'different chat:',
+						messageData.group_id !== currentActiveChatGroup
+					);
 					updateGlobalUnreadStatus(true);
 
 					if (isModalClosed) {
@@ -734,7 +772,13 @@ async function initEventSource(groupId, currentUserId) {
 					}
 				}
 
-				if (!isModalClosed && currentActiveChatGroup && currentActiveChatGroup.group_id && messageData.group_id.toString() === currentActiveChatGroup.group_id.toString()) {
+				if (
+					!isModalClosed &&
+					currentActiveChatGroup &&
+					currentActiveChatGroup.group_id &&
+					messageData.group_id.toString() ===
+						currentActiveChatGroup.group_id.toString()
+				) {
 					const chatLog = document.getElementById('chatLog-active');
 					if (!chatLog) {
 						console.error(`chatLog-active not found for initEventSource.`);
@@ -742,18 +786,31 @@ async function initEventSource(groupId, currentUserId) {
 					}
 
 					// Check if this message already exists in the chat log
-					const existingMessages = Array.from(chatLog.querySelectorAll('.chat-message')).map((msgEl) => {
-						const sender = msgEl.querySelector('.message-sender')?.textContent || '';
+					const existingMessages = Array.from(
+						chatLog.querySelectorAll('.chat-message')
+					).map((msgEl) => {
+						const sender =
+							msgEl.querySelector('.message-sender')?.textContent || '';
 						const content = msgEl.textContent
-							.replace(msgEl.querySelector('.message-sender')?.textContent || '', '')
-							.replace(msgEl.querySelector('.message-timestamp')?.textContent || '', '')
+							.replace(
+								msgEl.querySelector('.message-sender')?.textContent || '',
+								''
+							)
+							.replace(
+								msgEl.querySelector('.message-timestamp')?.textContent || '',
+								''
+							)
 							.trim();
-						const timestamp = msgEl.querySelector('.message-timestamp')?.textContent || '';
+						const timestamp =
+							msgEl.querySelector('.message-timestamp')?.textContent || '';
 						return `${sender}-${content}-${timestamp}`;
 					});
 
 					if (existingMessages.includes(messageId)) {
-						console.log('Message already exists in chat log, skipping:', messageId);
+						console.log(
+							'Message already exists in chat log, skipping:',
+							messageId
+						);
 						return;
 					}
 
@@ -768,7 +825,12 @@ async function initEventSource(groupId, currentUserId) {
 				} else {
 					// *** Le message est pour un autre chat non actif, déclenchez une notification ! ***
 					console.log('❌ Message NOT for active chat group');
-					console.log('Message group_id:', messageData.group_id, 'Active group id:', currentActiveChatGroup?.group_id);
+					console.log(
+						'Message group_id:',
+						messageData.group_id,
+						'Active group id:',
+						currentActiveChatGroup?.group_id
+					);
 					console.log(
 						`New message in inactive chat group ${messageData.group_id}: ${messageData.content}`
 					);
@@ -819,7 +881,10 @@ async function initEventSource(groupId, currentUserId) {
 
 			// Only attempt reconnect if currentActiveChatGroup is still this groupId
 			// and the connection wasn't intentionally closed
-			if (currentActiveChatGroup && currentActiveChatGroup.group_id === groupId) {
+			if (
+				currentActiveChatGroup &&
+				currentActiveChatGroup.group_id === groupId
+			) {
 				console.log('Refreshing token and reconnecting SSE...');
 				await new Promise((resolve) => setTimeout(resolve, 3000));
 				setTimeout(() => initEventSource(groupId, currentUserId), 3000); // Attempt reconnect after 3 seconds
@@ -987,8 +1052,9 @@ async function switchChatRoom(currentUserId, chatInfo) {
 		`Switched to chat room: ${chatInfo.group_id} (type: ${chatInfo.chat_type})`
 	);
 
-
-	const hasOtherUnreadChats = document.querySelector('#chatRoomList .has-unread-messages');
+	const hasOtherUnreadChats = document.querySelector(
+		'#chatRoomList .has-unread-messages'
+	);
 	if (!hasOtherUnreadChats) {
 		console.log('No more unread chats, removing global unread status');
 		updateGlobalUnreadStatus(false);
@@ -1598,14 +1664,16 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 			return;
 		}
 
-	// Check if chat with this user already exists in the list
-	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
-	let existinggroupId = null;
-	chatRooms.forEach((room) => {
-		if (room.dataset.targetUserId === chatInfo.target_id) {
-			existinggroupId = room.dataset.groupId;
-		}
-	});
+		// Check if chat with this user already exists in the list
+		const chatRooms = document.querySelectorAll(
+			'#chatRoomList .list-group-item'
+		);
+		let existinggroupId = null;
+		chatRooms.forEach((room) => {
+			if (room.dataset.targetUserId === chatInfo.target_id) {
+				existinggroupId = room.dataset.groupId;
+			}
+		});
 
 		if (existinggroupId) {
 			console.log(
@@ -1666,7 +1734,8 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 			.then((response) =>
 				response.json().then((data) => ({ data, ok: response.ok }))
 			)
-			.then(async ({ data, ok }) => { //Might cause issue
+			.then(async ({ data, ok }) => {
+				//Might cause issue
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
 					await loadChatRoomList(currentUserId);

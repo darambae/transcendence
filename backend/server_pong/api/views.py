@@ -1,9 +1,8 @@
-from django.shortcuts import render
+
 from django.http import HttpResponse
 from django.core.cache import cache
 from django.http import JsonResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import sys
 import ssl
 import uuid
 import websockets
