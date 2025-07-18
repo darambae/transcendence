@@ -47,51 +47,6 @@ function fillCircle(ctx, x, y, r) {
 	ctx.closePath();
 }
 
-// export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
-// 	const canvas = document.getElementById('gameCanvas');
-// 	const ctx = canvas.getContext('2d');
-
-// 	const fieldWidth = 1000;
-// 	const fieldHeight = 600;
-// 	const offsetX = (canvas.width - fieldWidth) / 2;
-// 	const offsetY = (canvas.height - fieldHeight) / 2;
-
-// 	// Clear canvas
-// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-// 	// Draw field background
-// 	ctx.fillStyle = '#000000';
-// 	ctx.fillRect(offsetX, offsetY, fieldWidth, fieldHeight);
-
-// 	// Draw center line
-// 	ctx.strokeStyle = '#ffffff';
-// 	ctx.lineWidth = 5;
-// 	ctx.setLineDash([20, 15]);
-// 	ctx.beginPath();
-// 	ctx.moveTo(offsetX + fieldWidth / 2, offsetY);
-// 	ctx.lineTo(offsetX + fieldWidth / 2, offsetY + fieldHeight);
-// 	ctx.stroke();
-// 	ctx.setLineDash([]);
-
-// 	// Draw field borders
-// 	ctx.strokeStyle = '#ffffff';
-// 	ctx.lineWidth = 5;
-// 	ctx.strokeRect(offsetX, offsetY, fieldWidth, fieldHeight);
-
-// 	// Draw paddles
-// 	ctx.fillStyle = '#ffffff';
-// 	if (Racket1Pos) {
-// 		roundRect(ctx, offsetX + Racket1Pos.x, offsetY + Racket1Pos.y, 20, 100, 10);
-// 	}
-// 	if (Racket2Pos) {
-// 		roundRect(ctx, offsetX + Racket2Pos.x, offsetY + Racket2Pos.y, 20, 100, 10);
-// 	}
-
-// 	// Draw ball
-// 	if (ballPos) {
-// 		fillCircle(ctx, offsetX + ballPos.x, offsetY + ballPos.y, 10);
-// 	}
-// }
 export function drawMap(ballPos, Racket1Pos, Racket2Pos) {
 	const canvas = document.getElementById('gameCanvas');
 	const ctx = canvas.getContext('2d');

@@ -5,7 +5,6 @@ import {
 	setApiKeyWebSP,
 } from './gameApi.js';
 import { drawMap } from './gameCanvas.js';
-import { drawCenterText } from './multiplayer.js';
 
 // Global variables to track the game interval, event handlers, SSE connection, and game state
 let gameInterval = null;
@@ -114,7 +113,6 @@ export function guideTouch() {
 }
 
 export function checkwin() {
-	// If game has already ended, don't check again
 	if (gameEnded) {
 		return;
 	}
@@ -132,11 +130,11 @@ export function checkwin() {
 		!player1Name ||
 		!player2Name
 	) {
-		return; // Exit early if any required elements don't exist
+		return;
 	}
 
 	if (player2Score.getAttribute('data-score') == 5) {
-		gameEnded = true; // Mark game as ended
+		gameEnded = true;
 		console.log('Game ended - Player 2 wins');
 		player1Score.style.setProperty('--score-color', 'red');
 		player1Name.style.color = 'red';
@@ -146,7 +144,7 @@ export function checkwin() {
 			replaySinglePlayer.style.display = 'block';
 		}
 	} else if (player1Score.getAttribute('data-score') == 5) {
-		gameEnded = true; // Mark game as ended
+		gameEnded = true;
 		console.log('Game ended - Player 1 wins');
 		player2Score.style.setProperty('--score-color', 'red');
 		player2Name.style.color = 'red';
@@ -163,11 +161,11 @@ export async function localGameController(id1, id2) {
 	drawCenterTextP();
 
 	let key_game = getPlayersLocalName();
-	currentApiKey = key_game; // Store globally
-	currentPostUrl = `/server-pong/send-message`; // Store globally
+	currentApiKey = key_game;
+	currentPostUrl = `/server-pong/send-message`;
 
-	gameStarted = false; // Reset global game state
-	gameEnded = false; // Reset game ended state
+	gameStarted = false;
+	gameEnded = false;
 	let game_stats;
 	const csrf = getCookie('csrftoken');
 	let username;
@@ -178,7 +176,6 @@ export async function localGameController(id1, id2) {
 	document.addEventListener('keydown', keydownHandler);
 	document.addEventListener('keyup', keyupHandler);
 
-	// ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	let score1 = document.getElementById('player1score');
 	let score2 = document.getElementById('player2score');
@@ -199,9 +196,7 @@ export async function localGameController(id1, id2) {
 		username = data.username || 'anonymous';
 	} catch (error) {
 		console.error('Request error:', error);
-		// Set default values to prevent undefined issues
 		username = 'anonymous';
-		// Could set default values for a, b, c if needed
 	}
 	console.log('results: ', username, a, b, c);
 	console.log(typeof(id1));
@@ -261,7 +256,6 @@ export async function localGameController(id1, id2) {
 			let sc1 = document.getElementById('player1score');
 			let sc2 = document.getElementById('player2score');
 
-			//console.log(data);
 			game_stats = data['game_stats'];
 			if (game_stats['State'] != 'Waiting for start') {
 				if (gameStarted == false) {
@@ -284,12 +278,12 @@ export async function localGameController(id1, id2) {
 				}
 			}
 		} catch (error) {
-			// console.log("ParsingError: ", error)
+			console.log("ParsingError: ", error)
 		}
 	};
 
 	const SSEStream = new EventSource(url_sse);
-	sseConnection = SSEStream; // Store reference for cleanup
+	sseConnection = SSEStream;
 	SSEStream.onmessage = handleSSEMessage;
 
 	// Add error handling for SSE connection
@@ -308,7 +302,6 @@ export async function localGameController(id1, id2) {
 	});
 
 	window.onbeforeunload = function (event) {
-		// console.log("Détection du rechargement ou fermeture de la page");
 		if (sseConnection && sseConnection.readyState !== EventSource.CLOSED) {
 			console.log('SSE connection will be closed on page unload');
 			sseConnection.close();
@@ -332,7 +325,6 @@ export async function localGameController(id1, id2) {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
-			//console.log('Local game keydown handler activated for key:', key);
 			event.preventDefault();
 			keysPressed.add(key);
 		}
@@ -342,19 +334,16 @@ export async function localGameController(id1, id2) {
 		const key = event.key;
 		const keysToPrevent = ['ArrowUp', 'ArrowDown', 'e', 'd', 'l', 'p', 'q'];
 		if (keysToPrevent.includes(key)) {
-			//console.log('Local game keyup handler activated for key:', key);
 		}
 		keysPressed.delete(event.key);
 	};
 
-	// Add event listeners
 	document.addEventListener('keydown', keydownHandler);
 	document.addEventListener('keyup', keyupHandler);
 
 	// Add replay button functionality
 	const replayButton = document.getElementById('replaySinglePlayer');
 	if (replayButton) {
-		// Remove any existing replay handler
 		if (replayHandler) {
 			replayButton.removeEventListener('click', replayHandler);
 		}
@@ -364,7 +353,7 @@ export async function localGameController(id1, id2) {
 
 			// Reset game state
 			gameStarted = false;
-			gameEnded = false; // Reset game ended state
+			gameEnded = false;
 
 			// Reset scores
 			const player1Score = document.getElementById('player1score');
@@ -373,18 +362,15 @@ export async function localGameController(id1, id2) {
 			const player2Name = document.getElementById('player2Username');
 
 			if (player1Score && player2Score && player1Name && player2Name) {
-				// Reset scores to 0
 				player1Score.setAttribute('data-score', '0');
 				player2Score.setAttribute('data-score', '0');
 
-				// Reset colors to default
 				player1Score.style.removeProperty('--score-color');
 				player2Score.style.removeProperty('--score-color');
 				player1Name.style.color = '';
 				player2Name.style.color = '';
 			}
 
-			// Hide the replay button
 			replayButton.style.display = 'none';
 
 			// Clear and redraw the canvas
@@ -399,7 +385,6 @@ export async function localGameController(id1, id2) {
 
 			// Generate a new API key for the new game
 			try {
-				// First, get a new API key from the backend
 				const response = await fetchWithRefresh('/server-pong/api-key', {
 					headers: { 'X-CSRFToken': csrf },
 					credentials: 'include',
@@ -409,10 +394,8 @@ export async function localGameController(id1, id2) {
 				const data = await response.json();
 				const newApiKey = data.api_key;
 
-				// Register the new API key with the backend for single player
 				await setApiKeyWebSP(newApiKey);
 
-				// Set the new API key in our global state
 				setPlayersLocalName(newApiKey);
 				currentApiKey = newApiKey;
 				console.log(
@@ -455,7 +438,6 @@ export async function localGameController(id1, id2) {
 				console.error('Error setting up replay:', error);
 			}
 
-			// Don't auto-start the game, let the player press 'P'
 			console.log('Game reset. Press P to start playing.');
 		};
 
@@ -496,7 +478,6 @@ export async function localGameController(id1, id2) {
 					}
 					break;
 				case 'q':
-					// console.log("Started : ", gameStarted);
 					if (gameStarted == true) {
 						await fetchWithRefresh(
 							`/server-pong/forfait-game?apikey=${currentApiKey}&idplayer=${1}`,
@@ -514,13 +495,7 @@ export async function localGameController(id1, id2) {
 					// console.log("Started : ", gameStarted);
 					if (gameStarted == true) {
 						await fetchWithRefresh(
-							`/server-pong/forfait-game?apikey=${currentApiKey}&idplayer=${2}`,
-							{
-								// headers: {
-								// 	Authorization: `bearer ${sessionStorage.getItem(
-								// 		'accessToken'
-								// 	)}`,
-								// },
+							`/server-pong/forfait-game?apikey=${currentApiKey}&idplayer=${2}`, {
 								credentials: 'include',
 							}
 						);
@@ -578,16 +553,13 @@ export async function localGameController(id1, id2) {
 		}
 	});
 
-	// Add cleanup listeners for page unload/refresh
 	window.addEventListener('beforeunload', cleanupLocalGame);
 	window.addEventListener('hashchange', cleanupLocalGame);
 }
 
-// Cleanup function to clear intervals and prevent memory leaks
 export function cleanupLocalGame() {
 	console.log('cleanupLocalGame() called');
 
-	// Reset game state
 	gameStarted = false;
 	gameEnded = false;
 	currentApiKey = null;
@@ -628,7 +600,6 @@ export function cleanupLocalGame() {
 		console.log('Replay listener removed');
 	}
 
-	// Remove event listeners to prevent memory leaks
 	window.removeEventListener('beforeunload', cleanupLocalGame);
 	window.removeEventListener('hashchange', cleanupLocalGame);
 }

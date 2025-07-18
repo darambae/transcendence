@@ -54,7 +54,6 @@ export function setupDoubleAuthHandler(mail, username) {
 			const responseData = await response.json();
 
 			if (response.ok) {
-				// Reset authentication cache immediately after successful login
 				resetAuthCache();
 
 				closeModal();

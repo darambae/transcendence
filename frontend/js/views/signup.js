@@ -45,7 +45,7 @@ export async function handleSignupSubmit(event) {
 		if (response.ok) {
 			console.log('signin form successfully submitted');
 			await actualizeIndexPage('main-content', routes.signupSuccess);
-			history.replaceState(null, '', '/'); // clean URL
+			history.replaceState(null, '', '/');
 			const mailDiv = document.querySelector('.signup-success .user-mail');
 			const mail = cleanData.mail;
 			if (mailDiv) {
@@ -81,7 +81,6 @@ export async function handleSignupSubmit(event) {
 
 			setTimeout(() => {
 				errorDiv.textContent = '';
-				//element.style.display = 'none';
 				errorDiv.classList.remove('shake');
 			}, 5000);
 		}
@@ -124,7 +123,6 @@ export function signupController() {
         }
 	}
 
-	// Utility function to display validation errors with animation
 	function displayErrors(element, messages) {
 		console.log('Validation errors:', messages);
 		if (!element) return;
@@ -132,11 +130,10 @@ export function signupController() {
 		element.textContent = messages.join('\n');
 		element.style.display = 'block';
 		element.classList.remove('shake');
-		void element.offsetWidth; // Force reflow
+		void element.offsetWidth;
 		element.classList.add('shake');
 	}
 
-	// Utility function to validate input length with a maximum of 15 characters
 	function validateMaxLength(inputElement, maxLength, fieldName) {
 		if (!inputElement) return;
 

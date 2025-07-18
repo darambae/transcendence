@@ -4,14 +4,13 @@ import { setApiKeyWeb } from './gameApi.js';
 export async function sendGameJoining() {
 	const mul = await fetch('./templates/matchJoining.html');
 	const mulTxt = await mul.text();
-	// // console.log(mulTxt)
 	let gameState = document.getElementById('idfooterCanvas');
 	gameState.innerHTML = mulTxt;
 
 	let btnJoin = document.getElementById('getTextBtn');
 	let txtApiKey;
 	let isGamePlayable;
-	let isJoining = false; // Prevent multiple simultaneous join attempts
+	let isJoining = false;
 
 	btnJoin.addEventListener('click', async (event) => {
 		if (isJoining) {
@@ -38,12 +37,9 @@ export async function sendGameJoining() {
 				btnJoin.textContent = 'Starting Game...';
 				return handleGame2Players(txtApiKey, 2, 0, -1);
 			} else if (isGamePlayable === 'Need more player') {
-				// Player registered successfully, now wait for game to be ready
 				btnJoin.textContent = 'Waiting for Host...';
-				// Directly call handleGame2Players which will wait for the game to be ready
 				return handleGame2Players(txtApiKey, 2, 0, -1);
 			} else {
-				// Handle other error cases
 				alert(`Unable to join game: ${isGamePlayable}`);
 			}
 		} catch (error) {
@@ -52,7 +48,6 @@ export async function sendGameJoining() {
 				'Error joining game. Please check the invitation code and try again.'
 			);
 		} finally {
-			// Only reset if we're not proceeding to the game
 			if (
 				isGamePlayable !== 'Game can start' &&
 				isGamePlayable !== 'Need more player'

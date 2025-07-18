@@ -89,7 +89,6 @@ export async function handleInvitSubmit(event) {
 		console.log('response data: ', data);
 		if (response.ok) {
 			try {
-				// Reset authentication cache immediately after successful guest login
 				resetAuthCache();
 
 				await double_authenticate(dataForm);
@@ -108,7 +107,6 @@ export async function handleInvitSubmit(event) {
 			}
 		} else {
 			console.log("Couldn't connect");
-			//Error handling (wrong password, mail address not known, etc...)
 			const errorDiv = document.querySelector('.login-form .error-msg');
 			const errorMsg = data.error;
 			if (errorMsg) {

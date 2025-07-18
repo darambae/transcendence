@@ -3,7 +3,6 @@ import { setCanvasAndContext } from './gameCanvas.js';
 import { sendGameCreation, cleanupGameCreation } from './gameCreation.js';
 import { sendGameJoining } from './gameJoining.js';
 
-// Global variables to track multiplayer game state and event handlers
 let multiplayerGameActive = false;
 let createButtonHandler = null;
 let joinButtonHandler = null;
@@ -68,7 +67,6 @@ export function multiplayerController() {
 		} catch (error) {
 			console.error('Error creating game:', error);
 			multiplayerGameActive = false;
-			// Re-enable buttons on error
 			if (createButton) createButton.disabled = false;
 			if (joinButton) joinButton.disabled = false;
 		}
@@ -84,7 +82,6 @@ export function multiplayerController() {
 		multiplayerGameActive = true;
 		console.log('Joining multiplayer game...');
 
-		// Disable buttons during game setup
 		if (createButton) createButton.disabled = true;
 		if (joinButton) joinButton.disabled = true;
 
@@ -93,13 +90,11 @@ export function multiplayerController() {
 		} catch (error) {
 			console.error('Error joining game:', error);
 			multiplayerGameActive = false;
-			// Re-enable buttons on error
 			if (createButton) createButton.disabled = false;
 			if (joinButton) joinButton.disabled = false;
 		}
 	};
 
-	// Add event listeners
 	if (createButton) {
 		createButton.addEventListener('click', createButtonHandler);
 	} else {
@@ -112,7 +107,6 @@ export function multiplayerController() {
 		console.warn('Join game button not found');
 	}
 
-	// Add cleanup listeners for page unload/refresh
 	const cleanupAllMultiplayerOperations = () => {
 		cleanupMultiplayerGame();
 		cleanupGameCreation();
