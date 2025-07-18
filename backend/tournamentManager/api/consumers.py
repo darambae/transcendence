@@ -207,6 +207,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				if (self.name == elem["username"] or self.name in elem["invites"]) :
 					self.guests = elem["invites"]
 		elif action == "ShowResults" :
+			await asyncio.sleep(2)
 			dicoInfo = {
 				"t_state" : "results",
 				"tkey" : self.room_group_name,
@@ -283,6 +284,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		await self.send(text_data=json.dumps({"t_state" : "Someone-joined-left"}))
 
 	async def sendReload(self, event) :
+		print("sendReload", file=sys.stderr)
 		await self.send(text_data=json.dumps({"t_state" : "Back-to-main"}))
 
 	
