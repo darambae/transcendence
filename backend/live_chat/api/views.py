@@ -1,4 +1,3 @@
-# live_chat/views.py
 
 import json
 from django.http import JsonResponse, StreamingHttpResponse
@@ -22,14 +21,10 @@ ACCESS_PG_BASE_URL = "https://access_postgresql:4000"
 class ChatGroupListCreateView(View):
     @method_decorator(csrf_exempt)
     def get(self, request, *args, **kwargs):
-        """
-        Lists chat groups for the logged-in user by proxying to access_postgresql.
-        Expects Authorization header for user identification to be passed along.
-        """
+
         access_token = request.COOKIES.get('access_token')
         if not access_token:
             return JsonResponse({'status': 'error', 'message': 'No access token'}, status=401)
-        # Forward the access token in the request headers to access_postgresql
         headers = {'Content-Type': 'application/json', 'Host': 'localhost','Authorization': f'Bearer {access_token}'}
         url = f"{ACCESS_PG_BASE_URL}/api/chat/"
         try:
@@ -45,16 +40,11 @@ class ChatGroupListCreateView(View):
 
     @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
-        """
-        Creates or retrieves a private chat group by proxying to access_postgresql.
-        Expects 'current_username' and 'target_username' in the JSON body.
-        """
         try:
             data = json.loads(request.body)
             target_id = data.get('target_id')
             if not target_id:
                 return JsonResponse({'status': 'error', 'message': 'target_id is required.'}, status=400)
-            # Get current user from the authenticated request
             logger.info(f"Creating private or tournament chat with target {target_id}")
             access_token = request.COOKIES.get('access_token')
             if not access_token:
@@ -67,13 +57,10 @@ class ChatGroupListCreateView(View):
                     'chat_type': data.get('chat_type')
                 }, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
-                # Envoyer une notification au destinataire du nouveau chat privé
                 response_data = resp.json()
                 if response_data.get('status') == 'success':
-                    # Récupérer les informations de l'utilisateur créateur pour la notification
                     channel_layer = get_channel_layer()
                     if channel_layer:
-                        # Notification pour le destinataire
                         if (data.get('chat_type') == 'private'):
                             notification_group_name = f"notifications_{target_id}"
                             async_to_sync(channel_layer.group_send)(
@@ -125,11 +112,6 @@ class ChatGroupListCreateView(View):
             return JsonResponse({'status': 'error', 'message': f'Internal server error: {e}'}, status=500)
 
 class ChatMessageView(View):
-    """
-    Handles fetching message history for a specific chat group by proxying to access_postgresql.
-    Maps to: path('chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message')
-    Communicates with access_postgresql's /api/chat/<int:group_id>/messages/ endpoint (GET).
-    """
     @method_decorator(csrf_exempt)
     def get(self, request, group_id):
         offset = request.GET.get('offset', 0)
@@ -150,12 +132,6 @@ class ChatMessageView(View):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': 'Internal server error during message history retrieval.'}, status=500)
 
-
-    """
-    Handles sending a message to a specific chat group by proxying to access_postgresql.
-    Maps to: path('chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message')
-    Communicates with access_postgresql's /api/chat/<int:group_id>/messages/ endpoint (POST).
-    """
     @method_decorator(csrf_exempt)
     def post(self, request, group_id):
         try:
@@ -187,7 +163,6 @@ class ChatMessageView(View):
                 resp.raise_for_status()
                 pg_response_data = resp.json()
 
-                # After successfully sending to access_postgresql, forward the message via Channels
                 if pg_response_data.get('status') == 'success' and 'message_data' in pg_response_data:
                     message_data_for_channels = pg_response_data['message_data']
                 else:
@@ -204,9 +179,7 @@ class ChatMessageView(View):
                 group_data = pg_response_data.get('group', {})
                 private = group_data.get('private')
 
-                # Si c'est un chat de tournoi, ajouter les informations supplémentaires
                 channel_group_name = f"chat_{group_id}"
-                # Use sync_to_async for group_send in a sync view
                 async_to_sync(channel_layer.group_send)(
                     channel_group_name,
                     {
@@ -233,18 +206,15 @@ async def sse_notification_stream(request, currentUserId):
     return response
 
 async def _generate_notification_events(request, user_id):
-    """Internal generator for notification SSE events."""
     channel_layer = get_channel_layer()
     if channel_layer is None:
         yield f"event: error\ndata: {json.dumps({'message': 'Channel layer not configured'})}\n\n"
         return
 
-    # Channel group name pour les notifications utilisateur spécifique
     channel_group_name = f"notifications_{user_id}"
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
 
-    # --- SSE Token Authentication ---
     try:
         access_token = request.COOKIES.get('access_token')
         token_data = jwt.decode(access_token, algorithms=["HS256"], options={"verify_signature": False})
@@ -257,7 +227,6 @@ async def _generate_notification_events(request, user_id):
     except Exception as e:
         logger.error(f"Error checking token expiration: {e}")
 
-    # Validate token
     try:
         async with httpx.AsyncClient(verify=False) as client:
             resp = await client.get(
@@ -310,10 +279,6 @@ async def _generate_notification_events(request, user_id):
         await channel_layer.group_discard(channel_group_name, client_channel_name)
 
 async def sse_chat_stream(request, group_id):
-    """
-    Server-Sent Events stream for real-time chat messages.
-    """
-    # Create a response object first
     response = StreamingHttpResponse(_generate_events(request, group_id),
                                     content_type="text/event-stream")
     response['Cache-Control'] = 'no-cache'
@@ -325,15 +290,13 @@ async def _generate_events(request, group_id):
     channel_layer = get_channel_layer()
     if channel_layer is None:
         yield f"event: error\ndata: {json.dumps({'message': 'Channel layer not configured'})}\n\n"
-        return  # Empty return to stop the generator
+        return 
 
     channel_group_name = f"chat_{group_id}"
     client_channel_name = await channel_layer.new_channel()
     await channel_layer.group_add(channel_group_name, client_channel_name)
 
-    # --- SSE Token Authentication ---
     try:
-        # Your token expiration check code
         access_token = request.COOKIES.get('access_token')
 
         token_data = jwt.decode(access_token, algorithms=["HS256"], options={"verify_signature": False})
@@ -346,7 +309,6 @@ async def _generate_events(request, group_id):
     except Exception as e:
         logger.error(f"Error checking token expiration: {e}")
 
-    # Validate token
     try:
         async with httpx.AsyncClient(verify=False) as client:
             resp = await client.get(
@@ -426,10 +388,8 @@ class blockedStatus(View):
                 resp = requests.post(url, json={}, headers=headers, timeout=10, verify=False)
                 resp.raise_for_status()
 
-                # Envoyer une notification au destinataire du changement de statut de blocage
                 response_data = resp.json()
                 if response_data.get('status') == 'success':
-                    # Envoyer la notification au destinataire
                     channel_layer = get_channel_layer()
                     if channel_layer:
                         notification_group_name = f"notifications_{targetUserId}"
@@ -438,7 +398,7 @@ class blockedStatus(View):
                             {
                                 "type": "block_notification",
                                 "notification": {
-                                    "action": response_data.get('action'),  # 'blocked' ou 'unblocked'
+                                    "action": response_data.get('action'),
                                     "target_user_id": targetUserId,
                                     "target_name": response_data.get('target_name'),
                                     "actor_id": response_data.get('actor_id'),

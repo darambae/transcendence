@@ -21,13 +21,10 @@ from api.views import DecodeJwt, addResultGames, keyGame, InfoUser, declineInvit
 from api.views import uploadImgAvatar, uploadPrivateInfoUser, uploadProfile, uploadNewPassword, refreshAccessToken, DeleteGuest
 from api.views import infoOtherUser, searchUsers, listennerFriends, addFriend, deleteFriends
 from api.views import ChatGroupListCreateView, ChatMessageView, blockedStatus
-#, ChatMessageHistoryView, ChatMessageSendView
 from api.views import matchHistory
-from rest_framework_simplejwt.views import (TokenRefreshView)
 
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
 	path('api/signup/', api_signup.as_view(), name='api_signup'),
 	path('api/info_link/', info_link.as_view(), name='info_link'),
 	path('api/activate_account/', activate_account.as_view(), name='activate_account'),
@@ -55,9 +52,7 @@ urlpatterns = [
 	path('api/matchHistory/', matchHistory.as_view(), name='matchHistory'),
 	path('api/logout/', logout.as_view(), name='logout'),
 	path('api/forgotPassword/', forgotPassword.as_view(), name='forgotPassword'),
-    #### Live Chat API URLs
     path('api/chat/', ChatGroupListCreateView.as_view(), name='chatgroup_list_create'),  # POST=create, GET=list
     path('api/chat/<int:group_id>/messages/', ChatMessageView.as_view(), name='chat_message'),  # GET=history POST=send message
 	path('api/chat/<int:targetUserId>/blockedStatus/', blockedStatus.as_view(), name='blockedUser'),
-	# path('api/chat/tournament/', tournamentChat.as_view(), name='tournament_chat')  # POST=create tournament chat - COMMENTED OUT: view not implemented
 ]

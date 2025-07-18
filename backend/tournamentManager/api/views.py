@@ -22,7 +22,6 @@ consumerUri = "wss://tournament:8050/ws/game/"
 class HttpResponseNoContent(HttpResponse):
 	status_code = HTTPStatus.NO_CONTENT
 
-# Create your views here.
 
 class TournamentError(Exception) :
 	pass
@@ -60,16 +59,10 @@ async def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 async def decodeJWT(request, func=None, encodedJwt=None) :
-	# with open(f"{func}_decodeJWT.txt", "a+") as f :
-	#     tm = datetime.now()
-	#     # print(f"--------------------------\nBeginning : {tm.hour}:{tm.minute}:{tm.second} ", file=f)
-	# with open(f"{func}_decodeJWT.txt", "a") as f :
 	if not encodedJwt :
 		encodedJwt = request.COOKIES.get("access_token", None)
 	if not encodedJwt :
 		return [None] * 3
-
-	# # print(f"encoded: {encodedJwt}", file=f)
 
 	res = requests.get(f'https://access_postgresql:4000/api/DecodeJwt', headers={"Authorization" : f"bearer {encodedJwt}", 'Host': 'localhost'}, verify=False)
 	res_json = res.json()
@@ -108,7 +101,7 @@ async def launchMatch(request) :
 			}
 		)
 
-		asyncio.sleep(5) # Might need change
+		asyncio.sleep(5)
 
 		await channel_layer.group_send(
 			tkey,

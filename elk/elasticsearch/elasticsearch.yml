@@ -1,64 +1,30 @@
 
-# NOTE: This is a minimal configuration for a single-node development cluster.
-#        For production use, please refer to the Elasticsearch documentation:
-#        https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
-#
-# ---------------------------------- Cluster -----------------------------------
-#
-# Use a descriptive name for your cluster:
-#
+
 cluster.name: "es-docker-cluster"
-#
-# ------------------------------------ Node ------------------------------------
-#
-# Use a descriptive name for the node:
-#
+
 node.name: "es01"
-#
-# Add custom attributes to the node:
-#
-# node.attr.rack: r1
-#
-# ----------------------------------- Paths ------------------------------------
-#
-# Path to the data directory:
-#
+
 path.data: /usr/share/elasticsearch/data
-#
-# Path to log files:
-#
+
 path.logs: /usr/share/elasticsearch/logs
-#
-# ---------------------------------- Network -----------------------------------
-#
-#
-# network.host: elasticsearch
-network.host: 0.0.0.0 # 컨테이너 내부의 모든 인터페이스에 바인딩
-# http.port: 9200
-# transport.port: 9300
+
+network.host: 0.0.0.0
+
 http.port: "9200"
 
 xpack.security.enabled: true
 xpack.security.authc.api_key.enabled: true
 xpack.security.http.ssl.enabled: true
 xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elasticsearch.p12
-# xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elasticsearch.p12
 xpack.security.http.ssl.verification_mode: certificate
 xpack.security.http.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
 
-# Optional: Configure transport layer SSL as well
 xpack.security.transport.ssl.enabled: true
 xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elasticsearch.p12
-# xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elasticsearch.p12 # Add this line
 xpack.security.transport.ssl.verification_mode: certificate
 xpack.security.transport.ssl.certificate_authorities: ["/usr/share/elasticsearch/config/certs/ca/ca.crt"]
-xpack.security.enrollment.enabled: true # for enrollment token
+xpack.security.enrollment.enabled: true 
 
-#
-# Set a custom port for transport (inter-node communication):
-#
 transport.port: 9300
-#
-# Enable or disable transport layer security:
-#
+
 cluster.initial_master_nodes: ["es01"]

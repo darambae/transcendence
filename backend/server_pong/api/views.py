@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.cache import cache
 from django.http import JsonResponse, StreamingHttpResponse
-from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 import sys
 import ssl
@@ -30,8 +29,6 @@ class HttpResponse401(HttpResponse):
 	status_code = 401
 
 
-# apiKey is a string that identifies the game room
-
 class   RequestParsed :
 	def __init__(self, apiKey, action) :
 		if apiKey in apiKeys or apiKey in apiKeysUnplayable :
@@ -40,7 +37,6 @@ class   RequestParsed :
 			self.apiKey = None
 		self.action = action
 
-# Create your views here.
 
 def setTheCookie(response, access=None, refresh=None) :
 	if access :
@@ -60,7 +56,6 @@ def setTheCookie(response, access=None, refresh=None) :
 	return response
 
 def decodeJWT(request, func=None, encodedJwt=None) :
-	# Continue with the JWT decoding logic without file logging
 	if not encodedJwt :
 		encodedJwt = request.COOKIES.get("access_token", None)
 	if not encodedJwt :
@@ -84,7 +79,7 @@ dictActivePlayer = {}
 apiKeysUnplayable = []
 dictApi = {}
 dictApiSp = {}
-dictApiPlayers = {}  # Track players per room: {apikey: [player1_id, player2_id]}
+dictApiPlayers = {}
 apiKeys = []
 
 def getSimulationState(request):
@@ -100,9 +95,6 @@ def getSimulationState(request):
 	else:
 		return JsonResponse({'error': 'Simulation not found'}, status=404)
 
-# Asynchronous generator function('async' + 'yield') to handle WebSocket connections
-# -> When it runs, it produces a value (in this case, a formatted string) and pauses 
-# the function’s execution. The next time the generator is iterated, execution resumes right after the yield.
 async def  checkForUpdates(uriKey, key) :
 	try :
 		ssl_context = ssl.create_default_context()
@@ -190,35 +182,27 @@ def setApiKey(request):
 	if apikey not in apiKeysUnplayable:
 		return JsonResponse({"playable" : f"Room {apikey} doesn't Exists"})
 	
-	# Check if this room already has enough players
 	if apikey in apiKeys:
 		return JsonResponse({"playable": "Game can start"})
 	
-	# Initialize player tracking for this room if not exists
 	if apikey not in dictApiPlayers:
 		dictApiPlayers[apikey] = []
 	
-	# Check if this user is already in the room (prevent duplicate joins)
 	if user_id in dictApiPlayers[apikey]:
-		# User already joined, return current status
 		current_count = len(dictApiPlayers[apikey])
 	else:
-		# Add new player to the room
 		dictApiPlayers[apikey].append(user_id)
 		current_count = len(dictApiPlayers[apikey])
 		
-		# Update dictApi for backward compatibility
 		dictApi[apikey] = current_count
 
 	if current_count >= 2 :
-		# Room is full, move to playable
 		if apikey in apiKeysUnplayable:
 			apiKeysUnplayable.remove(apikey)
 		if apikey not in apiKeys:
 			apiKeys.append(apikey)
 		playable = "Game can start"
 	else:
-		# Waiting for more players
 		playable = "Need more player"
 
 	return JsonResponse({"playable": playable})
@@ -231,13 +215,10 @@ def isGamePlayable(request) :
 	
 	apikey = json.loads(request.body).get('apiKey')
 	
-	# Check if this room is already playable
 	if apikey in apiKeys:
 		return JsonResponse({"playable": "Game can start"})
 	
-	# Use the new player tracking logic
 	if apikey in dictApiPlayers and len(dictApiPlayers[apikey]) >= 2:
-		# Move to playable if not already there
 		if apikey in apiKeysUnplayable:
 			apiKeysUnplayable.remove(apikey)
 		if apikey not in apiKeys:
@@ -253,7 +234,7 @@ def get_api_key(request):
 	JWT = decodeJWT(request, "getApiKey")	
 
 	if not JWT[0] :
-		return HttpResponseNoContent() # Set an error 
+		return HttpResponseNoContent() 
 	api_key = str(uuid.uuid4())
 	apiKeysUnplayable.append(api_key)
 
@@ -268,7 +249,7 @@ async def sendNewJSON(request):
 	message = dictionnaryJson.get("message", {})
 
 	if not api_key:
-		return HttpResponse(status=400)  # apiKey manquant
+		return HttpResponse(status=400)
 
 	m2 = json.loads(message)
 	speed = 15
@@ -326,8 +307,6 @@ async def forfaitUser(request) :
 				dictApiSp.pop(apikey)
 			except KeyError :
 				return HttpResponseNoContent()
-		
-		# Clean up player tracking
 		try:
 			dictApiPlayers.pop(apikey)
 		except KeyError:
@@ -363,7 +342,6 @@ async def disconnectUsr(request) :
 		except KeyError :
 			return
 	
-	# Clean up player tracking
 	try:
 		dictApiPlayers.pop(apikey)
 	except KeyError:

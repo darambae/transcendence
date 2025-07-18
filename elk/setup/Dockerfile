@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     openjdk-17-jdk-headless --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# RUN echo "elasticsearch ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY ssl.conf /usr/share/elasticsearch/config/ssl.conf
 RUN chown elasticsearch:elasticsearch /usr/local/bin/entrypoint.sh

@@ -1,20 +1,11 @@
 from django.core.mail import send_mail, BadHeaderError
-from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
-from django.shortcuts import render
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-import string
-import random
 import requests
-
 import logging
-
-# Create your views here.
 
 logger = logging.getLogger(__name__)
 

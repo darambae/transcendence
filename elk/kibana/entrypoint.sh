@@ -2,7 +2,6 @@
 
 set -e
 
-# Check if environment variables are set
 if [ -z "${KIBANA_PASSWORD}" ]; then
   echo "KIBANA_PASSWORD environment variable is not set."
   exit 1

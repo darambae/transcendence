@@ -610,7 +610,7 @@ class ChatGroupListCreateView(APIView):
 		Creates or retrieves a private chat group between the authenticated user
 		and a target user.
 		"""
-		current_user = request.user  # Authenticated user
+		current_user = request.user
 		data = request.data
 		if data.get('chat_type') == 'tournament':
 			tournament_id = data.get('target_id')

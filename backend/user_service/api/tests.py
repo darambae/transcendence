@@ -1,8 +1,6 @@
 from django.test import TestCase
-from .models import USER
 from unittest.mock import patch
 
-# Signup tests
 class SignupTestCase(TestCase):
     def setUp(self):
         self.valid_user = {

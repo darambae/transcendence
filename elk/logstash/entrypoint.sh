@@ -2,7 +2,6 @@
 set -e
 
 
-# Ensure certs directory and files have correct permissions
 if [ -d "/usr/share/logstash/config/certs" ]; then
     echo "Setting permissions for certs directory..."
     find /usr/share/logstash/config/certs -type d -exec chmod 750 {} \;
@@ -11,7 +10,6 @@ if [ -d "/usr/share/logstash/config/certs" ]; then
     chown -R logstash:logstash /usr/share/logstash/config/certs
 fi
 
-# Check if elasticsearch has fully started
 echo "Waiting for Elasticsearch to start..."
 until curl -s -f -k -u elastic:${ELASTIC_PASSWORD} "https://elasticsearch:9200/_cluster/health?wait_for_status=yellow&timeout=50s" > /dev/null; do
     echo "Elasticsearch is not ready yet. Waiting..."

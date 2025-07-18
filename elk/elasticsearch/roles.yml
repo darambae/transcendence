@@ -1,4 +1,4 @@
-# roles.yml
+
 - name: kibana_system
   cluster:
     - monitor

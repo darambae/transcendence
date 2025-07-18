@@ -1,17 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
-from .utils import generate_otp_send_mail
-from .models import USER
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-import json
 import requests
-import sys
 import os
 from .utils import setTheCookie, decodeJWT
 import random
@@ -175,49 +168,18 @@ class verifyTwofa(APIView): # The initial cookie is set in this view
 					return setTheCookie(JsonResponse({'error': error_detail}, status=response.status_code), 
 									access_token, refresh_token)
 			
-			# Success response
 			return setTheCookie(
 				JsonResponse({'success':'authentication successful, you are connected'}, status=200),
 				access_token, refresh_token)
 				
 		except ValueError:
-			# JSON parsing error
 			return setTheCookie(
 				JsonResponse({'error': 'Invalid response format', 'detail': response.text}, status=500),
 				jwtDecoded[1], jwtDecoded[2])
 		except requests.exceptions.RequestException as e:
-			# Network/connection error
 			return setTheCookie(
 				JsonResponse({'error': f'Connection error: {str(e)}'}, status=500),
 				jwtDecoded[1], jwtDecoded[2])
-		
-		# with open("log-tfa.txt", "a") as f :
-		# 	print(f"response json : {response.data}\nstatusCode : {response.status_code}", file=f)
-		# if response.ok:
-		# 	jwtDecoded[1] = response.json().get("access")
-		# 	jwtDecoded[2] = response.json().get("refresh")
-
-		# data_response = None
-		# try:
-		# 	if not response.ok:
-		# 		error_detail = response.json() if response.content else response.text
-		# 		if response.status_code in [400, 401, 403, 404]:
-		# 			return setTheCookie(JsonResponse({'error': error_detail}, status=400), jwtDecoded[1], jwtDecoded[2])
-		# except ValueError:
-		# 	data_response = {
-		# 		'error': 'Invalid response from mail service',
-		# 		'detail': response.text
-		# 	}
-
-		# if response.status_code == 200:
-		# 	data_response = {
-		# 		'success':'authentication successfull, you are connected',
-		# 	}
-		# else:
-		# 	data_response = {
-		# 		'error':response.text
-		# 	}
-		# return setTheCookie(JsonResponse(data_response, status=response.status_code), jwtDecoded[1], jwtDecoded[2])
 
 
 def activate_account(request, uidb64, token):

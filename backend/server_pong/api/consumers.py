@@ -1,16 +1,12 @@
 import sys
 import json
-import time
 import redis
-import random
 import asyncio
 import requests
 from serverPong.Map import Map
 from urllib.parse import parse_qs
 from django.core.cache import cache
 from serverPong.Racket import dictInfoRackets
-from serverPong.utilsClasses import Point, Vector
-from .tournamentChallenge import dictTournament, Tournament
 from channels.generic.websocket import AsyncWebsocketConsumer
 from serverPong.ball import Movement, BallData, calcIntersections
 
@@ -32,13 +28,12 @@ class GameConsumer(AsyncWebsocketConsumer):
 		params = parse_qs(query_string)
 		self.t2 = None
 
-		# Extraire le paramètre 'room' de la chaîne de requête
 		self.room_group_name = params.get('room', [None])[0]
 		self.usrID = int(params.get('userid', [2])[0])
 
 		self.AI = bool(int(params.get("AI", [False])[0]))
 
-		self.map = Map() #None
+		self.map = Map()
 		self.gameSimulation = Movement(BallData(), self.room_group_name, map=self.map, plnb=2, usrID=self.usrID)
 
 		if not self.room_group_name:

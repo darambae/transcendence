@@ -2,13 +2,8 @@ import math
 
 
 class Vector() :
-	'''Vector classes, permit an easier work on the calc, with overload operator'''
 	def __init__(self, xVector, yVector, norm : float = -1.0, spdMultiplier: int = 0) :
-		''' 
-			Init the values for the vector, there is 2 or 3 args :
-				-> From a float x, and a float y it calculate the norm
-				-> From a float y, y and the norm it will set values
-		'''
+
 		if((isinstance(xVector, float) and isinstance(yVector, float)) or isinstance(xVector, int) and isinstance(yVector, int)) :
 			self.x: float = xVector
 			self.y: float = yVector
@@ -23,18 +18,12 @@ class Vector() :
 		self.addedSpeed = spdMultiplier
 
 	def __str__(self) -> str :
-		'''
-			Return a string interpretation for the vector, for better reading
-		'''
 		return (f"Vector is : ({self.x} {self.y})")
 
 	def __repr__(self) -> str :
-		'''
-			Return a list containing x and y of vector, to better data construction on JSON creations functions.
-		'''
+
 		return (f"[{self.x}, {self.y}]")
 
-	''' Comparisons operator : == and != '''
 	def __eq__(self, other : 'Vector') -> bool :
 		if (isinstance(other, Vector) == False) :
 			return False
@@ -49,15 +38,6 @@ class Vector() :
 			return True
 		return False
 
-	''' Arithmetic operator : 
-			+ -> (1 + 2 = 3)
-			- -> (10 - 2 = 8)
-			* -> (3 * 2 = 6)
-			/ -> (3 / 2 = 1.5)
-			** -> (3 ** 2 = 9)
-			// -> (5 // 3 = 1)
-			% -> (5 % 3 = 2)
-	'''
 	def __add__(self, other : 'Vector') -> 'Vector' :
 		if (isinstance(other, Vector) == False) :
 			return Vector(-1, -1)
@@ -100,15 +80,6 @@ class Vector() :
 		else :
 			return (Vector(self.x ** other.x, self.y ** other.y))
 
-	''' Assignement operators :
-		-=
-		+=
-		*=
-		/=
-		//=
-		%=
-		**=
-	'''
 	def __isub__(self, other : 'Vector') -> None :
 		if (isinstance(other, Vector) == False) :
 			return  
@@ -152,36 +123,23 @@ class Vector() :
 		self.y **= other.y
 	
 	def getNormVector(self) -> 'Vector' :
-		'''
-			Get the norm vector with formule v (a b) | n (-b a)
-		'''
+
 		return Vector(-(self.y), self.x)
 	def toList(self) -> list :
 		return ([self.x, self.y])
 	
 
 class Point() :
-	'''Point classes, permit an easier work on the calc, with overload operator'''
 	def __init__(self, xPoint : float, yPoint : float) :
-		'''
-			init a Point class with x and y
-		'''
 		self.x: float = xPoint
 		self.y: float = yPoint
 
 	def __str__(self) -> str :
-		'''
-			Return a string interpretation for the point, for better reading
-		'''
 		return (f"Point is : ({self.x}, {self.y})")
 
 	def __repr__(self) -> str :
-		'''
-			Return a list containing x and y of point, to better data construction on JSON creations functions.
-		'''
 		return (f"< {self.x}, {self.y} >")
 
-	''' Comparisons operator : == and != '''
 	def __eq__(self, other : 'Point') -> bool :
 		if (isinstance(other, Point) == False) :
 			return False
@@ -196,15 +154,6 @@ class Point() :
 			return True
 		return False
 
-	''' Arithmetic operator : 
-		+ -> (1 + 2 = 3)
-		- -> (10 - 2 = 8)
-		* -> (3 * 2 = 6)
-		/ -> (3 / 2 = 1.5)
-		** -> (3 ** 2 = 9)
-		// -> (5 // 3 = 1)
-		% -> (5 % 3 = 2)
-	'''
 	def __add__(self, other : 'Point') -> 'Point' :
 		if (isinstance(other, Point) == False) :
 			return Point(-1, -1)
@@ -247,15 +196,6 @@ class Point() :
 		else :
 			return (Point(self.x ** other.x, self.y ** other.y))
 
-	''' Assignement operators :
-		-=
-		+=
-		*=
-		/=
-		//=
-		%=
-		**=
-	'''
 	def __isub__(self, other : 'Point') -> None :
 		if (isinstance(other, Point) == False) :
 			return  

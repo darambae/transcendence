@@ -10,7 +10,7 @@ import random
 LOCAL = 1
 REMOTE = 2
 
-trnmtDict = {} # Usage : {str : Tournament}
+trnmtDict = {}
 dictJwt = {}
 
 keygame = "https://server_pong:8030/"
