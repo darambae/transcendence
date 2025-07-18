@@ -146,6 +146,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			self.room_group_name,
 			self.channel_name
 		)
+		print("Disconnection ! ", file=sys.stderr)
 
 
 	async def launchGame(self, match, roundM) :
@@ -217,13 +218,25 @@ class GameConsumer(AsyncWebsocketConsumer):
 			}
 			await self.send(text_data=json.dumps(dicoInfo))
 
-			await asyncio.sleep(5)
+			await asyncio.sleep(3)
 
-			trnmtDict.pop(self.room_group_name)
+			try :
+				trnmtDict.pop(self.room_group_name)
+			except Exception :
+				pass
 
-			await asyncio.sleep(2)
+			await asyncio.sleep(1)
 
+			print("send reload", file=sys.stderr)
 			await self.sendReload(text_data)
+
+			await asyncio.sleep(1)
+
+			print("Disconnect", file=sys.stderr)
+			await self.disconnect(1000)
+
+
+
 
 		elif action == "supervise" and self.name == data.get("player", None):
 			roundMatch = data.get("round", 1)
