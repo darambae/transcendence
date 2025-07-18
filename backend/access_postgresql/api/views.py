@@ -621,7 +621,7 @@ class ChatGroupListCreateView(APIView):
 				}, status=status.HTTP_400_BAD_REQUEST)
 			try:
 				# Create stable group name using IDs instead of usernames
-				chat_name = f"tournament_{tournament_id}"
+				chat_name = f"chat_{tournament_id}"
 				existing_chat = ChatGroup.objects.filter(name=chat_name).first()
 				if existing_chat:
 					logger.info(f"Found existing chat group: {existing_chat.id}")
@@ -638,6 +638,7 @@ class ChatGroupListCreateView(APIView):
 					logger.info(f"Created new tournament chat: {chat_group.id}")
 				return Response({
 					'status': 'success',
+					'current_user_id': current_user.id,
 					'chat_type': 'tournament',
 					'group_id': chat_group.id,
 					'group_name': chat_group.name,
@@ -840,7 +841,7 @@ class ChatMessageView(APIView):
 					message_data["receiver_id"] = receiver_id
 					message_data["receiver_username"] = receiver_username
 			else :
-				channel_group_id = f"tournament_{chat_group.tournament_id}"
+				channel_group_id = f"chat_{chat_group.tournament_id}"
 				message_data = {
 					"id": message.id,
 					"current_user_id": current_user.id,

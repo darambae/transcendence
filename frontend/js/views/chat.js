@@ -1058,7 +1058,6 @@ async function switchChatRoom(currentUserId, chatInfo) {
 	// Load history and initialize SSE for the new group
 	messageOffsets[chatInfo.group_id] = 0; // Reset offset for new room
 	loadMessageHistory(currentUserId, chatInfo.group_id);
-
 	// Handle blocking logic only for private chats
 	if (chatInfo?.chat_type === 'private' && chatInfo.target_id) {
 		const targetbBlockedStatus = await getBlockedStatus(chatInfo.target_id);
@@ -1072,7 +1071,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 			);
 			if (unblockTargetUser) {
 				// Might need await
-				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, { 
+				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -1148,6 +1147,7 @@ async function switchChatRoom(currentUserId, chatInfo) {
 			if (messageInput) {
 				messageInput.focus();
 			}
+			messageInput.placeholder = 'Type your message...';
 		}
 	} else {
 		// For tournament chats, disable messaging (only server can send messages)
@@ -1299,52 +1299,52 @@ function updateMessageInputState(blockStatus, enabled = true) {
 	}
 }
 
-// Function to initialize the chat module
-export async function initChatModule(currentUserId) {
-	// Close any open EventSource connections for the current user
-	for (const key in eventSources) {
-		if (eventSources[key].readyState === EventSource.OPEN) {
-			eventSources[key].close();
-			delete eventSources[key];
-			console.log(`Closed SSE for group: ${key}`);
-		}
-	}
+// // Function to initialize the chat module
+// export async function initChatModule(currentUserId) {
+// 	// Close any open EventSource connections for the current user
+// 	for (const key in eventSources) {
+// 		if (eventSources[key].readyState === EventSource.OPEN) {
+// 			eventSources[key].close();
+// 			delete eventSources[key];
+// 			console.log(`Closed SSE for group: ${key}`);
+// 		}
+// 	}
 
-	// Close global event source
-	if (globalEventSource) {
-		globalEventSource.close();
-		globalEventSource = null;
-		console.log('Closed global chat notifications');
-	}
+// 	// Close global event source
+// 	if (globalEventSource) {
+// 		globalEventSource.close();
+// 		globalEventSource = null;
+// 		console.log('Closed global chat notifications');
+// 	}
 
-	// Reset global state
-	hasOverallUnreadMessages = false;
-	currentActiveChatGroup = null;
-	currentTargetId = null;
-	Object.keys(messageOffsets).forEach((key) => delete messageOffsets[key]);
+// 	// Reset global state
+// 	hasOverallUnreadMessages = false;
+// 	currentActiveChatGroup = null;
+// 	currentTargetId = null;
+// 	Object.keys(messageOffsets).forEach((key) => delete messageOffsets[key]);
 
-	const chatLog = document.getElementById('chatLog-active');
-	if (chatLog) {
-		chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
-	}
+// 	const chatLog = document.getElementById('chatLog-active');
+// 	if (chatLog) {
+// 		chatLog.innerHTML = `<div class="no-chat-selected text-center text-muted py-5"><p>Select a chat from the left, or start a new one above.</p></div>`;
+// 	}
 
-	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
-	if (mainChatToggleButton) {
-		mainChatToggleButton.classList.remove('has-unread-overall');
-	}
+// 	const mainChatToggleButton = document.getElementById('mainChatToggleButton');
+// 	if (mainChatToggleButton) {
+// 		mainChatToggleButton.classList.remove('has-unread-overall');
+// 	}
 
-	// Load chat room list
-	await loadChatRoomList(currentUserId);
+// 	// Load chat room list
+// 	await loadChatRoomList(currentUserId);
 
-	// Setup user search autocomplete
-	setupUserSearchAutocomplete();
+// 	// Setup user search autocomplete
+// 	setupUserSearchAutocomplete();
 
-	// Initialize global notifications
-	if (currentUserId) {
-		initGlobalChatNotifications(currentUserId);
-		await initializeAllChatConnections(currentUserId);
-	}
-}
+// 	// Initialize global notifications
+// 	if (currentUserId) {
+// 		initGlobalChatNotifications(currentUserId);
+// 		await initializeAllChatConnections(currentUserId);
+// 	}
+// }
 
 // Main chat controller function, called after login
 export function chatController(userId, username) {
