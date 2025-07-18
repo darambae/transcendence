@@ -843,6 +843,7 @@ class ChatMessageView(APIView):
 				channel_group_id = f"tournament_{chat_group.tournament_id}"
 				message_data = {
 					"id": message.id,
+					"current_user_id": current_user.id,
 					"tournament_id":chat_group.tournament_id,
 					"sender_username": 'server',
 					"content": content,

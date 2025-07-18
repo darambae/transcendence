@@ -591,9 +591,9 @@ export function sendMessage(msgInfo) {
 
 function updateGlobalUnreadStatus(hasUnread) {
     const mainChatToggleButton = document.getElementById('mainChatToggleButton');
-    
+
     if (!mainChatToggleButton) return;
-    
+
     if (hasUnread) {
         mainChatToggleButton.classList.add('has-unread-overall');
         console.log('Added unread indicator to chat button');
@@ -699,9 +699,9 @@ async function initEventSource(groupId, currentUserId) {
 				}
 
 				// Create a unique identifier that matches the one used in loadMessageHistory
-				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], { 
-					hour: '2-digit', 
-					minute: '2-digit' 
+				const messageTimestamp = new Date(messageData.timestamp).toLocaleTimeString([], {
+					hour: '2-digit',
+					minute: '2-digit'
 				});
 				const messageId = `${messageData.sender_username}-${messageData.content}-${messageTimestamp}`;
 
@@ -722,13 +722,13 @@ async function initEventSource(groupId, currentUserId) {
 
 				const mainChatWindowElement = document.getElementById('mainChatWindow');
 				const isModalClosed = !mainChatWindowElement || !mainChatWindowElement.classList.contains('show');
-				
+
 				console.log('Modal state - isModalClosed:', isModalClosed, 'currentActiveChatGroup:', currentActiveChatGroup, 'messageGroupId:', messageData.group_id);
 
 				if (isModalClosed || messageData.group_id !== currentActiveChatGroup) {
 					console.log('Marking global unread status - modal closed:', isModalClosed, 'different chat:', messageData.group_id !== currentActiveChatGroup);
 					updateGlobalUnreadStatus(true);
-					
+
 					if (isModalClosed) {
 						return;
 					}
@@ -1071,7 +1071,8 @@ async function switchChatRoom(currentUserId, chatInfo) {
 				'You blocked this user, do you want to unblock him ?'
 			);
 			if (unblockTargetUser) {
-				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, {
+				// Might need await
+				fetchWithRefresh(`/chat/${chatInfo.target_id}/blockedStatus/`, { 
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -1372,7 +1373,7 @@ export function chatController(userId, username) {
 
 		mainChatWindowElement.addEventListener('shown.bs.modal', async () => {
 			console.log('Main Chat Window is shown');
-			
+
 			updateGlobalUnreadStatus(false);
 
 			console.log('Logged in user ID:', userId);
@@ -1395,7 +1396,7 @@ export function chatController(userId, username) {
 				const chatInfo = currentActiveChatGroup;
 				await switchChatRoom(userId, chatInfo);
 			}
-			setupUserSearchAutocomplete(); 
+			setupUserSearchAutocomplete();
 
 			// Focus on new chat user ID input initially
 			const targetUserInput = document.getElementById('targetUserInput');
@@ -1601,8 +1602,8 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 	const chatRooms = document.querySelectorAll('#chatRoomList .list-group-item');
 	let existinggroupId = null;
 	chatRooms.forEach((room) => {
-		if (room.dataset.targetUserId === targetUserId) {
-			existinggroupId = room.dataset.groupId; 
+		if (room.dataset.targetUserId === chatInfo.target_id) {
+			existinggroupId = room.dataset.groupId;
 		}
 	});
 
@@ -1665,7 +1666,7 @@ async function promptPrivateChat(currentUserId, chatInfo) {
 			.then((response) =>
 				response.json().then((data) => ({ data, ok: response.ok }))
 			)
-			.then(async ({ data, ok }) => {
+			.then(async ({ data, ok }) => { //Might cause issue
 				if (ok && data.status === 'success' && data.group_id) {
 					console.log(`Chat group ${data.group_id} created/retrieved.`);
 					await loadChatRoomList(currentUserId);

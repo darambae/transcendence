@@ -74,8 +74,8 @@ class ChatGroupListCreateView(View):
                     channel_layer = get_channel_layer()
                     if channel_layer:
                         # Notification pour le destinataire
-                        notification_group_name = f"notifications_{target_id}"
                         if (data.get('chat_type') == 'private'):
+                            notification_group_name = f"notifications_{target_id}"
                             async_to_sync(channel_layer.group_send)(
                                 notification_group_name,
                                 {
@@ -92,6 +92,7 @@ class ChatGroupListCreateView(View):
                                 }
                             )
                         if (data.get('chat_type') == 'tournament'):
+                            notification_group_name = f"notifications_{response_data.get('current_user_id')}"
                             async_to_sync(channel_layer.group_send)(
                                 notification_group_name,
                                 {
@@ -204,12 +205,7 @@ class ChatMessageView(View):
                 private = group_data.get('private')
 
                 # Si c'est un chat de tournoi, ajouter les informations supplémentaires
-                if private:
-                    channel_group_name = f"chat_{group_id}"
-                else :
-                    tournament_id = group_data.get("tournament_id")
-                    channel_group_name = f"tournament_{tournament_id}"
-
+                channel_group_name = f"chat_{group_id}"
                 # Use sync_to_async for group_send in a sync view
                 async_to_sync(channel_layer.group_send)(
                     channel_group_name,
