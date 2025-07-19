@@ -20,6 +20,8 @@ APP_NAME = 'AI_pong'
 CSRF_TRUSTED_ORIGINS = [
     'https://transcendence.42.fr:8443',
 	'https://localhost:8443',
+    'https://10.18.162.0:8443'
+
 ]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

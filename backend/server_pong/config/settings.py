@@ -19,6 +19,7 @@ APP_NAME = 'server-pong'
 CSRF_TRUSTED_ORIGINS = [
     'https://transcendence.42.fr:8443',
 	'https://localhost:8443',
+    'https://10.18.162.0:8443'
 ]
 
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -56,7 +56,10 @@ INSTALLED_APPS = [
     'api',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://10.18.162.0:8443',
+
+]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
